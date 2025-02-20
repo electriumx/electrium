@@ -32,6 +32,55 @@ const products: Product[] = [
     price: 299.99,
     image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=800",
     quantity: 0
+  },
+  {
+    id: 4,
+    name: "Developer Laptop",
+    price: 1599.99,
+    image: "https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&w=800",
+    quantity: 0
+  },
+  {
+    id: 5,
+    name: "Coding Workstation",
+    price: 2499.99,
+    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800",
+    quantity: 0
+  },
+  {
+    id: 6,
+    name: "iMac Pro",
+    price: 1999.99,
+    image: "https://images.unsplash.com/photo-1483058712412-4245e9b90334?auto=format&fit=crop&w=800",
+    quantity: 0
+  },
+  {
+    id: 7,
+    name: "Office Chair",
+    price: 299.99,
+    image: "https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?auto=format&fit=crop&w=800",
+    quantity: 0
+  },
+  {
+    id: 8,
+    name: "Drone Camera",
+    price: 799.99,
+    image: "https://images.unsplash.com/photo-1487887235947-a955ef187fcc?auto=format&fit=crop&w=800",
+    quantity: 0
+  },
+  {
+    id: 9,
+    name: "Landscape Print",
+    price: 99.99,
+    image: "https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=800",
+    quantity: 0
+  },
+  {
+    id: 10,
+    name: "Cat Portrait",
+    price: 149.99,
+    image: "https://images.unsplash.com/photo-1582562124811-c09040d0a901?auto=format&fit=crop&w=800",
+    quantity: 0
   }
 ];
 
@@ -41,7 +90,7 @@ const Index = () => {
   const handleQuantityChange = (id: number, quantity: number) => {
     setCart(prevCart =>
       prevCart.map(item =>
-        item.id === id ? { ...item, quantity } : item
+        item.id === id ? { ...item, quantity: Math.max(0, quantity) } : item
       )
     );
   };

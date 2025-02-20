@@ -12,8 +12,14 @@ const Cart = ({ total, itemCount }: CartProps) => {
   const navigate = useNavigate();
 
   const handleCheckout = () => {
+    const cartData = JSON.parse(localStorage.getItem('cart') || '[]');
+    localStorage.setItem('cart', JSON.stringify(cartData));
     navigate('/checkout');
   };
+
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify([]));
+  }, []);
 
   return (
     <motion.div
