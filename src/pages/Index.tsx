@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import ProductCard from '../components/ProductCard';
 import Cart from '../components/Cart';
@@ -80,6 +79,76 @@ const products: Product[] = [
     name: "Cat Portrait",
     price: 149.99,
     image: "https://images.unsplash.com/photo-1582562124811-c09040d0a901?auto=format&fit=crop&w=800",
+    quantity: 0
+  },
+  {
+    id: 11,
+    name: "Standing Desk",
+    price: 599.99,
+    image: "https://images.unsplash.com/photo-1542372147193-a7aca54189cd?auto=format&fit=crop&w=800",
+    quantity: 0
+  },
+  {
+    id: 12,
+    name: "Mechanical Keyboard",
+    price: 159.99,
+    image: "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?auto=format&fit=crop&w=800",
+    quantity: 0
+  },
+  {
+    id: 13,
+    name: "Ultra Monitor",
+    price: 899.99,
+    image: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=800",
+    quantity: 0
+  },
+  {
+    id: 14,
+    name: "Wireless Mouse",
+    price: 79.99,
+    image: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?auto=format&fit=crop&w=800",
+    quantity: 0
+  },
+  {
+    id: 15,
+    name: "Desk Lamp",
+    price: 49.99,
+    image: "https://images.unsplash.com/photo-1534281670072-4af1d0e48a95?auto=format&fit=crop&w=800",
+    quantity: 0
+  },
+  {
+    id: 16,
+    name: "USB Hub",
+    price: 39.99,
+    image: "https://images.unsplash.com/photo-1625461987981-28866d21ab4e?auto=format&fit=crop&w=800",
+    quantity: 0
+  },
+  {
+    id: 17,
+    name: "Webcam Pro",
+    price: 129.99,
+    image: "https://images.unsplash.com/photo-1587826380700-8085d4e01124?auto=format&fit=crop&w=800",
+    quantity: 0
+  },
+  {
+    id: 18,
+    name: "Desktop Speaker",
+    price: 199.99,
+    image: "https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=800",
+    quantity: 0
+  },
+  {
+    id: 19,
+    name: "External SSD",
+    price: 149.99,
+    image: "https://images.unsplash.com/photo-1581349485608-9469926a8e5e?auto=format&fit=crop&w=800",
+    quantity: 0
+  },
+  {
+    id: 20,
+    name: "Graphics Tablet",
+    price: 249.99,
+    image: "https://images.unsplash.com/photo-1587302912306-cf1ed9c33146?auto=format&fit=crop&w=800",
     quantity: 0
   }
 ];
