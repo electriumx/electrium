@@ -2,17 +2,41 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { addUser } from '../data/users';
+import { useToast } from '@/components/ui/use-toast';
 
 const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // For demo purposes, just navigate to login
-    navigate('/login');
+    
+    // Create new user object
+    const newUser = {
+      username: email.toLowerCase(),
+      password: password,
+      displayName: name
+    };
+
+    // Add user to the database
+    try {
+      addUser(newUser);
+      toast({
+        title: "Registration successful",
+        description: "Your account has been created. Please sign in.",
+      });
+      navigate('/login');
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Registration failed",
+        description: "Please try again with different credentials.",
+      });
+    }
   };
 
   return (

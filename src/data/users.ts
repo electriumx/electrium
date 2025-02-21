@@ -5,7 +5,8 @@ export interface User {
   displayName: string;
 }
 
-export const users: User[] = [
+// Initial users array
+let users: User[] = [
   {
     username: "john_doe",
     password: "password123",
@@ -22,3 +23,23 @@ export const users: User[] = [
     displayName: "Bob Wilson"
   }
 ];
+
+// Function to add a new user
+export const addUser = (newUser: User) => {
+  users = [...users, newUser];
+  // Store in localStorage for persistence
+  localStorage.setItem('users', JSON.stringify(users));
+  return true;
+};
+
+// Function to get all users
+export const getUsers = () => {
+  const storedUsers = localStorage.getItem('users');
+  if (storedUsers) {
+    users = JSON.parse(storedUsers);
+  }
+  return users;
+};
+
+// Export the users array
+export { users };
