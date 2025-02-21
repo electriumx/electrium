@@ -1,7 +1,9 @@
 
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '@/components/ui/use-toast';
 
 interface CartProps {
   total: number;
@@ -10,10 +12,22 @@ interface CartProps {
 
 const Cart = ({ total, itemCount }: CartProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { isAuthenticated } = useAuth();
+  const { toast } = useToast();
 
   const handleCheckout = () => {
+    if (!isAuthenticated) {
+      toast({
+        variant: "destructive",
+        title: "Authentication required",
+        description: "Please sign in to proceed with checkout"
+      });
+      navigate('/login', { state: { from: location } });
+      return;
+    }
+
     const cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
-    // Store the current cart items in localStorage
     localStorage.setItem('cart', JSON.stringify(cartItems));
     navigate('/checkout');
   };
@@ -35,7 +49,7 @@ const Cart = ({ total, itemCount }: CartProps) => {
                  transition-all duration-200 hover:bg-sage-600 disabled:opacity-50 
                  disabled:cursor-not-allowed"
       >
-        Proceed to Checkout
+        {isAuthenticated ? 'Proceed to Checkout' : 'Sign in to Checkout'}
       </button>
     </motion.div>
   );
