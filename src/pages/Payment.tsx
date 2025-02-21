@@ -5,6 +5,11 @@ import { useNavigate } from 'react-router-dom';
 const Payment = () => {
   const navigate = useNavigate();
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    window.location.href = 'https://www.crazygames.com';
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-16 px-4">
       <div className="max-w-md mx-auto">
@@ -15,7 +20,7 @@ const Payment = () => {
         >
           <h1 className="text-3xl font-medium text-gray-900 mb-8">Payment Details</h1>
           
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="cardNumber" className="block text-sm font-medium text-gray-700 mb-1">
                 Card Number
