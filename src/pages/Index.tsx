@@ -157,11 +157,11 @@ const Index = () => {
   const [cart, setCart] = useState<Product[]>(products);
 
   const handleQuantityChange = (id: number, quantity: number) => {
-    setCart(prevCart =>
-      prevCart.map(item =>
-        item.id === id ? { ...item, quantity: Math.max(0, quantity) } : item
-      )
+    const updatedCart = cart.map(item =>
+      item.id === id ? { ...item, quantity: Math.max(0, quantity) } : item
     );
+    setCart(updatedCart);
+    localStorage.setItem('cart', JSON.stringify(updatedCart.filter(item => item.quantity > 0)));
   };
 
   const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
