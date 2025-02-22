@@ -8,6 +8,16 @@ const Payment = () => {
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [itemName, setItemName] = useState('');
   const [serviceDescription, setServiceDescription] = useState('');
+  const [deliveryType, setDeliveryType] = useState('normal');
+  const [deliveryTime, setDeliveryTime] = useState('');
+  const [baseTotal, setBaseTotal] = useState(() => {
+    const cart = localStorage.getItem('cart');
+    if (!cart) return 0;
+    const items = JSON.parse(cart);
+    return items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
+  });
+
+  const total = deliveryType === 'fast' ? baseTotal + 50 : baseTotal;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -115,6 +125,55 @@ const Payment = () => {
               </>
             )}
 
+            {paymentMethod === 'cash' && (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Delivery Type
+                  </label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDeliveryType('normal');
+                        setDeliveryTime('');
+                      }}
+                      className={`p-4 border rounded-lg ${
+                        deliveryType === 'normal' ? 'border-sage-500 bg-sage-50' : 'border-gray-200'
+                      }`}
+                    >
+                      Normal Delivery
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDeliveryType('fast')}
+                      className={`p-4 border rounded-lg ${
+                        deliveryType === 'fast' ? 'border-sage-500 bg-sage-50' : 'border-gray-200'
+                      }`}
+                    >
+                      Fast Delivery (+$50)
+                    </button>
+                  </div>
+                </div>
+
+                {deliveryType === 'fast' && (
+                  <div>
+                    <label htmlFor="deliveryTime" className="block text-sm font-medium text-gray-700 mb-1">
+                      Desired Delivery Time
+                    </label>
+                    <input
+                      type="time"
+                      id="deliveryTime"
+                      required
+                      value={deliveryTime}
+                      onChange={(e) => setDeliveryTime(e.target.value)}
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
             {paymentMethod === 'trade' && (
               <div>
                 <label htmlFor="itemName" className="block text-sm font-medium text-gray-700 mb-1">
@@ -149,20 +208,27 @@ const Payment = () => {
               </div>
             )}
 
-            <div>
-              <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
-                Delivery Address
-              </label>
-              <textarea
-                id="address"
-                required
-                rows={3}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500"
-                placeholder="Enter your delivery address"
-              />
-            </div>
+            {paymentMethod !== 'service' && (
+              <div>
+                <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
+                  Delivery Address
+                </label>
+                <textarea
+                  id="address"
+                  required
+                  rows={3}
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500"
+                  placeholder="Enter your delivery address"
+                />
+              </div>
+            )}
 
             <div className="pt-4">
+              <div className="mb-4 text-right">
+                <span className="text-lg font-medium">
+                  Total: ${total.toFixed(2)}
+                </span>
+              </div>
               <button
                 type="submit"
                 className="w-full bg-sage-500 text-white py-3 px-6 rounded-lg font-medium 
@@ -179,4 +245,3 @@ const Payment = () => {
 };
 
 export default Payment;
-

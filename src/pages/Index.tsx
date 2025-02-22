@@ -1,7 +1,6 @@
-
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom'; // Add this import
+import { useNavigate } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import Cart from '../components/Cart';
 
@@ -339,7 +338,7 @@ const products: Product[] = [
 ];
 
 const Index = () => {
-  const navigate = useNavigate(); // Add this line
+  const navigate = useNavigate();
   const [cart, setCart] = useState<Product[]>(() => {
     const savedCart = localStorage.getItem('cart');
     return savedCart ? JSON.parse(savedCart) : products;
@@ -371,7 +370,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Hero Section */}
-      <div className="relative h-screen bg-[url('/lovable-uploads/ace7647b-121e-4209-841e-ff2ebbb4ca5b.png')] bg-cover bg-center">
+      <div className="relative h-screen bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop')] bg-cover bg-center">
         <div className="absolute inset-0 bg-black/50">
           <div className="container mx-auto px-4 h-full flex flex-col justify-center items-center text-center">
             <motion.h1 
@@ -451,4 +450,3 @@ const Index = () => {
 };
 
 export default Index;
-
