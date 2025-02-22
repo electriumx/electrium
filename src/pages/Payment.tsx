@@ -1,13 +1,18 @@
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
 const Payment = () => {
   const navigate = useNavigate();
+  const [paymentMethod, setPaymentMethod] = useState('card');
+  const [itemName, setItemName] = useState('');
+  const [serviceDescription, setServiceDescription] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    window.location.href = 'https://www.crazygames.com';
+    localStorage.removeItem('cart'); // Clear cart after successful purchase
+    navigate('/thank-you');
   };
 
   return (
@@ -21,53 +26,139 @@ const Payment = () => {
           <h1 className="text-3xl font-medium text-gray-900 mb-8">Payment Details</h1>
           
           <form className="space-y-6" onSubmit={handleSubmit}>
-            <div>
-              <label htmlFor="cardNumber" className="block text-sm font-medium text-gray-700 mb-1">
-                Card Number
+            <div className="space-y-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Select Payment Method
               </label>
-              <input
-                type="text"
-                id="cardNumber"
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500"
-                placeholder="1234 5678 9012 3456"
-              />
+              <div className="grid grid-cols-2 gap-4">
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('card')}
+                  className={`p-4 border rounded-lg ${
+                    paymentMethod === 'card' ? 'border-sage-500 bg-sage-50' : 'border-gray-200'
+                  }`}
+                >
+                  Card
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('cash')}
+                  className={`p-4 border rounded-lg ${
+                    paymentMethod === 'cash' ? 'border-sage-500 bg-sage-50' : 'border-gray-200'
+                  }`}
+                >
+                  Cash
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('trade')}
+                  className={`p-4 border rounded-lg ${
+                    paymentMethod === 'trade' ? 'border-sage-500 bg-sage-50' : 'border-gray-200'
+                  }`}
+                >
+                  Item Trade
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('service')}
+                  className={`p-4 border rounded-lg ${
+                    paymentMethod === 'service' ? 'border-sage-500 bg-sage-50' : 'border-gray-200'
+                  }`}
+                >
+                  Service
+                </button>
+              </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            {paymentMethod === 'card' && (
+              <>
+                <div>
+                  <label htmlFor="cardNumber" className="block text-sm font-medium text-gray-700 mb-1">
+                    Card Number
+                  </label>
+                  <input
+                    type="text"
+                    id="cardNumber"
+                    required
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500"
+                    placeholder="1234 5678 9012 3456"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="expiry" className="block text-sm font-medium text-gray-700 mb-1">
+                      Expiry Date
+                    </label>
+                    <input
+                      type="text"
+                      id="expiry"
+                      required
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500"
+                      placeholder="MM/YY"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label htmlFor="cvv" className="block text-sm font-medium text-gray-700 mb-1">
+                      CVV
+                    </label>
+                    <input
+                      type="text"
+                      id="cvv"
+                      required
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500"
+                      placeholder="123"
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+
+            {paymentMethod === 'trade' && (
               <div>
-                <label htmlFor="expiry" className="block text-sm font-medium text-gray-700 mb-1">
-                  Expiry Date
+                <label htmlFor="itemName" className="block text-sm font-medium text-gray-700 mb-1">
+                  Item Name
                 </label>
                 <input
                   type="text"
-                  id="expiry"
+                  id="itemName"
+                  required
+                  value={itemName}
+                  onChange={(e) => setItemName(e.target.value)}
                   className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500"
-                  placeholder="MM/YY"
+                  placeholder="Enter item name"
                 />
               </div>
-              
+            )}
+
+            {paymentMethod === 'service' && (
               <div>
-                <label htmlFor="cvv" className="block text-sm font-medium text-gray-700 mb-1">
-                  CVV
+                <label htmlFor="serviceDescription" className="block text-sm font-medium text-gray-700 mb-1">
+                  Service Description
                 </label>
-                <input
-                  type="text"
-                  id="cvv"
+                <textarea
+                  id="serviceDescription"
+                  required
+                  value={serviceDescription}
+                  onChange={(e) => setServiceDescription(e.target.value)}
                   className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500"
-                  placeholder="123"
+                  placeholder="Describe your service"
+                  rows={3}
                 />
               </div>
-            </div>
+            )}
 
             <div>
               <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
-                Billing Address
+                Delivery Address
               </label>
               <textarea
                 id="address"
+                required
                 rows={3}
                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500"
-                placeholder="Enter your billing address"
+                placeholder="Enter your delivery address"
               />
             </div>
 
@@ -88,3 +179,4 @@ const Payment = () => {
 };
 
 export default Payment;
+

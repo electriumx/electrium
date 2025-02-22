@@ -26,6 +26,10 @@ let users: User[] = [
 
 // Function to add a new user
 export const addUser = (newUser: User) => {
+  // Check if user already exists
+  if (users.some(u => u.username === newUser.username)) {
+    return false;
+  }
   users = [...users, newUser];
   // Store in localStorage for persistence
   localStorage.setItem('users', JSON.stringify(users));
@@ -43,3 +47,4 @@ export const getUsers = () => {
 
 // Export the users array
 export { users };
+

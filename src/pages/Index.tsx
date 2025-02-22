@@ -337,7 +337,10 @@ const products: Product[] = [
 ];
 
 const Index = () => {
-  const [cart, setCart] = useState<Product[]>(products);
+  const [cart, setCart] = useState<Product[]>(() => {
+    const savedCart = localStorage.getItem('cart');
+    return savedCart ? JSON.parse(savedCart) : products;
+  });
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
 
   const handleQuantityChange = (id: number, quantity: number) => {
@@ -354,6 +357,13 @@ const Index = () => {
 
   const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  const scrollToProducts = () => {
+    const productsSection = document.querySelector('#products-section');
+    if (productsSection) {
+      productsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -376,6 +386,7 @@ const Index = () => {
             </p>
             <motion.button
               whileHover={{ scale: 1.05 }}
+              onClick={scrollToProducts}
               className="bg-[#9eff00] text-black px-8 py-3 rounded-full text-lg font-medium hover:bg-[#8bdf00] transition-colors"
             >
               Upgrade Your World
@@ -384,8 +395,8 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Brand Filter */}
-      <div className="container mx-auto px-4 py-8">
+      {/* Products Section */}
+      <div id="products-section" className="container mx-auto px-4 py-8">
         <div className="flex flex-wrap gap-4 justify-center mb-12">
           {["Apple", "Samsung", "Sony"].map((brand) => (
             <button
@@ -413,7 +424,25 @@ const Index = () => {
         </div>
       </div>
       
-      <Cart total={total} itemCount={itemCount} />
+      {/* Cart Section */}
+      {itemCount > 0 && (
+        <div className="bg-white/80 backdrop-blur-md border border-gray-200 p-6 mt-8">
+          <div className="container mx-auto max-w-4xl">
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-gray-600">Items in cart: {itemCount}</span>
+              <span className="text-lg font-medium">Total: ${total.toFixed(2)}</span>
+            </div>
+            <button
+              onClick={() => navigate('/checkout')}
+              className="w-full bg-sage-500 text-white py-3 px-6 rounded-lg font-medium 
+                       transition-all duration-200 hover:bg-sage-600 disabled:opacity-50 
+                       disabled:cursor-not-allowed"
+            >
+              Proceed to Checkout
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
