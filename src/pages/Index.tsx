@@ -19,7 +19,7 @@ const products: Product[] = [
     id: 1,
     name: "MacBook Pro 16",
     price: 2499.99,
-    image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=800",
+    image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800",
     quantity: 0,
     brand: "Apple"
   },
@@ -27,7 +27,7 @@ const products: Product[] = [
     id: 2,
     name: "iPhone 15 Pro",
     price: 999.99,
-    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800",
+    image: "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?auto=format&fit=crop&w=800",
     quantity: 0,
     brand: "Apple"
   },
@@ -35,7 +35,7 @@ const products: Product[] = [
     id: 3,
     name: "iPad Pro",
     price: 799.99,
-    image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=800",
+    image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=800",
     quantity: 0,
     brand: "Apple"
   },
@@ -369,9 +369,16 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Hero Section */}
-      <div className="relative h-screen bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop')] bg-cover bg-center">
-        <div className="absolute inset-0 bg-black/50">
+      {/* Hero Section with Space Background */}
+      <div className="relative h-screen">
+        <div className="absolute inset-0 z-0">
+          <div 
+            className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1470813740244-df37b8c1edcb?auto=format&fit=crop&w=2000')] 
+                     bg-cover bg-center opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black" />
+        </div>
+        <div className="relative z-10 h-full">
           <div className="container mx-auto px-4 h-full flex flex-col justify-center items-center text-center">
             <motion.h1 
               initial={{ opacity: 0, y: 20 }}
