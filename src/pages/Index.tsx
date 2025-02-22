@@ -1,5 +1,7 @@
+
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom'; // Add this import
 import ProductCard from '../components/ProductCard';
 import Cart from '../components/Cart';
 
@@ -337,6 +339,7 @@ const products: Product[] = [
 ];
 
 const Index = () => {
+  const navigate = useNavigate(); // Add this line
   const [cart, setCart] = useState<Product[]>(() => {
     const savedCart = localStorage.getItem('cart');
     return savedCart ? JSON.parse(savedCart) : products;
@@ -448,3 +451,4 @@ const Index = () => {
 };
 
 export default Index;
+
