@@ -2,49 +2,25 @@
 export interface User {
   username: string;
   password: string;
-  displayName: string;
+  displayName?: string;
 }
 
-// Initial users array
-let users: User[] = [
+export const users: User[] = [
   {
-    username: "john_doe",
-    password: "password123",
-    displayName: "John Doe"
+    username: 'user@example.com',
+    password: 'password123',
+    displayName: 'User'
   },
   {
-    username: "jane_smith",
-    password: "pass456",
-    displayName: "Jane Smith"
-  },
-  {
-    username: "bob_wilson",
-    password: "secure789",
-    displayName: "Bob Wilson"
+    username: 'test@example.com',
+    password: 'test123',
+    displayName: 'Test User'
   }
 ];
 
-// Function to add a new user
-export const addUser = (newUser: User) => {
-  // Check if user already exists
-  if (users.some(u => u.username === newUser.username)) {
-    return false;
+export const addUser = (user: User) => {
+  if (users.some(u => u.username === user.username)) {
+    throw new Error('Username already exists');
   }
-  users = [...users, newUser];
-  // Store in localStorage for persistence
-  localStorage.setItem('users', JSON.stringify(users));
-  return true;
+  users.push(user);
 };
-
-// Function to get all users
-export const getUsers = () => {
-  const storedUsers = localStorage.getItem('users');
-  if (storedUsers) {
-    users = JSON.parse(storedUsers);
-  }
-  return users;
-};
-
-// Export the users array
-export { users };
-

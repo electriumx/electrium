@@ -1,5 +1,5 @@
 
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, users } from '../data/users';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
@@ -18,13 +18,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  // Load user from localStorage on initial mount
+  useEffect(() => {
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+      setCurrentUser(JSON.parse(savedUser));
+    }
+  }, []);
+
   const login = (username: string, password: string) => {
     const user = users.find(u => u.username === username && u.password === password);
     if (user) {
       setCurrentUser(user);
+      localStorage.setItem('currentUser', JSON.stringify(user));
       toast({
         title: "Welcome back!",
-        description: `Successfully signed in as ${user.displayName}`
+        description: `Successfully signed in as ${user.displayName || 'User'}`
       });
       return true;
     }
@@ -38,6 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     setCurrentUser(null);
+    localStorage.removeItem('currentUser');
     navigate('/');
     toast({
       title: "Signed out",
