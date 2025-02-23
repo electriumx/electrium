@@ -14,6 +14,7 @@ const TopNavigation = () => {
           <Link to="/about" className="hover:text-[#9eff00] transition-colors">About</Link>
           <Link to="/discover" className="hover:text-[#9eff00] transition-colors">Discover</Link>
           <Link to="/contact" className="hover:text-[#9eff00] transition-colors">Contact</Link>
+          <Link to="/donation" className="hover:text-[#9eff00] transition-colors">Donation</Link>
         </div>
       </div>
     </nav>

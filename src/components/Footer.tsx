@@ -28,7 +28,7 @@ const Footer = () => {
           <div>
             <h4 className="text-lg font-semibold mb-4">Contact</h4>
             <p className="text-gray-300">Email: info@electrium.com</p>
-            <p className="text-gray-300">Phone: (555) 123-4567</p>
+            <p className="text-gray-300">Phone: +20 011 5468 4095</p>
           </div>
         </div>
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
@@ -40,4 +40,3 @@ const Footer = () => {
 };
 
 export default Footer;
-

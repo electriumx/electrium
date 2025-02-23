@@ -374,7 +374,7 @@ const Index = () => {
         <div className="absolute inset-0 z-0">
           <div 
             className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1470813740244-df37b8c1edcb?auto=format&fit=crop&w=2000')] 
-                     bg-cover bg-center opacity-30"
+                     bg-cover bg-center opacity-50"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black" />
         </div>
@@ -388,7 +388,7 @@ const Index = () => {
               NEXT-GEN SHOPPING
               <span className="block text-3xl md:text-4xl font-light">starts here</span>
             </motion.h1>
-            <p className="text-lg md:text-xl mb-8">
+            <p className="text-lg md:text-xl mb-8 font-['Times_New_Roman']">
               Quality products. Seamless shopping.
               <br />
               "Discover top-tier products designed to enhance your lifestyle."
