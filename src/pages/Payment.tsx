@@ -2,12 +2,15 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '@/components/ui/use-toast';
 
 const Payment = () => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const { toast } = useToast();
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [itemName, setItemName] = useState('');
-  const [serviceDescription, setServiceDescription] = useState('');
   const [deliveryType, setDeliveryType] = useState('normal');
   const [deliveryTime, setDeliveryTime] = useState('');
   const [baseTotal, setBaseTotal] = useState(() => {
@@ -21,7 +24,16 @@ const Payment = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    localStorage.removeItem('cart'); // Clear cart after successful purchase
+    if (!isAuthenticated) {
+      toast({
+        variant: "destructive",
+        title: "Authentication Required",
+        description: "Please sign in to complete your purchase"
+      });
+      navigate('/login', { state: { from: '/payment' } });
+      return;
+    }
+    localStorage.removeItem('cart');
     navigate('/thank-you');
   };
 
@@ -40,44 +52,15 @@ const Payment = () => {
               <label className="block text-sm font-medium text-gray-700">
                 Select Payment Method
               </label>
-              <div className="grid grid-cols-2 gap-4">
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('card')}
-                  className={`p-4 border rounded-lg ${
-                    paymentMethod === 'card' ? 'border-sage-500 bg-sage-50' : 'border-gray-200'
-                  }`}
-                >
-                  Card
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('cash')}
-                  className={`p-4 border rounded-lg ${
-                    paymentMethod === 'cash' ? 'border-sage-500 bg-sage-50' : 'border-gray-200'
-                  }`}
-                >
-                  Cash
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('trade')}
-                  className={`p-4 border rounded-lg ${
-                    paymentMethod === 'trade' ? 'border-sage-500 bg-sage-50' : 'border-gray-200'
-                  }`}
-                >
-                  Item Trade
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('service')}
-                  className={`p-4 border rounded-lg ${
-                    paymentMethod === 'service' ? 'border-sage-500 bg-sage-50' : 'border-gray-200'
-                  }`}
-                >
-                  Service
-                </button>
-              </div>
+              <select
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500 bg-white"
+              >
+                <option value="card">Card</option>
+                <option value="cash">Cash</option>
+                <option value="trade">Item Trade</option>
+              </select>
             </div>
 
             {paymentMethod === 'card' && (
@@ -191,37 +174,18 @@ const Payment = () => {
               </div>
             )}
 
-            {paymentMethod === 'service' && (
-              <div>
-                <label htmlFor="serviceDescription" className="block text-sm font-medium text-gray-700 mb-1">
-                  Service Description
-                </label>
-                <textarea
-                  id="serviceDescription"
-                  required
-                  value={serviceDescription}
-                  onChange={(e) => setServiceDescription(e.target.value)}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500"
-                  placeholder="Describe your service"
-                  rows={3}
-                />
-              </div>
-            )}
-
-            {paymentMethod !== 'service' && (
-              <div>
-                <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
-                  Delivery Address
-                </label>
-                <textarea
-                  id="address"
-                  required
-                  rows={3}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500"
-                  placeholder="Enter your delivery address"
-                />
-              </div>
-            )}
+            <div>
+              <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
+                Delivery Address
+              </label>
+              <textarea
+                id="address"
+                required
+                rows={3}
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500"
+                placeholder="Enter your delivery address"
+              />
+            </div>
 
             <div className="pt-4">
               <div className="mb-4 text-right">

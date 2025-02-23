@@ -3,55 +3,51 @@ import { motion } from 'framer-motion';
 
 const About = () => {
   const facts = [
-    "Founded in 2024, Electrium has revolutionized the tech shopping experience",
-    "We partner with leading brands like Apple, Samsung, and Sony",
-    "Our platform processes over 10,000 transactions daily",
-    "We offer a unique trade-in program for your old devices",
-    "Customer satisfaction rate of 98% based on verified reviews",
-    "Same-day delivery available in selected metropolitan areas",
-    "24/7 customer support through multiple channels",
-    "Green initiative: All packaging is 100% recyclable",
-    "Price match guarantee on all products",
-    "Regular tech workshops and product launches for our community"
+    "E-commerce reduces environmental impact by minimizing physical store energy consumption",
+    "Over 2.14 billion people worldwide shop online",
+    "Mobile shopping accounts for over 70% of all e-commerce transactions",
+    "Online shopping saves an average of 2 hours compared to traditional shopping",
+    "Digital payment methods are 26% more secure than traditional methods",
+    "Online marketplaces offer 73% more product variety than physical stores",
+    "Customer reviews influence 93% of online purchase decisions",
+    "Free shipping is the top factor in online purchase decisions",
+    "Online shopping reduces impulse purchases by 18%",
+    "E-commerce platforms operate 24/7, allowing shopping at any time"
   ];
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <div className="relative h-screen">
-        <div className="absolute inset-0 z-0">
-          <div 
-            className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1470813740244-df37b8c1edcb?auto=format&fit=crop&w=2000')] 
-                     bg-cover bg-center opacity-50"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black" />
-        </div>
-        
-        <div className="relative z-10 pt-24 px-4">
-          <div className="container mx-auto">
-            <motion.h1 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-5xl md:text-7xl font-bold mb-12 text-center"
-            >
-              About Electrium
-            </motion.h1>
+    <div className="min-h-screen bg-gray-50 pt-20 pb-16 px-4">
+      <div className="max-w-4xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-xl shadow-lg p-8"
+        >
+          <h1 className="text-4xl font-bold text-gray-900 mb-8">About Electrium</h1>
+          <div className="space-y-6">
+            <p className="text-gray-600 text-lg mb-8">
+              Welcome to Electrium, your premier destination for electronic devices. We strive to provide the best shopping experience with a curated selection of high-quality products.
+            </p>
             
-            <div className="grid gap-8 max-w-4xl mx-auto">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">Facts About Online Shopping</h2>
+            <ul className="space-y-4">
               {facts.map((fact, index) => (
-                <motion.div
+                <motion.li
                   key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="bg-white/10 backdrop-blur-md p-6 rounded-lg"
+                  className="flex items-start"
                 >
-                  <h3 className="text-xl font-bold text-[#9eff00] mb-2">Fact #{index + 1}</h3>
-                  <p className="text-gray-200">{fact}</p>
-                </motion.div>
+                  <span className="flex-shrink-0 w-6 h-6 bg-sage-500 text-white rounded-full flex items-center justify-center mr-3 mt-1">
+                    {index + 1}
+                  </span>
+                  <span className="text-gray-700">{fact}</span>
+                </motion.li>
               ))}
-            </div>
+            </ul>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

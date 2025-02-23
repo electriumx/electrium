@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
+import About from "./pages/About";
 import Checkout from "./pages/Checkout";
 import Payment from "./pages/Payment";
 import Login from "./pages/Login";
@@ -27,9 +28,10 @@ const App = () => (
           <Sonner />
           <TopNavigation />
           <Navigation />
-          <div className="pt-16"> {/* Add padding top to account for fixed header */}
+          <div className="pt-16">
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/about" element={<About />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/payment" element={<Payment />} />
               <Route path="/login" element={<Login />} />
@@ -46,4 +48,3 @@ const App = () => (
 );
 
 export default App;
-
