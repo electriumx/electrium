@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import ProductCard from '../components/ProductCard';
-import Cart from '../components/Cart';
+import Hero from '../components/Hero';
+import ProductFilters from '../components/ProductFilters';
+import ProductGrid from '../components/ProductGrid';
+import CartSummary from '../components/CartSummary';
 
 interface Product {
   id: number;
@@ -338,7 +338,6 @@ const products: Product[] = [
 ];
 
 const Index = () => {
-  const navigate = useNavigate();
   const [cart, setCart] = useState<Product[]>(() => {
     const savedCart = localStorage.getItem('cart');
     return savedCart ? JSON.parse(savedCart) : products;
@@ -369,89 +368,20 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Hero Section with Space Background */}
-      <div className="relative h-screen">
-        <div className="absolute inset-0 z-0">
-          <div 
-            className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1470813740244-df37b8c1edcb?auto=format&fit=crop&w=2000')] 
-                     bg-cover bg-center opacity-50"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black" />
-        </div>
-        <div className="relative z-10 h-full">
-          <div className="container mx-auto px-4 h-full flex flex-col justify-center items-center text-center">
-            <motion.h1 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-5xl md:text-7xl font-bold mb-4"
-            >
-              NEXT-GEN SHOPPING
-              <span className="block text-3xl md:text-4xl font-light">starts here</span>
-            </motion.h1>
-            <p className="text-lg md:text-xl mb-8 font-['Times_New_Roman']">
-              Quality products. Seamless shopping.
-              <br />
-              "Discover top-tier products designed to enhance your lifestyle."
-            </p>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              onClick={scrollToProducts}
-              className="bg-[#9eff00] text-black px-8 py-3 rounded-full text-lg font-medium hover:bg-[#8bdf00] transition-colors"
-            >
-              Upgrade Your World
-            </motion.button>
-          </div>
-        </div>
-      </div>
-
-      {/* Products Section */}
+      <Hero onExploreClick={scrollToProducts} />
+      
       <div id="products-section" className="container mx-auto px-4 py-8">
-        <div className="flex flex-wrap gap-4 justify-center mb-12">
-          {["Apple", "Samsung", "Sony"].map((brand) => (
-            <button
-              key={brand}
-              onClick={() => setSelectedBrand(selectedBrand === brand ? null : brand)}
-              className={`px-6 py-2 rounded-full transition-all ${
-                selectedBrand === brand 
-                  ? 'bg-[#9eff00] text-black'
-                  : 'bg-gray-800 text-white hover:bg-gray-700'
-              }`}
-            >
-              {brand} Devices
-            </button>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {filteredProducts.map(product => (
-            <ProductCard
-              key={product.id}
-              {...product}
-              onQuantityChange={handleQuantityChange}
-            />
-          ))}
-        </div>
+        <ProductFilters 
+          selectedBrand={selectedBrand}
+          onBrandSelect={setSelectedBrand}
+        />
+        <ProductGrid 
+          products={filteredProducts}
+          onQuantityChange={handleQuantityChange}
+        />
       </div>
       
-      {/* Cart Section */}
-      {itemCount > 0 && (
-        <div className="bg-white/80 backdrop-blur-md border border-gray-200 p-6 mt-8">
-          <div className="container mx-auto max-w-4xl">
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-gray-600">Items in cart: {itemCount}</span>
-              <span className="text-lg font-medium">Total: ${total.toFixed(2)}</span>
-            </div>
-            <button
-              onClick={() => navigate('/checkout')}
-              className="w-full bg-sage-500 text-white py-3 px-6 rounded-lg font-medium 
-                       transition-all duration-200 hover:bg-sage-600 disabled:opacity-50 
-                       disabled:cursor-not-allowed"
-            >
-              Proceed to Checkout
-            </button>
-          </div>
-        </div>
-      )}
+      <CartSummary itemCount={itemCount} total={total} />
     </div>
   );
 };
