@@ -12,6 +12,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
 import ThankYou from "./pages/ThankYou";
+import Donation from "./pages/Donation";
 import Navigation from "./components/Navigation";
 import TopNavigation from "./components/TopNavigation";
 import Footer from "./components/Footer";
@@ -37,6 +38,7 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/thank-you" element={<ThankYou />} />
+              <Route path="/donation" element={<Donation />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
