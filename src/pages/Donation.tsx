@@ -17,15 +17,19 @@ const Donation = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    let interval: number;
+    let intervalId: NodeJS.Timeout;
     if (isOnCooldown && cooldownTime > 0) {
-      interval = setInterval(() => {
+      intervalId = setInterval(() => {
         setCooldownTime((time) => time - 1);
       }, 1000);
     } else if (cooldownTime === 0) {
       setIsOnCooldown(false);
     }
-    return () => clearInterval(interval);
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
   }, [isOnCooldown, cooldownTime]);
 
   const handleSubmit = (e: React.FormEvent) => {
