@@ -7,9 +7,6 @@ import { useToast } from '@/components/ui/use-toast';
 
 const Donation = () => {
   const [amount, setAmount] = useState('');
-  const [cardNumber, setCardNumber] = useState('');
-  const [expiry, setExpiry] = useState('');
-  const [cvv, setCvv] = useState('');
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -37,31 +34,30 @@ const Donation = () => {
       return;
     }
 
-    // Here you would typically process the donation with the card details
+    // Here you would typically process the donation
     toast({
       title: "Thank you!",
       description: `Your donation of $${donationAmount} has been received`
     });
-    navigate('/thank-you');
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-md w-full space-y-8 bg-black/50 backdrop-blur-lg p-8 rounded-xl shadow-lg border border-white/10"
+        className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg"
       >
         <div>
-          <h2 className="text-center text-3xl font-bold text-white">Make a Donation</h2>
-          <p className="mt-2 text-center text-sm text-gray-300">
+          <h2 className="text-center text-3xl font-bold text-gray-900">Make a Donation</h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
             Support our mission with a donation between $1 and $1000
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div>
-            <label htmlFor="amount" className="block text-sm font-medium text-white">
+            <label htmlFor="amount" className="block text-sm font-medium text-gray-700">
               Donation Amount ($)
             </label>
             <input
@@ -71,63 +67,16 @@ const Donation = () => {
               min="1"
               max="1000"
               required
-              className="mt-1 block w-full px-3 py-2 bg-black/30 border border-white/20 rounded-md shadow-sm focus:outline-none focus:ring-[#7E69AB] focus:border-[#7E69AB] text-white"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-sage-500 focus:border-sage-500"
               placeholder="Enter amount"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
             />
           </div>
 
-          <div>
-            <label htmlFor="cardNumber" className="block text-sm font-medium text-white">
-              Card Number
-            </label>
-            <input
-              id="cardNumber"
-              type="text"
-              required
-              className="mt-1 block w-full px-3 py-2 bg-black/30 border border-white/20 rounded-md shadow-sm focus:outline-none focus:ring-[#7E69AB] focus:border-[#7E69AB] text-white"
-              placeholder="1234 5678 9012 3456"
-              value={cardNumber}
-              onChange={(e) => setCardNumber(e.target.value)}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="expiry" className="block text-sm font-medium text-white">
-                Expiry Date
-              </label>
-              <input
-                id="expiry"
-                type="text"
-                required
-                className="mt-1 block w-full px-3 py-2 bg-black/30 border border-white/20 rounded-md shadow-sm focus:outline-none focus:ring-[#7E69AB] focus:border-[#7E69AB] text-white"
-                placeholder="MM/YY"
-                value={expiry}
-                onChange={(e) => setExpiry(e.target.value)}
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="cvv" className="block text-sm font-medium text-white">
-                CVV
-              </label>
-              <input
-                id="cvv"
-                type="text"
-                required
-                className="mt-1 block w-full px-3 py-2 bg-black/30 border border-white/20 rounded-md shadow-sm focus:outline-none focus:ring-[#7E69AB] focus:border-[#7E69AB] text-white"
-                placeholder="123"
-                value={cvv}
-                onChange={(e) => setCvv(e.target.value)}
-              />
-            </div>
-          </div>
-
           <button
             type="submit"
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#7E69AB] hover:bg-[#6E59A5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#7E69AB]"
+            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-sage-500 hover:bg-sage-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sage-500"
           >
             Donate
           </button>
