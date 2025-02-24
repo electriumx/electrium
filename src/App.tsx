@@ -20,6 +20,7 @@ import TopNavigation from "./components/TopNavigation";
 import Footer from "./components/Footer";
 import SocialButtons from "./components/SocialButtons";
 import { AuthProvider } from "./contexts/AuthContext";
+import CookieConsent from "./components/CookieConsent";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +50,7 @@ const App = () => (
             </div>
             <SocialButtons />
             <Footer />
+            <CookieConsent />
           </AuthProvider>
         </BrowserRouter>
       </ThemeProvider>
