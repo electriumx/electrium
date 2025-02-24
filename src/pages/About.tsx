@@ -16,20 +16,26 @@ const About = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20 pb-16 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-black pt-20 pb-16 px-4">
+      <div className="absolute inset-0 z-0">
+        <div 
+          className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1470813740244-df37b8c1edcb?auto=format&fit=crop&w=2000')] 
+                   bg-cover bg-center opacity-30 animate-space-float"
+        />
+      </div>
+      <div className="max-w-4xl mx-auto relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-xl shadow-lg p-8"
+          className="bg-black/60 backdrop-blur-sm rounded-xl shadow-lg p-8"
         >
-          <h1 className="text-4xl font-bold text-gray-900 mb-8">About Electrium</h1>
+          <h1 className="text-4xl font-bold text-white mb-8">About Electrium</h1>
           <div className="space-y-6">
-            <p className="text-gray-600 text-lg mb-8">
+            <p className="text-gray-200 text-lg mb-8">
               Welcome to Electrium, your premier destination for electronic devices. We strive to provide the best shopping experience with a curated selection of high-quality products.
             </p>
             
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">Facts About Online Shopping</h2>
+            <h2 className="text-2xl font-semibold text-white mb-4">Facts About Online Shopping</h2>
             <ul className="space-y-4">
               {facts.map((fact, index) => (
                 <motion.li
@@ -37,12 +43,12 @@ const About = () => {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="flex items-start"
+                  className="flex items-start text-gray-200"
                 >
                   <span className="flex-shrink-0 w-6 h-6 bg-sage-500 text-white rounded-full flex items-center justify-center mr-3 mt-1">
                     {index + 1}
                   </span>
-                  <span className="text-gray-700">{fact}</span>
+                  <span>{fact}</span>
                 </motion.li>
               ))}
             </ul>

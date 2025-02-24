@@ -11,7 +11,7 @@ const TopNavigation = () => {
   };
 
   return (
-    <nav className="bg-black bg-opacity-70 text-white py-4 px-6 fixed w-full top-0 z-40">
+    <nav className="bg-transparent text-white py-4 px-6 fixed w-full top-0 z-40">
       <div className="container mx-auto flex items-center">
         <Link to="/" className="text-2xl font-bold text-[#9eff00]">
           Electrium
