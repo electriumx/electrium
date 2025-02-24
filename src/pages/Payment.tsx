@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -22,6 +21,38 @@ const Payment = () => {
 
   const total = deliveryType === 'fast' ? baseTotal + 50 : baseTotal;
 
+  const validateCardNumber = (number: string) => {
+    const cleaned = number.replace(/\D/g, '');
+    if (cleaned.length < 13 || cleaned.length > 19) {
+      return false;
+    }
+
+    let sum = 0;
+    let isEven = false;
+    
+    for (let i = cleaned.length - 1; i >= 0; i--) {
+      let digit = parseInt(cleaned.charAt(i));
+
+      if (isEven) {
+        digit *= 2;
+        if (digit > 9) {
+          digit -= 9;
+        }
+      }
+
+      sum += digit;
+      isEven = !isEven;
+    }
+
+    return sum % 10 === 0;
+  };
+
+  const formatCardNumber = (value: string) => {
+    const cleaned = value.replace(/\D/g, '');
+    const groups = cleaned.match(/.{1,4}/g) || [];
+    return groups.join(' ').trim();
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAuthenticated) {
@@ -33,6 +64,19 @@ const Payment = () => {
       navigate('/login', { state: { from: '/payment' } });
       return;
     }
+
+    if (paymentMethod === 'card') {
+      const cardNumberInput = document.getElementById('cardNumber') as HTMLInputElement;
+      if (!validateCardNumber(cardNumberInput.value)) {
+        toast({
+          variant: "destructive",
+          title: "Invalid Card Number",
+          description: "Please enter a valid card number"
+        });
+        return;
+      }
+    }
+
     localStorage.removeItem('cart');
     navigate('/thank-you');
   };

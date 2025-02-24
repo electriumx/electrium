@@ -32,6 +32,49 @@ const Donation = () => {
     };
   }, [isOnCooldown, cooldownTime]);
 
+  const validateCardNumber = (number: string) => {
+    // Remove all non-digit characters
+    const cleaned = number.replace(/\D/g, '');
+    
+    // Check if length is between 13 and 19 digits (valid card length range)
+    if (cleaned.length < 13 || cleaned.length > 19) {
+      return false;
+    }
+
+    // Luhn algorithm for card number validation
+    let sum = 0;
+    let isEven = false;
+    
+    // Loop through values starting from the rightmost one
+    for (let i = cleaned.length - 1; i >= 0; i--) {
+      let digit = parseInt(cleaned.charAt(i));
+
+      if (isEven) {
+        digit *= 2;
+        if (digit > 9) {
+          digit -= 9;
+        }
+      }
+
+      sum += digit;
+      isEven = !isEven;
+    }
+
+    return sum % 10 === 0;
+  };
+
+  const formatCardNumber = (value: string) => {
+    const cleaned = value.replace(/\D/g, '');
+    const groups = cleaned.match(/.{1,4}/g) || [];
+    return groups.join(' ').trim();
+  };
+
+  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const formatted = formatCardNumber(value);
+    setCardNumber(formatted);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const donationAmount = Number(amount);
@@ -51,6 +94,15 @@ const Donation = () => {
         variant: "destructive",
         title: "Donation Cooldown",
         description: `Please wait ${cooldownTime} seconds before making another donation`
+      });
+      return;
+    }
+
+    if (!validateCardNumber(cardNumber)) {
+      toast({
+        variant: "destructive",
+        title: "Invalid Card Number",
+        description: "Please enter a valid card number"
       });
       return;
     }
