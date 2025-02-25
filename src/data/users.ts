@@ -24,3 +24,14 @@ export const addUser = (user: User) => {
   }
   users.push(user);
 };
+
+export const updateUserPassword = (username: string, newPassword: string) => {
+  const user = users.find(u => u.username === username);
+  if (user) {
+    user.password = newPassword;
+  }
+};
+
+export const getUser = (username: string, password: string): User | undefined => {
+  return users.find(u => u.username === username && u.password === password);
+};
