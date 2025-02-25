@@ -14,8 +14,12 @@ interface Product {
   brand: "Apple" | "Samsung" | "Sony" | "Other";
 }
 
-const products: Product[] = [
-  // Apple Products
+const Index = () => {
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const products: Product[] = [
+    // Apple Products
   {
     id: 1,
     name: "MacBook Pro 16",
@@ -628,9 +632,4 @@ const products: Product[] = [
     id: 77,
     name: "Apple Watch Magnetic Fast Charger to USB-C Cable",
     price: 29.00,
-    image: "https://images.unsplash.com/photo-1534430206226-3ca46694ef5e?auto=format&fit=crop&w=800",
-    quantity: 0,
-    brand: "Apple"
-  },
-  {
-    id:
+    image: "https://images.unsplash.com/photo-1534430206226-3ca46694ef5e?
