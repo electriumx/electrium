@@ -1,4 +1,3 @@
-<lov-code>
 import { useState } from 'react';
 import Hero from '../components/Hero';
 import ProductFilters from '../components/ProductFilters';
@@ -633,3 +632,21 @@ const Index = () => {
     name: "Apple Watch Magnetic Fast Charger to USB-C Cable",
     price: 29.00,
     image: "https://images.unsplash.com/photo-1534430206226-3ca46694ef5e?",
+    quantity: 0,
+    brand: "Apple"
+  },
+  ];
+
+  return (
+    <div>
+      <Hero onExploreClick={() => {}} />
+      <div className="container mx-auto px-4 py-8">
+        <ProductFilters selectedBrand={null} onBrandSelect={(brand) => setSelectedBrands([brand])} />
+        <ProductGrid products={products.filter(p => selectedBrands.length === 0 || selectedBrands.includes(p.brand))} onQuantityChange={() => {}} />
+        <CartSummary itemCount={0} total={0} />
+      </div>
+    </div>
+  );
+};
+
+export default Index;
