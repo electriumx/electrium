@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -12,11 +11,17 @@ const Donation = () => {
   const [cvv, setCvv] = useState('');
   const [isOnCooldown, setIsOnCooldown] = useState(false);
   const [cooldownTime, setCooldownTime] = useState(0);
+  const [totalDonations, setTotalDonations] = useState(0);
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
+    const savedTotal = localStorage.getItem('totalDonations');
+    if (savedTotal) {
+      setTotalDonations(parseFloat(savedTotal));
+    }
+
     let intervalId: NodeJS.Timeout;
     if (isOnCooldown && cooldownTime > 0) {
       intervalId = setInterval(() => {
@@ -33,33 +38,19 @@ const Donation = () => {
   }, [isOnCooldown, cooldownTime]);
 
   const validateCardNumber = (number: string) => {
-    // Remove all non-digit characters
     const cleaned = number.replace(/\D/g, '');
-    
-    // Check if length is between 13 and 19 digits (valid card length range)
-    if (cleaned.length < 13 || cleaned.length > 19) {
-      return false;
-    }
-
-    // Luhn algorithm for card number validation
+    if (cleaned.length < 13 || cleaned.length > 19) return false;
     let sum = 0;
     let isEven = false;
-    
-    // Loop through values starting from the rightmost one
     for (let i = cleaned.length - 1; i >= 0; i--) {
       let digit = parseInt(cleaned.charAt(i));
-
       if (isEven) {
         digit *= 2;
-        if (digit > 9) {
-          digit -= 9;
-        }
+        if (digit > 9) digit -= 9;
       }
-
       sum += digit;
       isEven = !isEven;
     }
-
     return sum % 10 === 0;
   };
 
@@ -125,7 +116,10 @@ const Donation = () => {
       return;
     }
 
-    // Here you would typically process the donation
+    const newTotal = totalDonations + donationAmount;
+    setTotalDonations(newTotal);
+    localStorage.setItem('totalDonations', newTotal.toString());
+
     toast({
       title: "Thank you!",
       description: `Your donation of $${donationAmount} has been received`
@@ -140,21 +134,14 @@ const Donation = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="absolute inset-0 z-0">
-        <div 
-          className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1470813740244-df37b8c1edcb?auto=format&fit=crop&w=2000')] 
-                   bg-cover bg-center opacity-30 animate-space-float"
-        />
-      </div>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-md w-full space-y-8 bg-black/60 backdrop-blur-sm p-8 rounded-xl shadow-lg relative z-10"
-      >
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8 bg-card/60 backdrop-blur-sm p-8 rounded-xl shadow-lg relative">
         <div>
-          <h2 className="text-center text-3xl font-bold text-white">Make a Donation</h2>
-          <p className="mt-2 text-center text-sm text-gray-300">
+          <h2 className="text-center text-3xl font-bold mb-2">Make a Donation</h2>
+          <p className="text-center font-bold text-xl mb-4">
+            Total Donations: ${totalDonations.toFixed(2)}
+          </p>
+          <p className="mt-2 text-center text-sm text-muted-foreground">
             Support our mission with a donation between $1 and $1000
           </p>
           {isOnCooldown && (
@@ -246,7 +233,7 @@ const Donation = () => {
             Donate
           </button>
         </form>
-      </motion.div>
+      </div>
     </div>
   );
 };

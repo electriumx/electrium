@@ -19,6 +19,7 @@ import Navigation from "./components/Navigation";
 import TopNavigation from "./components/TopNavigation";
 import Footer from "./components/Footer";
 import SocialButtons from "./components/SocialButtons";
+import PaymentSuccess from "./components/PaymentSuccess";
 import { AuthProvider } from "./contexts/AuthContext";
 import CookieConsent from "./components/CookieConsent";
 
@@ -40,6 +41,7 @@ const App = () => (
                 <Route path="/about" element={<About />} />
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/payment" element={<Payment />} />
+                <Route path="/payment-success" element={<PaymentSuccess />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/thank-you" element={<ThankYou />} />

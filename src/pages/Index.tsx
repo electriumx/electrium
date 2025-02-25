@@ -346,10 +346,10 @@ const Index = () => {
 
   const handleQuantityChange = (id: number, quantity: number) => {
     const updatedCart = cart.map(item =>
-      item.id === id ? { ...item, quantity: Math.max(0, quantity) } : item
+      item.id === id ? { ...item, quantity } : item
     );
     setCart(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart.filter(item => item.quantity > 0)));
+    localStorage.setItem('cart', JSON.stringify(updatedCart));
   };
 
   const filteredProducts = selectedBrand 

@@ -1,15 +1,27 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "../contexts/AuthContext";
 
 const CookieConsent = () => {
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const hasSeenCookieConsent = localStorage.getItem("hasSeenCookieConsent");
+      if (!hasSeenCookieConsent) {
+        setIsVisible(true);
+      }
+    }
+  }, [isAuthenticated]);
 
   const handleCookieChoice = (accepted: boolean) => {
     setIsAnimating(true);
+    localStorage.setItem("hasSeenCookieConsent", "true");
     localStorage.setItem("cookieConsent", accepted ? "accepted" : "rejected");
     
     toast({
