@@ -1,7 +1,10 @@
 
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const TopNavigation = () => {
+  const location = useLocation();
+  const isIndexPage = location.pathname === '/';
+
   const handleContactClick = (e: React.MouseEvent) => {
     e.preventDefault();
     const footer = document.querySelector('footer');
@@ -17,13 +20,15 @@ const TopNavigation = () => {
           Electrium
         </Link>
         
-        <div className="flex-1 flex justify-center gap-8">
-          <Link to="/" className="text-white hover:text-[#9eff00] transition-colors">Explore</Link>
-          <Link to="/about" className="text-white hover:text-[#9eff00] transition-colors">About</Link>
-          <Link to="/discover" className="text-white hover:text-[#9eff00] transition-colors">Discover</Link>
-          <a href="#footer" onClick={handleContactClick} className="text-white hover:text-[#9eff00] transition-colors">Contact</a>
-          <Link to="/donation" className="text-white hover:text-[#9eff00] transition-colors">Donation</Link>
-        </div>
+        {isIndexPage && (
+          <div className="flex-1 flex justify-center gap-8">
+            <Link to="/" className="text-white hover:text-[#9eff00] transition-colors">Explore</Link>
+            <Link to="/about" className="text-white hover:text-[#9eff00] transition-colors">About</Link>
+            <Link to="/discover" className="text-white hover:text-[#9eff00] transition-colors">Discover</Link>
+            <a href="#footer" onClick={handleContactClick} className="text-white hover:text-[#9eff00] transition-colors">Contact</a>
+            <Link to="/donation" className="text-white hover:text-[#9eff00] transition-colors">Donation</Link>
+          </div>
+        )}
       </div>
     </nav>
   );

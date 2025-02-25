@@ -1,3 +1,4 @@
+<lov-code>
 import { useState } from 'react';
 import Hero from '../components/Hero';
 import ProductFilters from '../components/ProductFilters';
@@ -334,56 +335,302 @@ const products: Product[] = [
     image: "https://images.unsplash.com/photo-1588654444534-526ea14c2d51?auto=format&fit=crop&w=800",
     quantity: 0,
     brand: "Sony"
-  }
-];
-
-const Index = () => {
-  const [cart, setCart] = useState<Product[]>(() => {
-    const savedCart = localStorage.getItem('cart');
-    return savedCart ? JSON.parse(savedCart) : products;
-  });
-  const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
-
-  const handleQuantityChange = (id: number, quantity: number) => {
-    const updatedCart = cart.map(item =>
-      item.id === id ? { ...item, quantity } : item
-    );
-    setCart(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
-  };
-
-  const filteredProducts = selectedBrand 
-    ? products.filter(product => product.brand === selectedBrand)
-    : products;
-
-  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-
-  const scrollToProducts = () => {
-    const productsSection = document.querySelector('#products-section');
-    if (productsSection) {
-      productsSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-black text-white">
-      <Hero onExploreClick={scrollToProducts} />
-      
-      <div id="products-section" className="container mx-auto px-4 py-8">
-        <ProductFilters 
-          selectedBrand={selectedBrand}
-          onBrandSelect={setSelectedBrand}
-        />
-        <ProductGrid 
-          products={filteredProducts}
-          onQuantityChange={handleQuantityChange}
-        />
-      </div>
-      
-      <CartSummary itemCount={itemCount} total={total} />
-    </div>
-  );
-};
-
-export default Index;
+  },
+  {
+    id: 41,
+    name: "iPhone 15",
+    price: 799.99,
+    image: "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 42,
+    name: "iPhone 14 Pro",
+    price: 899.99,
+    image: "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 43,
+    name: "iPhone 14",
+    price: 699.99,
+    image: "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 44,
+    name: "iPhone SE",
+    price: 429.99,
+    image: "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 45,
+    name: "iPad Air",
+    price: 599.99,
+    image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 46,
+    name: "iPad mini",
+    price: 499.99,
+    image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 47,
+    name: "MacBook Air 13",
+    price: 1099.99,
+    image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 48,
+    name: "MacBook Air 15",
+    price: 1299.99,
+    image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 49,
+    name: "iMac 24-inch",
+    price: 1499.99,
+    image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 50,
+    name: "Mac Studio",
+    price: 1999.99,
+    image: "https://images.unsplash.com/photo-1588654513454-55c950269216?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 51,
+    name: "Pro Display XDR",
+    price: 4999.99,
+    image: "https://images.unsplash.com/photo-1562440695-5c982f7136a8?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 52,
+    name: "Apple Watch SE",
+    price: 279.99,
+    image: "https://images.unsplash.com/photo-1534430206226-3ca46694ef5e?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 53,
+    name: "AirPods (3rd generation)",
+    price: 179.99,
+    image: "https://images.unsplash.com/photo-1560529034-2a9988b6ca89?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 54,
+    name: "AirPods Max",
+    price: 549.99,
+    image: "https://images.unsplash.com/photo-1560529034-2a9988b6ca89?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 55,
+    name: "HomePod mini",
+    price: 99.99,
+    image: "https://images.unsplash.com/photo-1571008813725-93672963b471?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 56,
+    name: "iPod touch",
+    price: 199.99,
+    image: "https://images.unsplash.com/photo-1571008813725-93672963b471?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 57,
+    name: "Apple Watch Band",
+    price: 49.99,
+    image: "https://images.unsplash.com/photo-1534430206226-3ca46694ef5e?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+    {
+    id: 58,
+    name: "Apple USB-C Charge Cable",
+    price: 29.00,
+    image: "https://images.unsplash.com/photo-1584798845943-49e596bbd64a?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 59,
+    name: "Apple World Travel Adapter Kit",
+    price: 29.99,
+    image: "https://images.unsplash.com/photo-1591798241437-1e3e709110f4?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 60,
+    name: "Apple Polishing Cloth",
+    price: 19.00,
+    image: "https://images.unsplash.com/photo-1585242985478-51404841d293?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 61,
+    name: "Apple Leather Case",
+    price: 59.99,
+    image: "https://images.unsplash.com/photo-1585242985478-51404841d293?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 62,
+    name: "Apple Screen Cleaning Kit",
+    price: 29.99,
+    image: "https://images.unsplash.com/photo-1585242985478-51404841d293?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 63,
+    name: "Apple Smart Folio",
+    price: 79.99,
+    image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 64,
+    name: "Apple Smart Keyboard Folio",
+    price: 179.99,
+    image: "https://images.unsplash.com/photo-1588654444534-526ea14c2d51?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 65,
+    name: "Apple Magic Trackpad",
+    price: 129.99,
+    image: "https://images.unsplash.com/photo-1588654444534-526ea14c2d51?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 66,
+    name: "Apple Thunderbolt 4",
+    price: 59.99,
+    image: "https://images.unsplash.com/photo-1591798241437-1e3e709110f4?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 67,
+    name: "Apple USB-C to Lightning Adapter",
+    price: 39.99,
+    image: "https://images.unsplash.com/photo-1584798845943-49e596bbd64a?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 68,
+    name: "Apple MagSafe Battery Pack",
+    price: 99.99,
+    image: "https://images.unsplash.com/photo-1607962834403-697050018610?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 69,
+    name: "Apple Pencil Tips",
+    price: 19.99,
+    image: "https://images.unsplash.com/photo-1611162617474-522a220415fa?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 70,
+    name: "Apple AirPods Charging Case",
+    price: 79.99,
+    image: "https://images.unsplash.com/photo-1560529034-2a9988b6ca89?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 71,
+    name: "Apple Watch Magnetic Charging Cable",
+    price: 29.99,
+    image: "https://images.unsplash.com/photo-1534430206226-3ca46694ef5e?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 72,
+    name: "Apple Lightning to 3.5 mm Headphone Jack Adapter",
+    price: 9.99,
+    image: "https://images.unsplash.com/photo-1584798845943-49e596bbd64a?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 73,
+    name: "Apple USB-C to SD Card Reader",
+    price: 39.99,
+    image: "https://images.unsplash.com/photo-1591798241437-1e3e709110f4?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 74,
+    name: "Apple Studio Display Tilt Adapter",
+    price: 29.00,
+    image: "https://images.unsplash.com/photo-1562440695-5c982f7136a8?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 75,
+    name: "Apple iPhone FineWoven Wallet with MagSafe",
+    price: 59.00,
+    image: "https://images.unsplash.com/photo-1585242985478-51404841d293?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 76,
+    name: "Apple iPhone FineWoven Case with MagSafe",
+    price: 59.00,
+    image: "https://images.unsplash.com/photo-1585242985478-51404841d293?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 77,
+    name: "Apple Watch Magnetic Fast Charger to USB-C Cable",
+    price: 29.00,
+    image: "https://images.unsplash.com/photo-1534430206226-3ca46694ef5e?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id:

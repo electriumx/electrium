@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -126,7 +127,7 @@
     position: relative;
   }
 
-  body:not(.dark) {
+  .light body {
     background-image: url('/lovable-uploads/c8eb0948-530c-4b6a-9944-ab715f820775.png');
     background-size: cover;
     background-position: center;

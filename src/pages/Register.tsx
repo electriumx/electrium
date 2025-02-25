@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { addUser } from '../data/users';
 import { useToast } from '@/components/ui/use-toast';
+import { useAuth } from '../contexts/AuthContext';
 
 const Register = () => {
   const [email, setEmail] = useState('');
@@ -12,12 +13,12 @@ const Register = () => {
   const [errors, setErrors] = useState({ email: '', password: '', name: '' });
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { login } = useAuth();
 
   const validateForm = () => {
     const newErrors = { email: '', password: '', name: '' };
     let isValid = true;
 
-    // Name validation
     if (!name.trim()) {
       newErrors.name = 'Name is required';
       isValid = false;
@@ -26,7 +27,6 @@ const Register = () => {
       isValid = false;
     }
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) {
       newErrors.email = 'Email is required';
@@ -36,7 +36,6 @@ const Register = () => {
       isValid = false;
     }
 
-    // Password validation
     if (!password) {
       newErrors.password = 'Password is required';
       isValid = false;
@@ -61,11 +60,14 @@ const Register = () => {
 
       try {
         addUser(newUser);
-        toast({
-          title: "Registration successful",
-          description: "Your account has been created. Please sign in.",
-        });
-        navigate('/login');
+        // Automatically log in after successful registration
+        if (login(newUser.username, newUser.password)) {
+          toast({
+            title: "Welcome!",
+            description: "Your account has been created and you're now signed in.",
+          });
+          navigate('/');
+        }
       } catch (error) {
         toast({
           variant: "destructive",
