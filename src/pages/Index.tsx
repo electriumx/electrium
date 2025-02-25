@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import Hero from '../components/Hero';
 import ProductFilters from '../components/ProductFilters';
@@ -638,7 +639,7 @@ const Index = () => {
   ];
 
   return (
-    <div>
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
       <Hero onExploreClick={() => {}} />
       <div className="container mx-auto px-4 py-8">
         <ProductFilters selectedBrand={null} onBrandSelect={(brand) => setSelectedBrands([brand])} />
