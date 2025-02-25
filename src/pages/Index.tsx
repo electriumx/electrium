@@ -1,4 +1,3 @@
-<lov-code>
 import { useState } from 'react';
 import Hero from '../components/Hero';
 import ProductFilters from '../components/ProductFilters';
@@ -633,4 +632,4 @@ const products: Product[] = [
     brand: "Apple"
   },
   {
-    id:
+    id: 78
