@@ -1,4 +1,5 @@
-import { useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -10,6 +11,8 @@ const Payment = () => {
   const { toast } = useToast();
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [itemName, setItemName] = useState('');
+  const [itemImage, setItemImage] = useState('');
+  const [estimatedPrice, setEstimatedPrice] = useState('');
   const [deliveryType, setDeliveryType] = useState('normal');
   const [deliveryTime, setDeliveryTime] = useState('');
   const [baseTotal, setBaseTotal] = useState(() => {
@@ -19,7 +22,35 @@ const Payment = () => {
     return items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
   });
 
-  const total = deliveryType === 'fast' ? baseTotal + 50 : baseTotal;
+  // Calculate delivery fee based on time remaining
+  const calculateDeliveryFee = () => {
+    if (deliveryType !== 'fast' || !deliveryTime) return 0;
+    
+    const now = new Date();
+    const selected = new Date();
+    const [hours, minutes] = deliveryTime.split(':');
+    selected.setHours(parseInt(hours), parseInt(minutes));
+
+    // If selected time is before current time, assume it's for tomorrow
+    if (selected < now) {
+      selected.setDate(selected.getDate() + 1);
+    }
+
+    const timeDiff = (selected.getTime() - now.getTime()) / (1000 * 60 * 60); // difference in hours
+    
+    // Minimum 2 hours for fast delivery
+    if (timeDiff < 2) {
+      return -1; // Invalid time
+    }
+
+    // Base fee is $50, increases by $10 for each hour less than 6
+    const baseFee = 50;
+    if (timeDiff >= 6) return baseFee;
+    return baseFee + ((6 - timeDiff) * 10);
+  };
+
+  const deliveryFee = calculateDeliveryFee();
+  const total = baseTotal + (deliveryFee >= 0 ? deliveryFee : 0);
 
   const validateCardNumber = (number: string) => {
     const cleaned = number.replace(/\D/g, '');
@@ -77,6 +108,25 @@ const Payment = () => {
       }
     }
 
+    if (deliveryType === 'fast' && deliveryFee < 0) {
+      toast({
+        variant: "destructive",
+        title: "Invalid Delivery Time",
+        description: "Please select a delivery time at least 2 hours from now"
+      });
+      return;
+    }
+
+    if (paymentMethod === 'trade' && (!itemImage || !estimatedPrice || !itemName)) {
+      toast({
+        variant: "destructive",
+        title: "Missing Trade Information",
+        description: "Please provide all item trade details"
+      });
+      return;
+    }
+
+    // Clear cart and navigate to thank you page
     localStorage.removeItem('cart');
     navigate('/thank-you');
   };
@@ -178,7 +228,8 @@ const Payment = () => {
                         deliveryType === 'fast' ? 'border-sage-500 bg-sage-50' : 'border-gray-200'
                       }`}
                     >
-                      Fast Delivery (+$50)
+                      Fast Delivery
+                      {deliveryFee >= 0 && deliveryType === 'fast' && ` (+$${deliveryFee.toFixed(2)})`}
                     </button>
                   </div>
                 </div>
@@ -186,7 +237,7 @@ const Payment = () => {
                 {deliveryType === 'fast' && (
                   <div>
                     <label htmlFor="deliveryTime" className="block text-sm font-medium text-foreground mb-1">
-                      Desired Delivery Time
+                      Desired Delivery Time (Min. 2 hours from now)
                     </label>
                     <input
                       type="time"
@@ -196,6 +247,11 @@ const Payment = () => {
                       onChange={(e) => setDeliveryTime(e.target.value)}
                       className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500"
                     />
+                    {deliveryFee < 0 && (
+                      <p className="text-red-500 text-sm mt-1">
+                        Please select a time at least 2 hours from now
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
@@ -225,9 +281,24 @@ const Payment = () => {
                     type="url"
                     id="itemImage"
                     required
+                    value={itemImage}
+                    onChange={(e) => setItemImage(e.target.value)}
                     className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500 bg-background text-foreground"
                     placeholder="Enter image URL"
                   />
+                  {itemImage && (
+                    <div className="mt-2">
+                      <img
+                        src={itemImage}
+                        alt="Item preview"
+                        className="w-full h-48 object-cover rounded-lg"
+                        onError={(e) => {
+                          const img = e.target as HTMLImageElement;
+                          img.src = 'https://via.placeholder.com/400x300?text=Invalid+Image+URL';
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label htmlFor="estimatedPrice" className="block text-sm font-medium text-foreground mb-1">
@@ -237,6 +308,8 @@ const Payment = () => {
                     type="number"
                     id="estimatedPrice"
                     required
+                    value={estimatedPrice}
+                    onChange={(e) => setEstimatedPrice(e.target.value)}
                     min="0"
                     step="0.01"
                     className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500 bg-background text-foreground"

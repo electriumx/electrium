@@ -2,6 +2,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
+import { useEffect } from 'react';
 
 interface CartItem {
   id: number;
@@ -15,6 +16,11 @@ const CartSummary = ({ cart }: { cart: CartItem[] }) => {
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
 
+  useEffect(() => {
+    // Save cart to localStorage whenever it changes
+    localStorage.setItem('cart', JSON.stringify(cart));
+  }, [cart]);
+
   const itemCount = cart.reduce((total, item) => total + item.quantity, 0);
   const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
@@ -27,6 +33,8 @@ const CartSummary = ({ cart }: { cart: CartItem[] }) => {
       navigate('/login', { state: { from: '/checkout' } });
       return;
     }
+    // Save cart to localStorage before navigating
+    localStorage.setItem('cart', JSON.stringify(cart));
     navigate('/checkout');
   };
 
