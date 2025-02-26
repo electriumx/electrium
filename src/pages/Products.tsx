@@ -16,6 +16,7 @@ interface Product {
 
 const Products = () => {
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [cart, setCart] = useState<Product[]>([]);
   const location = useLocation();
   
   const products: Product[] = [
@@ -646,6 +647,27 @@ const Products = () => {
     });
   };
 
+  const handleQuantityChange = (id: number, quantity: number) => {
+    const product = products.find(p => p.id === id);
+    if (!product) return;
+
+    setCart(prevCart => {
+      const existingItem = prevCart.find(item => item.id === id);
+      if (existingItem) {
+        if (quantity === 0) {
+          return prevCart.filter(item => item.id !== id);
+        }
+        return prevCart.map(item =>
+          item.id === id ? { ...item, quantity } : item
+        );
+      }
+      if (quantity > 0) {
+        return [...prevCart, { ...product, quantity }];
+      }
+      return prevCart;
+    });
+  };
+
   const filteredProducts = selectedBrands.length > 0
     ? products.filter(product => selectedBrands.includes(product.brand))
     : products;
@@ -658,9 +680,10 @@ const Products = () => {
       />
       <div className="flex flex-wrap -mx-4">
         <div className="w-full px-4">
-          <ProductGrid products={filteredProducts} onQuantityChange={() => {}} />
+          <ProductGrid products={filteredProducts} onQuantityChange={handleQuantityChange} />
         </div>
       </div>
+      <CartSummary cart={cart} />
     </div>
   );
 };

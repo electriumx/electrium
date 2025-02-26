@@ -16,7 +16,12 @@ const TopNavigation = () => {
   return (
     <nav className="fixed w-full top-0 z-40">
       <div className="container mx-auto flex items-center py-4 px-6">
-        <Link to="/" className="text-2xl font-bold text-[#9eff00]">
+        <Link to="/" className="text-2xl font-bold text-[#9eff00] flex items-center gap-2">
+          <img 
+            src="/lovable-uploads/72ebffff-bdd7-4309-b67c-3142e2a52726.png" 
+            alt="Electrium Logo" 
+            className="w-8 h-8"
+          />
           Electrium
         </Link>
         
