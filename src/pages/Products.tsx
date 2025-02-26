@@ -19,23 +19,22 @@ const Products = () => {
   const location = useLocation();
   
   const products: Product[] = [
-    // Apple Products
-  {
-    id: 1,
-    name: "MacBook Pro 16",
-    price: 2499.99,
-    image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800",
-    quantity: 0,
-    brand: "Apple"
-  },
-  {
-    id: 2,
-    name: "iPhone 15 Pro",
-    price: 999.99,
-    image: "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?auto=format&fit=crop&w=800",
-    quantity: 0,
-    brand: "Apple"
-  },
+    {
+      id: 1,
+      name: "MacBook Pro 16",
+      price: 2499.99,
+      image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800",
+      quantity: 0,
+      brand: "Apple"
+    },
+    {
+      id: 2,
+      name: "iPhone 15 Pro",
+      price: 999.99,
+      image: "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?auto=format&fit=crop&w=800",
+      quantity: 0,
+      brand: "Apple"
+    },
   {
     id: 3,
     name: "iPad Pro",
@@ -632,4 +631,5 @@ const Products = () => {
     id: 77,
     name: "Apple Watch Magnetic Fast Charger to USB-C Cable",
     price: 29.00,
-    image: "https://images.unsplash.com/photo-1534430206226-3ca46694ef5e
+    image: "https://images.unsplash.com/photo-1534430206226-3ca46694ef5e",
+    quantity:
