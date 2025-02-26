@@ -82,24 +82,24 @@ const Payment = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-16 px-4">
+    <div className="min-h-screen bg-background py-16 px-4">
       <div className="max-w-md mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-xl shadow-lg p-8"
+          className="bg-card rounded-xl shadow-lg p-8"
         >
-          <h1 className="text-3xl font-medium text-gray-900 mb-8">Payment Details</h1>
+          <h1 className="text-3xl font-medium text-foreground mb-8">Payment Details</h1>
           
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="space-y-4">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-foreground">
                 Select Payment Method
               </label>
               <select
                 value={paymentMethod}
                 onChange={(e) => setPaymentMethod(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500 bg-white"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500 bg-background text-foreground"
               >
                 <option value="card">Card</option>
                 <option value="cash">Cash</option>
@@ -110,7 +110,7 @@ const Payment = () => {
             {paymentMethod === 'card' && (
               <>
                 <div>
-                  <label htmlFor="cardNumber" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="cardNumber" className="block text-sm font-medium text-foreground mb-1">
                     Card Number
                   </label>
                   <input
@@ -124,7 +124,7 @@ const Payment = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="expiry" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="expiry" className="block text-sm font-medium text-foreground mb-1">
                       Expiry Date
                     </label>
                     <input
@@ -137,7 +137,7 @@ const Payment = () => {
                   </div>
                   
                   <div>
-                    <label htmlFor="cvv" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="cvv" className="block text-sm font-medium text-foreground mb-1">
                       CVV
                     </label>
                     <input
@@ -155,7 +155,7 @@ const Payment = () => {
             {paymentMethod === 'cash' && (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     Delivery Type
                   </label>
                   <div className="grid grid-cols-2 gap-4">
@@ -185,7 +185,7 @@ const Payment = () => {
 
                 {deliveryType === 'fast' && (
                   <div>
-                    <label htmlFor="deliveryTime" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="deliveryTime" className="block text-sm font-medium text-foreground mb-1">
                       Desired Delivery Time
                     </label>
                     <input
@@ -202,24 +202,52 @@ const Payment = () => {
             )}
 
             {paymentMethod === 'trade' && (
-              <div>
-                <label htmlFor="itemName" className="block text-sm font-medium text-gray-700 mb-1">
-                  Item Name
-                </label>
-                <input
-                  type="text"
-                  id="itemName"
-                  required
-                  value={itemName}
-                  onChange={(e) => setItemName(e.target.value)}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500"
-                  placeholder="Enter item name"
-                />
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="itemName" className="block text-sm font-medium text-foreground mb-1">
+                    Item Name
+                  </label>
+                  <input
+                    type="text"
+                    id="itemName"
+                    required
+                    value={itemName}
+                    onChange={(e) => setItemName(e.target.value)}
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500 bg-background text-foreground"
+                    placeholder="Enter item name"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="itemImage" className="block text-sm font-medium text-foreground mb-1">
+                    Item Image URL
+                  </label>
+                  <input
+                    type="url"
+                    id="itemImage"
+                    required
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500 bg-background text-foreground"
+                    placeholder="Enter image URL"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="estimatedPrice" className="block text-sm font-medium text-foreground mb-1">
+                    Estimated Value ($)
+                  </label>
+                  <input
+                    type="number"
+                    id="estimatedPrice"
+                    required
+                    min="0"
+                    step="0.01"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500 bg-background text-foreground"
+                    placeholder="Enter estimated value"
+                  />
+                </div>
               </div>
             )}
 
             <div>
-              <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="address" className="block text-sm font-medium text-foreground mb-1">
                 Delivery Address
               </label>
               <textarea
