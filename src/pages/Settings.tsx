@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";
@@ -11,10 +10,18 @@ import { users } from "@/data/users";
 const Settings = () => {
   const { setTheme, theme } = useTheme();
   const { toast } = useToast();
-  const { currentUser, logout } = useAuth();
+  const { currentUser, logout, isAuthenticated } = useAuth();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  if (!isAuthenticated) {
+    return (
+      <div className="container mx-auto px-4 py-8 min-h-screen">
+        <h1 className="text-4xl font-bold mb-8 text-center">Please sign in to access settings</h1>
+      </div>
+    );
+  }
 
   const toggleTheme = () => {
     const newTheme = theme === "dark" ? "light" : "dark";

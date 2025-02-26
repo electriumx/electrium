@@ -3,15 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 
-interface CartSummaryProps {
-  itemCount: number;
-  total: number;
+interface CartItem {
+  id: number;
+  name: string;
+  price: number;
+  quantity: number;
 }
 
-const CartSummary = ({ itemCount, total }: CartSummaryProps) => {
+const CartSummary = ({ cart }: { cart: CartItem[] }) => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
+
+  const itemCount = cart.reduce((total, item) => total + item.quantity, 0);
+  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
   const handleCheckout = () => {
     if (!isAuthenticated) {
@@ -28,11 +33,11 @@ const CartSummary = ({ itemCount, total }: CartSummaryProps) => {
   if (itemCount === 0) return null;
 
   return (
-    <div className="sticky bottom-0 bg-background/80 backdrop-blur-md p-6 mt-8">
+    <div className="sticky bottom-0 bg-background/80 backdrop-blur-md p-6 mt-8 border-t dark:border-gray-800">
       <div className="container mx-auto max-w-4xl">
         <div className="flex justify-between items-center mb-4">
           <span className="text-foreground">Items in cart: {itemCount}</span>
-          <span className="text-lg font-medium">Total: ${total.toFixed(2)}</span>
+          <span className="text-lg font-medium text-foreground">Total: ${total.toFixed(2)}</span>
         </div>
         <button
           onClick={handleCheckout}

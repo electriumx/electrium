@@ -26,7 +26,7 @@ const ProductCard = ({ id, name, price, image, onQuantityChange }: ProductCardPr
   };
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm transition-all duration-300 hover:shadow-md">
+    <div className="bg-card rounded-xl p-6 shadow-sm transition-all duration-300 hover:shadow-md border border-border">
       <div className="relative aspect-square overflow-hidden rounded-lg mb-4">
         <img
           src={image}
@@ -36,24 +36,24 @@ const ProductCard = ({ id, name, price, image, onQuantityChange }: ProductCardPr
         />
       </div>
       <div className="space-y-2">
-        <h3 className="font-medium text-lg text-gray-900">{name}</h3>
-        <p className="text-gray-600">${price.toFixed(2)}</p>
+        <h3 className="font-medium text-lg text-foreground">{name}</h3>
+        <p className="text-muted-foreground">${price.toFixed(2)}</p>
         <div className="flex items-center justify-between mt-4">
           <div className="flex items-center gap-3">
             <button
               onClick={handleDecrement}
               disabled={quantity === 0}
-              className="p-2 rounded-full bg-sage-50 hover:bg-sage-100 transition-colors duration-200 
+              className="p-2 rounded-full bg-muted hover:bg-muted/80 transition-colors duration-200 
                        disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Minus className="w-5 h-5 text-sage-600" />
+              <Minus className="w-5 h-5 text-foreground" />
             </button>
-            <span className="text-sm text-gray-500">{quantity}</span>
+            <span className="text-sm text-muted-foreground">{quantity}</span>
             <button
               onClick={handleIncrement}
-              className="p-2 rounded-full bg-sage-50 hover:bg-sage-100 transition-colors duration-200"
+              className="p-2 rounded-full bg-muted hover:bg-muted/80 transition-colors duration-200"
             >
-              <Plus className="w-5 h-5 text-sage-600" />
+              <Plus className="w-5 h-5 text-foreground" />
             </button>
           </div>
         </div>

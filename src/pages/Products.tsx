@@ -1,15 +1,23 @@
-
 import { useState } from 'react';
 import ProductFilters from '../components/ProductFilters';
 import ProductGrid from '../components/ProductGrid';
 import CartSummary from '../components/CartSummary';
 import { useLocation } from 'react-router-dom';
 
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  image: string;
+  quantity: number;
+  brand: "Apple" | "Samsung" | "Sony" | "Other";
+}
+
 const Products = () => {
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const location = useLocation();
   
-  const products = [
+  const products: Product[] = [
     // Apple Products
   {
     id: 1,
@@ -63,7 +71,7 @@ const Products = () => {
     id: 7,
     name: "Mac Mini",
     price: 699.99,
-    image: "https://images.unsplash.com/photo-1588654513454-55c950269216?auto=format&fit=crop&w=800",
+    image: "https://images.unsplash.com/photo-1588654444534-526ea14c2d51?auto=format&fit=crop&w=800",
     quantity: 0,
     brand: "Apple"
   },
@@ -629,8 +637,7 @@ const Products = () => {
   },
   ];
 
-  // Initialize cart state from localStorage or URL state
-  const [cart, setCart] = useState(() => {
+  const [cart, setCart] = useState<Product[]>(() => {
     const savedCart = localStorage.getItem('cart');
     try {
       return savedCart ? JSON.parse(savedCart) : [];
@@ -640,7 +647,7 @@ const Products = () => {
   });
 
   const handleQuantityChange = (id: number, quantity: number) => {
-    const updatedCart = cart.map((item: any) =>
+    const updatedCart = cart.map(item =>
       item.id === id ? { ...item, quantity } : item
     );
     setCart(updatedCart);
@@ -679,4 +686,3 @@ const Products = () => {
 };
 
 export default Products;
-
