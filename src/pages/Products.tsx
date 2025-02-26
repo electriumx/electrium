@@ -1,4 +1,4 @@
-<lov-code>
+
 import { useState } from 'react';
 import ProductFilters from '../components/ProductFilters';
 import ProductGrid from '../components/ProductGrid';
@@ -631,4 +631,38 @@ const Products = () => {
       id: 77,
       name: "Apple Watch Magnetic Fast Charger to USB-C Cable",
       price: 29.00,
-      image: "https://images.unsplash.com/photo-1534430206226-3ca46694ef5e?auto=format&
+      image: "https://images.unsplash.com/photo-1534430206226-3ca46694ef5e?auto=format&fit=crop&w=800",
+      quantity: 0,
+      brand: "Apple"
+    }
+  ];
+
+  const handleBrandSelect = (brand: string) => {
+    setSelectedBrands(prevBrands => {
+      if (prevBrands.includes(brand)) {
+        return prevBrands.filter(b => b !== brand);
+      }
+      return [...prevBrands, brand];
+    });
+  };
+
+  const filteredProducts = selectedBrands.length > 0
+    ? products.filter(product => selectedBrands.includes(product.brand))
+    : products;
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <ProductFilters
+        selectedBrands={selectedBrands}
+        onBrandSelect={handleBrandSelect}
+      />
+      <div className="flex flex-wrap -mx-4">
+        <div className="w-full px-4">
+          <ProductGrid products={filteredProducts} onQuantityChange={() => {}} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Products;
