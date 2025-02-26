@@ -1,4 +1,4 @@
-<lov-code>
+
 import { useState } from 'react';
 import ProductFilters from '../components/ProductFilters';
 import ProductGrid from '../components/ProductGrid';
@@ -632,3 +632,51 @@ const Products = () => {
   // Initialize cart state from localStorage or URL state
   const [cart, setCart] = useState(() => {
     const savedCart = localStorage.getItem('cart');
+    try {
+      return savedCart ? JSON.parse(savedCart) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const handleQuantityChange = (id: number, quantity: number) => {
+    const updatedCart = cart.map((item: any) =>
+      item.id === id ? { ...item, quantity } : item
+    );
+    setCart(updatedCart);
+    localStorage.setItem('cart', JSON.stringify(updatedCart));
+  };
+
+  const filteredProducts = selectedBrands.length > 0
+    ? products.filter(product => selectedBrands.includes(product.brand))
+    : products;
+
+  return (
+    <div className="min-h-screen bg-background p-8">
+      <div className="container mx-auto">
+        <ProductFilters
+          selectedBrand={selectedBrands.length === 1 ? selectedBrands[0] : null}
+          onBrandSelect={(brand) => {
+            if (brand) {
+              setSelectedBrands(prev => 
+                prev.includes(brand) 
+                  ? prev.filter(b => b !== brand)
+                  : [...prev, brand]
+              );
+            } else {
+              setSelectedBrands([]);
+            }
+          }}
+        />
+        <ProductGrid
+          products={filteredProducts}
+          onQuantityChange={handleQuantityChange}
+        />
+        <CartSummary cart={cart} />
+      </div>
+    </div>
+  );
+};
+
+export default Products;
+
