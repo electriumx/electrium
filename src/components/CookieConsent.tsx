@@ -7,28 +7,27 @@ import { useAuth } from "../contexts/AuthContext";
 const CookieConsent = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [showManage, setShowManage] = useState(false);
   const { toast } = useToast();
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {
-    if (isAuthenticated) {
-      const hasSeenCookieConsent = localStorage.getItem("hasSeenCookieConsent");
-      if (!hasSeenCookieConsent) {
-        setIsVisible(true);
-      }
+    const hasSeenCookieConsent = sessionStorage.getItem("hasSeenCookieConsent");
+    if (!hasSeenCookieConsent) {
+      setIsVisible(true);
     }
-  }, [isAuthenticated]);
+  }, []);
 
   const handleCookieChoice = (accepted: boolean) => {
     setIsAnimating(true);
-    localStorage.setItem("hasSeenCookieConsent", "true");
+    sessionStorage.setItem("hasSeenCookieConsent", "true");
     localStorage.setItem("cookieConsent", accepted ? "accepted" : "rejected");
     
     toast({
-      title: accepted ? "Cookies Accepted" : "Cookies Rejected",
+      title: accepted ? "All Cookies Accepted" : "All Cookies Rejected",
       description: accepted 
-        ? "Thank you for accepting cookies" 
-        : "You've opted out of cookies",
+        ? "Thank you for accepting all cookies" 
+        : "You've opted out of all cookies",
     });
 
     setTimeout(() => {
@@ -42,23 +41,49 @@ const CookieConsent = () => {
     <div className={`fixed bottom-4 right-4 max-w-sm bg-card p-6 rounded-lg shadow-lg z-50 ${
       isAnimating ? "fade-out" : "fade-in"
     }`}>
-      <h3 className="font-semibold mb-2">Cookie Consent</h3>
+      <div className="flex justify-between items-start mb-4">
+        <h3 className="font-semibold">Cookie Consent</h3>
+        <Button 
+          variant="ghost"
+          size="sm"
+          onClick={() => setShowManage(prev => !prev)}
+        >
+          Manage Cookies
+        </Button>
+      </div>
       <p className="text-sm text-muted-foreground mb-4">
         We use cookies to enhance your browsing experience and analyze our traffic.
       </p>
-      <div className="flex gap-2">
-        <Button 
-          variant="outline" 
-          onClick={() => handleCookieChoice(false)}
-        >
-          Reject
-        </Button>
-        <Button 
-          onClick={() => handleCookieChoice(true)}
-        >
-          Accept
-        </Button>
-      </div>
+      {showManage ? (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <span className="text-sm">Essential Cookies</span>
+            <input type="checkbox" checked disabled className="accent-sage-500" />
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-sm">Analytics Cookies</span>
+            <input type="checkbox" className="accent-sage-500" />
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-sm">Marketing Cookies</span>
+            <input type="checkbox" className="accent-sage-500" />
+          </div>
+        </div>
+      ) : (
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={() => handleCookieChoice(false)}
+          >
+            Reject All
+          </Button>
+          <Button 
+            onClick={() => handleCookieChoice(true)}
+          >
+            Accept All
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
