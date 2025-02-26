@@ -1,3 +1,4 @@
+<lov-code>
 import { useState } from 'react';
 import ProductFilters from '../components/ProductFilters';
 import ProductGrid from '../components/ProductGrid';
@@ -631,4 +632,4 @@ const Products = () => {
     id: 77,
     name: "Apple Watch Magnetic Fast Charger to USB-C Cable",
     price: 29.00,
-    image: "https://images.unsplash.com/photo-1534430206226-3ca46694ef5e?
+    image: "https://images.unsplash.com/photo-1534430206226-3ca46694ef5e
