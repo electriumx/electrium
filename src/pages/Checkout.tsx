@@ -1,171 +1,93 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
 
-interface CartItem {
+import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+
+interface Product {
   id: number;
   name: string;
   price: number;
+  image: string;
   quantity: number;
-  image?: string;
 }
 
 const Checkout = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-
-  useEffect(() => {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-      try {
-        setCartItems(JSON.parse(savedCart));
-      } catch (error) {
-        console.error("Failed to parse cart from localStorage", error);
-        setCartItems([]);
-      }
-    }
-  }, []);
-
-  const updateQuantity = (id: number, newQuantity: number) => {
-    if (newQuantity < 1) return;
-
-    const updatedItems = cartItems.map(item => 
-      item.id === id ? { ...item, quantity: newQuantity } : item
-    );
-    
-    setCartItems(updatedItems);
-    localStorage.setItem('cart', JSON.stringify(updatedItems));
-  };
-
-  const removeItem = (id: number) => {
-    const updatedItems = cartItems.filter(item => item.id !== id);
-    setCartItems(updatedItems);
-    localStorage.setItem('cart', JSON.stringify(updatedItems));
-    
-    toast({
-      description: "Item removed from cart",
-    });
-  };
-
-  const calculateTotal = () => {
-    return cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  };
-
-  const handleCheckout = () => {
-    if (cartItems.length === 0) {
-      toast({
-        variant: "destructive",
-        title: "Empty Cart",
-        description: "Your cart is empty. Add some items before checkout."
-      });
-      return;
-    }
-    
-    localStorage.setItem('cart', JSON.stringify(cartItems));
-    navigate('/payment');
-  };
+  const cartData = JSON.parse(localStorage.getItem('cart') || '[]');
+  const purchasedItems = cartData.filter((item: Product) => item.quantity > 0);
+  const total = purchasedItems.reduce((sum: number, item: Product) => sum + (item.price * item.quantity), 0);
+  const purchaseDate = new Date().toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
 
   return (
-    <div className="min-h-screen bg-background py-16 px-4">
-      <div className="container mx-auto max-w-4xl">
+    <div className="min-h-screen bg-gray-50 py-16 px-4">
+      <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-card rounded-lg shadow-sm"
+          className="bg-white rounded-xl shadow-lg p-8"
         >
-          <div className="p-6 border-b">
-            <h1 className="text-2xl font-semibold text-foreground">Shopping Cart</h1>
-          </div>
-
-          {cartItems.length === 0 ? (
-            <div className="p-8 text-center">
-              <p className="text-muted-foreground mb-6">Your cart is empty</p>
-              <Link to="/products">
-                <Button variant="outline">Browse Products</Button>
-              </Link>
+          <h1 className="text-3xl font-medium text-gray-900 mb-8">Order Summary</h1>
+          
+          {purchasedItems.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600">Your cart is empty</p>
+              <button
+                onClick={() => navigate('/')}
+                className="mt-4 text-sage-600 hover:text-sage-700 font-medium"
+              >
+                Continue Shopping
+              </button>
             </div>
           ) : (
             <>
-              <div className="divide-y">
-                {cartItems.map(item => (
-                  <div key={item.id} className="p-6 flex items-center gap-4">
-                    <div className="w-20 h-20 rounded-md overflow-hidden bg-muted flex-shrink-0">
-                      {item.image ? (
-                        <img 
-                          src={item.image} 
-                          alt={item.name} 
-                          className="w-full h-full object-cover" 
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-secondary flex items-center justify-center text-secondary-foreground">
-                          No Image
-                        </div>
-                      )}
+              <div className="space-y-6">
+                {purchasedItems.map((item: Product) => (
+                  <div key={item.id} className="flex gap-4 items-center p-4 border rounded-lg">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-20 h-20 object-cover rounded-lg"
+                    />
+                    <div className="flex-1">
+                      <h3 className="font-medium text-gray-900">{item.name}</h3>
+                      <p className="text-gray-600">Quantity: {item.quantity}</p>
+                      <p className="text-gray-500 text-sm">Purchase Date: {purchaseDate}</p>
                     </div>
-                    
-                    <div className="flex-grow">
-                      <h3 className="font-medium text-foreground">{item.name}</h3>
-                      <p className="text-muted-foreground text-sm mt-1">${item.price.toFixed(2)}</p>
+                    <div className="text-right">
+                      <p className="font-medium text-sage-600">
+                        Item Total: ${(item.price * item.quantity).toFixed(2)}
+                      </p>
+                      <p className="text-sm text-gray-500">${item.price.toFixed(2)} each</p>
                     </div>
-                    
-                    <div className="flex items-center">
-                      <Button 
-                        variant="outline" 
-                        size="icon" 
-                        className="h-8 w-8"
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      >
-                        -
-                      </Button>
-                      <span className="w-10 text-center">{item.quantity}</span>
-                      <Button 
-                        variant="outline" 
-                        size="icon" 
-                        className="h-8 w-8"
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      >
-                        +
-                      </Button>
-                    </div>
-                    
-                    <div className="w-24 text-right font-medium">
-                      ${(item.price * item.quantity).toFixed(2)}
-                    </div>
-                    
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={() => removeItem(item.id)}
-                    >
-                      <Trash2 className="h-5 w-5" />
-                    </Button>
                   </div>
                 ))}
               </div>
-
-              <div className="p-6 bg-muted/30 rounded-b-lg">
-                <div className="flex justify-between text-lg font-medium mb-4">
+              
+              <div className="mt-8 pt-6 border-t">
+                <div className="flex justify-between items-center text-lg font-medium">
                   <span>Total</span>
-                  <span>${calculateTotal().toFixed(2)}</span>
+                  <span className="text-sage-600">${total.toFixed(2)}</span>
                 </div>
-                
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <Link to="/products" className="flex-1">
-                    <Button variant="outline" className="w-full">
-                      Continue Shopping
-                    </Button>
-                  </Link>
-                  <Button 
-                    className="flex-1 bg-sage-500 hover:bg-sage-600" 
-                    onClick={handleCheckout}
-                  >
-                    Proceed to Payment
-                  </Button>
-                </div>
+              </div>
+              
+              <div className="mt-8 space-y-4">
+                <button
+                  onClick={() => navigate('/payment')}
+                  className="w-full bg-sage-500 text-white py-3 px-6 rounded-lg font-medium 
+                           transition-all duration-200 hover:bg-sage-600"
+                >
+                  Proceed to Payment
+                </button>
+                <button
+                  onClick={() => navigate('/')}
+                  className="w-full bg-white text-sage-600 py-3 px-6 rounded-lg font-medium border border-sage-200
+                           transition-all duration-200 hover:bg-sage-50"
+                >
+                  Continue Shopping
+                </button>
               </div>
             </>
           )}
