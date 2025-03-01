@@ -5,6 +5,27 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 
+// Country and locations data for dropdowns
+const countries = [
+  { code: 'US', name: 'United States' },
+  { code: 'UK', name: 'United Kingdom' },
+  { code: 'CA', name: 'Canada' },
+  { code: 'AU', name: 'Australia' },
+  { code: 'DE', name: 'Germany' },
+  { code: 'FR', name: 'France' },
+  { code: 'JP', name: 'Japan' },
+];
+
+const locationsByCountry = {
+  US: ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego', 'Dallas', 'San Jose'],
+  UK: ['London', 'Birmingham', 'Manchester', 'Glasgow', 'Liverpool', 'Bristol', 'Edinburgh', 'Sheffield', 'Leeds', 'Leicester'],
+  CA: ['Toronto', 'Montreal', 'Vancouver', 'Calgary', 'Edmonton', 'Ottawa', 'Winnipeg', 'Quebec City', 'Hamilton', 'Kitchener'],
+  AU: ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide', 'Gold Coast', 'Newcastle', 'Canberra', 'Wollongong', 'Hobart'],
+  DE: ['Berlin', 'Hamburg', 'Munich', 'Cologne', 'Frankfurt', 'Stuttgart', 'Düsseldorf', 'Leipzig', 'Dortmund', 'Essen'],
+  FR: ['Paris', 'Marseille', 'Lyon', 'Toulouse', 'Nice', 'Nantes', 'Strasbourg', 'Montpellier', 'Bordeaux', 'Lille'],
+  JP: ['Tokyo', 'Yokohama', 'Osaka', 'Nagoya', 'Sapporo', 'Fukuoka', 'Kawasaki', 'Kobe', 'Kyoto', 'Saitama'],
+};
+
 const Payment = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
@@ -15,12 +36,21 @@ const Payment = () => {
   const [estimatedPrice, setEstimatedPrice] = useState('');
   const [deliveryType, setDeliveryType] = useState('normal');
   const [deliveryTime, setDeliveryTime] = useState('');
+  const [selectedCountry, setSelectedCountry] = useState('US');
+  const [selectedLocation, setSelectedLocation] = useState('');
+  const [availableLocations, setAvailableLocations] = useState<string[]>([]);
   const [baseTotal, setBaseTotal] = useState(() => {
     const cart = localStorage.getItem('cart');
     if (!cart) return 0;
     const items = JSON.parse(cart);
     return items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
   });
+
+  // Update available locations when country changes
+  useEffect(() => {
+    setAvailableLocations(locationsByCountry[selectedCountry as keyof typeof locationsByCountry] || []);
+    setSelectedLocation(locationsByCountry[selectedCountry as keyof typeof locationsByCountry]?.[0] || '');
+  }, [selectedCountry]);
 
   // Calculate delivery fee based on time remaining
   const calculateDeliveryFee = () => {
@@ -122,6 +152,15 @@ const Payment = () => {
         variant: "destructive",
         title: "Missing Trade Information",
         description: "Please provide all item trade details"
+      });
+      return;
+    }
+
+    if (!selectedLocation) {
+      toast({
+        variant: "destructive",
+        title: "Delivery Location Required",
+        description: "Please select a delivery location"
       });
       return;
     }
@@ -319,17 +358,57 @@ const Payment = () => {
               </div>
             )}
 
-            <div>
-              <label htmlFor="address" className="block text-sm font-medium text-foreground mb-1">
-                Delivery Address
-              </label>
-              <textarea
-                id="address"
-                required
-                rows={3}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500"
-                placeholder="Enter your delivery address"
-              />
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="country" className="block text-sm font-medium text-foreground mb-1">
+                  Country
+                </label>
+                <select
+                  id="country"
+                  value={selectedCountry}
+                  onChange={(e) => setSelectedCountry(e.target.value)}
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500 bg-background text-foreground"
+                  required
+                >
+                  {countries.map((country) => (
+                    <option key={country.code} value={country.code}>
+                      {country.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="location" className="block text-sm font-medium text-foreground mb-1">
+                  Location
+                </label>
+                <select
+                  id="location"
+                  value={selectedLocation}
+                  onChange={(e) => setSelectedLocation(e.target.value)}
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500 bg-background text-foreground"
+                  required
+                >
+                  {availableLocations.map((location) => (
+                    <option key={location} value={location}>
+                      {location}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="addressDetails" className="block text-sm font-medium text-foreground mb-1">
+                  Address Details
+                </label>
+                <textarea
+                  id="addressDetails"
+                  required
+                  rows={3}
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500 bg-background text-foreground"
+                  placeholder="Enter your street address, apartment number, etc."
+                />
+              </div>
             </div>
 
             <div className="pt-4">

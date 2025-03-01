@@ -1,11 +1,10 @@
-
 interface ProductFiltersProps {
-  selectedBrand: string | null;
-  onBrandSelect: (brand: string | null) => void;
   selectedBrands: string[];
+  selectedBrand: string;
+  onBrandSelect: (brand: string) => void;
 }
 
-const ProductFilters = ({ selectedBrands, onBrandSelect }: ProductFiltersProps) => {
+const ProductFilters = ({ selectedBrands, selectedBrand, onBrandSelect }: ProductFiltersProps) => {
   return (
     <div className="flex flex-wrap gap-4 justify-center mb-12">
       {["Apple", "Samsung", "Sony"].map((brand) => (
