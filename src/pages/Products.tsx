@@ -680,7 +680,10 @@ const Products = () => {
       />
       <div className="flex flex-wrap -mx-4">
         <div className="w-full px-4">
-          <ProductGrid products={filteredProducts} onQuantityChange={handleQuantityChange} />
+          <ProductGrid 
+            products={filteredProducts} 
+            onQuantityChange={handleQuantityChange}
+          />
         </div>
       </div>
       <CartSummary cart={cart} />

@@ -23,43 +23,72 @@ import SocialButtons from "./components/SocialButtons";
 import PaymentSuccess from "./components/PaymentSuccess";
 import { AuthProvider } from "./contexts/AuthContext";
 import CookieConsent from "./components/CookieConsent";
+import { useState, useEffect } from "react";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <ThemeProvider attribute="class" defaultTheme="dark">
-        <BrowserRouter>
-          <AuthProvider>
-            <Toaster />
-            <Sonner />
-            <TopNavigation />
-            <Navigation />
-            <div className="pt-16">
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/products" element={<Products />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/payment" element={<Payment />} />
-                <Route path="/payment-success" element={<PaymentSuccess />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/thank-you" element={<ThankYou />} />
-                <Route path="/donation" element={<Donation />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </div>
-            <SocialButtons />
-            <Footer />
-            <CookieConsent />
-          </AuthProvider>
-        </BrowserRouter>
-      </ThemeProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  const [themeChangeAllowed, setThemeChangeAllowed] = useState(true);
+
+  // Add this effect to handle the theme change cooldown
+  useEffect(() => {
+    const handleThemeChange = () => {
+      if (themeChangeAllowed) {
+        setThemeChangeAllowed(false);
+        setTimeout(() => {
+          setThemeChangeAllowed(true);
+        }, 2000); // 2-second cooldown
+      }
+    };
+
+    // Listen for theme changes
+    window.addEventListener('themechange', handleThemeChange);
+
+    return () => {
+      window.removeEventListener('themechange', handleThemeChange);
+    };
+  }, [themeChangeAllowed]);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={false}
+          disableTransitionOnChange={false}
+        >
+          <BrowserRouter>
+            <AuthProvider>
+              <Toaster />
+              <Sonner />
+              <TopNavigation />
+              <Navigation />
+              <div className="pt-16">
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/products" element={<Products />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/payment" element={<Payment />} />
+                  <Route path="/payment-success" element={<PaymentSuccess />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/thank-you" element={<ThankYou />} />
+                  <Route path="/donation" element={<Donation />} />
+                  <Route path="/settings" element={<Settings />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </div>
+              <SocialButtons />
+              <Footer />
+              <CookieConsent />
+            </AuthProvider>
+          </BrowserRouter>
+        </ThemeProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

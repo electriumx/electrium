@@ -55,7 +55,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground transition-colors duration-300;
+    @apply bg-background text-foreground transition-colors duration-700;
   }
 }
 
@@ -66,4 +66,3 @@
 .dark body {
   background: linear-gradient(to right, #243949 0%, #517fa4 100%);
 }
-
