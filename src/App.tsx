@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "next-themes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
 import Index from "./pages/Index";
 import Products from "./pages/Products";
 import About from "./pages/About";
@@ -26,35 +27,52 @@ import CookieConsent from "./components/CookieConsent";
 
 const queryClient = new QueryClient();
 
+const AppContent = () => {
+  useEffect(() => {
+    // Load custom background if available
+    const savedBackground = localStorage.getItem('customBackground');
+    if (savedBackground) {
+      document.documentElement.style.setProperty('--custom-background', `url(${savedBackground})`);
+      document.body.style.backgroundImage = `url(${savedBackground})`;
+    }
+  }, []);
+
+  return (
+    <>
+      <Toaster />
+      <Sonner />
+      <TopNavigation />
+      <Navigation />
+      <div className="pt-16">
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/payment" element={<Payment />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/thank-you" element={<ThankYou />} />
+          <Route path="/donation" element={<Donation />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </div>
+      <SocialButtons />
+      <Footer />
+      <CookieConsent />
+    </>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <ThemeProvider attribute="class" defaultTheme="dark">
         <BrowserRouter>
           <AuthProvider>
-            <Toaster />
-            <Sonner />
-            <TopNavigation />
-            <Navigation />
-            <div className="pt-16">
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/products" element={<Products />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/payment" element={<Payment />} />
-                <Route path="/payment-success" element={<PaymentSuccess />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/thank-you" element={<ThankYou />} />
-                <Route path="/donation" element={<Donation />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </div>
-            <SocialButtons />
-            <Footer />
-            <CookieConsent />
+            <AppContent />
           </AuthProvider>
         </BrowserRouter>
       </ThemeProvider>

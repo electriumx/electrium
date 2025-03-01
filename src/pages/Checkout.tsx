@@ -35,7 +35,7 @@ const Checkout = () => {
             <div className="text-center py-8">
               <p className="text-gray-600">Your cart is empty</p>
               <button
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/products')}
                 className="mt-4 text-sage-600 hover:text-sage-700 font-medium"
               >
                 Continue Shopping
@@ -82,7 +82,7 @@ const Checkout = () => {
                   Proceed to Payment
                 </button>
                 <button
-                  onClick={() => navigate('/')}
+                  onClick={() => navigate('/products')}
                   className="w-full bg-white text-sage-600 py-3 px-6 rounded-lg font-medium border border-sage-200
                            transition-all duration-200 hover:bg-sage-50"
                 >

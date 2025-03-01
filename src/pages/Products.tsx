@@ -1,9 +1,9 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import ProductFilters from '../components/ProductFilters';
 import ProductGrid from '../components/ProductGrid';
 import CartSummary from '../components/CartSummary';
-import { useLocation } from 'react-router-dom';
 
 interface Product {
   id: number;
@@ -19,6 +19,7 @@ const Products = () => {
   const [cart, setCart] = useState<Product[]>([]);
   const location = useLocation();
   
+  // Initialize products array with all the product data
   const products: Product[] = [
     {
       id: 1,
@@ -638,33 +639,44 @@ const Products = () => {
     }
   ];
 
+  useEffect(() => {
+    // Load cart from localStorage when component mounts
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+      setCart(JSON.parse(savedCart));
+    }
+  }, []);
+
   const handleBrandSelect = (brand: string) => {
-    setSelectedBrands(prevBrands => {
-      if (prevBrands.includes(brand)) {
-        return prevBrands.filter(b => b !== brand);
-      }
-      return [...prevBrands, brand];
-    });
+    if (selectedBrands.includes(brand)) {
+      setSelectedBrands(selectedBrands.filter(b => b !== brand));
+    } else {
+      setSelectedBrands([...selectedBrands, brand]);
+    }
   };
 
-  const handleQuantityChange = (id: number, quantity: number) => {
-    const product = products.find(p => p.id === id);
-    if (!product) return;
-
+  const handleAddToCart = (productId: number) => {
     setCart(prevCart => {
-      const existingItem = prevCart.find(item => item.id === id);
-      if (existingItem) {
-        if (quantity === 0) {
-          return prevCart.filter(item => item.id !== id);
+      const updatedCart = [...prevCart];
+      const productIndex = updatedCart.findIndex(item => item.id === productId);
+      
+      if (productIndex >= 0) {
+        // Product already in cart, increase quantity
+        updatedCart[productIndex] = {
+          ...updatedCart[productIndex],
+          quantity: updatedCart[productIndex].quantity + 1
+        };
+      } else {
+        // Product not in cart, add it
+        const product = products.find(p => p.id === productId);
+        if (product) {
+          updatedCart.push({ ...product, quantity: 1 });
         }
-        return prevCart.map(item =>
-          item.id === id ? { ...item, quantity } : item
-        );
       }
-      if (quantity > 0) {
-        return [...prevCart, { ...product, quantity }];
-      }
-      return prevCart;
+      
+      // Save to localStorage
+      localStorage.setItem('cart', JSON.stringify(updatedCart));
+      return updatedCart;
     });
   };
 
@@ -673,14 +685,18 @@ const Products = () => {
     : products;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <ProductFilters
-        selectedBrands={selectedBrands}
-        onBrandSelect={handleBrandSelect}
-      />
-      <div className="flex flex-wrap -mx-4">
-        <div className="w-full px-4">
-          <ProductGrid products={filteredProducts} onQuantityChange={handleQuantityChange} />
+    <div className="container mx-auto px-4 py-8 min-h-screen">
+      <h1 className="text-4xl font-bold mb-8">Our Products</h1>
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div className="lg:col-span-1">
+          <ProductFilters 
+            selectedBrands={selectedBrands} 
+            selectedBrand="" // Added this to fix the TypeScript error
+            onBrandSelect={handleBrandSelect} 
+          />
+        </div>
+        <div className="lg:col-span-3">
+          <ProductGrid products={filteredProducts} onAddToCart={handleAddToCart} />
         </div>
       </div>
       <CartSummary cart={cart} />

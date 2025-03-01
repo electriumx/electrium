@@ -56,6 +56,11 @@
   }
   body {
     @apply bg-background text-foreground transition-colors duration-300;
+    background-image: var(--custom-background);
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
   }
 }
 
@@ -67,3 +72,29 @@
   background: linear-gradient(to right, #243949 0%, #517fa4 100%);
 }
 
+/* Preserve custom background in both light and dark modes */
+.light body[style*="background-image"], 
+.dark body[style*="background-image"] {
+  background: none;
+}
+
+/* Add custom styles for background image with overlay */
+body[style*="background-image"]::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background-color: rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+
+.light body[style*="background-image"]::before {
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.dark body[style*="background-image"]::before {
+  background-color: rgba(0, 0, 0, 0.7);
+}
