@@ -1,3 +1,4 @@
+
 interface ProductFiltersProps {
   selectedBrands: string[];
   selectedBrand: string;

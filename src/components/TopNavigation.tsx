@@ -25,8 +25,8 @@ const TopNavigation = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <Link to="/" className="text-lg font-bold text-foreground">
-              Brand
+            <Link to="/" className="flex items-center">
+              <span className="text-lg font-bold text-foreground">Electrium</span>
             </Link>
           </div>
 
@@ -36,8 +36,8 @@ const TopNavigation = () => {
               to="/"
               className={`px-3 py-2 rounded-md text-sm font-medium ${
                 pathname === '/' 
-                  ? 'bg-primary text-primary-foreground' 
-                  : 'text-foreground hover:bg-accent hover:text-accent-foreground'
+                  ? 'text-primary border-b-2 border-primary' 
+                  : 'text-foreground hover:text-primary hover:border-b-2 hover:border-primary'
               }`}
             >
               Home
@@ -46,8 +46,8 @@ const TopNavigation = () => {
               to="/products"
               className={`px-3 py-2 rounded-md text-sm font-medium ${
                 pathname === '/products' 
-                  ? 'bg-primary text-primary-foreground' 
-                  : 'text-foreground hover:bg-accent hover:text-accent-foreground'
+                  ? 'text-primary border-b-2 border-primary' 
+                  : 'text-foreground hover:text-primary hover:border-b-2 hover:border-primary'
               }`}
             >
               Products
@@ -56,31 +56,32 @@ const TopNavigation = () => {
               to="/about"
               className={`px-3 py-2 rounded-md text-sm font-medium ${
                 pathname === '/about' 
-                  ? 'bg-primary text-primary-foreground' 
-                  : 'text-foreground hover:bg-accent hover:text-accent-foreground'
+                  ? 'text-primary border-b-2 border-primary' 
+                  : 'text-foreground hover:text-primary hover:border-b-2 hover:border-primary'
               }`}
             >
               About
             </Link>
+            <Link
+              to="/donation"
+              className={`px-3 py-2 rounded-md text-sm font-medium ${
+                pathname === '/donation' 
+                  ? 'text-primary border-b-2 border-primary' 
+                  : 'text-foreground hover:text-primary hover:border-b-2 hover:border-primary'
+              }`}
+            >
+              Donation
+            </Link>
             <a
               href="#"
               onClick={handleContactClick}
-              className="px-3 py-2 rounded-md text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground"
+              className="px-3 py-2 rounded-md text-sm font-medium text-foreground hover:text-primary hover:border-b-2 hover:border-primary"
             >
               Contact
             </a>
           </nav>
 
           <div className="hidden md:flex items-center space-x-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label="Toggle Theme"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            >
-              {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-            </Button>
-
             {isAuthenticated ? (
               <>
                 <Link to="/settings">
@@ -113,15 +114,6 @@ const TopNavigation = () => {
             <Button
               variant="ghost"
               size="icon"
-              aria-label="Toggle Theme"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="mr-2"
-            >
-              {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
               aria-label="Toggle Menu"
               onClick={() => setIsOpen(!isOpen)}
             >
@@ -139,8 +131,8 @@ const TopNavigation = () => {
               to="/"
               className={`block px-3 py-2 rounded-md text-base font-medium ${
                 pathname === '/' 
-                  ? 'bg-primary text-primary-foreground' 
-                  : 'text-foreground hover:bg-accent hover:text-accent-foreground'
+                  ? 'text-primary border-l-2 border-primary' 
+                  : 'text-foreground hover:text-primary hover:border-l-2 hover:border-primary'
               }`}
               onClick={() => setIsOpen(false)}
             >
@@ -150,8 +142,8 @@ const TopNavigation = () => {
               to="/products"
               className={`block px-3 py-2 rounded-md text-base font-medium ${
                 pathname === '/products' 
-                  ? 'bg-primary text-primary-foreground' 
-                  : 'text-foreground hover:bg-accent hover:text-accent-foreground'
+                  ? 'text-primary border-l-2 border-primary' 
+                  : 'text-foreground hover:text-primary hover:border-l-2 hover:border-primary'
               }`}
               onClick={() => setIsOpen(false)}
             >
@@ -161,12 +153,23 @@ const TopNavigation = () => {
               to="/about"
               className={`block px-3 py-2 rounded-md text-base font-medium ${
                 pathname === '/about' 
-                  ? 'bg-primary text-primary-foreground' 
-                  : 'text-foreground hover:bg-accent hover:text-accent-foreground'
+                  ? 'text-primary border-l-2 border-primary' 
+                  : 'text-foreground hover:text-primary hover:border-l-2 hover:border-primary'
               }`}
               onClick={() => setIsOpen(false)}
             >
               About
+            </Link>
+            <Link
+              to="/donation"
+              className={`block px-3 py-2 rounded-md text-base font-medium ${
+                pathname === '/donation' 
+                  ? 'text-primary border-l-2 border-primary' 
+                  : 'text-foreground hover:text-primary hover:border-l-2 hover:border-primary'
+              }`}
+              onClick={() => setIsOpen(false)}
+            >
+              Donation
             </Link>
             <a
               href="#"
@@ -174,7 +177,7 @@ const TopNavigation = () => {
                 handleContactClick(e);
                 setIsOpen(false);
               }}
-              className="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:bg-accent hover:text-accent-foreground"
+              className="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:text-primary hover:border-l-2 hover:border-primary"
             >
               Contact
             </a>
@@ -185,13 +188,13 @@ const TopNavigation = () => {
                 <>
                   <Link
                     to="/settings"
-                    className="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:bg-accent hover:text-accent-foreground"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:text-primary hover:border-l-2 hover:border-primary"
                     onClick={() => setIsOpen(false)}
                   >
                     Settings
                   </Link>
                   <button
-                    className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-foreground hover:bg-accent hover:text-accent-foreground"
+                    className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-foreground hover:text-primary hover:border-l-2 hover:border-primary"
                     onClick={() => {
                       logout();
                       setIsOpen(false);
@@ -204,14 +207,14 @@ const TopNavigation = () => {
                 <>
                   <Link
                     to="/login"
-                    className="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:bg-accent hover:text-accent-foreground"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:text-primary hover:border-l-2 hover:border-primary"
                     onClick={() => setIsOpen(false)}
                   >
                     Login
                   </Link>
                   <Link
                     to="/register"
-                    className="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:bg-accent hover:text-accent-foreground"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:text-primary hover:border-l-2 hover:border-primary"
                     onClick={() => setIsOpen(false)}
                   >
                     Register
