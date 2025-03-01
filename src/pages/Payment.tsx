@@ -4,6 +4,84 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+
+// Country and location data
+const countryData = {
+  "United States": [
+    "New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "Philadelphia", 
+    "San Antonio", "San Diego", "Dallas", "San Jose", "Austin", "Jacksonville",
+    "Fort Worth", "Columbus", "San Francisco", "Charlotte", "Indianapolis", "Seattle",
+    "Denver", "Washington DC", "Boston", "El Paso", "Nashville", "Detroit", "Portland"
+  ],
+  "Canada": [
+    "Toronto", "Montreal", "Vancouver", "Calgary", "Edmonton", "Ottawa", 
+    "Winnipeg", "Quebec City", "Hamilton", "Kitchener", "London", "Victoria",
+    "Halifax", "Oshawa", "Windsor", "Saskatoon", "Regina", "St. John's"
+  ],
+  "United Kingdom": [
+    "London", "Birmingham", "Manchester", "Glasgow", "Liverpool", "Bristol",
+    "Edinburgh", "Sheffield", "Leeds", "Leicester", "Coventry", "Bradford",
+    "Cardiff", "Belfast", "Nottingham", "Kingston upon Hull", "Newcastle"
+  ],
+  "Australia": [
+    "Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide", "Gold Coast",
+    "Newcastle", "Canberra", "Wollongong", "Hobart", "Geelong", "Townsville",
+    "Cairns", "Darwin", "Toowoomba", "Ballarat", "Bendigo"
+  ],
+  "Germany": [
+    "Berlin", "Hamburg", "Munich", "Cologne", "Frankfurt", "Stuttgart",
+    "Düsseldorf", "Leipzig", "Dortmund", "Essen", "Bremen", "Dresden",
+    "Hanover", "Nuremberg", "Duisburg", "Bochum", "Wuppertal"
+  ],
+  "France": [
+    "Paris", "Marseille", "Lyon", "Toulouse", "Nice", "Nantes", "Strasbourg",
+    "Montpellier", "Bordeaux", "Lille", "Rennes", "Reims", "Le Havre",
+    "Saint-Étienne", "Toulon", "Angers", "Grenoble", "Dijon", "Nîmes"
+  ],
+  "Japan": [
+    "Tokyo", "Yokohama", "Osaka", "Nagoya", "Sapporo", "Fukuoka", "Kobe",
+    "Kyoto", "Kawasaki", "Saitama", "Hiroshima", "Sendai", "Kitakyushu",
+    "Chiba", "Sakai", "Niigata", "Hamamatsu", "Kumamoto", "Sagamihara"
+  ],
+  "Brazil": [
+    "São Paulo", "Rio de Janeiro", "Brasília", "Salvador", "Fortaleza", 
+    "Belo Horizonte", "Manaus", "Curitiba", "Recife", "Porto Alegre", 
+    "Belém", "Goiânia", "Guarulhos", "Campinas", "São Luís", "Maceió"
+  ],
+  "India": [
+    "Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai", "Kolkata",
+    "Pune", "Ahmedabad", "Surat", "Jaipur", "Lucknow", "Kanpur", "Nagpur",
+    "Indore", "Thane", "Bhopal", "Visakhapatnam", "Patna", "Vadodara"
+  ],
+  "China": [
+    "Shanghai", "Beijing", "Guangzhou", "Shenzhen", "Chengdu", "Tianjin",
+    "Wuhan", "Dongguan", "Chongqing", "Nanjing", "Shenyang", "Hangzhou",
+    "Xi'an", "Harbin", "Suzhou", "Qingdao", "Dalian", "Zhengzhou", "Jinan"
+  ],
+  "South Korea": [
+    "Seoul", "Busan", "Incheon", "Daegu", "Daejeon", "Gwangju", "Suwon",
+    "Ulsan", "Changwon", "Seongnam", "Goyang", "Yongin", "Bucheon", "Ansan"
+  ],
+  "Mexico": [
+    "Mexico City", "Guadalajara", "Monterrey", "Puebla", "Tijuana", "León",
+    "Juárez", "Zapopan", "Nezahualcóyotl", "Chihuahua", "Aguascalientes"
+  ],
+  "Spain": [
+    "Madrid", "Barcelona", "Valencia", "Seville", "Zaragoza", "Málaga",
+    "Murcia", "Palma", "Las Palmas", "Bilbao", "Alicante", "Córdoba"
+  ],
+  "Italy": [
+    "Rome", "Milan", "Naples", "Turin", "Palermo", "Genoa", "Bologna",
+    "Florence", "Bari", "Catania", "Venice", "Verona", "Messina", "Padua"
+  ],
+  "Russia": [
+    "Moscow", "Saint Petersburg", "Novosibirsk", "Yekaterinburg", "Kazan",
+    "Nizhny Novgorod", "Chelyabinsk", "Omsk", "Samara", "Rostov-on-Don", 
+    "Ufa", "Krasnoyarsk", "Voronezh", "Perm", "Volgograd", "Krasnodar"
+  ]
+};
 
 const Payment = () => {
   const navigate = useNavigate();
@@ -15,12 +93,24 @@ const Payment = () => {
   const [estimatedPrice, setEstimatedPrice] = useState('');
   const [deliveryType, setDeliveryType] = useState('normal');
   const [deliveryTime, setDeliveryTime] = useState('');
+  const [country, setCountry] = useState('United States');
+  const [location, setLocation] = useState('');
+  const [address, setAddress] = useState('');
+  const [locations, setLocations] = useState<string[]>(countryData["United States"]);
   const [baseTotal, setBaseTotal] = useState(() => {
     const cart = localStorage.getItem('cart');
     if (!cart) return 0;
     const items = JSON.parse(cart);
     return items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
   });
+
+  // Update locations when country changes
+  useEffect(() => {
+    if (country && countryData[country]) {
+      setLocations(countryData[country]);
+      setLocation(''); // Reset location when country changes
+    }
+  }, [country]);
 
   // Calculate delivery fee based on time remaining
   const calculateDeliveryFee = () => {
@@ -126,6 +216,15 @@ const Payment = () => {
       return;
     }
 
+    if (!country || !location || !address) {
+      toast({
+        variant: "destructive",
+        title: "Missing Address Information",
+        description: "Please provide complete delivery address"
+      });
+      return;
+    }
+
     // Clear cart and navigate to thank you page
     localStorage.removeItem('cart');
     navigate('/thank-you');
@@ -163,11 +262,11 @@ const Payment = () => {
                   <label htmlFor="cardNumber" className="block text-sm font-medium text-foreground mb-1">
                     Card Number
                   </label>
-                  <input
+                  <Input
                     type="text"
                     id="cardNumber"
                     required
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500"
+                    className="w-full"
                     placeholder="1234 5678 9012 3456"
                   />
                 </div>
@@ -177,11 +276,11 @@ const Payment = () => {
                     <label htmlFor="expiry" className="block text-sm font-medium text-foreground mb-1">
                       Expiry Date
                     </label>
-                    <input
+                    <Input
                       type="text"
                       id="expiry"
                       required
-                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500"
+                      className="w-full"
                       placeholder="MM/YY"
                     />
                   </div>
@@ -190,11 +289,11 @@ const Payment = () => {
                     <label htmlFor="cvv" className="block text-sm font-medium text-foreground mb-1">
                       CVV
                     </label>
-                    <input
+                    <Input
                       type="text"
                       id="cvv"
                       required
-                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500"
+                      className="w-full"
                       placeholder="123"
                     />
                   </div>
@@ -239,13 +338,12 @@ const Payment = () => {
                     <label htmlFor="deliveryTime" className="block text-sm font-medium text-foreground mb-1">
                       Desired Delivery Time (Min. 2 hours from now)
                     </label>
-                    <input
+                    <Input
                       type="time"
                       id="deliveryTime"
                       required
                       value={deliveryTime}
                       onChange={(e) => setDeliveryTime(e.target.value)}
-                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500"
                     />
                     {deliveryFee < 0 && (
                       <p className="text-red-500 text-sm mt-1">
@@ -263,13 +361,13 @@ const Payment = () => {
                   <label htmlFor="itemName" className="block text-sm font-medium text-foreground mb-1">
                     Item Name
                   </label>
-                  <input
+                  <Input
                     type="text"
                     id="itemName"
                     required
                     value={itemName}
                     onChange={(e) => setItemName(e.target.value)}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500 bg-background text-foreground"
+                    className="w-full"
                     placeholder="Enter item name"
                   />
                 </div>
@@ -277,13 +375,13 @@ const Payment = () => {
                   <label htmlFor="itemImage" className="block text-sm font-medium text-foreground mb-1">
                     Item Image URL
                   </label>
-                  <input
+                  <Input
                     type="url"
                     id="itemImage"
                     required
                     value={itemImage}
                     onChange={(e) => setItemImage(e.target.value)}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500 bg-background text-foreground"
+                    className="w-full"
                     placeholder="Enter image URL"
                   />
                   {itemImage && (
@@ -304,7 +402,7 @@ const Payment = () => {
                   <label htmlFor="estimatedPrice" className="block text-sm font-medium text-foreground mb-1">
                     Estimated Value ($)
                   </label>
-                  <input
+                  <Input
                     type="number"
                     id="estimatedPrice"
                     required
@@ -312,24 +410,66 @@ const Payment = () => {
                     onChange={(e) => setEstimatedPrice(e.target.value)}
                     min="0"
                     step="0.01"
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500 bg-background text-foreground"
+                    className="w-full"
                     placeholder="Enter estimated value"
                   />
                 </div>
               </div>
             )}
 
-            <div>
-              <label htmlFor="address" className="block text-sm font-medium text-foreground mb-1">
-                Delivery Address
-              </label>
-              <textarea
-                id="address"
-                required
-                rows={3}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500"
-                placeholder="Enter your delivery address"
-              />
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="country" className="block text-sm font-medium text-foreground mb-1">
+                  Country
+                </label>
+                <select
+                  id="country"
+                  required
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500 bg-background text-foreground"
+                >
+                  {Object.keys(countryData).map((countryName) => (
+                    <option key={countryName} value={countryName}>
+                      {countryName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <label htmlFor="location" className="block text-sm font-medium text-foreground mb-1">
+                  City/Location
+                </label>
+                <select
+                  id="location"
+                  required
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500 bg-background text-foreground"
+                >
+                  <option value="" disabled>Select a location</option>
+                  {locations.map((loc) => (
+                    <option key={loc} value={loc}>
+                      {loc}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <label htmlFor="address" className="block text-sm font-medium text-foreground mb-1">
+                  Street Address
+                </label>
+                <Input
+                  id="address"
+                  required
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  className="w-full"
+                  placeholder="Enter your street address"
+                />
+              </div>
             </div>
 
             <div className="pt-4">
@@ -338,13 +478,13 @@ const Payment = () => {
                   Total: ${total.toFixed(2)}
                 </span>
               </div>
-              <button
+              <Button
                 type="submit"
                 className="w-full bg-sage-500 text-white py-3 px-6 rounded-lg font-medium 
                          transition-all duration-200 hover:bg-sage-600"
               >
                 Complete Purchase
-              </button>
+              </Button>
             </div>
           </form>
         </motion.div>
