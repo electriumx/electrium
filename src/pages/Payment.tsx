@@ -5,23 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 
-// Countries and locations data
-const countries = [
-  { id: 'us', name: 'United States' },
-  { id: 'ca', name: 'Canada' },
-  { id: 'uk', name: 'United Kingdom' },
-  { id: 'au', name: 'Australia' },
-  { id: 'de', name: 'Germany' }
-];
-
-const locations = {
-  us: ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego', 'Dallas', 'San Jose'],
-  ca: ['Toronto', 'Montreal', 'Vancouver', 'Calgary', 'Edmonton', 'Ottawa', 'Winnipeg', 'Quebec City', 'Hamilton', 'Kitchener'],
-  uk: ['London', 'Birmingham', 'Manchester', 'Glasgow', 'Liverpool', 'Bristol', 'Edinburgh', 'Sheffield', 'Leeds', 'Newcastle'],
-  au: ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide', 'Gold Coast', 'Canberra', 'Newcastle', 'Wollongong', 'Logan City'],
-  de: ['Berlin', 'Hamburg', 'Munich', 'Cologne', 'Frankfurt', 'Stuttgart', 'Düsseldorf', 'Dortmund', 'Essen', 'Leipzig']
-};
-
 const Payment = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
@@ -32,22 +15,12 @@ const Payment = () => {
   const [estimatedPrice, setEstimatedPrice] = useState('');
   const [deliveryType, setDeliveryType] = useState('normal');
   const [deliveryTime, setDeliveryTime] = useState('');
-  const [selectedCountry, setSelectedCountry] = useState('us');
-  const [availableLocations, setAvailableLocations] = useState<string[]>(locations.us);
-  const [selectedLocation, setSelectedLocation] = useState('');
-  const [address, setAddress] = useState('');
   const [baseTotal, setBaseTotal] = useState(() => {
     const cart = localStorage.getItem('cart');
     if (!cart) return 0;
     const items = JSON.parse(cart);
     return items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
   });
-
-  // Update available locations when country changes
-  useEffect(() => {
-    setAvailableLocations(locations[selectedCountry as keyof typeof locations] || []);
-    setSelectedLocation(''); // Reset location when country changes
-  }, [selectedCountry]);
 
   // Calculate delivery fee based on time remaining
   const calculateDeliveryFee = () => {
@@ -149,15 +122,6 @@ const Payment = () => {
         variant: "destructive",
         title: "Missing Trade Information",
         description: "Please provide all item trade details"
-      });
-      return;
-    }
-
-    if (!selectedLocation) {
-      toast({
-        variant: "destructive",
-        title: "Address Required",
-        description: "Please select a delivery location"
       });
       return;
     }
@@ -355,50 +319,16 @@ const Payment = () => {
               </div>
             )}
 
-            <div className="space-y-4">
-              <label className="block text-sm font-medium text-foreground mb-1">
-                Country
-              </label>
-              <select
-                value={selectedCountry}
-                onChange={(e) => setSelectedCountry(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500 bg-background text-foreground"
-              >
-                {countries.map(country => (
-                  <option key={country.id} value={country.id}>{country.name}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="space-y-4">
-              <label className="block text-sm font-medium text-foreground mb-1">
-                Location
-              </label>
-              <select
-                value={selectedLocation}
-                onChange={(e) => setSelectedLocation(e.target.value)}
-                required
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500 bg-background text-foreground"
-              >
-                <option value="">Select location</option>
-                {availableLocations.map(location => (
-                  <option key={location} value={location}>{location}</option>
-                ))}
-              </select>
-            </div>
-
             <div>
               <label htmlFor="address" className="block text-sm font-medium text-foreground mb-1">
-                Street Address
+                Delivery Address
               </label>
               <textarea
                 id="address"
                 required
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
                 rows={3}
                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sage-500"
-                placeholder="Enter your street address"
+                placeholder="Enter your delivery address"
               />
             </div>
 

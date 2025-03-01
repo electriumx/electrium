@@ -18,9 +18,7 @@ const CartSummary = ({ cart }: { cart: CartItem[] }) => {
 
   useEffect(() => {
     // Save cart to localStorage whenever it changes
-    if (cart && cart.length > 0) {
-      localStorage.setItem('cart', JSON.stringify(cart));
-    }
+    localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
 
   const itemCount = cart.reduce((total, item) => total + item.quantity, 0);
