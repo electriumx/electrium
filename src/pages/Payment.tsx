@@ -6,7 +6,55 @@ import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
+const distanceFromCairo: Record<string, Record<string, number>> = {
+  "Egypt": {
+    "Cairo": 0,
+    "Alexandria": 220,
+    "Giza": 20,
+    "Sharm El Sheikh": 500,
+    "Luxor": 650,
+    "Aswan": 850,
+    "Hurghada": 450,
+    "Mansoura": 120,
+    "Tanta": 94,
+    "Asyut": 375
+  },
+  "United States": {
+    "New York": 9000, "Los Angeles": 12000, "Chicago": 10000, "Houston": 11000, 
+    "Phoenix": 11500, "Philadelphia": 9200, "San Antonio": 11200, "San Diego": 12100,
+    "Dallas": 11100, "San Jose": 12200
+  },
+  "United Kingdom": {
+    "London": 3500, "Birmingham": 3700, "Manchester": 3800, "Glasgow": 4000,
+    "Liverpool": 3850, "Bristol": 3600, "Edinburgh": 4100, "Sheffield": 3750
+  },
+  "Canada": {
+    "Toronto": 8900, "Montreal": 8700, "Vancouver": 11500, "Calgary": 10500,
+    "Edmonton": 10600, "Ottawa": 8800, "Winnipeg": 9500, "Quebec City": 8600
+  },
+  "Australia": {
+    "Sydney": 14000, "Melbourne": 14200, "Brisbane": 13800, "Perth": 12500,
+    "Adelaide": 13600, "Gold Coast": 13700, "Canberra": 14100, "Hobart": 14500
+  },
+  "Japan": {
+    "Tokyo": 9500, "Yokohama": 9550, "Osaka": 9700, "Nagoya": 9650,
+    "Sapporo": 10000, "Fukuoka": 10200, "Kyoto": 9750, "Kobe": 9800
+  },
+  "Germany": {
+    "Berlin": 3200, "Hamburg": 3300, "Munich": 3000, "Cologne": 3150,
+    "Frankfurt": 3100, "Stuttgart": 3050, "Düsseldorf": 3250, "Leipzig": 3300
+  },
+  "France": {
+    "Paris": 3300, "Marseille": 3000, "Lyon": 3100, "Toulouse": 3250,
+    "Nice": 2900, "Nantes": 3350, "Strasbourg": 3200, "Bordeaux": 3300
+  }
+};
+
 const countryData = {
+  "Egypt": [
+    "Cairo", "Alexandria", "Giza", "Sharm El Sheikh", "Luxor", 
+    "Aswan", "Hurghada", "Mansoura", "Tanta", "Asyut"
+  ],
   "United States": [
     "New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "Philadelphia", 
     "San Antonio", "San Diego", "Dallas", "San Jose", "Austin", "Jacksonville",
@@ -91,16 +139,20 @@ const Payment = () => {
   const [estimatedPrice, setEstimatedPrice] = useState('');
   const [deliveryType, setDeliveryType] = useState('normal');
   const [deliveryTime, setDeliveryTime] = useState('');
-  const [country, setCountry] = useState('United States');
-  const [location, setLocation] = useState('');
+  const [country, setCountry] = useState('Egypt');
+  const [location, setLocation] = useState('Cairo');
   const [address, setAddress] = useState('');
-  const [locations, setLocations] = useState<string[]>(countryData["United States"]);
+  const [locations, setLocations] = useState<string[]>(countryData["Egypt"]);
   const [baseTotal, setBaseTotal] = useState(() => {
     const cart = localStorage.getItem('cart');
     if (!cart) return 0;
     const items = JSON.parse(cart);
     return items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
   });
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     if (country && countryData[country]) {
@@ -126,7 +178,12 @@ const Payment = () => {
       return -1;
     }
 
-    const baseFee = 50;
+    const distanceFactor = distanceFromCairo[country]?.[location] 
+      ? distanceFromCairo[country][location] / 1000
+      : 0;
+    
+    const baseFee = 50 + (distanceFactor * 20);
+    
     if (timeDiff >= 6) return baseFee;
     return baseFee + ((6 - timeDiff) * 10);
   };
@@ -468,10 +525,21 @@ const Payment = () => {
             </div>
 
             <div className="pt-4">
-              <div className="mb-4 text-right">
-                <span className="text-lg font-medium">
-                  Total: ${total.toFixed(2)}
-                </span>
+              <div className="mb-4">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-muted-foreground">Subtotal:</span>
+                  <span>${baseTotal.toFixed(2)}</span>
+                </div>
+                {deliveryFee > 0 && (
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-muted-foreground">Delivery Fee:</span>
+                    <span>${deliveryFee.toFixed(2)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between items-center text-lg font-medium pt-2 border-t border-border">
+                  <span>Total:</span>
+                  <span className="text-sage-600 dark:text-sage-400">${total.toFixed(2)}</span>
+                </div>
               </div>
               <Button
                 type="submit"

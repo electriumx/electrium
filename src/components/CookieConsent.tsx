@@ -8,6 +8,8 @@ const CookieConsent = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [showManage, setShowManage] = useState(false);
+  const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
+  const [marketingEnabled, setMarketingEnabled] = useState(false);
   const { toast } = useToast();
   const { isAuthenticated } = useAuth();
 
@@ -42,6 +44,23 @@ const CookieConsent = () => {
     }, 300);
   };
 
+  const handleConfirmSelectedCookies = () => {
+    setIsAnimating(true);
+    sessionStorage.setItem("hasSeenCookieConsent", "true");
+    localStorage.setItem("cookieConsent", "custom");
+    localStorage.setItem("analyticsEnabled", analyticsEnabled.toString());
+    localStorage.setItem("marketingEnabled", marketingEnabled.toString());
+    
+    toast({
+      title: "Custom Cookie Preferences Saved",
+      description: "Your cookie preferences have been saved",
+    });
+
+    setTimeout(() => {
+      setIsVisible(false);
+    }, 300);
+  };
+
   if (!isVisible) return null;
 
   return (
@@ -55,7 +74,7 @@ const CookieConsent = () => {
           size="sm"
           onClick={() => setShowManage(prev => !prev)}
         >
-          Manage Cookies
+          {showManage ? "Hide" : "Manage Cookies"}
         </Button>
       </div>
       <p className="text-sm text-muted-foreground mb-4">
@@ -69,12 +88,28 @@ const CookieConsent = () => {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-sm text-foreground">Analytics Cookies</span>
-            <input type="checkbox" className="accent-sage-500" />
+            <input 
+              type="checkbox" 
+              className="accent-sage-500" 
+              checked={analyticsEnabled}
+              onChange={(e) => setAnalyticsEnabled(e.target.checked)}
+            />
           </div>
           <div className="flex items-center justify-between">
             <span className="text-sm text-foreground">Marketing Cookies</span>
-            <input type="checkbox" className="accent-sage-500" />
+            <input 
+              type="checkbox" 
+              className="accent-sage-500" 
+              checked={marketingEnabled}
+              onChange={(e) => setMarketingEnabled(e.target.checked)}
+            />
           </div>
+          <Button 
+            onClick={handleConfirmSelectedCookies}
+            className="w-full mt-2"
+          >
+            Confirm Cookies
+          </Button>
         </div>
       ) : (
         <div className="flex gap-2">

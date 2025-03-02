@@ -1,6 +1,7 @@
 
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 interface Product {
   id: number;
@@ -20,6 +21,11 @@ const Checkout = () => {
     month: 'long',
     day: 'numeric'
   });
+  
+  // Add auto-scroll to top when page loads
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background py-16 px-4">
