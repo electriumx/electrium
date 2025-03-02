@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Minus } from 'lucide-react';
 
 interface ProductCardProps {
@@ -12,6 +12,22 @@ interface ProductCardProps {
 
 const ProductCard = ({ id, name, price, image, onQuantityChange }: ProductCardProps) => {
   const [quantity, setQuantity] = useState(0);
+
+  // Load initial quantity from localStorage
+  useEffect(() => {
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+      try {
+        const parsedCart = JSON.parse(savedCart);
+        const cartItem = parsedCart.find((item: any) => item.id === id);
+        if (cartItem) {
+          setQuantity(cartItem.quantity);
+        }
+      } catch (error) {
+        console.error('Error parsing cart from localStorage:', error);
+      }
+    }
+  }, [id]);
 
   const handleIncrement = () => {
     const newQuantity = quantity + 1;

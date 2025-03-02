@@ -1,5 +1,5 @@
-
-import { useState } from 'react';
+<lov-code>
+import { useState, useEffect } from 'react';
 import ProductFilters from '../components/ProductFilters';
 import ProductGrid from '../components/ProductGrid';
 import CartSummary from '../components/CartSummary';
@@ -18,6 +18,23 @@ const Products = () => {
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [cart, setCart] = useState<Product[]>([]);
   const location = useLocation();
+  
+  // Add useEffect to load cart from localStorage
+  useEffect(() => {
+    // Load cart from localStorage
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+      try {
+        const parsedCart = JSON.parse(savedCart);
+        setCart(parsedCart);
+      } catch (error) {
+        console.error('Error parsing cart from localStorage:', error);
+      }
+    }
+    
+    // Scroll to top when component mounts
+    window.scrollTo(0, 0);
+  }, []);
   
   const products: Product[] = [
     {
@@ -624,71 +641,4 @@ const Products = () => {
     id: 76,
     name: "Apple iPhone FineWoven Case with MagSafe",
     price: 59.00,
-    image: "https://images.unsplash.com/photo-1585242985478-51404841d293?auto=format&fit=crop&w=800",
-    quantity: 0,
-    brand: "Apple"
-  },
-    {
-      id: 77,
-      name: "Apple Watch Magnetic Fast Charger to USB-C Cable",
-      price: 29.00,
-      image: "https://images.unsplash.com/photo-1534430206226-3ca46694ef5e?auto=format&fit=crop&w=800",
-      quantity: 0,
-      brand: "Apple"
-    }
-  ];
-
-  const handleBrandSelect = (brand: string) => {
-    setSelectedBrands(prevBrands => {
-      if (prevBrands.includes(brand)) {
-        return prevBrands.filter(b => b !== brand);
-      }
-      return [...prevBrands, brand];
-    });
-  };
-
-  const handleQuantityChange = (id: number, quantity: number) => {
-    const product = products.find(p => p.id === id);
-    if (!product) return;
-
-    setCart(prevCart => {
-      const existingItem = prevCart.find(item => item.id === id);
-      if (existingItem) {
-        if (quantity === 0) {
-          return prevCart.filter(item => item.id !== id);
-        }
-        return prevCart.map(item =>
-          item.id === id ? { ...item, quantity } : item
-        );
-      }
-      if (quantity > 0) {
-        return [...prevCart, { ...product, quantity }];
-      }
-      return prevCart;
-    });
-  };
-
-  const filteredProducts = selectedBrands.length > 0
-    ? products.filter(product => selectedBrands.includes(product.brand))
-    : products;
-
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <ProductFilters
-        selectedBrands={selectedBrands}
-        onBrandSelect={handleBrandSelect}
-      />
-      <div className="flex flex-wrap -mx-4">
-        <div className="w-full px-4">
-          <ProductGrid 
-            products={filteredProducts} 
-            onQuantityChange={handleQuantityChange}
-          />
-        </div>
-      </div>
-      <CartSummary cart={cart} />
-    </div>
-  );
-};
-
-export default Products;
+    image: "https://images.unsplash.com/photo

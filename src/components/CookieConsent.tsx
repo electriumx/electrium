@@ -17,13 +17,6 @@ const CookieConsent = () => {
     const hasSeenCookieConsent = sessionStorage.getItem("hasSeenCookieConsent");
     if (!hasSeenCookieConsent) {
       setIsVisible(true);
-      
-      // Auto-dismiss after 2 seconds
-      const autoDismissTimer = setTimeout(() => {
-        handleCookieChoice(true); // Auto-accept cookies
-      }, 2000);
-      
-      return () => clearTimeout(autoDismissTimer);
     }
   }, []);
 
@@ -41,7 +34,7 @@ const CookieConsent = () => {
 
     setTimeout(() => {
       setIsVisible(false);
-    }, 300);
+    }, 2000);
   };
 
   const handleConfirmSelectedCookies = () => {
@@ -58,7 +51,7 @@ const CookieConsent = () => {
 
     setTimeout(() => {
       setIsVisible(false);
-    }, 300);
+    }, 2000);
   };
 
   if (!isVisible) return null;

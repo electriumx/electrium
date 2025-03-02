@@ -2,7 +2,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface CartItem {
   id: number;
@@ -15,11 +15,23 @@ const CartSummary = ({ cart }: { cart: CartItem[] }) => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { toast } = useToast();
+  const [initialized, setInitialized] = useState(false);
 
+  // Load cart from localStorage on first render
   useEffect(() => {
-    // Save cart to localStorage whenever it changes
-    localStorage.setItem('cart', JSON.stringify(cart));
-  }, [cart]);
+    // Only save the cart to localStorage after initial render
+    if (!initialized) {
+      // Check if localStorage has items
+      const savedCart = localStorage.getItem('cart');
+      if (!savedCart) {
+        localStorage.setItem('cart', JSON.stringify(cart));
+      }
+      setInitialized(true);
+    } else {
+      // Save cart to localStorage whenever it changes after initial load
+      localStorage.setItem('cart', JSON.stringify(cart));
+    }
+  }, [cart, initialized]);
 
   const itemCount = cart.reduce((total, item) => total + item.quantity, 0);
   const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);

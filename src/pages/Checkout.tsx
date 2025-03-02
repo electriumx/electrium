@@ -33,7 +33,7 @@ const Checkout = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-card rounded-xl shadow-lg p-8"
+          className="bg-card rounded-xl shadow-lg p-8 border border-border"
         >
           <h1 className="text-3xl font-medium text-foreground mb-8">Order Summary</h1>
           
