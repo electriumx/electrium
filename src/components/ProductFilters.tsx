@@ -1,8 +1,8 @@
 
 interface ProductFiltersProps {
-  selectedBrand: string | null;
-  onBrandSelect: (brand: string | null) => void;
   selectedBrands: string[];
+  onBrandSelect: (brand: string | null) => void;
+  // Remove selectedBrand as it's not used and causing errors
 }
 
 const ProductFilters = ({ selectedBrands, onBrandSelect }: ProductFiltersProps) => {

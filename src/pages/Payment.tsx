@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -7,7 +6,6 @@ import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
-// Country and location data
 const countryData = {
   "United States": [
     "New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "Philadelphia", 
@@ -104,15 +102,13 @@ const Payment = () => {
     return items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
   });
 
-  // Update locations when country changes
   useEffect(() => {
     if (country && countryData[country]) {
       setLocations(countryData[country]);
-      setLocation(''); // Reset location when country changes
+      setLocation('');
     }
   }, [country]);
 
-  // Calculate delivery fee based on time remaining
   const calculateDeliveryFee = () => {
     if (deliveryType !== 'fast' || !deliveryTime) return 0;
     
@@ -121,19 +117,15 @@ const Payment = () => {
     const [hours, minutes] = deliveryTime.split(':');
     selected.setHours(parseInt(hours), parseInt(minutes));
 
-    // If selected time is before current time, assume it's for tomorrow
     if (selected < now) {
       selected.setDate(selected.getDate() + 1);
     }
 
-    const timeDiff = (selected.getTime() - now.getTime()) / (1000 * 60 * 60); // difference in hours
-    
-    // Minimum 2 hours for fast delivery
+    const timeDiff = (selected.getTime() - now.getTime()) / (1000 * 60 * 60);
     if (timeDiff < 2) {
-      return -1; // Invalid time
+      return -1;
     }
 
-    // Base fee is $50, increases by $10 for each hour less than 6
     const baseFee = 50;
     if (timeDiff >= 6) return baseFee;
     return baseFee + ((6 - timeDiff) * 10);
@@ -225,7 +217,6 @@ const Payment = () => {
       return;
     }
 
-    // Clear cart and navigate to thank you page
     localStorage.removeItem('cart');
     navigate('/thank-you');
   };
@@ -314,8 +305,10 @@ const Payment = () => {
                         setDeliveryType('normal');
                         setDeliveryTime('');
                       }}
-                      className={`p-4 border rounded-lg ${
-                        deliveryType === 'normal' ? 'border-sage-500 bg-sage-50' : 'border-gray-200'
+                      className={`p-4 border rounded-lg transition-colors ${
+                        deliveryType === 'normal' 
+                          ? 'border-sage-500 bg-sage-50 dark:bg-sage-900/30 dark:border-sage-400' 
+                          : 'border-gray-200 dark:border-gray-700 bg-background'
                       }`}
                     >
                       Normal Delivery
@@ -323,8 +316,10 @@ const Payment = () => {
                     <button
                       type="button"
                       onClick={() => setDeliveryType('fast')}
-                      className={`p-4 border rounded-lg ${
-                        deliveryType === 'fast' ? 'border-sage-500 bg-sage-50' : 'border-gray-200'
+                      className={`p-4 border rounded-lg transition-colors ${
+                        deliveryType === 'fast' 
+                          ? 'border-sage-500 bg-sage-50 dark:bg-sage-900/30 dark:border-sage-400' 
+                          : 'border-gray-200 dark:border-gray-700 bg-background'
                       }`}
                     >
                       Fast Delivery

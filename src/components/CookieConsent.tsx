@@ -15,6 +15,13 @@ const CookieConsent = () => {
     const hasSeenCookieConsent = sessionStorage.getItem("hasSeenCookieConsent");
     if (!hasSeenCookieConsent) {
       setIsVisible(true);
+      
+      // Auto-dismiss after 2 seconds
+      const autoDismissTimer = setTimeout(() => {
+        handleCookieChoice(true); // Auto-accept cookies
+      }, 2000);
+      
+      return () => clearTimeout(autoDismissTimer);
     }
   }, []);
 
@@ -42,7 +49,7 @@ const CookieConsent = () => {
       isAnimating ? "fade-out" : "fade-in"
     }`}>
       <div className="flex justify-between items-start mb-4">
-        <h3 className="font-semibold">Cookie Consent</h3>
+        <h3 className="font-semibold text-foreground">Cookie Consent</h3>
         <Button 
           variant="ghost"
           size="sm"
@@ -57,15 +64,15 @@ const CookieConsent = () => {
       {showManage ? (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm">Essential Cookies</span>
+            <span className="text-sm text-foreground">Essential Cookies</span>
             <input type="checkbox" checked disabled className="accent-sage-500" />
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-sm">Analytics Cookies</span>
+            <span className="text-sm text-foreground">Analytics Cookies</span>
             <input type="checkbox" className="accent-sage-500" />
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-sm">Marketing Cookies</span>
+            <span className="text-sm text-foreground">Marketing Cookies</span>
             <input type="checkbox" className="accent-sage-500" />
           </div>
         </div>
