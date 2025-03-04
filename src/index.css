@@ -61,8 +61,25 @@
 
 .light body {
   background: linear-gradient(109.6deg, rgba(223,234,247,1) 11.2%, rgba(244,248,252,1) 91.1%);
+  color: hsl(222.2 84% 4.9%);
 }
 
 .dark body {
   background: linear-gradient(to right, #243949 0%, #517fa4 100%);
+  color: hsl(210 40% 98%);
+}
+
+/* Additional styles to ensure light mode text is visible */
+.light .text-foreground {
+  color: hsl(222.2 84% 4.9%);
+}
+
+.light .bg-card {
+  background-color: white;
+}
+
+/* Improved card contrast in light mode */
+.light .card, 
+.light .bg-card {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
