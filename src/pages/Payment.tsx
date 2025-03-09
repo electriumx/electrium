@@ -5,6 +5,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { products } from '../data/productData';
+import { Search } from 'lucide-react';
 
 const distanceFromCairo: Record<string, Record<string, number>> = {
   "Egypt": {
@@ -143,12 +145,18 @@ const Payment = () => {
   const [location, setLocation] = useState('Cairo');
   const [address, setAddress] = useState('');
   const [locations, setLocations] = useState<string[]>(countryData["Egypt"]);
-  const [baseTotal, setBaseTotal] = useState(() => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState<typeof products>([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [tradeForProductId, setTradeForProductId] = useState<number | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<typeof products[0] | null>(null);
+  
+  const baseTotal = () => {
     const cart = localStorage.getItem('cart');
     if (!cart) return 0;
     const items = JSON.parse(cart);
     return items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
-  });
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -160,6 +168,33 @@ const Payment = () => {
       setLocation('');
     }
   }, [country]);
+
+  useEffect(() => {
+    if (itemName.trim().length > 2) {
+      const foundProduct = products.find(
+        p => p.name.toLowerCase() === itemName.toLowerCase()
+      );
+      
+      if (foundProduct) {
+        setItemImage(foundProduct.image);
+        setEstimatedPrice(foundProduct.price.toString());
+        setSelectedProduct(foundProduct);
+      }
+    }
+  }, [itemName]);
+
+  useEffect(() => {
+    if (searchTerm.trim().length > 1) {
+      const results = products.filter(p => 
+        p.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setSearchResults(results.slice(0, 5)); // Limit to 5 results
+      setShowSearchResults(true);
+    } else {
+      setSearchResults([]);
+      setShowSearchResults(false);
+    }
+  }, [searchTerm]);
 
   const calculateDeliveryFee = () => {
     if (deliveryType !== 'fast' || !deliveryTime) return 0;
@@ -189,7 +224,7 @@ const Payment = () => {
   };
 
   const deliveryFee = calculateDeliveryFee();
-  const total = baseTotal + (deliveryFee >= 0 ? deliveryFee : 0);
+  const total = baseTotal() + (deliveryFee >= 0 ? deliveryFee : 0);
 
   const validateCardNumber = (number: string) => {
     const cleaned = number.replace(/\D/g, '');
@@ -265,6 +300,15 @@ const Payment = () => {
       return;
     }
 
+    if (paymentMethod === 'trade' && !tradeForProductId) {
+      toast({
+        variant: "destructive",
+        title: "Missing Selection",
+        description: "Please select a product you want to receive in exchange"
+      });
+      return;
+    }
+
     if (!country || !location || !address) {
       toast({
         variant: "destructive",
@@ -277,6 +321,10 @@ const Payment = () => {
     localStorage.removeItem('cart');
     navigate('/thank-you');
   };
+
+  const availableProducts = products.filter(p => 
+    selectedProduct ? p.price <= parseFloat(estimatedPrice) * 1.2 : true
+  );
 
   return (
     <div className="min-h-screen bg-background py-16 px-4">
@@ -409,6 +457,45 @@ const Payment = () => {
 
             {paymentMethod === 'trade' && (
               <div className="space-y-4">
+                <div className="relative">
+                  <label htmlFor="searchItem" className="block text-sm font-medium text-foreground mb-1">
+                    Search Your Item
+                  </label>
+                  <div className="relative">
+                    <Input
+                      type="text"
+                      id="searchItem"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full pl-10"
+                      placeholder="Type to search products"
+                    />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                  </div>
+                  
+                  {showSearchResults && searchResults.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-md shadow-lg max-h-60 overflow-auto">
+                      {searchResults.map((product) => (
+                        <div
+                          key={product.id}
+                          className="flex items-center p-3 hover:bg-muted cursor-pointer border-b border-border last:border-b-0"
+                          onClick={() => handleSelectProduct(product)}
+                        >
+                          <img 
+                            src={product.image} 
+                            alt={product.name} 
+                            className="w-10 h-10 object-cover rounded mr-3" 
+                          />
+                          <div>
+                            <div className="text-sm font-medium text-foreground">{product.name}</div>
+                            <div className="text-xs text-muted-foreground">${product.price.toFixed(2)}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                
                 <div>
                   <label htmlFor="itemName" className="block text-sm font-medium text-foreground mb-1">
                     Item Name
@@ -423,6 +510,7 @@ const Payment = () => {
                     placeholder="Enter item name"
                   />
                 </div>
+                
                 <div>
                   <label htmlFor="itemImage" className="block text-sm font-medium text-foreground mb-1">
                     Item Image URL
@@ -450,6 +538,7 @@ const Payment = () => {
                     </div>
                   )}
                 </div>
+                
                 <div>
                   <label htmlFor="estimatedPrice" className="block text-sm font-medium text-foreground mb-1">
                     Estimated Value ($)
@@ -465,6 +554,37 @@ const Payment = () => {
                     className="w-full"
                     placeholder="Enter estimated value"
                   />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Select Product to Receive
+                  </label>
+                  <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto p-2 border border-border rounded-lg">
+                    {availableProducts.length > 0 ? (
+                      availableProducts.map(product => (
+                        <div
+                          key={product.id}
+                          onClick={() => handleSelectTradeProduct(product)}
+                          className={`p-2 rounded-lg cursor-pointer border transition-colors ${
+                            tradeForProductId === product.id 
+                              ? 'border-sage-500 bg-sage-50 dark:bg-sage-900/30' 
+                              : 'border-border hover:bg-muted'
+                          }`}
+                        >
+                          <img 
+                            src={product.image} 
+                            alt={product.name} 
+                            className="w-full h-20 object-cover rounded-md mb-1" 
+                          />
+                          <div className="text-xs font-medium text-foreground truncate">{product.name}</div>
+                          <div className="text-xs text-muted-foreground">${product.price.toFixed(2)}</div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="col-span-2 text-sm text-muted-foreground p-2">No products available in this price range</p>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
@@ -528,7 +648,7 @@ const Payment = () => {
               <div className="mb-4">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-muted-foreground">Subtotal:</span>
-                  <span>${baseTotal.toFixed(2)}</span>
+                  <span>${baseTotal().toFixed(2)}</span>
                 </div>
                 {deliveryFee > 0 && (
                   <div className="flex justify-between items-center mb-2">

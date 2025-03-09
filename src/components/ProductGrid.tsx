@@ -1,14 +1,6 @@
 
 import ProductCard from './ProductCard';
-
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  quantity: number;
-  brand: "Apple" | "Samsung" | "Sony" | "Other";
-}
+import { Product } from '../data/productData';
 
 interface ProductGridProps {
   products: Product[];
