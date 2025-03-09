@@ -196,6 +196,19 @@ const Payment = () => {
     }
   }, [searchTerm]);
 
+  const handleSelectProduct = (product: typeof products[0]) => {
+    setSearchTerm('');
+    setShowSearchResults(false);
+    setItemName(product.name);
+    setItemImage(product.image);
+    setEstimatedPrice(product.price.toString());
+    setSelectedProduct(product);
+  };
+
+  const handleSelectTradeProduct = (product: typeof products[0]) => {
+    setTradeForProductId(product.id);
+  };
+
   const calculateDeliveryFee = () => {
     if (deliveryType !== 'fast' || !deliveryTime) return 0;
     
@@ -222,9 +235,6 @@ const Payment = () => {
     if (timeDiff >= 6) return baseFee;
     return baseFee + ((6 - timeDiff) * 10);
   };
-
-  const deliveryFee = calculateDeliveryFee();
-  const total = baseTotal() + (deliveryFee >= 0 ? deliveryFee : 0);
 
   const validateCardNumber = (number: string) => {
     const cleaned = number.replace(/\D/g, '');
@@ -321,6 +331,9 @@ const Payment = () => {
     localStorage.removeItem('cart');
     navigate('/thank-you');
   };
+
+  const deliveryFee = calculateDeliveryFee();
+  const total = baseTotal() + (deliveryFee >= 0 ? deliveryFee : 0);
 
   const availableProducts = products.filter(p => 
     selectedProduct ? p.price <= parseFloat(estimatedPrice) * 1.2 : true
@@ -525,11 +538,11 @@ const Payment = () => {
                     placeholder="Enter image URL"
                   />
                   {itemImage && (
-                    <div className="mt-2">
+                    <div className="mt-2 border border-border rounded-lg overflow-hidden h-48">
                       <img
                         src={itemImage}
                         alt="Item preview"
-                        className="w-full h-48 object-cover rounded-lg"
+                        className="w-full h-full object-contain bg-black/5 p-2"
                         onError={(e) => {
                           const img = e.target as HTMLImageElement;
                           img.src = 'https://via.placeholder.com/400x300?text=Invalid+Image+URL';

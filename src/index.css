@@ -60,7 +60,10 @@
 }
 
 .light body {
-  background: linear-gradient(109.6deg, rgba(223,234,247,1) 11.2%, rgba(244,248,252,1) 91.1%);
+  background-image: url('/lovable-uploads/95727ca4-9d53-4231-86c1-0b37c7f5e4f1.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   color: hsl(222.2 84% 4.9%);
 }
 
@@ -75,11 +78,21 @@
 }
 
 .light .bg-card {
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
 }
 
 /* Improved card contrast in light mode */
 .light .card, 
 .light .bg-card {
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+/* Make product cards in light mode more readable */
+.light .bg-card.border.border-border {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.light .bg-popover {
+  background-color: rgba(255, 255, 255, 0.95);
 }

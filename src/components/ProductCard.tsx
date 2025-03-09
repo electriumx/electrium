@@ -44,12 +44,16 @@ const ProductCard = ({ id, name, price, image, brand, onQuantityChange }: Produc
     onQuantityChange(id, newQuantity);
   };
 
+  const handleImageClick = () => {
+    setModalOpen(true);
+  };
+
   return (
     <>
       <div className="bg-card rounded-xl p-6 shadow-sm transition-all duration-300 hover:shadow-md border border-border">
         <div 
           className="relative aspect-square overflow-hidden rounded-lg mb-4 cursor-pointer"
-          onClick={() => setModalOpen(true)}
+          onClick={handleImageClick}
         >
           <img
             src={image}
