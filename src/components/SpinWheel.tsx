@@ -1,238 +1,169 @@
 
-import { useState, useEffect, useRef } from 'react';
-import { Button } from './ui/button';
-import { useToast } from '@/hooks/use-toast';
-
-interface Segment {
-  text: string;
-  brand: string;
-  discount: number;
-  color: string;
-}
-
-const segments: Segment[] = [
-  { text: '5% off Apple', brand: 'Apple', discount: 5, color: '#1f2937' },
-  { text: '10% off Samsung', brand: 'Samsung', discount: 10, color: '#111827' },
-  { text: '15% off Sony', brand: 'Sony', discount: 15, color: '#0f172a' },
-  { text: '20% off Google', brand: 'Google', discount: 20, color: '#0f766e' },
-  { text: '25% off Microsoft', brand: 'Microsoft', discount: 25, color: '#0e7490' },
-  { text: '30% off Xiaomi', brand: 'Xiaomi', discount: 30, color: '#0369a1' },
-  { text: '35% off Audio', brand: 'Audio', discount: 35, color: '#1e40af' },
-  { text: '40% off Access.', brand: 'Accessories', discount: 40, color: '#4338ca' },
-  { text: '45% off PS', brand: 'PlayStation', discount: 45, color: '#6d28d9' },
-  { text: '50% off PC Games', brand: 'PC Games', discount: 50, color: '#7e22ce' },
-  { text: '15% off Games', brand: 'Games', discount: 15, color: '#a21caf' },
-  { text: '20% off All', brand: 'All', discount: 20, color: '#be185d' },
-  { text: '10% off Sony', brand: 'Sony', discount: 10, color: '#be123c' },
-  { text: '25% off PS5', brand: 'PlayStation', discount: 25, color: '#b91c1c' },
-  { text: '30% off PS4', brand: 'PlayStation', discount: 30, color: '#c2410c' },
-  { text: '15% off Xbox', brand: 'Microsoft', discount: 15, color: '#ca8a04' },
-];
+import { useState, useRef, useEffect } from 'react';
 
 interface SpinWheelProps {
   onWin: (brand: string, discount: number) => void;
 }
 
 const SpinWheel = ({ onWin }: SpinWheelProps) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [rotation, setRotation] = useState(0);
   const [isSpinning, setIsSpinning] = useState(false);
-  const [lastSpinTime, setLastSpinTime] = useState<number | null>(null);
-  const [timeUntilNextSpin, setTimeUntilNextSpin] = useState<string>('');
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { toast } = useToast();
-
-  // Draw the wheel
+  const [result, setResult] = useState<string | null>(null);
+  
+  // Define wheel segments with brand and discount pairs
+  const segments = [
+    { brand: "Apple", discount: 5, color: "#4a5568" },
+    { brand: "Samsung", discount: 10, color: "#1a202c" },
+    { brand: "All", discount: 15, color: "#2d3748" },
+    { brand: "Sony", discount: 7, color: "#4a5568" },
+    { brand: "Google", discount: 12, color: "#1a202c" },
+    { brand: "Microsoft", discount: 8, color: "#2d3748" }
+  ];
+  
+  const numSegments = segments.length;
+  const segmentAngle = 360 / numSegments;
+  
+  // Draw the wheel on canvas
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
+    
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
-    const radius = Math.min(centerX, centerY) * 0.9;
-
+    
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+    
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const radius = Math.min(centerX, centerY) - 10;
+    
     // Draw segments
-    const segmentAngle = (2 * Math.PI) / segments.length;
     segments.forEach((segment, i) => {
-      const startAngle = i * segmentAngle - Math.PI / 2 + rotation * (Math.PI / 180);
-      const endAngle = (i + 1) * segmentAngle - Math.PI / 2 + rotation * (Math.PI / 180);
-
-      // Draw segment
+      const startAngle = (i * segmentAngle - 90 + rotation) * Math.PI / 180;
+      const endAngle = ((i + 1) * segmentAngle - 90 + rotation) * Math.PI / 180;
+      
       ctx.beginPath();
       ctx.moveTo(centerX, centerY);
       ctx.arc(centerX, centerY, radius, startAngle, endAngle);
       ctx.closePath();
+      
       ctx.fillStyle = segment.color;
       ctx.fill();
-      ctx.strokeStyle = '#1e293b';
-      ctx.lineWidth = 1;
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 2;
       ctx.stroke();
-
+      
       // Draw text
       ctx.save();
       ctx.translate(centerX, centerY);
-      ctx.rotate(startAngle + segmentAngle / 2);
-      ctx.textAlign = 'right';
-      ctx.fillStyle = '#f8fafc';
-      ctx.font = 'bold 10px Arial';
-      ctx.fillText(segment.text, radius * 0.75, 5);
+      const textAngle = startAngle + (endAngle - startAngle) / 2;
+      ctx.rotate(textAngle);
+      ctx.translate(radius * 0.65, 0);
+      ctx.rotate(Math.PI / 2);
+      
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '12px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${segment.brand} ${segment.discount}%`, 0, 0);
+      
       ctx.restore();
     });
-
+    
     // Draw center circle
     ctx.beginPath();
-    ctx.arc(centerX, centerY, radius * 0.1, 0, 2 * Math.PI);
-    ctx.fillStyle = '#f8fafc';
+    ctx.arc(centerX, centerY, 15, 0, Math.PI * 2);
+    ctx.fillStyle = '#4a5568';
     ctx.fill();
-    ctx.strokeStyle = '#475569';
+    ctx.strokeStyle = '#e2e8f0';
     ctx.lineWidth = 2;
     ctx.stroke();
-
+    
     // Draw pointer
     ctx.beginPath();
-    ctx.moveTo(centerX, centerY - radius - 10);
-    ctx.lineTo(centerX - 10, centerY - radius + 10);
-    ctx.lineTo(centerX + 10, centerY - radius + 10);
+    ctx.moveTo(centerX, centerY - radius - 5);
+    ctx.lineTo(centerX - 10, centerY - radius - 20);
+    ctx.lineTo(centerX + 10, centerY - radius - 20);
     ctx.closePath();
-    ctx.fillStyle = '#9eff00';
+    ctx.fillStyle = '#4a5568';
     ctx.fill();
-    ctx.strokeStyle = '#64748b';
+    ctx.strokeStyle = '#e2e8f0';
     ctx.lineWidth = 2;
     ctx.stroke();
-  }, [rotation]);
-
-  // Check last spin time from localStorage
-  useEffect(() => {
-    const storedTime = localStorage.getItem('lastSpinTime');
-    if (storedTime) {
-      setLastSpinTime(parseInt(storedTime, 10));
-    }
-  }, []);
-
-  // Update countdown timer
-  useEffect(() => {
-    if (!lastSpinTime) return;
-
-    const interval = setInterval(() => {
-      const now = Date.now();
-      const nextSpinTime = lastSpinTime + 24 * 60 * 60 * 1000; // 24 hours
-      const timeLeft = nextSpinTime - now;
-
-      if (timeLeft <= 0) {
-        setTimeUntilNextSpin('');
-        clearInterval(interval);
-      } else {
-        const hours = Math.floor(timeLeft / (60 * 60 * 1000));
-        const minutes = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
-        const seconds = Math.floor((timeLeft % (60 * 1000)) / 1000);
-        setTimeUntilNextSpin(`${hours}h ${minutes}m ${seconds}s`);
-      }
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [lastSpinTime]);
-
-  const handleSpin = () => {
-    const now = Date.now();
     
-    // Check if 24 hours have passed since last spin
-    if (lastSpinTime && now - lastSpinTime < 24 * 60 * 60 * 1000) {
-      toast({
-        title: "You've already spun today!",
-        description: `You can spin again in ${timeUntilNextSpin}`,
-        variant: "destructive"
-      });
-      return;
-    }
-
+  }, [rotation, segments, numSegments, segmentAngle]);
+  
+  const spinWheel = () => {
+    if (isSpinning) return;
+    
     setIsSpinning(true);
+    setResult(null);
     
-    // Calculate random rotation (5-10 full rotations + random segment)
-    const spinDuration = 5000; // 5 seconds
-    const fullRotations = 5 + Math.floor(Math.random() * 5);
-    const extraRotation = Math.floor(Math.random() * 360);
-    const totalRotation = fullRotations * 360 + extraRotation;
+    // Random number of rotations (3-5 full rotations)
+    const rotations = 3 + Math.random() * 2;
     
-    // Animated spin
-    let start: number | null = null;
-    const animate = (timestamp: number) => {
-      if (!start) start = timestamp;
-      const progress = timestamp - start;
-      const percentage = Math.min(progress / spinDuration, 1);
+    // Random angle to land on (0-360)
+    const landingAngle = Math.floor(Math.random() * 360);
+    
+    // Total rotation will be multiple full rotations plus the landing angle
+    const totalRotation = rotations * 360 + landingAngle;
+    
+    // Animate the spin
+    let currentRotation = rotation;
+    const startTime = Date.now();
+    const duration = 3000; // 3 seconds
+    
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
       
-      // Easing function for natural deceleration
-      const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
-      const currentRotation = totalRotation * easeOut(percentage);
+      // Ease out cubic function for slowing down
+      const easeOut = 1 - Math.pow(1 - progress, 3);
       
-      setRotation(currentRotation % 360);
+      currentRotation = rotation + totalRotation * easeOut;
+      setRotation(currentRotation);
       
-      if (progress < spinDuration) {
+      if (progress < 1) {
         requestAnimationFrame(animate);
       } else {
-        // Spin completed
-        setIsSpinning(false);
-        
-        // Determine winning segment
+        // Determine which segment was landed on
         const normalizedRotation = currentRotation % 360;
-        const segmentAngle = 360 / segments.length;
-        const winningIndex = Math.floor(
-          ((360 - normalizedRotation) % 360) / segmentAngle
-        );
-        const winningSegment = segments[winningIndex];
+        const segmentIndex = Math.floor(((normalizedRotation + 90) % 360) / segmentAngle);
+        const landedSegment = segments[segmentIndex % numSegments];
         
-        // Record spin time
-        setLastSpinTime(now);
-        localStorage.setItem('lastSpinTime', now.toString());
-        
-        // Notify about the win
-        toast({
-          title: "Congratulations!",
-          description: `You won: ${winningSegment.text}!`,
-        });
-        
-        // Call the callback with the winning segment
-        onWin(winningSegment.brand, winningSegment.discount);
+        setResult(`You won ${landedSegment.discount}% off ${landedSegment.brand} products!`);
+        onWin(landedSegment.brand, landedSegment.discount);
+        setIsSpinning(false);
       }
     };
     
-    requestAnimationFrame(animate);
+    animate();
   };
-
-  const canSpin = !lastSpinTime || Date.now() - lastSpinTime >= 24 * 60 * 60 * 1000;
-
+  
   return (
-    <div className="flex flex-col items-center max-w-md mx-auto bg-card rounded-xl p-6 shadow-md border border-border">
-      <h3 className="text-xl font-bold mb-4">Daily Spin Wheel</h3>
-      
-      <div className="relative w-full aspect-square">
+    <div className="flex flex-col items-center p-4">
+      <h2 className="text-xl font-bold mb-4">Spin to Win a Discount!</h2>
+      <div className="relative">
         <canvas 
           ref={canvasRef} 
           width={300} 
           height={300} 
-          className="w-full h-full"
+          className="border rounded-full"
         />
       </div>
-      
-      <div className="mt-6 text-center">
-        {timeUntilNextSpin ? (
-          <div className="text-sm text-muted-foreground mb-2">
-            Next spin available in: <span className="font-bold">{timeUntilNextSpin}</span>
-          </div>
-        ) : null}
-        
-        <Button
-          onClick={handleSpin}
-          disabled={isSpinning || !canSpin}
-          className="w-full"
-        >
-          {isSpinning ? 'Spinning...' : canSpin ? 'Spin the Wheel!' : 'Come back tomorrow!'}
-        </Button>
-      </div>
+      <button 
+        onClick={spinWheel} 
+        disabled={isSpinning}
+        className="mt-4 px-6 py-2 bg-primary text-white rounded-md hover:bg-primary/90 disabled:opacity-50"
+      >
+        {isSpinning ? 'Spinning...' : 'Spin'}
+      </button>
+      {result && (
+        <div className="mt-4 p-3 bg-green-100 text-green-700 rounded-md">
+          {result}
+        </div>
+      )}
     </div>
   );
 };
