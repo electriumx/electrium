@@ -11,7 +11,7 @@ import { Product, products } from '../data/productData';
 const Products = () => {
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [cart, setCart] = useState<Product[]>([]);
-  const [discounts, setDiscounts] = useState<Record<string, number>>({});
+  const [discounts, setDiscounts] = useState<Record<string, { value: number, expiresAt: number }>>({});
   const [showSpinWheel, setShowSpinWheel] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -34,11 +34,41 @@ const Products = () => {
       }
     }
     
-    // Load discounts from localStorage
+    // Load discounts from localStorage with expiration
     const savedDiscounts = localStorage.getItem('discounts');
     if (savedDiscounts) {
       try {
-        setDiscounts(JSON.parse(savedDiscounts));
+        const parsedDiscounts = JSON.parse(savedDiscounts);
+        
+        // Convert old format to new format if necessary
+        const formattedDiscounts: Record<string, { value: number, expiresAt: number }> = {};
+        
+        Object.entries(parsedDiscounts).forEach(([brand, value]) => {
+          // Check if it's the old format (just number) or new format (object with value and expiresAt)
+          if (typeof value === 'number') {
+            // Old format - give it 48 hours from now
+            formattedDiscounts[brand] = {
+              value,
+              expiresAt: Date.now() + (48 * 60 * 60 * 1000)
+            };
+          } else if (typeof value === 'object' && value !== null && 'value' in value && 'expiresAt' in value) {
+            // Already in new format
+            formattedDiscounts[brand] = value as { value: number, expiresAt: number };
+          }
+        });
+        
+        // Filter out expired discounts
+        const currentTime = Date.now();
+        Object.keys(formattedDiscounts).forEach(brand => {
+          if (formattedDiscounts[brand].expiresAt < currentTime || formattedDiscounts[brand].value === 0) {
+            delete formattedDiscounts[brand];
+          }
+        });
+        
+        setDiscounts(formattedDiscounts);
+        
+        // Save the cleaned up discounts back to localStorage
+        localStorage.setItem('discounts', JSON.stringify(formattedDiscounts));
       } catch (error) {
         console.error('Error parsing discounts from localStorage:', error);
       }
@@ -105,8 +135,11 @@ const Products = () => {
     localStorage.setItem('cart', JSON.stringify(updatedCart));
   };
 
-  const handleSpinWin = (brand: string, discount: number) => {
-    const newDiscounts = { ...discounts, [brand]: discount };
+  const handleSpinWin = (brand: string, discount: number, expiresAt: number) => {
+    const newDiscounts = { 
+      ...discounts, 
+      [brand]: { value: discount, expiresAt } 
+    };
     setDiscounts(newDiscounts);
     localStorage.setItem('discounts', JSON.stringify(newDiscounts));
     setShowSpinWheel(false);
@@ -162,11 +195,21 @@ const Products = () => {
         <div className="mb-6 p-4 bg-card rounded-lg border border-border">
           <h2 className="text-lg font-semibold mb-2">Active Discounts</h2>
           <div className="flex flex-wrap gap-2">
-            {Object.entries(discounts).map(([brand, discount]) => (
-              <span key={brand} className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-destructive/20 text-destructive">
-                {brand}: {discount}% off
-              </span>
-            ))}
+            {Object.entries(discounts).map(([brand, discount]) => {
+              // Only show discounts with value > 0
+              if (discount.value <= 0) return null;
+              
+              // Calculate time remaining
+              const now = Date.now();
+              const timeRemaining = discount.expiresAt - now;
+              const hoursRemaining = Math.floor(timeRemaining / (1000 * 60 * 60));
+              
+              return (
+                <span key={brand} className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-destructive/20 text-destructive">
+                  {brand}: {discount.value}% off ({hoursRemaining}h left)
+                </span>
+              );
+            })}
           </div>
         </div>
       )}

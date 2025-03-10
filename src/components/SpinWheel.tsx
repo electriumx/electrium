@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 
 interface SpinWheelProps {
-  onWin: (brand: string, discount: number) => void;
+  onWin: (brand: string, discount: number, expiresAt: number) => void;
 }
 
 const SpinWheel = ({ onWin }: SpinWheelProps) => {
@@ -24,7 +24,11 @@ const SpinWheel = ({ onWin }: SpinWheelProps) => {
     { brand: "Google", discount: 12, color: "#1a202c" },
     { brand: "Microsoft", discount: 8, color: "#2d3748" },
     { brand: "Xiaomi", discount: 20, color: "#4a5568" },
-    { brand: "Accessories", discount: 25, color: "#1a202c" }
+    { brand: "Accessories", discount: 25, color: "#1a202c" },
+    { brand: "Audio", discount: 18, color: "#4a5568" },
+    { brand: "Games", discount: 30, color: "#1a202c" },
+    { brand: "PlayStation", discount: 15, color: "#2d3748" },
+    { brand: "PC Games", discount: 22, color: "#4a5568" }
   ];
   
   const numSegments = segments.length;
@@ -116,9 +120,20 @@ const SpinWheel = ({ onWin }: SpinWheelProps) => {
       ctx.rotate(Math.PI / 2);
       
       ctx.fillStyle = '#ffffff';
-      ctx.font = '10px sans-serif'; // Smaller text size
+      ctx.font = '9px sans-serif'; // Smaller text size
       ctx.textAlign = 'center';
-      ctx.fillText(`${segment.brand}`, 0, 0);
+      
+      // Split brand name if it's too long
+      const brand = segment.brand;
+      if (brand.length > 10) {
+        const midpoint = Math.floor(brand.length / 2);
+        const firstHalf = brand.substring(0, midpoint);
+        const secondHalf = brand.substring(midpoint);
+        ctx.fillText(`${firstHalf}-`, 0, -5);
+        ctx.fillText(`${secondHalf}`, 0, 5);
+      } else {
+        ctx.fillText(`${brand}`, 0, 0);
+      }
       ctx.fillText(`${segment.discount}%`, 0, 12); // Add a line break for percentage
       
       ctx.restore();
@@ -185,8 +200,11 @@ const SpinWheel = ({ onWin }: SpinWheelProps) => {
         const segmentIndex = Math.floor(((normalizedRotation + 90) % 360) / segmentAngle);
         const landedSegment = segments[segmentIndex % numSegments];
         
+        // Calculate expiration time (48 hours from now)
+        const expirationTime = Date.now() + (48 * 60 * 60 * 1000);
+        
         setResult(`You won ${landedSegment.discount}% off ${landedSegment.brand} products!`);
-        onWin(landedSegment.brand, landedSegment.discount);
+        onWin(landedSegment.brand, landedSegment.discount, expirationTime);
         setIsSpinning(false);
         
         // Set cooldown
@@ -196,7 +214,7 @@ const SpinWheel = ({ onWin }: SpinWheelProps) => {
         
         toast({
           title: "Discount Applied!",
-          description: `You won ${landedSegment.discount}% off ${landedSegment.brand} products! Come back in 24 hours to spin again.`,
+          description: `You won ${landedSegment.discount}% off ${landedSegment.brand} products! Expires in 48 hours. Come back in 24 hours to spin again.`,
         });
       }
     };

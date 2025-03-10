@@ -1,222 +1,136 @@
 
-import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/components/ui/use-toast";
-import { Star, StarHalf } from "lucide-react";
-import { format } from "date-fns";
+
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  image: string;
+  brand: string;
+  discount?: number;
+}
 
 interface Review {
-  id: number;
   name: string;
   rating: number;
   comment: string;
-  date: Date;
 }
 
 interface ProductDetailModalProps {
-  product: {
-    id: number;
-    name: string;
-    price: number;
-    image: string;
-    brand: string;
-    discount?: number;
-  };
+  product: Product;
   isOpen: boolean;
   onClose: () => void;
+  reviews?: Review[];
 }
 
-const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProps) => {
-  const { toast } = useToast();
-  const [fullscreenImage, setFullscreenImage] = useState(false);
-  const [newReview, setNewReview] = useState({ name: "", rating: 5, comment: "" });
-  const [reviews, setReviews] = useState<Review[]>(() => {
-    // Load reviews from localStorage
-    const savedReviews = localStorage.getItem(`product-${product.id}-reviews`);
-    return savedReviews ? JSON.parse(savedReviews) : [];
-  });
-
-  const handleModalChange = (open: boolean) => {
-    if (!open) {
-      setFullscreenImage(false);
-      onClose();
-    }
-  };
-
-  // Calculate discounted price if there's a discount
-  const discountedPrice = product.discount && product.discount > 0 
-    ? product.price * (1 - product.discount / 100) 
-    : product.price;
-
-  const handleReviewSubmit = () => {
-    if (!newReview.name.trim() || !newReview.comment.trim()) {
-      toast({
-        title: "Error",
-        description: "Please fill in all fields",
-        variant: "destructive",
-      });
-      return;
-    }
+const ProductDetailModal = ({ product, isOpen, onClose, reviews = [] }: ProductDetailModalProps) => {
+  const { name, price, image, brand, discount = 0 } = product;
+  const discountedPrice = discount > 0 ? price * (1 - discount / 100) : price;
+  
+  const handleImageClick = () => {
+    // Open image in full screen
+    const img = new Image();
+    img.src = image;
+    img.style.maxHeight = '90vh';
+    img.style.maxWidth = '90vw';
+    img.style.objectFit = 'contain';
     
-    const review: Review = {
-      id: Date.now(),
-      ...newReview,
-      date: new Date(),
+    const viewer = document.createElement('div');
+    viewer.style.position = 'fixed';
+    viewer.style.top = '0';
+    viewer.style.left = '0';
+    viewer.style.width = '100vw';
+    viewer.style.height = '100vh';
+    viewer.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+    viewer.style.display = 'flex';
+    viewer.style.justifyContent = 'center';
+    viewer.style.alignItems = 'center';
+    viewer.style.zIndex = '9999';
+    viewer.style.cursor = 'zoom-out';
+    
+    viewer.onclick = () => {
+      document.body.removeChild(viewer);
     };
     
-    const updatedReviews = [...reviews, review];
-    setReviews(updatedReviews);
-    
-    // Save to localStorage
-    localStorage.setItem(`product-${product.id}-reviews`, JSON.stringify(updatedReviews));
-    
-    // Reset form
-    setNewReview({ name: "", rating: 5, comment: "" });
-    
-    toast({
-      title: "Review submitted",
-      description: "Thank you for your feedback!",
-    });
-  };
-
-  const handleRatingChange = (rating: number) => {
-    setNewReview({ ...newReview, rating });
+    viewer.appendChild(img);
+    document.body.appendChild(viewer);
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleModalChange}>
-      <DialogContent className={fullscreenImage ? "max-w-5xl h-[90vh]" : "max-w-md"}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold">{product.name}</DialogTitle>
+          <DialogTitle>{name}</DialogTitle>
         </DialogHeader>
-
-        {fullscreenImage ? (
-          <div className="h-full flex flex-col">
-            <div className="flex-grow overflow-hidden flex items-center justify-center">
-              <img
-                src={product.image}
-                alt={product.name}
-                className="max-w-full max-h-full object-contain"
-              />
-            </div>
-            <Button 
-              onClick={() => setFullscreenImage(false)}
-              className="mt-4"
-            >
-              Close Fullscreen
-            </Button>
+        
+        <div className="mt-4 space-y-6">
+          <div 
+            className="rounded-lg overflow-hidden cursor-zoom-in"
+            onClick={handleImageClick}
+          >
+            <img 
+              src={image} 
+              alt={name} 
+              className="w-full h-auto object-cover"
+            />
           </div>
-        ) : (
-          <div className="mt-4 space-y-6">
-            <div 
-              className="overflow-hidden rounded-md cursor-pointer"
-              onClick={() => setFullscreenImage(true)}
-            >
-              <img
-                src={product.image}
-                alt={product.name}
-                className="w-full h-auto object-contain"
-              />
-              <div className="text-center text-sm text-muted-foreground mt-2">
-                Click image to view fullscreen
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-muted-foreground">Brand: {product.brand}</p>
-              
-              {product.discount && product.discount > 0 ? (
-                <div className="space-y-1">
-                  <p className="text-muted-foreground line-through">${product.price.toFixed(2)}</p>
-                  <p className="text-destructive font-semibold text-lg">
-                    ${discountedPrice.toFixed(2)} ({product.discount}% off)
-                  </p>
-                </div>
+          
+          <div>
+            <p className="text-lg font-semibold">
+              {discount > 0 ? (
+                <>
+                  <span className="line-through text-muted-foreground mr-2">${price.toFixed(2)}</span>
+                  <span className="text-destructive">${discountedPrice.toFixed(2)}</span>
+                  <span className="ml-2 text-xs bg-destructive text-white px-2 py-1 rounded-full">
+                    {discount}% OFF
+                  </span>
+                </>
               ) : (
-                <p className="font-semibold text-lg">${product.price.toFixed(2)}</p>
+                <span>${price.toFixed(2)}</span>
               )}
-              
-              <p className="text-muted-foreground text-sm mt-4">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor 
-                incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud 
-                exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-              </p>
-            </div>
-
-            {/* Reviews section */}
-            <div className="border-t pt-4">
-              <h3 className="text-lg font-semibold mb-4">Customer Reviews</h3>
-              
-              {reviews.length > 0 ? (
-                <div className="space-y-4 max-h-60 overflow-y-auto mb-6">
-                  {reviews.map((review) => (
-                    <div key={review.id} className="border-b pb-3">
-                      <div className="flex justify-between items-center">
-                        <p className="font-medium">{review.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {format(new Date(review.date), "MMM d, yyyy")}
-                        </p>
-                      </div>
-                      <div className="flex my-1">
+            </p>
+            <p className="text-muted-foreground">Brand: {brand}</p>
+          </div>
+          
+          {/* Reviews section */}
+          <div className="border-t pt-4">
+            <h3 className="text-lg font-medium mb-3">Reviews ({reviews.length})</h3>
+            
+            {reviews.length === 0 ? (
+              <p className="text-muted-foreground">No reviews yet.</p>
+            ) : (
+              <div className="space-y-4">
+                {reviews.map((review, index) => (
+                  <div key={index} className="border-b pb-3 last:border-0">
+                    <div className="flex justify-between items-center mb-1">
+                      <p className="font-medium">{review.name}</p>
+                      <div className="flex">
                         {[1, 2, 3, 4, 5].map((star) => (
-                          <Star 
+                          <svg 
                             key={star}
-                            className={star <= review.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"} 
-                            size={16}
-                          />
+                            xmlns="http://www.w3.org/2000/svg" 
+                            width="14" 
+                            height="14" 
+                            viewBox="0 0 24 24" 
+                            fill={star <= review.rating ? "gold" : "none"} 
+                            stroke="currentColor" 
+                            strokeWidth="2" 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round"
+                            className="text-yellow-500"
+                          >
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                          </svg>
                         ))}
                       </div>
-                      <p className="text-sm mt-1">{review.comment}</p>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-muted-foreground mb-4">No reviews yet. Be the first to review!</p>
-              )}
-              
-              {/* Add review form */}
-              <div className="space-y-3">
-                <h4 className="font-medium">Write a Review</h4>
-                <div className="space-y-2">
-                  <input
-                    type="text"
-                    placeholder="Your Name"
-                    className="w-full p-2 border rounded"
-                    value={newReview.name}
-                    onChange={(e) => setNewReview({ ...newReview, name: e.target.value })}
-                  />
-                  
-                  <div className="flex items-center space-x-1">
-                    <span className="mr-2">Rating:</span>
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star 
-                        key={star}
-                        className={`cursor-pointer ${
-                          star <= newReview.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
-                        }`}
-                        onClick={() => handleRatingChange(star)}
-                        size={20}
-                      />
-                    ))}
+                    <p className="text-sm">{review.comment}</p>
                   </div>
-                  
-                  <Textarea
-                    placeholder="Your Review"
-                    className="w-full"
-                    value={newReview.comment}
-                    onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
-                  />
-                  
-                  <Button onClick={handleReviewSubmit} className="w-full">
-                    Submit Review
-                  </Button>
-                </div>
+                ))}
               </div>
-            </div>
+            )}
           </div>
-        )}
+        </div>
       </DialogContent>
     </Dialog>
   );

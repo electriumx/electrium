@@ -18,6 +18,9 @@ const Donation = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Increased donation cap
+  const MAX_DONATION = 1000000;
+
   useEffect(() => {
     const savedTotal = localStorage.getItem('totalDonations');
     if (savedTotal) {
@@ -105,11 +108,11 @@ const Donation = () => {
       return;
     }
 
-    if (isNaN(donationAmount) || donationAmount < 1 || donationAmount > 1000) {
+    if (isNaN(donationAmount) || donationAmount < 1 || donationAmount > MAX_DONATION) {
       toast({
         variant: "destructive",
         title: "Invalid Amount",
-        description: "Please enter an amount between $1 and $1000"
+        description: `Please enter an amount between $1 and $${MAX_DONATION.toLocaleString()}`
       });
       return;
     }
@@ -162,7 +165,7 @@ const Donation = () => {
             </div>
           </div>
           <p className="mt-2 text-center text-sm text-muted-foreground">
-            Support our mission with a donation between $1 and $1000
+            Support our mission with a donation between $1 and ${MAX_DONATION.toLocaleString()}
           </p>
           {isOnCooldown && (
             <p className="mt-2 text-center text-sm text-yellow-400">
@@ -182,7 +185,7 @@ const Donation = () => {
                 name="amount"
                 type="number"
                 min="1"
-                max="1000"
+                max={MAX_DONATION}
                 required
                 className="mt-1 block w-full px-3 py-2 border border-gray-700 rounded-md shadow-sm bg-gray-900 text-white focus:outline-none focus:ring-sage-500 focus:border-sage-500"
                 placeholder="Enter amount"
@@ -203,7 +206,7 @@ const Donation = () => {
                 className="mt-1 block w-full px-3 py-2 border border-gray-700 rounded-md shadow-sm bg-gray-900 text-white focus:outline-none focus:ring-sage-500 focus:border-sage-500"
                 placeholder="1234 5678 9012 3456"
                 value={cardNumber}
-                onChange={(e) => setCardNumber(e.target.value)}
+                onChange={handleCardNumberChange}
                 maxLength={19}
               />
             </div>

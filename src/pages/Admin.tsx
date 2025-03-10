@@ -35,10 +35,38 @@ const Admin = () => {
   });
 
   // Category discount state
-  const [categoryDiscounts, setCategoryDiscounts] = useState<Record<string, number>>(() => {
+  const [categoryDiscounts, setCategoryDiscounts] = useState<Record<string, { value: number, expiresAt: number }>>(() => {
     const savedDiscounts = localStorage.getItem('adminCategoryDiscounts');
-    return savedDiscounts ? JSON.parse(savedDiscounts) : 
-      productBrands.reduce((acc, brand) => ({ ...acc, [brand]: 0 }), {});
+    if (savedDiscounts) {
+      try {
+        const parsed = JSON.parse(savedDiscounts);
+        // Convert from old format if needed
+        if (typeof Object.values(parsed)[0] === 'number') {
+          return productBrands.reduce((acc, brand) => {
+            const value = parsed[brand] || 0;
+            return { 
+              ...acc, 
+              [brand]: { 
+                value, 
+                expiresAt: Date.now() + (48 * 60 * 60 * 1000) 
+              } 
+            };
+          }, {});
+        }
+        return parsed;
+      } catch (e) {
+        console.error('Error parsing discounts:', e);
+        return productBrands.reduce((acc, brand) => ({ 
+          ...acc, 
+          [brand]: { value: 0, expiresAt: Date.now() + (48 * 60 * 60 * 1000) } 
+        }), {});
+      }
+    } else {
+      return productBrands.reduce((acc, brand) => ({ 
+        ...acc, 
+        [brand]: { value: 0, expiresAt: Date.now() + (48 * 60 * 60 * 1000) } 
+      }), {});
+    }
   });
 
   // Stats state
@@ -49,6 +77,12 @@ const Admin = () => {
     revenue: 0,
     activeUsers: 0,
     conversionRate: 0,
+  });
+
+  // Wheel state
+  const [wheelCooldown, setWheelCooldown] = useState({
+    active: false,
+    timeLeft: 0
   });
 
   useEffect(() => {
@@ -70,6 +104,28 @@ const Admin = () => {
       }
     }
 
+    // Check wheel cooldown status
+    const lastSpinTime = localStorage.getItem('lastSpinTime');
+    if (lastSpinTime) {
+      const lastTime = parseInt(lastSpinTime, 10);
+      const currentTime = Date.now();
+      const timeDiff = currentTime - lastTime;
+      const cooldownPeriod = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+      
+      if (timeDiff < cooldownPeriod) {
+        const remainingTime = cooldownPeriod - timeDiff;
+        setWheelCooldown({
+          active: true,
+          timeLeft: Math.floor(remainingTime / 1000)
+        });
+      } else {
+        setWheelCooldown({
+          active: false,
+          timeLeft: 0
+        });
+      }
+    }
+
     // Simulate loading data
     const timer = setTimeout(() => {
       setStats({
@@ -85,6 +141,31 @@ const Admin = () => {
     
     return () => clearTimeout(timer);
   }, []);
+
+  // Update wheel cooldown timer
+  useEffect(() => {
+    if (!wheelCooldown.active) return;
+    
+    const interval = setInterval(() => {
+      setWheelCooldown(prev => {
+        if (prev.timeLeft <= 1) {
+          clearInterval(interval);
+          return { active: false, timeLeft: 0 };
+        }
+        return { ...prev, timeLeft: prev.timeLeft - 1 };
+      });
+    }, 1000);
+    
+    return () => clearInterval(interval);
+  }, [wheelCooldown.active]);
+
+  // Format wheel cooldown time
+  const formatWheelCooldown = () => {
+    const hours = Math.floor(wheelCooldown.timeLeft / 3600);
+    const minutes = Math.floor((wheelCooldown.timeLeft % 3600) / 60);
+    const seconds = wheelCooldown.timeLeft % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  };
 
   // This is a hidden page, redirect if accessed directly
   useEffect(() => {
@@ -116,7 +197,13 @@ const Admin = () => {
   };
 
   const handleCategoryDiscountChange = (category: string, value: number) => {
-    const updatedDiscounts = { ...categoryDiscounts, [category]: value };
+    // Set expiration time to 48 hours from now
+    const expiresAt = Date.now() + (48 * 60 * 60 * 1000);
+    
+    const updatedDiscounts = { 
+      ...categoryDiscounts, 
+      [category]: { value, expiresAt } 
+    };
     setCategoryDiscounts(updatedDiscounts);
     
     // Save to localStorage for admin panel
@@ -127,7 +214,17 @@ const Admin = () => {
     
     toast({
       title: "Discount updated",
-      description: `${category} discount set to ${value}%`,
+      description: `${category} discount set to ${value}% for the next 48 hours`,
+    });
+  };
+
+  const handleResetWheelCooldown = () => {
+    localStorage.removeItem('lastSpinTime');
+    setWheelCooldown({ active: false, timeLeft: 0 });
+    
+    toast({
+      title: "Wheel cooldown reset",
+      description: "Users can now spin the wheel again",
     });
   };
 
@@ -253,6 +350,39 @@ const Admin = () => {
             <CardFooter>
               <Button variant="outline" className="w-full">View Detailed Analytics</Button>
             </CardFooter>
+          </Card>
+          
+          {/* Add Wheel Cooldown Controls */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Wheel Spin Controls</CardTitle>
+              <CardDescription>Manage the wheel spin cooldown</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span>Wheel Cooldown Status:</span>
+                  <span className={`font-semibold ${wheelCooldown.active ? 'text-destructive' : 'text-green-500'}`}>
+                    {wheelCooldown.active ? 'Active' : 'Inactive'}
+                  </span>
+                </div>
+                
+                {wheelCooldown.active && (
+                  <div className="flex justify-between items-center">
+                    <span>Time Until Reset:</span>
+                    <span className="font-mono">{formatWheelCooldown()}</span>
+                  </div>
+                )}
+                
+                <Button 
+                  onClick={handleResetWheelCooldown}
+                  disabled={!wheelCooldown.active}
+                  className="w-full"
+                >
+                  Reset Wheel Cooldown
+                </Button>
+              </div>
+            </CardContent>
           </Card>
         </TabsContent>
         
@@ -380,25 +510,39 @@ const Admin = () => {
           <Card>
             <CardHeader>
               <CardTitle>Category Discounts</CardTitle>
-              <CardDescription>Set discount percentages for each product category</CardDescription>
+              <CardDescription>Set discount percentages for each product category (valid for 48 hours)</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {productBrands.map((brand) => (
-                  <div key={brand} className="space-y-2">
-                    <div className="flex justify-between">
-                      <Label>{brand}</Label>
-                      <span className="font-semibold">{categoryDiscounts[brand] || 0}%</span>
+                {productBrands.map((brand) => {
+                  const discount = categoryDiscounts[brand] || { value: 0, expiresAt: 0 };
+                  const now = Date.now();
+                  const isActive = discount.expiresAt > now;
+                  const timeLeft = isActive ? Math.floor((discount.expiresAt - now) / 1000 / 60 / 60) : 0;
+                  
+                  return (
+                    <div key={brand} className="space-y-2">
+                      <div className="flex justify-between">
+                        <Label>{brand}</Label>
+                        <div className="text-right">
+                          <span className="font-semibold">{discount.value}%</span>
+                          {isActive && discount.value > 0 && (
+                            <span className="ml-2 text-xs text-muted-foreground">
+                              ({timeLeft}h left)
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <Slider 
+                        value={[discount.value]} 
+                        min={0} 
+                        max={100} 
+                        step={5}
+                        onValueChange={([value]) => handleCategoryDiscountChange(brand, value)}
+                      />
                     </div>
-                    <Slider 
-                      value={[categoryDiscounts[brand] || 0]} 
-                      min={0} 
-                      max={100} 
-                      step={5}
-                      onValueChange={([value]) => handleCategoryDiscountChange(brand, value)}
-                    />
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </CardContent>
             <CardFooter>
