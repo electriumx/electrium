@@ -4,7 +4,7 @@ export interface Product {
   price: number;
   image: string;
   quantity: number;
-  brand: "Apple" | "Samsung" | "Sony" | "Google" | "Microsoft" | "Xiaomi" | "Audio" | "Accessories";
+  brand: "Apple" | "Samsung" | "Sony" | "Google" | "Microsoft" | "Xiaomi" | "Audio" | "Accessories" | "PlayStation" | "PC Games" | "Games" | "All";
 }
 
 export const products: Product[] = [
@@ -1007,5 +1007,165 @@ export const products: Product[] = [
     image: "https://images.unsplash.com/photo-1584798845954-9f8d7359d447?auto=format&fit=crop&w=800",
     quantity: 0,
     brand: "Accessories"
+  },
+  {
+    id: 126,
+    name: "Call of Duty: Modern Warfare III",
+    price: 69.99,
+    image: "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "PlayStation"
+  },
+  {
+    id: 127,
+    name: "Call of Duty: Black Ops 6",
+    price: 69.99,
+    image: "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "PlayStation"
+  },
+  {
+    id: 128,
+    name: "Call of Duty: Black Ops Cold War",
+    price: 59.99,
+    image: "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "PlayStation"
+  },
+  {
+    id: 129,
+    name: "Call of Duty: Vanguard",
+    price: 59.99,
+    image: "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "PlayStation"
+  },
+  {
+    id: 130,
+    name: "GTA V",
+    price: 29.99,
+    image: "https://images.unsplash.com/photo-1605144358469-73748bc6c0ad?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "PlayStation"
+  },
+  {
+    id: 131,
+    name: "GTA VI",
+    price: 79.99,
+    image: "https://images.unsplash.com/photo-1605144358469-73748bc6c0ad?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "PlayStation"
+  },
+  {
+    id: 132,
+    name: "FIFA 24",
+    price: 69.99,
+    image: "https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "PlayStation"
+  },
+  {
+    id: 133,
+    name: "Spider-Man 2",
+    price: 69.99,
+    image: "https://images.unsplash.com/photo-1608889476518-6628d79bf8a5?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "PlayStation"
+  },
+  {
+    id: 134,
+    name: "God of War Ragnarök",
+    price: 59.99,
+    image: "https://images.unsplash.com/photo-1608889825271-9696283ab804?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "PlayStation"
+  },
+  {
+    id: 135,
+    name: "The Last of Us Part II",
+    price: 49.99,
+    image: "https://images.unsplash.com/photo-1583384990896-778235d9cee9?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "PlayStation"
+  },
+  {
+    id: 136,
+    name: "Call of Duty: Modern Warfare III (PC)",
+    price: 69.99,
+    image: "https://images.unsplash.com/photo-1607853202273-797f1c22a38e?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "PC Games"
+  },
+  {
+    id: 137,
+    name: "Call of Duty: Black Ops 6 (PC)",
+    price: 69.99,
+    image: "https://images.unsplash.com/photo-1607853202273-797f1c22a38e?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "PC Games"
+  },
+  {
+    id: 138,
+    name: "Call of Duty: Black Ops Cold War (PC)",
+    price: 59.99,
+    image: "https://images.unsplash.com/photo-1607853202273-797f1c22a38e?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "PC Games"
+  },
+  {
+    id: 139,
+    name: "Call of Duty: Vanguard (PC)",
+    price: 59.99,
+    image: "https://images.unsplash.com/photo-1607853202273-797f1c22a38e?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "PC Games"
+  },
+  {
+    id: 140,
+    name: "GTA V (PC)",
+    price: 29.99,
+    image: "https://images.unsplash.com/photo-1605144358469-73748bc6c0ad?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "PC Games"
+  },
+  {
+    id: 141,
+    name: "GTA VI (PC)",
+    price: 79.99,
+    image: "https://images.unsplash.com/photo-1605144358469-73748bc6c0ad?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "PC Games"
+  },
+  {
+    id: 142,
+    name: "Cyberpunk 2077",
+    price: 49.99,
+    image: "https://images.unsplash.com/photo-1607853202273-797f1c22a38e?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "PC Games"
+  },
+  {
+    id: 143,
+    name: "The Witcher 3: Wild Hunt",
+    price: 39.99,
+    image: "https://images.unsplash.com/photo-1607853202273-797f1c22a38e?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "PC Games"
+  },
+  {
+    id: 144,
+    name: "Red Dead Redemption 2 (PC)",
+    price: 59.99,
+    image: "https://images.unsplash.com/photo-1607853202273-797f1c22a38e?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "PC Games"
+  },
+  {
+    id: 145,
+    name: "Elden Ring (PC)",
+    price: 59.99,
+    image: "https://images.unsplash.com/photo-1607853202273-797f1c22a38e?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "PC Games"
   }
 ];

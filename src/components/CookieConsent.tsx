@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "../contexts/AuthContext";
 
 const CookieConsent = () => {
@@ -34,7 +34,7 @@ const CookieConsent = () => {
 
     setTimeout(() => {
       setIsVisible(false);
-    }, 2000);
+    }, 300);
   };
 
   const handleConfirmSelectedCookies = () => {
@@ -51,7 +51,7 @@ const CookieConsent = () => {
 
     setTimeout(() => {
       setIsVisible(false);
-    }, 2000);
+    }, 300);
   };
 
   if (!isVisible) return null;

@@ -112,7 +112,7 @@ const ProductCard = ({ id, name, price, image, brand, onQuantityChange, discount
       </div>
 
       <ProductDetailModal 
-        product={modalOpen ? { id, name, price, image, brand, discount } : null}
+        product={{ id, name, price, image, brand, discount }}
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
       />

@@ -14,7 +14,11 @@ const ProductGrid = ({ products, onQuantityChange, discounts = {} }: ProductGrid
       {products.map(product => (
         <ProductCard
           key={product.id}
-          {...product}
+          id={product.id}
+          name={product.name}
+          price={product.price}
+          image={product.image}
+          brand={product.brand}
           onQuantityChange={onQuantityChange}
           discount={discounts[product.brand] || 0}
         />

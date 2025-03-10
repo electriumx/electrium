@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Button } from './ui/button';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 interface Segment {
   text: string;
@@ -19,6 +19,10 @@ const segments: Segment[] = [
   { text: '30% off Xiaomi', brand: 'Xiaomi', discount: 30, color: '#fb923c' },
   { text: '35% off Audio', brand: 'Audio', discount: 35, color: '#22d3ee' },
   { text: '40% off Accessories', brand: 'Accessories', discount: 40, color: '#f472b6' },
+  { text: '45% off PlayStation', brand: 'PlayStation', discount: 45, color: '#0ea5e9' },
+  { text: '50% off PC Games', brand: 'PC Games', discount: 50, color: '#10b981' },
+  { text: '15% off All Games', brand: 'Games', discount: 15, color: '#8b5cf6' },
+  { text: '20% off All Products', brand: 'All', discount: 20, color: '#ec4899' },
 ];
 
 interface SpinWheelProps {

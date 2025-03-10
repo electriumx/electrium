@@ -5,7 +5,7 @@ interface ProductFiltersProps {
 }
 
 const ProductFilters = ({ selectedBrands, onFilterChange }: ProductFiltersProps) => {
-  const brands = ["Apple", "Samsung", "Sony", "Google", "Microsoft", "Xiaomi", "Audio", "Accessories"];
+  const brands = ["Apple", "Samsung", "Sony", "Google", "Microsoft", "Xiaomi", "Audio", "Accessories", "PlayStation", "PC Games"];
   
   return (
     <div className="p-4 rounded-lg bg-card shadow-md">
