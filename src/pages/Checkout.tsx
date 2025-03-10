@@ -1,7 +1,7 @@
 
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface Product {
   id: number;
@@ -9,23 +9,53 @@ interface Product {
   price: number;
   image: string;
   quantity: number;
+  brand?: string;
 }
 
 const Checkout = () => {
   const navigate = useNavigate();
-  const cartData = JSON.parse(localStorage.getItem('cart') || '[]');
-  const purchasedItems = cartData.filter((item: Product) => item.quantity > 0);
-  const total = purchasedItems.reduce((sum: number, item: Product) => sum + (item.price * item.quantity), 0);
+  const [cartData, setCartData] = useState<Product[]>([]);
+  const [discounts, setDiscounts] = useState<Record<string, number>>({});
+  
+  useEffect(() => {
+    // Load cart data
+    const cart = localStorage.getItem('cart');
+    if (cart) {
+      setCartData(JSON.parse(cart));
+    }
+    
+    // Load discounts
+    const savedDiscounts = localStorage.getItem('discounts');
+    if (savedDiscounts) {
+      setDiscounts(JSON.parse(savedDiscounts));
+    }
+    
+    // Add auto-scroll to top when page loads
+    window.scrollTo(0, 0);
+  }, []);
+
+  const getDiscountedPrice = (item: Product) => {
+    if (!item.brand) return item.price;
+    
+    const discount = discounts[item.brand] || discounts['All'] || 0;
+    if (discount === 0) return item.price;
+    
+    return item.price * (1 - discount / 100);
+  };
+
+  const calculateItemTotal = (item: Product) => {
+    const discountedPrice = getDiscountedPrice(item);
+    return discountedPrice * item.quantity;
+  };
+
+  const purchasedItems = cartData.filter(item => item.quantity > 0);
+  const total = purchasedItems.reduce((sum, item) => sum + calculateItemTotal(item), 0);
+  
   const purchaseDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   });
-  
-  // Add auto-scroll to top when page loads
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   return (
     <div className="min-h-screen bg-background py-16 px-4">
@@ -50,26 +80,43 @@ const Checkout = () => {
           ) : (
             <>
               <div className="space-y-6">
-                {purchasedItems.map((item: Product) => (
-                  <div key={item.id} className="flex gap-4 items-center p-4 border rounded-lg border-border">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-20 h-20 object-cover rounded-lg"
-                    />
-                    <div className="flex-1">
-                      <h3 className="font-medium text-foreground">{item.name}</h3>
-                      <p className="text-muted-foreground">Quantity: {item.quantity}</p>
-                      <p className="text-muted-foreground text-sm">Purchase Date: {purchaseDate}</p>
+                {purchasedItems.map((item: Product) => {
+                  const hasDiscount = item.brand && (discounts[item.brand] || discounts['All']);
+                  const discount = item.brand ? (discounts[item.brand] || discounts['All'] || 0) : 0;
+                  const discountedPrice = getDiscountedPrice(item);
+                  
+                  return (
+                    <div key={item.id} className="flex gap-4 items-center p-4 border rounded-lg border-border">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-20 h-20 object-cover rounded-lg"
+                      />
+                      <div className="flex-1">
+                        <h3 className="font-medium text-foreground">{item.name}</h3>
+                        <p className="text-muted-foreground">Quantity: {item.quantity}</p>
+                        <p className="text-muted-foreground text-sm">Purchase Date: {purchaseDate}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium text-sage-600 dark:text-sage-400">
+                          Item Total: ${calculateItemTotal(item).toFixed(2)}
+                        </p>
+                        {hasDiscount ? (
+                          <div>
+                            <p className="text-sm line-through text-muted-foreground">
+                              ${item.price.toFixed(2)} each
+                            </p>
+                            <p className="text-sm text-destructive font-medium">
+                              ${discountedPrice.toFixed(2)} each ({discount}% off)
+                            </p>
+                          </div>
+                        ) : (
+                          <p className="text-sm text-muted-foreground">${item.price.toFixed(2)} each</p>
+                        )}
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-medium text-sage-600 dark:text-sage-400">
-                        Item Total: ${(item.price * item.quantity).toFixed(2)}
-                      </p>
-                      <p className="text-sm text-muted-foreground">${item.price.toFixed(2)} each</p>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
               
               <div className="mt-8 pt-6 border-t border-border">

@@ -1,8 +1,10 @@
 
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { ShoppingCart, Trash2 } from 'lucide-react';
 
 interface CartItem {
   id: number;
@@ -50,6 +52,20 @@ const CartSummary = ({ cart }: { cart: CartItem[] }) => {
     navigate('/checkout');
   };
 
+  const handleClearCart = () => {
+    // Clear the cart in localStorage
+    localStorage.setItem('cart', JSON.stringify([]));
+    
+    // Show toast notification
+    toast({
+      title: "Cart Cleared",
+      description: "All items have been removed from your cart",
+    });
+    
+    // Refresh the page to update the UI
+    window.location.reload();
+  };
+
   if (itemCount === 0) return null;
 
   return (
@@ -59,14 +75,25 @@ const CartSummary = ({ cart }: { cart: CartItem[] }) => {
           <span className="text-foreground">Items in cart: {itemCount}</span>
           <span className="text-lg font-medium text-foreground">Total: ${total.toFixed(2)}</span>
         </div>
-        <button
-          onClick={handleCheckout}
-          className="w-full bg-sage-500 text-white py-3 px-6 rounded-lg font-medium 
-                   transition-all duration-200 hover:bg-sage-600 disabled:opacity-50 
-                   disabled:cursor-not-allowed"
-        >
-          Proceed to Checkout
-        </button>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Button
+            onClick={handleCheckout}
+            className="w-full bg-sage-500 text-white py-3 px-6 rounded-lg font-medium 
+                     transition-all duration-200 hover:bg-sage-600 disabled:opacity-50 
+                     disabled:cursor-not-allowed"
+          >
+            <ShoppingCart className="mr-2 h-4 w-4" />
+            Proceed to Checkout
+          </Button>
+          <Button
+            onClick={handleClearCart}
+            variant="destructive"
+            className="w-full py-3 px-6 rounded-lg font-medium"
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            Clear All Items
+          </Button>
+        </div>
       </div>
     </div>
   );

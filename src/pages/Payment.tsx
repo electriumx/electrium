@@ -150,7 +150,7 @@ const Payment = () => {
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [tradeForProductId, setTradeForProductId] = useState<number | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<typeof products[0] | null>(null);
-  
+
   const baseTotal = () => {
     const cart = localStorage.getItem('cart');
     if (!cart) return 0;
@@ -267,6 +267,17 @@ const Payment = () => {
     const groups = cleaned.match(/.{1,4}/g) || [];
     return groups.join(' ').trim();
   };
+
+  const calculateDifferenceValue = () => {
+    if (!selectedProduct || !tradeForProductId) return 0;
+    
+    const tradeProduct = products.find(p => p.id === tradeForProductId);
+    if (!tradeProduct) return 0;
+    
+    return tradeProduct.price - parseFloat(estimatedPrice);
+  };
+
+  const differenceValue = calculateDifferenceValue();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -599,6 +610,28 @@ const Payment = () => {
                     )}
                   </div>
                 </div>
+                
+                {tradeForProductId && estimatedPrice && (
+                  <div className="p-3 bg-muted rounded-lg">
+                    <h4 className="font-medium mb-1">Trade Value Difference</h4>
+                    <div className="flex justify-between">
+                      <span>Your item:</span>
+                      <span>${estimatedPrice}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Selected product:</span>
+                      <span>${products.find(p => p.id === tradeForProductId)?.price.toFixed(2) || '0.00'}</span>
+                    </div>
+                    <div className="flex justify-between font-medium mt-1 pt-1 border-t border-border">
+                      <span>Difference:</span>
+                      <span className={differenceValue > 0 ? 'text-red-500' : 'text-green-500'}>
+                        {differenceValue > 0 ? `You pay $${differenceValue.toFixed(2)}` : 
+                         differenceValue < 0 ? `You receive $${Math.abs(differenceValue).toFixed(2)}` : 
+                         'Even trade'}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -690,3 +723,4 @@ const Payment = () => {
 };
 
 export default Payment;
+

@@ -11,18 +11,18 @@ interface Segment {
 }
 
 const segments: Segment[] = [
-  { text: '5% off Apple', brand: 'Apple', discount: 5, color: '#f87171' },
-  { text: '10% off Samsung', brand: 'Samsung', discount: 10, color: '#60a5fa' },
-  { text: '15% off Sony', brand: 'Sony', discount: 15, color: '#4ade80' },
-  { text: '20% off Google', brand: 'Google', discount: 20, color: '#facc15' },
-  { text: '25% off Microsoft', brand: 'Microsoft', discount: 25, color: '#a78bfa' },
-  { text: '30% off Xiaomi', brand: 'Xiaomi', discount: 30, color: '#fb923c' },
-  { text: '35% off Audio', brand: 'Audio', discount: 35, color: '#22d3ee' },
-  { text: '40% off Accessories', brand: 'Accessories', discount: 40, color: '#f472b6' },
-  { text: '45% off PlayStation', brand: 'PlayStation', discount: 45, color: '#0ea5e9' },
-  { text: '50% off PC Games', brand: 'PC Games', discount: 50, color: '#10b981' },
-  { text: '15% off All Games', brand: 'Games', discount: 15, color: '#8b5cf6' },
-  { text: '20% off All Products', brand: 'All', discount: 20, color: '#ec4899' },
+  { text: '5% off Apple', brand: 'Apple', discount: 5, color: '#94a3b8' },
+  { text: '10% off Samsung', brand: 'Samsung', discount: 10, color: '#64748b' },
+  { text: '15% off Sony', brand: 'Sony', discount: 15, color: '#475569' },
+  { text: '20% off Google', brand: 'Google', discount: 20, color: '#334155' },
+  { text: '25% off Microsoft', brand: 'Microsoft', discount: 25, color: '#1e293b' },
+  { text: '30% off Xiaomi', brand: 'Xiaomi', discount: 30, color: '#0f172a' },
+  { text: '35% off Audio', brand: 'Audio', discount: 35, color: '#020617' },
+  { text: '40% off Accessories', brand: 'Accessories', discount: 40, color: '#052e16' },
+  { text: '45% off PlayStation', brand: 'PlayStation', discount: 45, color: '#064e3b' },
+  { text: '50% off PC Games', brand: 'PC Games', discount: 50, color: '#0f766e' },
+  { text: '15% off All Games', brand: 'Games', discount: 15, color: '#0e7490' },
+  { text: '20% off All Products', brand: 'All', discount: 20, color: '#0369a1' },
 ];
 
 interface SpinWheelProps {
@@ -65,8 +65,8 @@ const SpinWheel = ({ onWin }: SpinWheelProps) => {
       ctx.closePath();
       ctx.fillStyle = segment.color;
       ctx.fill();
-      ctx.strokeStyle = 'white';
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 1;
       ctx.stroke();
 
       // Draw text
@@ -74,18 +74,18 @@ const SpinWheel = ({ onWin }: SpinWheelProps) => {
       ctx.translate(centerX, centerY);
       ctx.rotate(startAngle + segmentAngle / 2);
       ctx.textAlign = 'right';
-      ctx.fillStyle = 'white';
-      ctx.font = 'bold 14px Arial';
-      ctx.fillText(segment.text, radius * 0.8, 5);
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = 'bold 12px Arial';
+      ctx.fillText(segment.text, radius * 0.75, 5);
       ctx.restore();
     });
 
     // Draw center circle
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius * 0.1, 0, 2 * Math.PI);
-    ctx.fillStyle = 'white';
+    ctx.fillStyle = '#f8fafc';
     ctx.fill();
-    ctx.strokeStyle = 'black';
+    ctx.strokeStyle = '#475569';
     ctx.lineWidth = 2;
     ctx.stroke();
 
@@ -95,9 +95,9 @@ const SpinWheel = ({ onWin }: SpinWheelProps) => {
     ctx.lineTo(centerX - 10, centerY - radius + 10);
     ctx.lineTo(centerX + 10, centerY - radius + 10);
     ctx.closePath();
-    ctx.fillStyle = 'gold';
+    ctx.fillStyle = '#f59e0b';
     ctx.fill();
-    ctx.strokeStyle = 'black';
+    ctx.strokeStyle = '#78350f';
     ctx.lineWidth = 2;
     ctx.stroke();
   }, [rotation]);
