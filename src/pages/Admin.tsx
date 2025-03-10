@@ -11,6 +11,9 @@ import { Slider } from '@/components/ui/slider';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
+// Get all unique brands from the products for discount settings
+const productBrands = ['Apple', 'Samsung', 'Sony', 'Google', 'Microsoft', 'Xiaomi', 'Audio', 'Accessories', 'PlayStation', 'PC Games', 'Games', 'All'];
+
 const Admin = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
@@ -31,6 +34,13 @@ const Admin = () => {
     adminEmail: 'admin@example.com',
   });
 
+  // Category discount state
+  const [categoryDiscounts, setCategoryDiscounts] = useState<Record<string, number>>(() => {
+    const savedDiscounts = localStorage.getItem('adminCategoryDiscounts');
+    return savedDiscounts ? JSON.parse(savedDiscounts) : 
+      productBrands.reduce((acc, brand) => ({ ...acc, [brand]: 0 }), {});
+  });
+
   // Stats state
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -42,6 +52,24 @@ const Admin = () => {
   });
 
   useEffect(() => {
+    // Load settings from localStorage
+    const savedSettings = localStorage.getItem('adminSettings');
+    if (savedSettings) {
+      try {
+        const parsedSettings = JSON.parse(savedSettings);
+        setSettings(parsedSettings);
+        
+        // Apply dark mode from settings
+        if (parsedSettings.darkMode) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      } catch (error) {
+        console.error('Error parsing settings from localStorage:', error);
+      }
+    }
+
     // Simulate loading data
     const timer = setTimeout(() => {
       setStats({
@@ -67,7 +95,11 @@ const Admin = () => {
   }, [navigate]);
 
   const handleSettingChange = (setting: string, value: any) => {
-    setSettings(prev => ({ ...prev, [setting]: value }));
+    const updatedSettings = { ...settings, [setting]: value };
+    setSettings(updatedSettings);
+    
+    // Save settings to localStorage
+    localStorage.setItem('adminSettings', JSON.stringify(updatedSettings));
     
     if (setting === 'darkMode') {
       if (value) {
@@ -83,11 +115,33 @@ const Admin = () => {
     });
   };
 
+  const handleCategoryDiscountChange = (category: string, value: number) => {
+    const updatedDiscounts = { ...categoryDiscounts, [category]: value };
+    setCategoryDiscounts(updatedDiscounts);
+    
+    // Save to localStorage for admin panel
+    localStorage.setItem('adminCategoryDiscounts', JSON.stringify(updatedDiscounts));
+    
+    // Also save to the 'discounts' key for use by product components
+    localStorage.setItem('discounts', JSON.stringify(updatedDiscounts));
+    
+    toast({
+      title: "Discount updated",
+      description: `${category} discount set to ${value}%`,
+    });
+  };
+
   const handleSaveSettings = () => {
     // Simulate saving settings
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
+      
+      // Save all settings to localStorage
+      localStorage.setItem('adminSettings', JSON.stringify(settings));
+      localStorage.setItem('adminCategoryDiscounts', JSON.stringify(categoryDiscounts));
+      localStorage.setItem('discounts', JSON.stringify(categoryDiscounts));
+      
       toast({
         title: "Settings saved",
         description: "All settings have been saved successfully",
@@ -131,9 +185,10 @@ const Admin = () => {
       </div>
       
       <Tabs defaultValue="dashboard">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
+          <TabsTrigger value="discounts">Discounts</TabsTrigger>
           <TabsTrigger value="developer">Developer</TabsTrigger>
           <TabsTrigger value="database">Database</TabsTrigger>
         </TabsList>
@@ -316,6 +371,43 @@ const Admin = () => {
                 disabled={isLoading}
               >
                 {isLoading ? 'Saving...' : 'Save Settings'}
+              </Button>
+            </CardFooter>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="discounts" className="mt-6 space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Category Discounts</CardTitle>
+              <CardDescription>Set discount percentages for each product category</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {productBrands.map((brand) => (
+                  <div key={brand} className="space-y-2">
+                    <div className="flex justify-between">
+                      <Label>{brand}</Label>
+                      <span className="font-semibold">{categoryDiscounts[brand] || 0}%</span>
+                    </div>
+                    <Slider 
+                      value={[categoryDiscounts[brand] || 0]} 
+                      min={0} 
+                      max={100} 
+                      step={5}
+                      onValueChange={([value]) => handleCategoryDiscountChange(brand, value)}
+                    />
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button 
+                className="w-full" 
+                onClick={handleSaveSettings}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Saving...' : 'Save All Discounts'}
               </Button>
             </CardFooter>
           </Card>

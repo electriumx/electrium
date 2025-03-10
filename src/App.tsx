@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "next-themes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import Index from "./pages/Index";
 import Products from "./pages/Products";
 import About from "./pages/About";
@@ -28,11 +28,49 @@ import { useState, useEffect } from "react";
 
 const queryClient = new QueryClient();
 
+// Admin key handler component
+const AdminKeyHandler = () => {
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === '/') {
+        e.preventDefault();
+        navigate('/admin');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [navigate]);
+  
+  return null;
+};
+
 const App = () => {
   const [themeChangeAllowed, setThemeChangeAllowed] = useState(true);
   const [showCookieConsent, setShowCookieConsent] = useState(() => {
     return localStorage.getItem('cookieConsent') !== 'accepted';
   });
+
+  // Load theme from admin settings
+  useEffect(() => {
+    const adminSettings = localStorage.getItem('adminSettings');
+    if (adminSettings) {
+      try {
+        const settings = JSON.parse(adminSettings);
+        if (settings.darkMode !== undefined) {
+          if (settings.darkMode) {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        }
+      } catch (e) {
+        console.error('Error parsing admin settings:', e);
+      }
+    }
+  }, []);
 
   // Add this effect to handle the theme change cooldown
   useEffect(() => {
@@ -69,6 +107,7 @@ const App = () => {
         >
           <BrowserRouter>
             <AuthProvider>
+              <AdminKeyHandler />
               <Toaster />
               <Sonner />
               <TopNavigation />

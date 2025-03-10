@@ -1,5 +1,6 @@
 
 import { useState, useRef, useEffect } from 'react';
+import { useToast } from "@/components/ui/use-toast";
 
 interface SpinWheelProps {
   onWin: (brand: string, discount: number) => void;
@@ -10,6 +11,9 @@ const SpinWheel = ({ onWin }: SpinWheelProps) => {
   const [rotation, setRotation] = useState(0);
   const [isSpinning, setIsSpinning] = useState(false);
   const [result, setResult] = useState<string | null>(null);
+  const [cooldownActive, setCooldownActive] = useState(false);
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+  const { toast } = useToast();
   
   // Define wheel segments with brand and discount pairs
   const segments = [
@@ -18,11 +22,59 @@ const SpinWheel = ({ onWin }: SpinWheelProps) => {
     { brand: "All", discount: 15, color: "#2d3748" },
     { brand: "Sony", discount: 7, color: "#4a5568" },
     { brand: "Google", discount: 12, color: "#1a202c" },
-    { brand: "Microsoft", discount: 8, color: "#2d3748" }
+    { brand: "Microsoft", discount: 8, color: "#2d3748" },
+    { brand: "Xiaomi", discount: 20, color: "#4a5568" },
+    { brand: "Accessories", discount: 25, color: "#1a202c" }
   ];
   
   const numSegments = segments.length;
   const segmentAngle = 360 / numSegments;
+  
+  // Check cooldown on component mount
+  useEffect(() => {
+    const lastSpinTime = localStorage.getItem('lastSpinTime');
+    if (lastSpinTime) {
+      const lastTime = parseInt(lastSpinTime, 10);
+      const currentTime = Date.now();
+      const timeDiff = currentTime - lastTime;
+      const cooldownPeriod = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+      
+      if (timeDiff < cooldownPeriod) {
+        const remainingTime = cooldownPeriod - timeDiff;
+        setCooldownActive(true);
+        setTimeLeft(Math.floor(remainingTime / 1000));
+      }
+    }
+  }, []);
+  
+  // Update cooldown timer
+  useEffect(() => {
+    if (!cooldownActive || timeLeft === null) return;
+    
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev === null || prev <= 1) {
+          clearInterval(timer);
+          setCooldownActive(false);
+          return null;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    
+    return () => clearInterval(timer);
+  }, [cooldownActive, timeLeft]);
+  
+  // Format time left for display
+  const formatTimeLeft = () => {
+    if (timeLeft === null) return '';
+    
+    const hours = Math.floor(timeLeft / 3600);
+    const minutes = Math.floor((timeLeft % 3600) / 60);
+    const seconds = timeLeft % 60;
+    
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  };
   
   // Draw the wheel on canvas
   useEffect(() => {
@@ -64,9 +116,10 @@ const SpinWheel = ({ onWin }: SpinWheelProps) => {
       ctx.rotate(Math.PI / 2);
       
       ctx.fillStyle = '#ffffff';
-      ctx.font = '12px sans-serif';
+      ctx.font = '10px sans-serif'; // Smaller text size
       ctx.textAlign = 'center';
-      ctx.fillText(`${segment.brand} ${segment.discount}%`, 0, 0);
+      ctx.fillText(`${segment.brand}`, 0, 0);
+      ctx.fillText(`${segment.discount}%`, 0, 12); // Add a line break for percentage
       
       ctx.restore();
     });
@@ -95,7 +148,7 @@ const SpinWheel = ({ onWin }: SpinWheelProps) => {
   }, [rotation, segments, numSegments, segmentAngle]);
   
   const spinWheel = () => {
-    if (isSpinning) return;
+    if (isSpinning || cooldownActive) return;
     
     setIsSpinning(true);
     setResult(null);
@@ -135,6 +188,16 @@ const SpinWheel = ({ onWin }: SpinWheelProps) => {
         setResult(`You won ${landedSegment.discount}% off ${landedSegment.brand} products!`);
         onWin(landedSegment.brand, landedSegment.discount);
         setIsSpinning(false);
+        
+        // Set cooldown
+        localStorage.setItem('lastSpinTime', Date.now().toString());
+        setCooldownActive(true);
+        setTimeLeft(24 * 60 * 60); // 24 hours in seconds
+        
+        toast({
+          title: "Discount Applied!",
+          description: `You won ${landedSegment.discount}% off ${landedSegment.brand} products! Come back in 24 hours to spin again.`,
+        });
       }
     };
     
@@ -152,13 +215,20 @@ const SpinWheel = ({ onWin }: SpinWheelProps) => {
           className="border rounded-full"
         />
       </div>
-      <button 
-        onClick={spinWheel} 
-        disabled={isSpinning}
-        className="mt-4 px-6 py-2 bg-primary text-white rounded-md hover:bg-primary/90 disabled:opacity-50"
-      >
-        {isSpinning ? 'Spinning...' : 'Spin'}
-      </button>
+      {cooldownActive ? (
+        <div className="mt-4 text-center">
+          <div className="font-mono text-lg">{formatTimeLeft()}</div>
+          <p className="text-muted-foreground text-sm">Time until next spin</p>
+        </div>
+      ) : (
+        <button 
+          onClick={spinWheel} 
+          disabled={isSpinning}
+          className="mt-4 px-6 py-2 bg-primary text-white rounded-md hover:bg-primary/90 disabled:opacity-50"
+        >
+          {isSpinning ? 'Spinning...' : 'Spin'}
+        </button>
+      )}
       {result && (
         <div className="mt-4 p-3 bg-green-100 text-green-700 rounded-md">
           {result}
