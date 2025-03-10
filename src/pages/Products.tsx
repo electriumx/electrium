@@ -4,6 +4,7 @@ import ProductFilters from '../components/ProductFilters';
 import ProductGrid from '../components/ProductGrid';
 import CartSummary from '../components/CartSummary';
 import SpinWheel from '../components/SpinWheel';
+import AIChat from '../components/AIChat';
 import { useLocation } from 'react-router-dom';
 import { Product, products } from '../data/productData';
 
@@ -12,7 +13,13 @@ const Products = () => {
   const [cart, setCart] = useState<Product[]>([]);
   const [discounts, setDiscounts] = useState<Record<string, number>>({});
   const [showSpinWheel, setShowSpinWheel] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const location = useLocation();
+  
+  // Find max price for slider
+  const maxPrice = Math.max(...products.map(p => p.price));
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, maxPrice]);
   
   // Add useEffect to load cart from localStorage
   useEffect(() => {
@@ -41,8 +48,29 @@ const Products = () => {
     window.scrollTo(0, 0);
   }, []);
 
+  // Add keyboard shortcut handler for admin panel
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === '/') {
+        e.preventDefault();
+        window.location.href = '/admin';
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const handleFilterChange = (brands: string[]) => {
     setSelectedBrands(brands);
+  };
+
+  const handlePriceRangeChange = (range: [number, number]) => {
+    setPriceRange(range);
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
   };
 
   const handleQuantityChange = (id: number, quantity: number) => {
@@ -84,10 +112,32 @@ const Products = () => {
     setShowSpinWheel(false);
   };
 
-  // Filter products based on selected brands
-  const filteredProducts = selectedBrands.length > 0
-    ? products.filter(product => selectedBrands.includes(product.brand))
-    : products;
+  const toggleChat = () => {
+    setIsChatOpen(!isChatOpen);
+  };
+
+  // Filter products based on selected brands, price range, and search
+  let filteredProducts = products;
+  
+  if (selectedBrands.length > 0) {
+    filteredProducts = filteredProducts.filter(product => 
+      selectedBrands.includes(product.brand)
+    );
+  }
+  
+  if (priceRange[0] > 0 || priceRange[1] < maxPrice) {
+    filteredProducts = filteredProducts.filter(product => 
+      product.price >= priceRange[0] && product.price <= priceRange[1]
+    );
+  }
+  
+  if (searchQuery) {
+    const query = searchQuery.toLowerCase();
+    filteredProducts = filteredProducts.filter(product => 
+      product.name.toLowerCase().includes(query) || 
+      product.brand.toLowerCase().includes(query)
+    );
+  }
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8">
@@ -126,6 +176,10 @@ const Products = () => {
           <ProductFilters
             onFilterChange={handleFilterChange}
             selectedBrands={selectedBrands}
+            priceRange={priceRange}
+            onPriceRangeChange={handlePriceRangeChange}
+            maxPrice={maxPrice}
+            onSearch={handleSearch}
           />
         </div>
         
@@ -139,6 +193,18 @@ const Products = () => {
       </div>
       
       <CartSummary cart={cart} />
+      
+      {/* AI Chat button */}
+      <button
+        onClick={toggleChat}
+        className="fixed bottom-4 left-4 z-50 p-3 bg-primary text-white rounded-full shadow-lg hover:bg-primary/90 transition-transform hover:scale-105"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-message-circle">
+          <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>
+        </svg>
+      </button>
+      
+      {isChatOpen && <AIChat onClose={toggleChat} />}
     </div>
   );
 };

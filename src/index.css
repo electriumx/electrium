@@ -122,3 +122,50 @@
   max-height: 100%;
   object-fit: contain;
 }
+
+/* Cookie consent */
+.cookie-consent {
+  animation: slide-up 0.3s ease-out;
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* AI Chat animation */
+.chat-bubble-animate {
+  animation: fade-in 0.3s ease-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Admin panel key shortcut */
+.key-shortcut {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 0.3rem;
+  border-radius: 0.25rem;
+  background-color: rgba(0, 0, 0, 0.1);
+  color: inherit;
+  font-size: 0.75rem;
+  font-weight: 500;
+}

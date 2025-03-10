@@ -16,6 +16,7 @@ import NotFound from "./pages/NotFound";
 import ThankYou from "./pages/ThankYou";
 import Donation from "./pages/Donation";
 import Settings from "./pages/Settings";
+import Admin from "./pages/Admin";
 import Navigation from "./components/Navigation";
 import TopNavigation from "./components/TopNavigation";
 import Footer from "./components/Footer";
@@ -29,6 +30,9 @@ const queryClient = new QueryClient();
 
 const App = () => {
   const [themeChangeAllowed, setThemeChangeAllowed] = useState(true);
+  const [showCookieConsent, setShowCookieConsent] = useState(() => {
+    return localStorage.getItem('cookieConsent') !== 'accepted';
+  });
 
   // Add this effect to handle the theme change cooldown
   useEffect(() => {
@@ -48,6 +52,11 @@ const App = () => {
       window.removeEventListener('themechange', handleThemeChange);
     };
   }, [themeChangeAllowed]);
+
+  const handleCookieAccept = () => {
+    localStorage.setItem('cookieConsent', 'accepted');
+    setShowCookieConsent(false);
+  };
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -77,12 +86,13 @@ const App = () => {
                   <Route path="/thank-you" element={<ThankYou />} />
                   <Route path="/donation" element={<Donation />} />
                   <Route path="/settings" element={<Settings />} />
+                  <Route path="/admin" element={<Admin />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </div>
               <SocialButtons />
               <Footer />
-              <CookieConsent />
+              {showCookieConsent && <CookieConsent onAccept={handleCookieAccept} />}
             </AuthProvider>
           </BrowserRouter>
         </ThemeProvider>

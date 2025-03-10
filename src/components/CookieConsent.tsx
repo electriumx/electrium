@@ -1,124 +1,37 @@
 
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "../contexts/AuthContext";
 
-const CookieConsent = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [showManage, setShowManage] = useState(false);
-  const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
-  const [marketingEnabled, setMarketingEnabled] = useState(false);
-  const { toast } = useToast();
-  const { isAuthenticated } = useAuth();
+interface CookieConsentProps {
+  onAccept: () => void;
+}
 
-  useEffect(() => {
-    const hasSeenCookieConsent = sessionStorage.getItem("hasSeenCookieConsent");
-    if (!hasSeenCookieConsent) {
-      setIsVisible(true);
-    }
-  }, []);
-
-  const handleCookieChoice = (accepted: boolean) => {
-    setIsAnimating(true);
-    sessionStorage.setItem("hasSeenCookieConsent", "true");
-    localStorage.setItem("cookieConsent", accepted ? "accepted" : "rejected");
-    
-    toast({
-      title: accepted ? "All Cookies Accepted" : "All Cookies Rejected",
-      description: accepted 
-        ? "Thank you for accepting all cookies" 
-        : "You've opted out of all cookies",
-    });
-
-    setTimeout(() => {
-      setIsVisible(false);
-    }, 300);
-  };
-
-  const handleConfirmSelectedCookies = () => {
-    setIsAnimating(true);
-    sessionStorage.setItem("hasSeenCookieConsent", "true");
-    localStorage.setItem("cookieConsent", "custom");
-    localStorage.setItem("analyticsEnabled", analyticsEnabled.toString());
-    localStorage.setItem("marketingEnabled", marketingEnabled.toString());
-    
-    toast({
-      title: "Custom Cookie Preferences Saved",
-      description: "Your cookie preferences have been saved",
-    });
-
-    setTimeout(() => {
-      setIsVisible(false);
-    }, 300);
-  };
-
-  if (!isVisible) return null;
-
+const CookieConsent = ({ onAccept }: CookieConsentProps) => {
   return (
-    <div className={`fixed bottom-4 right-4 max-w-sm bg-card p-6 rounded-lg shadow-lg z-50 ${
-      isAnimating ? "fade-out" : "fade-in"
-    }`}>
-      <div className="flex justify-between items-start mb-4">
-        <h3 className="font-semibold text-foreground">Cookie Consent</h3>
-        <Button 
-          variant="ghost"
-          size="sm"
-          onClick={() => setShowManage(prev => !prev)}
-        >
-          {showManage ? "Hide" : "Manage Cookies"}
-        </Button>
-      </div>
-      <p className="text-sm text-muted-foreground mb-4">
-        We use cookies to enhance your browsing experience and analyze our traffic.
-      </p>
-      {showManage ? (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-foreground">Essential Cookies</span>
-            <input type="checkbox" checked disabled className="accent-sage-500" />
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-foreground">Analytics Cookies</span>
-            <input 
-              type="checkbox" 
-              className="accent-sage-500" 
-              checked={analyticsEnabled}
-              onChange={(e) => setAnalyticsEnabled(e.target.checked)}
-            />
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-foreground">Marketing Cookies</span>
-            <input 
-              type="checkbox" 
-              className="accent-sage-500" 
-              checked={marketingEnabled}
-              onChange={(e) => setMarketingEnabled(e.target.checked)}
-            />
-          </div>
-          <Button 
-            onClick={handleConfirmSelectedCookies}
-            className="w-full mt-2"
-          >
-            Confirm Cookies
-          </Button>
+    <div className="fixed bottom-0 left-0 w-full bg-card border-t border-border z-50 p-4 cookie-consent">
+      <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="text-sm md:text-base">
+          <p>
+            This website uses cookies to ensure you get the best experience on our
+            website. By continuing to use this site, you consent to our use of
+            cookies.
+          </p>
         </div>
-      ) : (
         <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            onClick={() => handleCookieChoice(false)}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onAccept}
           >
-            Reject All
+            Decline
           </Button>
-          <Button 
-            onClick={() => handleCookieChoice(true)}
+          <Button
+            size="sm"
+            onClick={onAccept}
           >
             Accept All
           </Button>
         </div>
-      )}
+      </div>
     </div>
   );
 };

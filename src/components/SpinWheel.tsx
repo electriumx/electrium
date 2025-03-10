@@ -11,18 +11,22 @@ interface Segment {
 }
 
 const segments: Segment[] = [
-  { text: '5% off Apple', brand: 'Apple', discount: 5, color: '#94a3b8' },
-  { text: '10% off Samsung', brand: 'Samsung', discount: 10, color: '#64748b' },
-  { text: '15% off Sony', brand: 'Sony', discount: 15, color: '#475569' },
-  { text: '20% off Google', brand: 'Google', discount: 20, color: '#334155' },
-  { text: '25% off Microsoft', brand: 'Microsoft', discount: 25, color: '#1e293b' },
-  { text: '30% off Xiaomi', brand: 'Xiaomi', discount: 30, color: '#0f172a' },
-  { text: '35% off Audio', brand: 'Audio', discount: 35, color: '#020617' },
-  { text: '40% off Accessories', brand: 'Accessories', discount: 40, color: '#052e16' },
-  { text: '45% off PlayStation', brand: 'PlayStation', discount: 45, color: '#064e3b' },
-  { text: '50% off PC Games', brand: 'PC Games', discount: 50, color: '#0f766e' },
-  { text: '15% off All Games', brand: 'Games', discount: 15, color: '#0e7490' },
-  { text: '20% off All Products', brand: 'All', discount: 20, color: '#0369a1' },
+  { text: '5% off Apple', brand: 'Apple', discount: 5, color: '#1f2937' },
+  { text: '10% off Samsung', brand: 'Samsung', discount: 10, color: '#111827' },
+  { text: '15% off Sony', brand: 'Sony', discount: 15, color: '#0f172a' },
+  { text: '20% off Google', brand: 'Google', discount: 20, color: '#0f766e' },
+  { text: '25% off Microsoft', brand: 'Microsoft', discount: 25, color: '#0e7490' },
+  { text: '30% off Xiaomi', brand: 'Xiaomi', discount: 30, color: '#0369a1' },
+  { text: '35% off Audio', brand: 'Audio', discount: 35, color: '#1e40af' },
+  { text: '40% off Access.', brand: 'Accessories', discount: 40, color: '#4338ca' },
+  { text: '45% off PS', brand: 'PlayStation', discount: 45, color: '#6d28d9' },
+  { text: '50% off PC Games', brand: 'PC Games', discount: 50, color: '#7e22ce' },
+  { text: '15% off Games', brand: 'Games', discount: 15, color: '#a21caf' },
+  { text: '20% off All', brand: 'All', discount: 20, color: '#be185d' },
+  { text: '10% off Sony', brand: 'Sony', discount: 10, color: '#be123c' },
+  { text: '25% off PS5', brand: 'PlayStation', discount: 25, color: '#b91c1c' },
+  { text: '30% off PS4', brand: 'PlayStation', discount: 30, color: '#c2410c' },
+  { text: '15% off Xbox', brand: 'Microsoft', discount: 15, color: '#ca8a04' },
 ];
 
 interface SpinWheelProps {
@@ -65,7 +69,7 @@ const SpinWheel = ({ onWin }: SpinWheelProps) => {
       ctx.closePath();
       ctx.fillStyle = segment.color;
       ctx.fill();
-      ctx.strokeStyle = '#e2e8f0';
+      ctx.strokeStyle = '#1e293b';
       ctx.lineWidth = 1;
       ctx.stroke();
 
@@ -75,7 +79,7 @@ const SpinWheel = ({ onWin }: SpinWheelProps) => {
       ctx.rotate(startAngle + segmentAngle / 2);
       ctx.textAlign = 'right';
       ctx.fillStyle = '#f8fafc';
-      ctx.font = 'bold 12px Arial';
+      ctx.font = 'bold 10px Arial';
       ctx.fillText(segment.text, radius * 0.75, 5);
       ctx.restore();
     });
@@ -95,9 +99,9 @@ const SpinWheel = ({ onWin }: SpinWheelProps) => {
     ctx.lineTo(centerX - 10, centerY - radius + 10);
     ctx.lineTo(centerX + 10, centerY - radius + 10);
     ctx.closePath();
-    ctx.fillStyle = '#f59e0b';
+    ctx.fillStyle = '#9eff00';
     ctx.fill();
-    ctx.strokeStyle = '#78350f';
+    ctx.strokeStyle = '#64748b';
     ctx.lineWidth = 2;
     ctx.stroke();
   }, [rotation]);
