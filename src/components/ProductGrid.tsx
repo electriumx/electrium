@@ -26,15 +26,13 @@ const ProductGrid = ({ products, onQuantityChange, discounts = {} }: ProductGrid
         return (
           <ProductCard
             key={product.id}
-            product={{
-              id: product.id,
-              name: product.name,
-              price: product.price,
-              image: product.image,
-              brand: product.brand,
-              discount,
-              discountedPrice
-            }}
+            id={product.id}
+            name={product.name}
+            price={product.price}
+            image={product.image}
+            brand={product.brand}
+            discount={discount}
+            discountedPrice={discountedPrice}
             onQuantityChange={onQuantityChange}
           />
         );
