@@ -807,5 +807,205 @@ export const products: Product[] = [
     image: "https://images.unsplash.com/photo-1541406213863-2ff94db0e36e?auto=format&fit=crop&w=800",
     quantity: 0,
     brand: "Accessories"
+  },
+  {
+    id: 101,
+    name: "PlayStation 4 Slim",
+    price: 299.99,
+    image: "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Sony"
+  },
+  {
+    id: 102,
+    name: "PlayStation 4 Pro",
+    price: 399.99,
+    image: "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Sony"
+  },
+  {
+    id: 103,
+    name: "PlayStation 5 Digital Edition",
+    price: 399.99,
+    image: "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Sony"
+  },
+  {
+    id: 104,
+    name: "PlayStation 5 Disc Edition",
+    price: 499.99,
+    image: "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Sony"
+  },
+  {
+    id: 105,
+    name: "DualSense Wireless Controller",
+    price: 69.99,
+    image: "https://images.unsplash.com/photo-1617096200347-cb04ae810b1d?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Sony"
+  },
+  {
+    id: 106,
+    name: "PS5 DualSense Charging Station",
+    price: 29.99,
+    image: "https://images.unsplash.com/photo-1617096200347-cb04ae810b1d?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Sony"
+  },
+  {
+    id: 107,
+    name: "PS5 HD Camera",
+    price: 59.99,
+    image: "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Sony"
+  },
+  {
+    id: 108,
+    name: "PS5 Media Remote",
+    price: 29.99,
+    image: "https://images.unsplash.com/photo-1605901309584-818e25960a8f?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Sony"
+  },
+  {
+    id: 109,
+    name: "MacBook Pro 14",
+    price: 1999.99,
+    image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 110,
+    name: "Mac Pro",
+    price: 5999.99,
+    image: "https://images.unsplash.com/photo-1588654513454-55c950269216?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 111,
+    name: "Studio Display",
+    price: 1599.99,
+    image: "https://images.unsplash.com/photo-1562440695-5c982f7136a8?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 112,
+    name: "iPhone 15 Plus",
+    price: 899.99,
+    image: "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 113,
+    name: "iPhone 15 Pro Max",
+    price: 1199.99,
+    image: "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 114,
+    name: "iPad 10th Generation",
+    price: 449.99,
+    image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Apple"
+  },
+  {
+    id: 115,
+    name: "Xiaomi Pad 6",
+    price: 349.99,
+    image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Xiaomi"
+  },
+  {
+    id: 116,
+    name: "Xiaomi Watch S3",
+    price: 149.99,
+    image: "https://images.unsplash.com/photo-1534430206226-3ca46694ef5e?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Xiaomi"
+  },
+  {
+    id: 117,
+    name: "Xiaomi Smart TV X",
+    price: 499.99,
+    image: "https://images.unsplash.com/photo-1593784991095-a205069470b6?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Xiaomi"
+  },
+  {
+    id: 118,
+    name: "Xiaomi Electric Scooter",
+    price: 399.99,
+    image: "https://images.unsplash.com/photo-1595854341625-f33e06255a43?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Xiaomi"
+  },
+  {
+    id: 119,
+    name: "Xiaomi Air Purifier",
+    price: 199.99,
+    image: "https://images.unsplash.com/photo-1595941069915-4218169fb748?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Xiaomi"
+  },
+  {
+    id: 120,
+    name: "Xiaomi Buds 4 Pro",
+    price: 129.99,
+    image: "https://images.unsplash.com/photo-1560529034-2a9988b6ca89?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Xiaomi"
+  },
+  {
+    id: 121,
+    name: "10,000mAh Power Bank",
+    price: 39.99,
+    image: "https://images.unsplash.com/photo-1609692814858-f7cd2f0afa4f?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Accessories"
+  },
+  {
+    id: 122,
+    name: "Wireless Charging Pad",
+    price: 29.99,
+    image: "https://images.unsplash.com/photo-1607853202273-797f1c22a38e?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Accessories"
+  },
+  {
+    id: 123,
+    name: "USB-C Hub 8-in-1",
+    price: 49.99,
+    image: "https://images.unsplash.com/photo-1591798241437-1e3e709110f4?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Accessories"
+  },
+  {
+    id: 124,
+    name: "Laptop Stand",
+    price: 25.99,
+    image: "https://images.unsplash.com/photo-1611258623154-c15b6fbbab5c?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Accessories"
+  },
+  {
+    id: 125,
+    name: "Premium HDMI Cable 4K",
+    price: 14.99,
+    image: "https://images.unsplash.com/photo-1584798845954-9f8d7359d447?auto=format&fit=crop&w=800",
+    quantity: 0,
+    brand: "Accessories"
   }
 ];

@@ -10,9 +10,10 @@ interface ProductCardProps {
   image: string;
   brand: string;
   onQuantityChange: (id: number, quantity: number) => void;
+  discount?: number; // Optional discount percentage
 }
 
-const ProductCard = ({ id, name, price, image, brand, onQuantityChange }: ProductCardProps) => {
+const ProductCard = ({ id, name, price, image, brand, onQuantityChange, discount = 0 }: ProductCardProps) => {
   const [quantity, setQuantity] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -48,6 +49,9 @@ const ProductCard = ({ id, name, price, image, brand, onQuantityChange }: Produc
     setModalOpen(true);
   };
 
+  // Calculate discounted price if there's a discount
+  const discountedPrice = discount > 0 ? price * (1 - discount / 100) : price;
+
   return (
     <>
       <div className="bg-card rounded-xl p-6 shadow-sm transition-all duration-300 hover:shadow-md border border-border">
@@ -66,10 +70,25 @@ const ProductCard = ({ id, name, price, image, brand, onQuantityChange }: Produc
               View Details
             </span>
           </div>
+          
+          {discount > 0 && (
+            <div className="absolute top-2 right-2 bg-destructive text-destructive-foreground text-xs font-bold rounded-full px-2 py-1">
+              -{discount}%
+            </div>
+          )}
         </div>
         <div className="space-y-2">
           <h3 className="font-medium text-lg text-foreground">{name}</h3>
-          <p className="text-muted-foreground">${price.toFixed(2)}</p>
+          <div>
+            {discount > 0 ? (
+              <div className="flex flex-col">
+                <p className="text-muted-foreground line-through text-sm">${price.toFixed(2)}</p>
+                <p className="text-destructive font-medium">${discountedPrice.toFixed(2)}</p>
+              </div>
+            ) : (
+              <p className="text-muted-foreground">${price.toFixed(2)}</p>
+            )}
+          </div>
           <div className="flex items-center justify-between mt-4">
             <div className="flex items-center gap-3">
               <button
@@ -93,7 +112,7 @@ const ProductCard = ({ id, name, price, image, brand, onQuantityChange }: Produc
       </div>
 
       <ProductDetailModal 
-        product={modalOpen ? { id, name, price, image, brand } : null}
+        product={modalOpen ? { id, name, price, image, brand, discount } : null}
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
       />

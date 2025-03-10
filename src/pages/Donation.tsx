@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -12,6 +13,7 @@ const Donation = () => {
   const [isOnCooldown, setIsOnCooldown] = useState(false);
   const [cooldownTime, setCooldownTime] = useState(0);
   const [totalDonations, setTotalDonations] = useState(0);
+  const [donationCount, setDonationCount] = useState(0);
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -20,6 +22,11 @@ const Donation = () => {
     const savedTotal = localStorage.getItem('totalDonations');
     if (savedTotal) {
       setTotalDonations(parseFloat(savedTotal));
+    }
+    
+    const savedCount = localStorage.getItem('donationCount');
+    if (savedCount) {
+      setDonationCount(parseInt(savedCount, 10));
     }
 
     let intervalId: NodeJS.Timeout;
@@ -116,9 +123,15 @@ const Donation = () => {
       return;
     }
 
+    // Update total donations amount
     const newTotal = totalDonations + donationAmount;
     setTotalDonations(newTotal);
     localStorage.setItem('totalDonations', newTotal.toString());
+    
+    // Update donation count
+    const newCount = donationCount + 1;
+    setDonationCount(newCount);
+    localStorage.setItem('donationCount', newCount.toString());
 
     toast({
       title: "Thank you!",
@@ -138,9 +151,16 @@ const Donation = () => {
       <div className="max-w-md w-full space-y-8 bg-card/60 backdrop-blur-sm p-8 rounded-xl shadow-lg relative">
         <div>
           <h2 className="text-center text-3xl font-bold mb-2">Make a Donation</h2>
-          <p className="text-center font-bold text-xl mb-4">
-            Total Donations: ${totalDonations.toFixed(2)}
-          </p>
+          <div className="flex justify-center gap-6 mb-4">
+            <div className="text-center">
+              <p className="text-muted-foreground text-sm">Total Raised</p>
+              <p className="font-bold text-xl">${totalDonations.toFixed(2)}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-muted-foreground text-sm">Donations</p>
+              <p className="font-bold text-xl">{donationCount}</p>
+            </div>
+          </div>
           <p className="mt-2 text-center text-sm text-muted-foreground">
             Support our mission with a donation between $1 and $1000
           </p>
