@@ -21,7 +21,8 @@ const ProductFilters = ({
   maxPrice,
   onSearch 
 }: ProductFiltersProps) => {
-  const brands = ["Apple", "Samsung", "Sony", "Google", "Microsoft", "Xiaomi", "Audio", "Accessories", "PlayStation", "PC Games"];
+  const brands = ["Apple", "Samsung", "Sony", "Google", "Microsoft", "Xiaomi", "Audio", "PlayStation", "PC Games"];
+  const accessories = ["Headphones", "Cases", "Chargers", "Screen Protectors", "Cables", "Memory Cards"];
   const [searchQuery, setSearchQuery] = useState('');
   
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -34,9 +35,9 @@ const ProductFilters = ({
   };
   
   return (
-    <div className="p-4 rounded-lg bg-card shadow-md space-y-6">
+    <div className="space-y-4">
       {/* Search Bar */}
-      <div className="mb-4">
+      <div className="p-4 rounded-lg bg-card shadow-md">
         <form onSubmit={handleSearchSubmit} className="relative">
           <Input
             type="text"
@@ -55,7 +56,7 @@ const ProductFilters = ({
       </div>
 
       {/* Price Range Filter */}
-      <div>
+      <div className="p-4 rounded-lg bg-card shadow-md">
         <h3 className="text-lg font-semibold mb-4 text-foreground">Price Range</h3>
         <div className="px-2">
           <Slider
@@ -79,8 +80,8 @@ const ProductFilters = ({
       </div>
 
       {/* Brand Filter */}
-      <div>
-        <h3 className="text-lg font-semibold mb-4 text-foreground">Filter by Brand</h3>
+      <div className="p-4 rounded-lg bg-card shadow-md">
+        <h3 className="text-lg font-semibold mb-4 text-foreground">Brands</h3>
         <div className="flex flex-wrap gap-2">
           {brands.map((brand) => (
             <button
@@ -108,6 +109,31 @@ const ProductFilters = ({
               Clear All
             </button>
           )}
+        </div>
+      </div>
+
+      {/* Accessories Filter */}
+      <div className="p-4 rounded-lg bg-card shadow-md">
+        <h3 className="text-lg font-semibold mb-4 text-foreground">Accessories</h3>
+        <div className="flex flex-wrap gap-2">
+          {accessories.map((accessory) => (
+            <button
+              key={accessory}
+              onClick={() => {
+                const newSelectedBrands = selectedBrands.includes(accessory)
+                  ? selectedBrands.filter(b => b !== accessory)
+                  : [...selectedBrands, accessory];
+                onFilterChange(newSelectedBrands);
+              }}
+              className={`px-3 py-1 text-sm rounded-full transition-all ${
+                selectedBrands.includes(accessory) 
+                  ? 'bg-sage-500 text-white'
+                  : 'bg-secondary text-foreground border border-border hover:bg-muted'
+              }`}
+            >
+              {accessory}
+            </button>
+          ))}
         </div>
       </div>
     </div>

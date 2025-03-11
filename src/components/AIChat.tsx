@@ -131,7 +131,7 @@ const AIChat: React.FC<AIChatProps> = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed bottom-16 left-4 bg-background border border-border rounded-lg shadow-lg w-80 sm:w-96 z-50 flex flex-col" style={{ height: '400px' }}>
+    <div className="fixed top-16 right-4 bg-background border border-border rounded-lg shadow-lg w-80 sm:w-96 z-50 flex flex-col" style={{ height: '400px' }}>
       <div className="p-3 border-b border-border flex justify-between items-center bg-primary text-primary-foreground rounded-t-lg">
         <div className="flex items-center">
           <img src="/lovable-uploads/332dd32d-b893-48bd-8da7-73aa4bc107bb.png" alt="Electrium" className="w-6 h-6 mr-2" />

@@ -2,6 +2,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
+import { Plus, Check } from "lucide-react";
 
 interface Product {
   id: number;
@@ -16,6 +17,14 @@ interface Review {
   name: string;
   rating: number;
   comment: string;
+}
+
+interface Accessory {
+  id: number;
+  name: string;
+  price: number;
+  compatible: string[];
+  image: string;
 }
 
 interface ProductDetailModalProps {
@@ -55,6 +64,25 @@ const getTechSpecs = (productId: number, brand: string) => {
       camera: "HD Webcam",
       connectivity: "Wi-Fi 6, Bluetooth 5.1"
     },
+    PlayStation: {
+      processor: "Custom AMD Zen 2, 8 cores",
+      gpu: "Custom RDNA 2, 10.28 TFLOPs",
+      ram: "16GB GDDR6",
+      storage: "825GB SSD",
+      resolution: "Up to 4K at 120fps",
+      audioOutput: "Tempest 3D AudioTech",
+      connectivity: "Wi-Fi 6, Bluetooth 5.1, HDMI 2.1"
+    },
+    "PC Games": {
+      minCpu: "Intel Core i5 or AMD Ryzen 5",
+      recCpu: "Intel Core i7 or AMD Ryzen 7",
+      minGpu: "NVIDIA GTX 1660 or AMD RX 5600 XT",
+      recGpu: "NVIDIA RTX 3060 or AMD RX 6700 XT",
+      minRam: "8GB RAM",
+      recRam: "16GB RAM",
+      storage: "70GB available space",
+      os: "Windows 10 64-bit"
+    },
     default: {
       ram: "6GB",
       storage: "128GB",
@@ -70,12 +98,30 @@ const getTechSpecs = (productId: number, brand: string) => {
   return specs[brand as keyof typeof specs] || specs.default;
 };
 
+// Mock accessories data
+const accessories: Accessory[] = [
+  { id: 101, name: "Premium Headphones", price: 99.99, compatible: ["Apple", "Samsung", "Sony"], image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" },
+  { id: 102, name: "Wireless Charger", price: 49.99, compatible: ["Apple", "Samsung"], image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" },
+  { id: 103, name: "Protective Case", price: 29.99, compatible: ["Apple", "Samsung", "Sony"], image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" },
+  { id: 104, name: "Screen Protector", price: 19.99, compatible: ["Apple", "Samsung", "Sony"], image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" },
+  { id: 105, name: "Extra Controller", price: 69.99, compatible: ["PlayStation"], image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" },
+  { id: 106, name: "Gaming Headset", price: 89.99, compatible: ["PlayStation", "PC Games"], image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" },
+  { id: 107, name: "Gaming Mouse", price: 59.99, compatible: ["PC Games"], image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" },
+  { id: 108, name: "Mechanical Keyboard", price: 129.99, compatible: ["PC Games"], image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" }
+];
+
 const ProductDetailModal = ({ product, isOpen, onClose, reviews = [] }: ProductDetailModalProps) => {
   const { id, name, price, image, brand, discount = 0 } = product;
   const discountedPrice = discount > 0 ? price * (1 - discount / 100) : price;
   const [activeTab, setActiveTab] = useState("overview");
+  const [selectedAccessories, setSelectedAccessories] = useState<Accessory[]>([]);
   
   const specs = getTechSpecs(id, brand);
+  
+  // Filter accessories compatible with this product brand
+  const compatibleAccessories = accessories.filter(acc => 
+    acc.compatible.includes(brand)
+  );
   
   const handleImageClick = () => {
     // Open image in full screen
@@ -106,6 +152,22 @@ const ProductDetailModal = ({ product, isOpen, onClose, reviews = [] }: ProductD
     document.body.appendChild(viewer);
   };
 
+  const handleToggleAccessory = (accessory: Accessory) => {
+    setSelectedAccessories(current => {
+      const isSelected = current.some(a => a.id === accessory.id);
+      if (isSelected) {
+        return current.filter(a => a.id !== accessory.id);
+      } else {
+        return [...current, accessory];
+      }
+    });
+  };
+
+  const totalPrice = selectedAccessories.reduce(
+    (sum, acc) => sum + acc.price, 
+    discount > 0 ? discountedPrice : price
+  );
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[650px] max-h-[90vh] overflow-y-auto">
@@ -117,9 +179,10 @@ const ProductDetailModal = ({ product, isOpen, onClose, reviews = [] }: ProductD
         </DialogHeader>
         
         <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="mt-4">
-          <TabsList className="grid grid-cols-3 mb-4">
+          <TabsList className="grid grid-cols-4 mb-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="specs">Specifications</TabsTrigger>
+            <TabsTrigger value="accessories">Accessories</TabsTrigger>
             <TabsTrigger value="reviews">Reviews ({reviews.length})</TabsTrigger>
           </TabsList>
           
@@ -161,44 +224,72 @@ const ProductDetailModal = ({ product, isOpen, onClose, reviews = [] }: ProductD
             <div className="space-y-4">
               <h3 className="text-lg font-medium">Technical Specifications</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <div className="flex justify-between py-2 border-b">
-                    <span className="font-medium">RAM</span>
-                    <span>{specs.ram}</span>
+                {Object.entries(specs).map(([key, value]) => (
+                  <div key={key} className="flex justify-between py-2 border-b">
+                    <span className="font-medium">{key.charAt(0).toUpperCase() + key.slice(1)}</span>
+                    <span>{value}</span>
                   </div>
-                  <div className="flex justify-between py-2 border-b">
-                    <span className="font-medium">Storage</span>
-                    <span>{specs.storage}</span>
-                  </div>
-                  <div className="flex justify-between py-2 border-b">
-                    <span className="font-medium">Processor</span>
-                    <span>{specs.processor}</span>
-                  </div>
-                  <div className="flex justify-between py-2 border-b">
-                    <span className="font-medium">Display</span>
-                    <span>{specs.display}</span>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between py-2 border-b">
-                    <span className="font-medium">Battery</span>
-                    <span>{specs.battery}</span>
-                  </div>
-                  <div className="flex justify-between py-2 border-b">
-                    <span className="font-medium">Camera</span>
-                    <span>{specs.camera}</span>
-                  </div>
-                  <div className="flex justify-between py-2 border-b">
-                    <span className="font-medium">Connectivity</span>
-                    <span>{specs.connectivity}</span>
-                  </div>
-                  <div className="flex justify-between py-2 border-b">
-                    <span className="font-medium">Warranty</span>
-                    <span>1 Year</span>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
+          </TabsContent>
+          
+          <TabsContent value="accessories" className="space-y-4">
+            <h3 className="text-lg font-medium">Compatible Accessories</h3>
+            {compatibleAccessories.length === 0 ? (
+              <p className="text-muted-foreground">No compatible accessories found for this product.</p>
+            ) : (
+              <div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  {compatibleAccessories.map((accessory) => {
+                    const isSelected = selectedAccessories.some(a => a.id === accessory.id);
+                    return (
+                      <div 
+                        key={accessory.id} 
+                        className={`border rounded-lg p-3 cursor-pointer transition-all ${
+                          isSelected ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/50'
+                        }`}
+                        onClick={() => handleToggleAccessory(accessory)}
+                      >
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <h4 className="font-medium">{accessory.name}</h4>
+                            <p className="text-sm text-muted-foreground">${accessory.price.toFixed(2)}</p>
+                          </div>
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                            isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                          }`}>
+                            {isSelected ? <Check size={14} /> : <Plus size={14} />}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                
+                {selectedAccessories.length > 0 && (
+                  <div className="bg-card rounded-lg p-4 mt-4 border border-border">
+                    <h4 className="font-medium mb-2">Selected Accessories</h4>
+                    <ul className="space-y-2 mb-4">
+                      <li className="flex justify-between">
+                        <span>{name}</span>
+                        <span>${(discount > 0 ? discountedPrice : price).toFixed(2)}</span>
+                      </li>
+                      {selectedAccessories.map(accessory => (
+                        <li key={accessory.id} className="flex justify-between text-sm">
+                          <span>{accessory.name}</span>
+                          <span>${accessory.price.toFixed(2)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="flex justify-between font-bold pt-2 border-t">
+                      <span>Total</span>
+                      <span>${totalPrice.toFixed(2)}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </TabsContent>
           
           <TabsContent value="reviews">
