@@ -1,9 +1,11 @@
 
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 const TopNavigation = () => {
   const location = useLocation();
   const isIndexPage = location.pathname === '/';
+  const { isAuthenticated } = useAuth();
 
   const handleContactClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -18,7 +20,7 @@ const TopNavigation = () => {
       <div className="container mx-auto flex items-center py-4 px-6">
         <Link to="/" className="text-2xl font-bold text-[#9eff00] flex items-center gap-2">
           <img 
-            src="/lovable-uploads/72ebffff-bdd7-4309-b67c-3142e2a52726.png" 
+            src="/lovable-uploads/332dd32d-b893-48bd-8da7-73aa4bc107bb.png" 
             alt="Electrium Logo" 
             className="w-8 h-8"
           />
@@ -34,6 +36,17 @@ const TopNavigation = () => {
             <Link to="/donation" className="text-white hover:text-[#9eff00] transition-colors">Donation</Link>
           </div>
         )}
+        
+        <div className="ml-auto">
+          {!isAuthenticated && (
+            <Link
+              to="/login"
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+            >
+              Log In
+            </Link>
+          )}
+        </div>
       </div>
     </nav>
   );

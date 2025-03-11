@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
@@ -48,9 +48,63 @@ const Login = () => {
     }
   };
 
+  const handleGoogleLogin = () => {
+    // In a real implementation, this would be integrated with Google OAuth
+    // For now, we'll simulate the popup behavior
+    const width = 500;
+    const height = 600;
+    const left = window.screenX + (window.outerWidth - width) / 2;
+    const top = window.screenY + (window.outerHeight - height) / 2.5;
+    
+    const googleWindow = window.open(
+      'about:blank',
+      'Google Sign In',
+      `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes,status=yes`
+    );
+    
+    if (googleWindow) {
+      googleWindow.document.write(`
+        <html>
+          <head>
+            <title>Google Sign In</title>
+            <style>
+              body { font-family: Arial, sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
+              .google-logo { width: 100px; margin-bottom: 20px; }
+              h1 { color: #202124; font-size: 24px; }
+              p { color: #5f6368; }
+              .spinner { border: 4px solid #f3f3f3; border-radius: 50%; border-top: 4px solid #4285f4; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px 0; }
+              @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+            </style>
+          </head>
+          <body>
+            <img class="google-logo" src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google">
+            <h1>Signing in...</h1>
+            <div class="spinner"></div>
+            <p>Please wait while we connect you to your Google account.</p>
+          </body>
+        </html>
+      `);
+      
+      // Simulate auth flow completing after 2 seconds
+      setTimeout(() => {
+        googleWindow.close();
+        
+        // Log the user in with demo credentials
+        if (login('demo', 'demo123')) {
+          const from = location.state?.from?.pathname || '/';
+          navigate(from);
+        }
+      }, 2000);
+    }
+  };
+
   const handleSocialLogin = (provider: string) => {
-    // In a real app, we would implement OAuth here
-    // For now, we'll just log in as a demo user
+    if (provider === 'google') {
+      handleGoogleLogin();
+      return;
+    }
+    
+    // For other providers, use demo login for now
     if (login('demo', 'demo123')) {
       const from = location.state?.from?.pathname || '/';
       navigate(from);

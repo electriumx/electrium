@@ -1,5 +1,7 @@
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useState } from "react";
 
 interface Product {
   id: number;
@@ -23,9 +25,57 @@ interface ProductDetailModalProps {
   reviews?: Review[];
 }
 
+// Mock tech specs since they're not in the product data
+const getTechSpecs = (productId: number, brand: string) => {
+  const specs = {
+    Apple: {
+      ram: "8GB",
+      storage: "256GB SSD",
+      processor: "Apple M2 Chip",
+      display: "13.3-inch Retina Display",
+      battery: "Up to 18 hours",
+      camera: "1080p FaceTime HD Camera",
+      connectivity: "Wi-Fi 6, Bluetooth 5.0"
+    },
+    Samsung: {
+      ram: "12GB",
+      storage: "512GB",
+      processor: "Snapdragon 8 Gen 2",
+      display: "6.8-inch Dynamic AMOLED 2X",
+      battery: "5000mAh",
+      camera: "108MP main camera",
+      connectivity: "5G, Wi-Fi 6E, Bluetooth 5.3"
+    },
+    Sony: {
+      ram: "8GB",
+      storage: "1TB SSD",
+      processor: "AMD Ryzen 7",
+      display: "15.6-inch 4K OLED",
+      battery: "Up to 10 hours",
+      camera: "HD Webcam",
+      connectivity: "Wi-Fi 6, Bluetooth 5.1"
+    },
+    default: {
+      ram: "6GB",
+      storage: "128GB",
+      processor: "Octa-core",
+      display: "6.5-inch IPS LCD",
+      battery: "4500mAh",
+      camera: "64MP main camera",
+      connectivity: "4G LTE, Wi-Fi 5, Bluetooth 5.0"
+    }
+  };
+
+  // Return brand-specific specs or default if brand not found
+  return specs[brand as keyof typeof specs] || specs.default;
+};
+
 const ProductDetailModal = ({ product, isOpen, onClose, reviews = [] }: ProductDetailModalProps) => {
-  const { name, price, image, brand, discount = 0 } = product;
+  const { id, name, price, image, brand, discount = 0 } = product;
   const discountedPrice = discount > 0 ? price * (1 - discount / 100) : price;
+  const [activeTab, setActiveTab] = useState("overview");
+  
+  const specs = getTechSpecs(id, brand);
   
   const handleImageClick = () => {
     // Open image in full screen
@@ -58,79 +108,139 @@ const ProductDetailModal = ({ product, isOpen, onClose, reviews = [] }: ProductD
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[650px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{name}</DialogTitle>
+          <DialogDescription>
+            Detailed information about {name} by {brand}
+          </DialogDescription>
         </DialogHeader>
         
-        <div className="mt-4 space-y-6">
-          <div 
-            className="rounded-lg overflow-hidden cursor-zoom-in"
-            onClick={handleImageClick}
-          >
-            <img 
-              src={image} 
-              alt={name} 
-              className="w-full h-auto object-cover"
-            />
-          </div>
+        <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="mt-4">
+          <TabsList className="grid grid-cols-3 mb-4">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="specs">Specifications</TabsTrigger>
+            <TabsTrigger value="reviews">Reviews ({reviews.length})</TabsTrigger>
+          </TabsList>
           
-          <div>
-            <p className="text-lg font-semibold">
-              {discount > 0 ? (
-                <>
-                  <span className="line-through text-muted-foreground mr-2">${price.toFixed(2)}</span>
-                  <span className="text-destructive">${discountedPrice.toFixed(2)}</span>
-                  <span className="ml-2 text-xs bg-destructive text-white px-2 py-1 rounded-full">
-                    {discount}% OFF
-                  </span>
-                </>
-              ) : (
-                <span>${price.toFixed(2)}</span>
-              )}
-            </p>
-            <p className="text-muted-foreground">Brand: {brand}</p>
-          </div>
-          
-          {/* Reviews section */}
-          <div className="border-t pt-4">
-            <h3 className="text-lg font-medium mb-3">Reviews ({reviews.length})</h3>
+          <TabsContent value="overview" className="space-y-4">
+            <div 
+              className="rounded-lg overflow-hidden cursor-zoom-in"
+              onClick={handleImageClick}
+            >
+              <img 
+                src={image} 
+                alt={name} 
+                className="w-full h-auto object-cover"
+              />
+            </div>
             
-            {reviews.length === 0 ? (
-              <p className="text-muted-foreground">No reviews yet.</p>
-            ) : (
-              <div className="space-y-4">
-                {reviews.map((review, index) => (
-                  <div key={index} className="border-b pb-3 last:border-0">
-                    <div className="flex justify-between items-center mb-1">
-                      <p className="font-medium">{review.name}</p>
-                      <div className="flex">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <svg 
-                            key={star}
-                            xmlns="http://www.w3.org/2000/svg" 
-                            width="14" 
-                            height="14" 
-                            viewBox="0 0 24 24" 
-                            fill={star <= review.rating ? "gold" : "none"} 
-                            stroke="currentColor" 
-                            strokeWidth="2" 
-                            strokeLinecap="round" 
-                            strokeLinejoin="round"
-                            className="text-yellow-500"
-                          >
-                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                          </svg>
-                        ))}
-                      </div>
-                    </div>
-                    <p className="text-sm">{review.comment}</p>
+            <div>
+              <p className="text-lg font-semibold">
+                {discount > 0 ? (
+                  <>
+                    <span className="line-through text-muted-foreground mr-2">${price.toFixed(2)}</span>
+                    <span className="text-destructive">${discountedPrice.toFixed(2)}</span>
+                    <span className="ml-2 text-xs bg-destructive text-white px-2 py-1 rounded-full">
+                      {discount}% OFF
+                    </span>
+                  </>
+                ) : (
+                  <span>${price.toFixed(2)}</span>
+                )}
+              </p>
+              <p className="text-muted-foreground">Brand: {brand}</p>
+              <p className="mt-4">
+                {name} is a premium device from {brand}, designed for optimal performance and user experience.
+                Click on the Specifications tab to see detailed technical information.
+              </p>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="specs">
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">Technical Specifications</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <div className="flex justify-between py-2 border-b">
+                    <span className="font-medium">RAM</span>
+                    <span>{specs.ram}</span>
                   </div>
-                ))}
+                  <div className="flex justify-between py-2 border-b">
+                    <span className="font-medium">Storage</span>
+                    <span>{specs.storage}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b">
+                    <span className="font-medium">Processor</span>
+                    <span>{specs.processor}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b">
+                    <span className="font-medium">Display</span>
+                    <span>{specs.display}</span>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between py-2 border-b">
+                    <span className="font-medium">Battery</span>
+                    <span>{specs.battery}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b">
+                    <span className="font-medium">Camera</span>
+                    <span>{specs.camera}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b">
+                    <span className="font-medium">Connectivity</span>
+                    <span>{specs.connectivity}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b">
+                    <span className="font-medium">Warranty</span>
+                    <span>1 Year</span>
+                  </div>
+                </div>
               </div>
-            )}
-          </div>
-        </div>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="reviews">
+            <div>
+              <h3 className="text-lg font-medium mb-3">Customer Reviews ({reviews.length})</h3>
+              
+              {reviews.length === 0 ? (
+                <p className="text-muted-foreground">No reviews yet. Be the first to review this product!</p>
+              ) : (
+                <div className="space-y-4">
+                  {reviews.map((review, index) => (
+                    <div key={index} className="border-b pb-3 last:border-0">
+                      <div className="flex justify-between items-center mb-1">
+                        <p className="font-medium">{review.name}</p>
+                        <div className="flex">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <svg 
+                              key={star}
+                              xmlns="http://www.w3.org/2000/svg" 
+                              width="14" 
+                              height="14" 
+                              viewBox="0 0 24 24" 
+                              fill={star <= review.rating ? "gold" : "none"} 
+                              stroke="currentColor" 
+                              strokeWidth="2" 
+                              strokeLinecap="round" 
+                              strokeLinejoin="round"
+                              className="text-yellow-500"
+                            >
+                              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                          ))}
+                        </div>
+                      </div>
+                      <p className="text-sm">{review.comment}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );

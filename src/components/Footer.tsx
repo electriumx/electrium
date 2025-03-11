@@ -1,14 +1,28 @@
 
 import { useState, useEffect } from 'react';
+import { Globe, Mail, Phone } from 'lucide-react';
 
 const Footer = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [currentTimeUTC, setCurrentTimeUTC] = useState('');
   
   useEffect(() => {
     // Update time every minute
     const interval = setInterval(() => {
-      setCurrentTime(new Date());
+      const now = new Date();
+      setCurrentTime(now);
+      
+      // Format UTC time
+      const utcHours = now.getUTCHours().toString().padStart(2, '0');
+      const utcMinutes = now.getUTCMinutes().toString().padStart(2, '0');
+      setCurrentTimeUTC(`${utcHours}:${utcMinutes} UTC`);
     }, 60000);
+    
+    // Initial setting
+    const now = new Date();
+    const utcHours = now.getUTCHours().toString().padStart(2, '0');
+    const utcMinutes = now.getUTCMinutes().toString().padStart(2, '0');
+    setCurrentTimeUTC(`${utcHours}:${utcMinutes} UTC`);
     
     return () => clearInterval(interval);
   }, []);
@@ -27,7 +41,10 @@ const Footer = () => {
           <div>
             <h3 className="text-xl font-bold mb-4 text-[#9eff00]">Electrium</h3>
             <p className="text-gray-300">Your one-stop shop for premium electronics</p>
-            <p className="text-gray-400 mt-2">Current Time: {formattedTime}</p>
+            <div className="flex flex-col text-gray-400 mt-2 space-y-1">
+              <p>Local Time: {formattedTime}</p>
+              <p>Universal Time: {currentTimeUTC}</p>
+            </div>
           </div>
           <div>
             <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
@@ -51,8 +68,20 @@ const Footer = () => {
           </div>
           <div>
             <h4 className="text-lg font-semibold mb-4">Contact</h4>
-            <p className="text-gray-300">Email: electriumx@gmail.com</p>
-            <p className="text-gray-300">Phone: +20 011 5468 4095</p>
+            <div className="space-y-3">
+              <p className="text-gray-300 flex items-center gap-2">
+                <Mail size={16} />
+                <span>electriumx@gmail.com</span>
+              </p>
+              <p className="text-gray-300 flex items-center gap-2">
+                <Phone size={16} />
+                <span>+20 011 5468 4095</span>
+              </p>
+              <p className="text-gray-300 flex items-center gap-2">
+                <Globe size={16} />
+                <span>www.electrium.com</span>
+              </p>
+            </div>
           </div>
         </div>
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">

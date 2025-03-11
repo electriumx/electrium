@@ -34,11 +34,28 @@ const ProductGrid = ({ products, onQuantityChange, discounts = {} }: ProductGrid
     return product.price * (1 - discount / 100);
   };
 
+  // If no products, show a message
+  if (products.length === 0) {
+    return (
+      <div className="py-10 text-center">
+        <p className="text-lg text-muted-foreground">
+          No products found matching your criteria.
+        </p>
+        <p className="text-muted-foreground mt-2">
+          Try adjusting your filters or search terms.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
       {products.map(product => {
         const discount = activeDiscounts[product.brand] || activeDiscounts['All'] || 0;
         const discountedPrice = getDiscountedPrice(product);
+        
+        // Skip showing 0% discounts
+        const effectiveDiscount = discount > 0 ? discount : 0;
         
         return (
           <ProductCard
@@ -48,7 +65,7 @@ const ProductGrid = ({ products, onQuantityChange, discounts = {} }: ProductGrid
             price={product.price}
             image={product.image}
             brand={product.brand}
-            discount={discount} // Only pass non-zero discounts
+            discount={effectiveDiscount}
             discountedPrice={discountedPrice}
             onQuantityChange={onQuantityChange}
           />
