@@ -1,10 +1,11 @@
+
 import { useState, useEffect } from 'react';
 import ProductFilters from '../components/ProductFilters';
 import ProductGrid from '../components/ProductGrid';
 import CartSummary from '../components/CartSummary';
 import SpinWheel from '../components/SpinWheel';
 import AIChat from '../components/AIChat';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Product, products } from '../data/productData';
 
 const Products = () => {
@@ -15,6 +16,7 @@ const Products = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isChatOpen, setIsChatOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   
   const maxPrice = Math.max(...products.map(p => p.price));
   const [priceRange, setPriceRange] = useState<[number, number]>([0, maxPrice]);
@@ -66,17 +68,42 @@ const Products = () => {
     window.scrollTo(0, 0);
   }, []);
 
+  // Listen for cart update events
+  useEffect(() => {
+    const handleCartUpdate = (e: CustomEvent) => {
+      setCart(e.detail || []);
+    };
+
+    window.addEventListener('cartUpdate', handleCartUpdate as EventListener);
+    return () => window.removeEventListener('cartUpdate', handleCartUpdate as EventListener);
+  }, []);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === '/') {
         e.preventDefault();
-        window.location.href = '/admin';
+        
+        // Store current location or restore previous location
+        const prevPage = sessionStorage.getItem('prevPageBeforeAdmin');
+        
+        if (location.pathname === '/admin') {
+          // If currently on admin page, go back to previous page
+          if (prevPage) {
+            navigate(prevPage);
+          } else {
+            navigate('/');
+          }
+        } else {
+          // Store current page and go to admin
+          sessionStorage.setItem('prevPageBeforeAdmin', location.pathname);
+          navigate('/admin');
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [navigate, location.pathname]);
 
   const handleFilterChange = (brands: string[]) => {
     setSelectedBrands(brands);
@@ -164,8 +191,13 @@ const Products = () => {
       </div>
       
       {showSpinWheel && (
-        <div className="mb-8">
+        <div className="mb-8 text-center">
           <SpinWheel onWin={handleSpinWin} />
+          <button
+            className="mt-4 px-4 py-2 bg-white text-black rounded-md font-medium hover:bg-gray-100 transition-colors"
+          >
+            Spin
+          </button>
         </div>
       )}
       

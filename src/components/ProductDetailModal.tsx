@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
@@ -98,7 +97,7 @@ const getTechSpecs = (productId: number, brand: string) => {
   return specs[brand as keyof typeof specs] || specs.default;
 };
 
-// Mock accessories data
+// Mock accessories data with more detailed categories
 const accessories: Accessory[] = [
   { id: 101, name: "Premium Headphones", price: 99.99, compatible: ["Apple", "Samsung", "Sony"], image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" },
   { id: 102, name: "Wireless Charger", price: 49.99, compatible: ["Apple", "Samsung"], image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" },
@@ -107,7 +106,11 @@ const accessories: Accessory[] = [
   { id: 105, name: "Extra Controller", price: 69.99, compatible: ["PlayStation"], image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" },
   { id: 106, name: "Gaming Headset", price: 89.99, compatible: ["PlayStation", "PC Games"], image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" },
   { id: 107, name: "Gaming Mouse", price: 59.99, compatible: ["PC Games"], image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" },
-  { id: 108, name: "Mechanical Keyboard", price: 129.99, compatible: ["PC Games"], image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" }
+  { id: 108, name: "Mechanical Keyboard", price: 129.99, compatible: ["PC Games"], image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" },
+  { id: 109, name: "Fast Charging Cable", price: 14.99, compatible: ["Apple", "Samsung", "Sony", "Google", "Xiaomi"], image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" },
+  { id: 110, name: "128GB Memory Card", price: 39.99, compatible: ["Samsung", "Sony"], image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" },
+  { id: 111, name: "256GB Memory Card", price: 59.99, compatible: ["Samsung", "Sony"], image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" },
+  { id: 112, name: "Premium Earbuds", price: 79.99, compatible: ["Apple", "Samsung", "Sony", "Google"], image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" }
 ];
 
 const ProductDetailModal = ({ product, isOpen, onClose, reviews = [] }: ProductDetailModalProps) => {

@@ -62,8 +62,8 @@ const CartSummary = ({ cart }: { cart: CartItem[] }) => {
       description: "All items have been removed from your cart",
     });
     
-    // Refresh the page to update the UI
-    window.location.reload();
+    // Don't refresh the page, just use window.dispatchEvent to trigger a cart update
+    window.dispatchEvent(new CustomEvent('cartUpdate', { detail: [] }));
   };
 
   if (itemCount === 0) return null;

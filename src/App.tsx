@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "next-themes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import Index from "./pages/Index";
 import Products from "./pages/Products";
 import About from "./pages/About";
@@ -31,18 +31,34 @@ const queryClient = new QueryClient();
 // Admin key handler component
 const AdminKeyHandler = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === '/') {
         e.preventDefault();
-        navigate('/admin');
+        
+        // Store current location or restore previous location
+        const prevPage = sessionStorage.getItem('prevPageBeforeAdmin');
+        
+        if (location.pathname === '/admin') {
+          // If currently on admin page, go back to previous page
+          if (prevPage) {
+            navigate(prevPage);
+          } else {
+            navigate('/');
+          }
+        } else {
+          // Store current page and go to admin
+          sessionStorage.setItem('prevPageBeforeAdmin', location.pathname);
+          navigate('/admin');
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [navigate]);
+  }, [navigate, location.pathname]);
   
   return null;
 };
