@@ -1012,7 +1012,7 @@ export const products: Product[] = [
     id: 126,
     name: "Call of Duty: Modern Warfare III",
     price: 69.99,
-    image: "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?auto=format&fit=crop&w=800",
+    image: "/lovable-uploads/0043f050-6bed-4f97-bb85-96fb6a0dffcd.png",
     quantity: 0,
     brand: "PlayStation"
   },
@@ -1020,7 +1020,7 @@ export const products: Product[] = [
     id: 127,
     name: "Call of Duty: Black Ops 6",
     price: 69.99,
-    image: "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?auto=format&fit=crop&w=800",
+    image: "/lovable-uploads/9e75b39e-727b-45c3-83f0-144af9271dba.png",
     quantity: 0,
     brand: "PlayStation"
   },
@@ -1028,7 +1028,7 @@ export const products: Product[] = [
     id: 128,
     name: "Call of Duty: Black Ops Cold War",
     price: 59.99,
-    image: "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?auto=format&fit=crop&w=800",
+    image: "/lovable-uploads/9e75b39e-727b-45c3-83f0-144af9271dba.png",
     quantity: 0,
     brand: "PlayStation"
   },
@@ -1036,7 +1036,7 @@ export const products: Product[] = [
     id: 129,
     name: "Call of Duty: Vanguard",
     price: 59.99,
-    image: "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?auto=format&fit=crop&w=800",
+    image: "/lovable-uploads/9e75b39e-727b-45c3-83f0-144af9271dba.png",
     quantity: 0,
     brand: "PlayStation"
   },
@@ -1044,7 +1044,7 @@ export const products: Product[] = [
     id: 130,
     name: "GTA V",
     price: 29.99,
-    image: "https://images.unsplash.com/photo-1605144358469-73748bc6c0ad?auto=format&fit=crop&w=800",
+    image: "/lovable-uploads/36503a17-78b8-4912-9fae-5e0b7d358857.png",
     quantity: 0,
     brand: "PlayStation"
   },
@@ -1052,7 +1052,7 @@ export const products: Product[] = [
     id: 131,
     name: "GTA VI",
     price: 79.99,
-    image: "https://images.unsplash.com/photo-1605144358469-73748bc6c0ad?auto=format&fit=crop&w=800",
+    image: "/lovable-uploads/36503a17-78b8-4912-9fae-5e0b7d358857.png",
     quantity: 0,
     brand: "PlayStation"
   },
@@ -1092,7 +1092,7 @@ export const products: Product[] = [
     id: 136,
     name: "Call of Duty: Modern Warfare III (PC)",
     price: 69.99,
-    image: "https://images.unsplash.com/photo-1607853202273-797f1c22a38e?auto=format&fit=crop&w=800",
+    image: "/lovable-uploads/0043f050-6bed-4f97-bb85-96fb6a0dffcd.png",
     quantity: 0,
     brand: "PC Games"
   },
@@ -1100,7 +1100,7 @@ export const products: Product[] = [
     id: 137,
     name: "Call of Duty: Black Ops 6 (PC)",
     price: 69.99,
-    image: "https://images.unsplash.com/photo-1607853202273-797f1c22a38e?auto=format&fit=crop&w=800",
+    image: "/lovable-uploads/9e75b39e-727b-45c3-83f0-144af9271dba.png",
     quantity: 0,
     brand: "PC Games"
   },
@@ -1108,7 +1108,7 @@ export const products: Product[] = [
     id: 138,
     name: "Call of Duty: Black Ops Cold War (PC)",
     price: 59.99,
-    image: "https://images.unsplash.com/photo-1607853202273-797f1c22a38e?auto=format&fit=crop&w=800",
+    image: "/lovable-uploads/9e75b39e-727b-45c3-83f0-144af9271dba.png",
     quantity: 0,
     brand: "PC Games"
   },
@@ -1116,7 +1116,7 @@ export const products: Product[] = [
     id: 139,
     name: "Call of Duty: Vanguard (PC)",
     price: 59.99,
-    image: "https://images.unsplash.com/photo-1607853202273-797f1c22a38e?auto=format&fit=crop&w=800",
+    image: "/lovable-uploads/9e75b39e-727b-45c3-83f0-144af9271dba.png",
     quantity: 0,
     brand: "PC Games"
   },
@@ -1124,7 +1124,7 @@ export const products: Product[] = [
     id: 140,
     name: "GTA V (PC)",
     price: 29.99,
-    image: "https://images.unsplash.com/photo-1605144358469-73748bc6c0ad?auto=format&fit=crop&w=800",
+    image: "/lovable-uploads/36503a17-78b8-4912-9fae-5e0b7d358857.png",
     quantity: 0,
     brand: "PC Games"
   },
@@ -1132,7 +1132,7 @@ export const products: Product[] = [
     id: 141,
     name: "GTA VI (PC)",
     price: 79.99,
-    image: "https://images.unsplash.com/photo-1605144358469-73748bc6c0ad?auto=format&fit=crop&w=800",
+    image: "/lovable-uploads/36503a17-78b8-4912-9fae-5e0b7d358857.png",
     quantity: 0,
     brand: "PC Games"
   },
@@ -1140,7 +1140,7 @@ export const products: Product[] = [
     id: 142,
     name: "Cyberpunk 2077",
     price: 49.99,
-    image: "https://images.unsplash.com/photo-1607853202273-797f1c22a38e?auto=format&fit=crop&w=800",
+    image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
     quantity: 0,
     brand: "PC Games"
   },
@@ -1148,7 +1148,7 @@ export const products: Product[] = [
     id: 143,
     name: "The Witcher 3: Wild Hunt",
     price: 39.99,
-    image: "https://images.unsplash.com/photo-1607853202273-797f1c22a38e?auto=format&fit=crop&w=800",
+    image: "/lovable-uploads/07224c91-e369-4205-a0c2-458050f508f3.png",
     quantity: 0,
     brand: "PC Games"
   },
@@ -1156,7 +1156,7 @@ export const products: Product[] = [
     id: 144,
     name: "Red Dead Redemption 2 (PC)",
     price: 59.99,
-    image: "https://images.unsplash.com/photo-1607853202273-797f1c22a38e?auto=format&fit=crop&w=800",
+    image: "/lovable-uploads/b48e7d14-29ab-4227-a09c-eb324e7620d7.png",
     quantity: 0,
     brand: "PC Games"
   },
@@ -1164,7 +1164,7 @@ export const products: Product[] = [
     id: 145,
     name: "Elden Ring (PC)",
     price: 59.99,
-    image: "https://images.unsplash.com/photo-1607853202273-797f1c22a38e?auto=format&fit=crop&w=800",
+    image: "/lovable-uploads/6e559433-f480-42f6-9f32-9429e4b3b349.png",
     quantity: 0,
     brand: "PC Games"
   }
