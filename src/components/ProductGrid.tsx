@@ -48,7 +48,7 @@ const ProductGrid = ({ products, onQuantityChange, discounts = {} }: ProductGrid
             price={product.price}
             image={product.image}
             brand={product.brand}
-            discount={discount}
+            discount={discount} // Only pass non-zero discounts
             discountedPrice={discountedPrice}
             onQuantityChange={onQuantityChange}
           />

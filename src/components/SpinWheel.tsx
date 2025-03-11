@@ -1,6 +1,7 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 interface SpinWheelProps {
   onWin: (brand: string, discount: number, expiresAt: number) => void;
@@ -14,8 +15,9 @@ const SpinWheel = ({ onWin }: SpinWheelProps) => {
   const [cooldownActive, setCooldownActive] = useState(false);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   
-  // Define wheel segments with brand and discount pairs
   const segments = [
     { brand: "Apple", discount: 5, color: "#4a5568" },
     { brand: "Samsung", discount: 10, color: "#1a202c" },
@@ -34,7 +36,6 @@ const SpinWheel = ({ onWin }: SpinWheelProps) => {
   const numSegments = segments.length;
   const segmentAngle = 360 / numSegments;
   
-  // Check cooldown on component mount
   useEffect(() => {
     const lastSpinTime = localStorage.getItem('lastSpinTime');
     if (lastSpinTime) {
@@ -51,7 +52,6 @@ const SpinWheel = ({ onWin }: SpinWheelProps) => {
     }
   }, []);
   
-  // Update cooldown timer
   useEffect(() => {
     if (!cooldownActive || timeLeft === null) return;
     
@@ -69,7 +69,6 @@ const SpinWheel = ({ onWin }: SpinWheelProps) => {
     return () => clearInterval(timer);
   }, [cooldownActive, timeLeft]);
   
-  // Format time left for display
   const formatTimeLeft = () => {
     if (timeLeft === null) return '';
     
@@ -80,7 +79,6 @@ const SpinWheel = ({ onWin }: SpinWheelProps) => {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
   
-  // Draw the wheel on canvas
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -88,14 +86,12 @@ const SpinWheel = ({ onWin }: SpinWheelProps) => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     
-    // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
     const radius = Math.min(centerX, centerY) - 10;
     
-    // Draw segments
     segments.forEach((segment, i) => {
       const startAngle = (i * segmentAngle - 90 + rotation) * Math.PI / 180;
       const endAngle = ((i + 1) * segmentAngle - 90 + rotation) * Math.PI / 180;
@@ -111,7 +107,6 @@ const SpinWheel = ({ onWin }: SpinWheelProps) => {
       ctx.lineWidth = 2;
       ctx.stroke();
       
-      // Draw text
       ctx.save();
       ctx.translate(centerX, centerY);
       const textAngle = startAngle + (endAngle - startAngle) / 2;
@@ -120,26 +115,23 @@ const SpinWheel = ({ onWin }: SpinWheelProps) => {
       ctx.rotate(Math.PI / 2);
       
       ctx.fillStyle = '#ffffff';
-      ctx.font = '9px sans-serif'; // Smaller text size
+      ctx.font = '9px sans-serif';
       ctx.textAlign = 'center';
       
-      // Split brand name if it's too long
-      const brand = segment.brand;
-      if (brand.length > 10) {
-        const midpoint = Math.floor(brand.length / 2);
-        const firstHalf = brand.substring(0, midpoint);
-        const secondHalf = brand.substring(midpoint);
+      if (segment.brand.length > 10) {
+        const midpoint = Math.floor(segment.brand.length / 2);
+        const firstHalf = segment.brand.substring(0, midpoint);
+        const secondHalf = segment.brand.substring(midpoint);
         ctx.fillText(`${firstHalf}-`, 0, -5);
         ctx.fillText(`${secondHalf}`, 0, 5);
       } else {
-        ctx.fillText(`${brand}`, 0, 0);
+        ctx.fillText(`${segment.brand}`, 0, 0);
       }
-      ctx.fillText(`${segment.discount}%`, 0, 12); // Add a line break for percentage
+      ctx.fillText(`${segment.discount}%`, 0, 12);
       
       ctx.restore();
     });
     
-    // Draw center circle
     ctx.beginPath();
     ctx.arc(centerX, centerY, 15, 0, Math.PI * 2);
     ctx.fillStyle = '#4a5568';
@@ -148,7 +140,6 @@ const SpinWheel = ({ onWin }: SpinWheelProps) => {
     ctx.lineWidth = 2;
     ctx.stroke();
     
-    // Draw pointer
     ctx.beginPath();
     ctx.moveTo(centerX, centerY - radius - 5);
     ctx.lineTo(centerX - 10, centerY - radius - 20);
@@ -159,34 +150,36 @@ const SpinWheel = ({ onWin }: SpinWheelProps) => {
     ctx.strokeStyle = '#e2e8f0';
     ctx.lineWidth = 2;
     ctx.stroke();
-    
   }, [rotation, segments, numSegments, segmentAngle]);
   
   const spinWheel = () => {
     if (isSpinning || cooldownActive) return;
     
+    if (!isAuthenticated) {
+      toast({
+        variant: "destructive",
+        title: "Authentication Required",
+        description: "Please log in to use the spin wheel"
+      });
+      navigate('/login', { state: { from: '/products' } });
+      return;
+    }
+    
     setIsSpinning(true);
     setResult(null);
     
-    // Random number of rotations (3-5 full rotations)
     const rotations = 3 + Math.random() * 2;
-    
-    // Random angle to land on (0-360)
     const landingAngle = Math.floor(Math.random() * 360);
-    
-    // Total rotation will be multiple full rotations plus the landing angle
     const totalRotation = rotations * 360 + landingAngle;
     
-    // Animate the spin
     let currentRotation = rotation;
     const startTime = Date.now();
-    const duration = 3000; // 3 seconds
+    const duration = 3000;
     
     const animate = () => {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
       
-      // Ease out cubic function for slowing down
       const easeOut = 1 - Math.pow(1 - progress, 3);
       
       currentRotation = rotation + totalRotation * easeOut;
@@ -195,22 +188,17 @@ const SpinWheel = ({ onWin }: SpinWheelProps) => {
       if (progress < 1) {
         requestAnimationFrame(animate);
       } else {
-        // Determine which segment was landed on
         const normalizedRotation = currentRotation % 360;
         const segmentIndex = Math.floor(((normalizedRotation + 90) % 360) / segmentAngle);
         const landedSegment = segments[segmentIndex % numSegments];
         
-        // Calculate expiration time (48 hours from now)
-        const expirationTime = Date.now() + (48 * 60 * 60 * 1000);
-        
         setResult(`You won ${landedSegment.discount}% off ${landedSegment.brand} products!`);
-        onWin(landedSegment.brand, landedSegment.discount, expirationTime);
+        onWin(landedSegment.brand, landedSegment.discount, Date.now() + (48 * 60 * 60 * 1000));
         setIsSpinning(false);
         
-        // Set cooldown
         localStorage.setItem('lastSpinTime', Date.now().toString());
         setCooldownActive(true);
-        setTimeLeft(24 * 60 * 60); // 24 hours in seconds
+        setTimeLeft(24 * 60 * 60);
         
         toast({
           title: "Discount Applied!",

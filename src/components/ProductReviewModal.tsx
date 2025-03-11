@@ -5,6 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/components/ui/use-toast';
 
 interface ProductReviewModalProps {
   productId: number;
@@ -25,8 +28,30 @@ const ProductReviewModal = ({
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
   const [errors, setErrors] = useState({ name: false, comment: false });
+  const { isAuthenticated, currentUser } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  // Pre-fill name if user is authenticated
+  useState(() => {
+    if (currentUser?.displayName) {
+      setName(currentUser.displayName);
+    }
+  });
 
   const handleSubmit = () => {
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      toast({
+        variant: "destructive",
+        title: "Authentication Required",
+        description: "Please log in to submit a review"
+      });
+      onClose();
+      navigate('/login', { state: { from: '/products' } });
+      return;
+    }
+    
     // Basic validation
     const newErrors = {
       name: name.trim() === '',
@@ -37,7 +62,7 @@ const ProductReviewModal = ({
     
     if (!newErrors.name && !newErrors.comment) {
       onSubmit(name, rating, comment);
-      setName('');
+      setName(currentUser?.displayName || '');
       setRating(5);
       setComment('');
     }
