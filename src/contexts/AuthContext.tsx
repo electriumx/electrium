@@ -9,9 +9,6 @@ interface AuthContextType {
   login: (username: string, password: string) => boolean;
   logout: () => void;
   isAuthenticated: boolean;
-  isAdmin: boolean;
-  loginAsAdmin: () => void;
-  canAccessAdminPanel: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -48,16 +45,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return false;
   };
 
-  const loginAsAdmin = () => {
-    const adminUser = users.find(u => u.username === "Omar Tarek" && u.isAdmin);
-    if (adminUser) {
-      adminUser.password = "otdk1234"; // Set the password
-      setCurrentUser(adminUser);
-      localStorage.setItem('currentUser', JSON.stringify(adminUser));
-      navigate('/admin');
-    }
-  };
-
   const logout = () => {
     setCurrentUser(null);
     localStorage.removeItem('currentUser');
@@ -68,22 +55,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const isAdmin = currentUser?.isAdmin === true;
-
-  const canAccessAdminPanel = () => {
-    return currentUser?.username === "Omar Tarek" && currentUser?.password === "otdk1234";
-  };
-
   return (
-    <AuthContext.Provider value={{ 
-      currentUser, 
-      login, 
-      logout, 
-      isAuthenticated: !!currentUser,
-      isAdmin,
-      loginAsAdmin,
-      canAccessAdminPanel
-    }}>
+    <AuthContext.Provider value={{ currentUser, login, logout, isAuthenticated: !!currentUser }}>
       {children}
     </AuthContext.Provider>
   );
