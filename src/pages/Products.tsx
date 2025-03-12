@@ -5,7 +5,6 @@ import ProductGrid from '../components/ProductGrid';
 import CartSummary from '../components/CartSummary';
 import SpinWheel from '../components/SpinWheel';
 import AIChat from '../components/AIChat';
-import FloatingActions from '../components/FloatingActions';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Product, products } from '../data/productData';
 
@@ -79,6 +78,33 @@ const Products = () => {
     return () => window.removeEventListener('cartUpdate', handleCartUpdate as EventListener);
   }, []);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === '/') {
+        e.preventDefault();
+        
+        // Store current location or restore previous location
+        const prevPage = sessionStorage.getItem('prevPageBeforeAdmin');
+        
+        if (location.pathname === '/admin') {
+          // If currently on admin page, go back to previous page
+          if (prevPage) {
+            navigate(prevPage);
+          } else {
+            navigate('/');
+          }
+        } else {
+          // Store current page and go to admin
+          sessionStorage.setItem('prevPageBeforeAdmin', location.pathname);
+          navigate('/admin');
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [navigate, location.pathname]);
+
   const handleFilterChange = (brands: string[]) => {
     setSelectedBrands(brands);
   };
@@ -113,12 +139,6 @@ const Products = () => {
     
     setCart(updatedCart);
     localStorage.setItem('cart', JSON.stringify(updatedCart));
-    
-    // Dispatch custom event to notify other components
-    const event = new CustomEvent('cartUpdate', {
-      detail: updatedCart
-    });
-    window.dispatchEvent(event);
   };
 
   const handleSpinWin = (brand: string, discount: number, expiresAt: number) => {
@@ -128,12 +148,7 @@ const Products = () => {
     };
     setDiscounts(newDiscounts);
     localStorage.setItem('discounts', JSON.stringify(newDiscounts));
-  };
-
-  const handleSpin = () => {
-    // This function would trigger the wheel to spin
-    console.log("Spinning the wheel");
-    // Wheel spinning logic would be in the SpinWheel component
+    setShowSpinWheel(false);
   };
 
   const toggleChat = () => {
@@ -161,8 +176,6 @@ const Products = () => {
       product.brand.toLowerCase().includes(query)
     );
   }
-  
-  const cartItemCount = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8">
@@ -171,7 +184,7 @@ const Products = () => {
       <div className="mb-6 flex justify-center">
         <button
           onClick={() => setShowSpinWheel(!showSpinWheel)}
-          className="px-4 py-2 bg-card text-foreground rounded-md border border-border hover:bg-accent transition-colors"
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
         >
           {showSpinWheel ? 'Hide Spin Wheel' : 'Try Your Luck with Daily Spin!'}
         </button>
@@ -181,8 +194,7 @@ const Products = () => {
         <div className="mb-8 text-center">
           <SpinWheel onWin={handleSpinWin} />
           <button
-            onClick={handleSpin}
-            className="mt-4 px-4 py-2 bg-[#555] text-white rounded-md font-medium hover:bg-[#444] transition-colors"
+            className="mt-4 px-4 py-2 bg-white text-black rounded-md font-medium hover:bg-gray-100 transition-colors"
           >
             Spin
           </button>
@@ -227,18 +239,19 @@ const Products = () => {
             products={filteredProducts}
             onQuantityChange={handleQuantityChange}
             discounts={discounts}
-            showWishlistButton={false}
           />
         </div>
       </div>
       
       <CartSummary cart={cart} />
       
-      <FloatingActions 
-        showCheckout={true}
-        cartItemCount={cartItemCount}
-        toggleChat={toggleChat}
-      />
+      <button
+        onClick={toggleChat}
+        className="fixed top-4 right-4 z-50 flex items-center justify-center w-10 h-10 bg-primary text-white rounded-full shadow-lg hover:bg-primary/90 transition-transform hover:scale-105"
+        aria-label="Chat with Electrium Assistant"
+      >
+        <span className="text-xs font-medium">Chat</span>
+      </button>
       
       {isChatOpen && <AIChat onClose={toggleChat} />}
     </div>

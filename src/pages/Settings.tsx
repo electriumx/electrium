@@ -1,5 +1,6 @@
-
 import { useState } from "react";
+import { useTheme } from "next-themes";
+import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
@@ -7,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { users } from "@/data/users";
 
 const Settings = () => {
+  const { setTheme, theme } = useTheme();
   const { toast } = useToast();
   const { currentUser, logout, isAuthenticated } = useAuth();
   const [currentPassword, setCurrentPassword] = useState("");
@@ -20,6 +22,15 @@ const Settings = () => {
       </div>
     );
   }
+
+  const toggleTheme = () => {
+    const newTheme = theme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+    toast({
+      title: "Theme Changed",
+      description: `Switched to ${newTheme} mode`,
+    });
+  };
 
   const handlePasswordChange = () => {
     // Verify current password
@@ -71,6 +82,24 @@ const Settings = () => {
       <h1 className="text-4xl font-bold mb-8">Settings</h1>
       
       <div className="max-w-md mx-auto space-y-6">
+        {/* Theme Settings */}
+        <div className="bg-card p-6 rounded-lg shadow-lg">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold">Theme</h2>
+              <p className="text-muted-foreground">Toggle between light and dark mode</p>
+            </div>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={toggleTheme}
+              className="h-10 w-10"
+            >
+              {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </Button>
+          </div>
+        </div>
+
         {/* Account Information */}
         <div className="bg-card p-6 rounded-lg shadow-lg">
           <h2 className="text-xl font-semibold mb-4">Account Information</h2>
