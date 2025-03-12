@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -60,9 +59,15 @@ const Payment = () => {
   const [couponDiscount, setCouponDiscount] = useState(0);
   const [discounts, setDiscounts] = useState<Record<string, number>>({});
   const [expandedSection, setExpandedSection] = useState<string | null>('items');
-  
+  const [deliveryOption, setDeliveryOption] = useState('normal');
+  const [deliveryTime, setDeliveryTime] = useState('');
+  const [deliveryLocation, setDeliveryLocation] = useState('');
+  const [tradeItems, setTradeItems] = useState<string[]>([]);
+  const [tradeValue, setTradeValue] = useState(0);
+  const [tradeDescription, setTradeDescription] = useState('');
+  const [tradeItemCondition, setTradeItemCondition] = useState('good');
+
   useEffect(() => {
-    // Load cart data
     const cartData = localStorage.getItem('cart');
     if (cartData) {
       try {
@@ -73,14 +78,12 @@ const Payment = () => {
       }
     }
     
-    // Load saved cards
     const savedCardsData = localStorage.getItem('savedCards');
     if (savedCardsData) {
       try {
         const parsedCards = JSON.parse(savedCardsData);
         setSavedCards(parsedCards);
         
-        // Set default card if available
         const defaultCard = parsedCards.find((card: SavedCard) => card.default);
         if (defaultCard) {
           setSelectedCard(defaultCard.id);
@@ -91,14 +94,12 @@ const Payment = () => {
       }
     }
     
-    // Load saved addresses
     const addressesData = localStorage.getItem('savedAddresses');
     if (addressesData) {
       try {
         const parsedAddresses = JSON.parse(addressesData);
         setSavedAddresses(parsedAddresses);
         
-        // Set default address if available
         if (parsedAddresses.length > 0) {
           setSelectedAddress(parsedAddresses[0]);
           setShowAddressForm(false);
@@ -108,12 +109,10 @@ const Payment = () => {
       }
     }
     
-    // Load discounts
     const discountsData = localStorage.getItem('discounts');
     if (discountsData) {
       try {
         const parsedDiscounts = JSON.parse(discountsData);
-        // Format discounts properly
         const formattedDiscounts: Record<string, number> = {};
         Object.entries(parsedDiscounts).forEach(([brand, data]) => {
           if (typeof data === 'object' && data !== null && 'value' in data && 'expiresAt' in data) {
@@ -144,7 +143,6 @@ const Payment = () => {
   const calculateItemTotal = (item: Product) => {
     const itemPrice = getDiscountedPrice(item);
     
-    // Add accessory prices if any
     let accessoriesPrice = 0;
     if (item.accessories) {
       accessoriesPrice = item.accessories
@@ -160,27 +158,49 @@ const Payment = () => {
   };
 
   const calculateTax = () => {
-    return calculateSubtotal() * 0.08; // 8% tax
+    return calculateSubtotal() * 0.08;
   };
 
   const calculateShipping = () => {
     const subtotal = calculateSubtotal();
-    return subtotal > 100 ? 0 : 10; // Free shipping over $100
+    return subtotal > 100 ? 0 : 10;
+  };
+
+  const getDeliveryFee = () => {
+    if (deliveryOption === 'normal') {
+      return 5;
+    } else if (deliveryOption === 'fast') {
+      return 15;
+    }
+    return 0;
+  };
+
+  const getEstimatedDeliveryTime = () => {
+    if (deliveryOption === 'normal') {
+      return '1-3 days';
+    } else if (deliveryOption === 'fast') {
+      return '45-90 minutes';
+    }
+    return '';
+  };
+
+  const calculateTradeDiscount = () => {
+    return tradeValue;
   };
 
   const calculateTotal = () => {
     const subtotal = calculateSubtotal();
     const tax = calculateTax();
     const shipping = calculateShipping();
+    const deliveryFee = paymentMethod === 'cash' ? getDeliveryFee() : 0;
     
-    // Apply coupon discount
-    const discount = couponDiscount / 100 * subtotal;
+    const couponDiscountAmount = couponDiscount / 100 * subtotal;
+    const tradeDiscount = paymentMethod === 'trade' ? calculateTradeDiscount() : 0;
     
-    return subtotal + tax + shipping - discount;
+    return subtotal + tax + shipping + deliveryFee - couponDiscountAmount - tradeDiscount;
   };
 
   const handleApplyCoupon = () => {
-    // Very simple coupon validation
     if (couponCode === 'SAVE10') {
       setAppliedCoupon(couponCode);
       setCouponDiscount(10);
@@ -227,40 +247,32 @@ const Payment = () => {
   };
 
   const formatCardNumber = (input: string) => {
-    // Remove non-digit characters
     const digits = input.replace(/\D/g, '');
-    
-    // Format with spaces every 4 digits
     let formatted = '';
     for (let i = 0; i < digits.length; i += 4) {
       formatted += digits.slice(i, i + 4) + ' ';
     }
-    
     return formatted.trim();
   };
 
   const formatExpiry = (input: string) => {
-    // Remove non-digit characters
     const digits = input.replace(/\D/g, '');
-    
-    // Format as MM/YY
     if (digits.length > 2) {
       return digits.slice(0, 2) + '/' + digits.slice(2, 4);
     } else if (digits.length > 0) {
       return digits;
     }
-    
     return '';
   };
 
   const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatCardNumber(e.target.value);
-    setCardNumber(formatted.substring(0, 19)); // Limit to 16 digits + 3 spaces
+    setCardNumber(formatted.substring(0, 19));
   };
 
   const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatExpiry(e.target.value);
-    setCardExpiry(formatted.substring(0, 5)); // Limit to MM/YY format
+    setCardExpiry(formatted.substring(0, 5));
   };
 
   const handleSubmitPayment = (e: React.FormEvent) => {
@@ -268,8 +280,7 @@ const Payment = () => {
     
     setProcessingPayment(true);
     
-    // If save card is enabled, save the card details
-    if (saveCard && showCardForm) {
+    if (paymentMethod === 'card' && saveCard && showCardForm) {
       const newCard: SavedCard = {
         id: Date.now().toString(),
         name: cardName,
@@ -280,7 +291,6 @@ const Payment = () => {
       
       const updatedCards = [...savedCards];
       
-      // If this is set as default, remove default from other cards
       if (isDefault) {
         updatedCards.forEach(card => card.default = false);
       }
@@ -288,9 +298,19 @@ const Payment = () => {
       updatedCards.push(newCard);
       setSavedCards(updatedCards);
       localStorage.setItem('savedCards', JSON.stringify(updatedCards));
+    } else if (paymentMethod === 'cash') {
+      localStorage.setItem('deliveryPreferences', JSON.stringify({
+        option: deliveryOption,
+        location: deliveryLocation
+      }));
+    } else if (paymentMethod === 'trade') {
+      localStorage.setItem('tradePreferences', JSON.stringify({
+        items: tradeItems,
+        value: tradeValue,
+        condition: tradeItemCondition
+      }));
     }
     
-    // Save address if needed
     if (showAddressForm) {
       const addressString = `${billingAddress.name}, ${billingAddress.street}, ${billingAddress.city}, ${billingAddress.state} ${billingAddress.zip}, ${billingAddress.country}`;
       
@@ -301,12 +321,8 @@ const Payment = () => {
       }
     }
     
-    // Simulate payment processing
     setTimeout(() => {
-      // Clear cart after successful payment
       localStorage.setItem('cart', JSON.stringify([]));
-      
-      // Redirect to thank you page
       navigate('/payment-success');
     }, 2000);
   };
@@ -325,7 +341,6 @@ const Payment = () => {
       
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="lg:w-7/12 space-y-6">
-          {/* Order summary on mobile */}
           <div className="lg:hidden mb-6">
             <div 
               className="bg-card p-4 rounded-lg border border-border flex justify-between items-center cursor-pointer"
@@ -389,9 +404,10 @@ const Payment = () => {
             <h2 className="text-xl font-semibold mb-6">Payment Method</h2>
             
             <Tabs defaultValue="card" onValueChange={setPaymentMethod} className="w-full">
-              <TabsList className="grid grid-cols-2 mb-6">
+              <TabsList className="grid grid-cols-3 mb-6">
                 <TabsTrigger value="card">Credit Card</TabsTrigger>
-                <TabsTrigger value="paypal">PayPal</TabsTrigger>
+                <TabsTrigger value="cash">Cash on Delivery</TabsTrigger>
+                <TabsTrigger value="trade">Item Trading</TabsTrigger>
               </TabsList>
               
               <TabsContent value="card" className="space-y-6">
@@ -509,11 +525,125 @@ const Payment = () => {
                 )}
               </TabsContent>
               
-              <TabsContent value="paypal" className="space-y-4">
-                <p className="text-muted-foreground mb-4">You will be redirected to PayPal to complete your payment.</p>
-                <Button className="w-full bg-[#0070ba] hover:bg-[#005ea6]">
-                  Continue with PayPal
-                </Button>
+              <TabsContent value="cash" className="space-y-4">
+                <p className="text-muted-foreground mb-4">Choose your delivery speed and provide your location details.</p>
+                
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="delivery-option">Delivery Option</Label>
+                    <RadioGroup 
+                      value={deliveryOption} 
+                      onValueChange={setDeliveryOption}
+                      className="flex flex-col space-y-2"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="normal" id="normal" />
+                        <Label htmlFor="normal" className="cursor-pointer">
+                          <div>
+                            <p className="font-medium">Normal Delivery (1-3 days)</p>
+                            <p className="text-sm text-muted-foreground">$5.00 delivery fee</p>
+                          </div>
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="fast" id="fast" />
+                        <Label htmlFor="fast" className="cursor-pointer">
+                          <div>
+                            <p className="font-medium">Fast Delivery (45-90 min)</p>
+                            <p className="text-sm text-muted-foreground">$15.00 delivery fee</p>
+                          </div>
+                        </Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="delivery-location">Delivery Notes</Label>
+                    <Input 
+                      id="delivery-location" 
+                      placeholder="Apartment number, access codes, or special instructions" 
+                      value={deliveryLocation}
+                      onChange={(e) => setDeliveryLocation(e.target.value)}
+                    />
+                  </div>
+                  
+                  <div className="mt-4 p-3 bg-muted rounded-lg">
+                    <p className="text-sm text-muted-foreground">
+                      <strong>Note:</strong> Payment will be collected upon delivery. Please have the exact amount ready.
+                      Minimum delivery time is 45 minutes for fast delivery option.
+                    </p>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="trade" className="space-y-4">
+                <p className="text-muted-foreground mb-4">Trade in your items for store credit to use with this purchase.</p>
+                
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="trade-items">Item Name(s) to Trade</Label>
+                    <Input 
+                      id="trade-items" 
+                      placeholder="PlayStation 4, iPhone 12, etc."
+                      value={tradeItems.join(', ')}
+                      onChange={(e) => setTradeItems(e.target.value.split(',').map(item => item.trim()))}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="trade-description">Item Description</Label>
+                    <Input 
+                      id="trade-description" 
+                      placeholder="Details about the items you're trading"
+                      value={tradeDescription}
+                      onChange={(e) => setTradeDescription(e.target.value)}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="trade-condition">Item Condition</Label>
+                    <RadioGroup 
+                      value={tradeItemCondition} 
+                      onValueChange={setTradeItemCondition}
+                      className="flex flex-col space-y-2"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="like-new" id="like-new" />
+                        <Label htmlFor="like-new">Like New</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="good" id="good" />
+                        <Label htmlFor="good">Good</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="fair" id="fair" />
+                        <Label htmlFor="fair">Fair</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="poor" id="poor" />
+                        <Label htmlFor="poor">Poor</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="trade-value">Estimated Trade Value ($)</Label>
+                    <Input 
+                      id="trade-value" 
+                      type="number"
+                      placeholder="0.00"
+                      value={tradeValue.toString()}
+                      onChange={(e) => setTradeValue(Number(e.target.value))}
+                    />
+                  </div>
+                  
+                  <div className="mt-4 p-3 bg-muted rounded-lg">
+                    <p className="text-sm text-muted-foreground">
+                      <strong>Note:</strong> After placing your order, you'll receive instructions for sending or dropping off your trade items. 
+                      Final trade value will be determined upon inspection.
+                    </p>
+                  </div>
+                </div>
               </TabsContent>
             </Tabs>
           </div>
@@ -672,7 +802,6 @@ const Payment = () => {
           </div>
         </div>
         
-        {/* Order summary (desktop) */}
         <div className="hidden lg:block lg:w-5/12">
           <div className="sticky top-20 p-6 bg-card rounded-lg border border-border">
             <h2 className="text-xl font-semibold mb-6">Order Summary</h2>

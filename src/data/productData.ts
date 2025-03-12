@@ -1,4 +1,3 @@
-
 export interface Product {
   id: number;
   name: string;
@@ -35,9 +34,9 @@ export const products: Product[] = [
     rating: 4.8,
     reviews: 235,
     accessories: [
-      { id: '1', name: 'AirPods Pro', price: 249, category: 'Headphones' },
-      { id: '2', name: 'Leather Case', price: 59, category: 'Cases' },
-      { id: '3', name: '20W USB-C Power Adapter', price: 19, category: 'Chargers' }
+      { id: '1', name: 'AirPods Pro', price: 249, category: 'Headphones', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
+      { id: '2', name: 'Leather Case', price: 59, category: 'Cases', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
+      { id: '3', name: '20W USB-C Power Adapter', price: 19, category: 'Chargers', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
     ]
   },
   {
@@ -51,9 +50,9 @@ export const products: Product[] = [
     rating: 4.7,
     reviews: 198,
     accessories: [
-      { id: '4', name: 'Galaxy Buds Pro', price: 199, category: 'Headphones' },
-      { id: '5', name: 'Silicone Cover', price: 29, category: 'Cases' },
-      { id: '6', name: '25W Travel Adapter', price: 24, category: 'Chargers' }
+      { id: '4', name: 'Galaxy Buds Pro', price: 199, category: 'Headphones', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
+      { id: '5', name: 'Silicone Cover', price: 29, category: 'Cases', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
+      { id: '6', name: '25W Travel Adapter', price: 24, category: 'Chargers', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
     ]
   },
   {
@@ -67,8 +66,8 @@ export const products: Product[] = [
     rating: 4.9,
     reviews: 312,
     accessories: [
-      { id: '7', name: 'DualSense Controller', price: 69, category: 'Controllers' },
-      { id: '8', name: 'Pulse 3D Wireless Headset', price: 99, category: 'Headphones' }
+      { id: '7', name: 'DualSense Controller', price: 69, category: 'Controllers', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
+      { id: '8', name: 'Pulse 3D Wireless Headset', price: 99, category: 'Headphones', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
     ]
   },
   {
@@ -82,8 +81,8 @@ export const products: Product[] = [
     rating: 4.8,
     reviews: 287,
     accessories: [
-      { id: '9', name: 'Xbox Wireless Controller', price: 59, category: 'Controllers' },
-      { id: '10', name: 'Xbox Wireless Headset', price: 99, category: 'Headphones' }
+      { id: '9', name: 'Xbox Wireless Controller', price: 59, category: 'Controllers', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
+      { id: '10', name: 'Xbox Wireless Headset', price: 99, category: 'Headphones', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
     ]
   },
   {
@@ -97,8 +96,8 @@ export const products: Product[] = [
     rating: 4.9,
     reviews: 265,
     accessories: [
-      { id: '11', name: 'Magic Mouse', price: 99, category: 'Accessories' },
-      { id: '12', name: 'USB-C to USB Adapter', price: 19, category: 'Adapters' }
+      { id: '11', name: 'Magic Mouse', price: 99, category: 'Accessories', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
+      { id: '12', name: 'USB-C to USB Adapter', price: 19, category: 'Adapters', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
     ]
   },
   {
@@ -145,8 +144,8 @@ export const products: Product[] = [
     rating: 4.9,
     reviews: 293,
     accessories: [
-      { id: '13', name: 'Apple Pencil (2nd generation)', price: 129, category: 'Accessories' },
-      { id: '14', name: 'Smart Keyboard Folio', price: 179, category: 'Accessories' }
+      { id: '13', name: 'Apple Pencil (2nd generation)', price: 129, category: 'Accessories', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
+      { id: '14', name: 'Smart Keyboard Folio', price: 179, category: 'Accessories', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
     ]
   },
   {
@@ -160,7 +159,7 @@ export const products: Product[] = [
     rating: 4.8,
     reviews: 245,
     accessories: [
-      { id: '15', name: 'Book Cover Keyboard', price: 149, category: 'Accessories' }
+      { id: '15', name: 'Book Cover Keyboard', price: 149, category: 'Accessories', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
     ]
   },
   {
@@ -216,7 +215,11 @@ export const products: Product[] = [
     brand: 'PC Games',
     category: 'Games',
     rating: 4.9,
-    reviews: 420
+    reviews: 420,
+    accessories: [
+      { id: '40', name: 'Digital Art Book', price: 9.99, category: 'Digital Content', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
+      { id: '41', name: 'Season Pass', price: 29.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
+    ]
   },
   {
     id: 16,
@@ -227,7 +230,11 @@ export const products: Product[] = [
     brand: 'PlayStation',
     category: 'Games',
     rating: 4.8,
-    reviews: 350
+    reviews: 350,
+    accessories: [
+      { id: '42', name: 'Digital Soundtrack', price: 14.99, category: 'Digital Content', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
+      { id: '43', name: 'Digital Deluxe Upgrade', price: 19.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
+    ]
   },
   {
     id: 17,
@@ -238,7 +245,11 @@ export const products: Product[] = [
     brand: 'PlayStation',
     category: 'Games',
     rating: 4.7,
-    reviews: 300
+    reviews: 300,
+    accessories: [
+      { id: '44', name: 'Digital Soundtrack', price: 9.99, category: 'Digital Content', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
+      { id: '45', name: 'Concept Art Book', price: 14.99, category: 'Digital Content', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
+    ]
   },
   {
     id: 18,
@@ -249,7 +260,11 @@ export const products: Product[] = [
     brand: 'PC Games',
     category: 'Games',
     rating: 4.6,
-    reviews: 280
+    reviews: 280,
+    accessories: [
+      { id: '46', name: 'Expansion Pass', price: 29.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
+      { id: '47', name: 'Digital Art Book', price: 9.99, category: 'Digital Content', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
+    ]
   },
   {
     id: 19,
@@ -260,7 +275,11 @@ export const products: Product[] = [
     brand: 'PC Games',
     category: 'Games',
     rating: 4.5,
-    reviews: 250
+    reviews: 250,
+    accessories: [
+      { id: '48', name: 'Digital Deluxe Content', price: 9.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
+      { id: '49', name: 'Original Score', price: 14.99, category: 'Digital Content', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
+    ]
   },
   {
     id: 20,
@@ -271,6 +290,124 @@ export const products: Product[] = [
     brand: 'PlayStation',
     category: 'Games',
     rating: 4.8,
-    reviews: 320
+    reviews: 320,
+    accessories: [
+      { id: '50', name: 'Director\'s Cut Upgrade', price: 19.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
+      { id: '51', name: 'Digital Mini Art Book', price: 4.99, category: 'Digital Content', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
+    ]
+  },
+  
+  {
+    id: 21,
+    name: 'Google Pixel 7 Pro',
+    description: 'The most advanced Pixel phone yet with the best camera and a powerful Tensor G2 processor.',
+    price: 899,
+    imageUrl: '/lovable-uploads/google-pixel-6-pro.jpg',
+    brand: 'Google',
+    category: 'Smartphones',
+    rating: 4.7,
+    reviews: 189,
+    accessories: [
+      { id: '52', name: 'Pixel Stand', price: 79, category: 'Chargers', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
+      { id: '53', name: 'Pixel Buds Pro', price: 199, category: 'Headphones', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
+    ]
+  },
+  
+  {
+    id: 22,
+    name: 'iPhone 14',
+    description: 'The latest iPhone with advanced camera features and powerful A16 chip.',
+    price: 799,
+    imageUrl: '/lovable-uploads/iphone-13-pro-max.jpg',
+    brand: 'Apple',
+    category: 'Smartphones',
+    rating: 4.8,
+    reviews: 210,
+    discount: 10,
+    accessories: [
+      { id: '54', name: 'MagSafe Charger', price: 39, category: 'Chargers', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
+      { id: '55', name: 'Silicone Case', price: 49, category: 'Cases', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
+    ]
+  },
+  
+  {
+    id: 23,
+    name: 'Xbox Series X',
+    description: 'The most powerful Xbox ever with 4K gaming at up to 120 FPS.',
+    price: 499,
+    imageUrl: '/lovable-uploads/microsoft-xbox-series-x.jpg',
+    brand: 'Microsoft',
+    category: 'Gaming Consoles',
+    rating: 4.8,
+    reviews: 275,
+    accessories: [
+      { id: '56', name: 'Xbox Wireless Controller', price: 59, category: 'Controllers', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
+      { id: '57', name: 'Play & Charge Kit', price: 24.99, category: 'Accessories', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
+    ]
+  },
+  
+  {
+    id: 24,
+    name: 'Dell XPS 15',
+    description: 'Premium laptop with InfinityEdge display and powerful performance.',
+    price: 1499,
+    imageUrl: '/lovable-uploads/apple-macbook-pro-16.jpg',
+    brand: 'Dell',
+    category: 'Laptops',
+    rating: 4.7,
+    reviews: 198,
+    accessories: [
+      { id: '58', name: 'USB-C Dock', price: 199, category: 'Accessories', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
+      { id: '59', name: 'Laptop Backpack', price: 69, category: 'Accessories', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
+    ]
+  },
+  
+  {
+    id: 25,
+    name: 'Apple AirPods Max',
+    description: 'High-fidelity audio with Active Noise Cancellation and Transparency mode.',
+    price: 549,
+    imageUrl: '/lovable-uploads/sony-wh-1000xm4-headphones.jpg',
+    brand: 'Apple',
+    category: 'Headphones',
+    rating: 4.8,
+    reviews: 156,
+    discount: 15,
+    accessories: [
+      { id: '60', name: 'AirPods Max Smart Case', price: 59, category: 'Cases', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
+      { id: '61', name: 'AppleCare+ for Headphones', price: 29, category: 'Services', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
+    ]
+  },
+  
+  {
+    id: 26,
+    name: 'God of War Ragnarök',
+    description: 'Embark on an epic journey as Kratos and Atreus in the Nordic realm.',
+    price: 69.99,
+    imageUrl: '/lovable-uploads/ghost-of-tsushima.jpg',
+    brand: 'PlayStation',
+    category: 'Games',
+    rating: 4.9,
+    reviews: 340,
+    accessories: [
+      { id: '62', name: 'Digital Soundtrack', price: 9.99, category: 'Digital Content', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
+      { id: '63', name: 'Art Book', price: 19.99, category: 'Digital Content', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
+    ]
+  },
+  
+  {
+    id: 27,
+    name: 'Logitech G Pro X Keyboard',
+    description: 'Compact tenkeyless design with pro-grade switches for gaming.',
+    price: 149.99,
+    imageUrl: '/lovable-uploads/razer-blackwidow-v3-keyboard.jpg',
+    brand: 'Accessories',
+    category: 'PC Accessories',
+    rating: 4.7,
+    reviews: 187,
+    accessories: [
+      { id: '64', name: 'Wrist Rest', price: 19.99, category: 'Accessories', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
+      { id: '65', name: 'Keycap Set', price: 29.99, category: 'Accessories', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
+    ]
   }
 ];

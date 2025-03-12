@@ -128,7 +128,12 @@ const Products = () => {
     };
     setDiscounts(newDiscounts);
     localStorage.setItem('discounts', JSON.stringify(newDiscounts));
-    setShowSpinWheel(false);
+  };
+
+  const handleSpin = () => {
+    // This function would trigger the wheel to spin
+    console.log("Spinning the wheel");
+    // Wheel spinning logic would be in the SpinWheel component
   };
 
   const toggleChat = () => {
@@ -166,7 +171,7 @@ const Products = () => {
       <div className="mb-6 flex justify-center">
         <button
           onClick={() => setShowSpinWheel(!showSpinWheel)}
-          className="px-4 py-2 bg-[#0a4d68] text-white rounded-md hover:bg-[#085e80] transition-colors"
+          className="px-4 py-2 bg-card text-foreground rounded-md border border-border hover:bg-accent transition-colors"
         >
           {showSpinWheel ? 'Hide Spin Wheel' : 'Try Your Luck with Daily Spin!'}
         </button>
@@ -176,7 +181,8 @@ const Products = () => {
         <div className="mb-8 text-center">
           <SpinWheel onWin={handleSpinWin} />
           <button
-            className="mt-4 px-4 py-2 bg-[#0a4d68] text-white rounded-md font-medium hover:bg-[#085e80] transition-colors"
+            onClick={handleSpin}
+            className="mt-4 px-4 py-2 bg-[#555] text-white rounded-md font-medium hover:bg-[#444] transition-colors"
           >
             Spin
           </button>
@@ -221,6 +227,7 @@ const Products = () => {
             products={filteredProducts}
             onQuantityChange={handleQuantityChange}
             discounts={discounts}
+            showWishlistButton={false}
           />
         </div>
       </div>

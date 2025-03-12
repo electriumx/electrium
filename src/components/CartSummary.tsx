@@ -149,12 +149,21 @@ const CartSummary = ({ cart }: CartSummaryProps) => {
               </div>
             </div>
             
-            <Button 
-              className="w-full"
-              onClick={handleCheckout}
-            >
-              Proceed to Checkout
-            </Button>
+            <div className="flex space-x-2">
+              <Button 
+                className="w-full"
+                onClick={handleCheckout}
+              >
+                Proceed to Checkout
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={clearCart}
+              >
+                Clear All Items
+              </Button>
+            </div>
           </div>
         </div>
       </div>
