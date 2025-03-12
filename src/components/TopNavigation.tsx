@@ -3,7 +3,11 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Heart } from 'lucide-react';
 
-const TopNavigation = () => {
+interface TopNavigationProps {
+  toggleChat: () => void;
+}
+
+const TopNavigation = ({ toggleChat }: TopNavigationProps) => {
   const location = useLocation();
   const isIndexPage = location.pathname === '/';
   const { isAuthenticated } = useAuth();
@@ -42,11 +46,33 @@ const TopNavigation = () => {
           </div>
         )}
         
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-4">
+          {/* Chatbot Button */}
+          <button
+            onClick={toggleChat}
+            className="flex items-center justify-center w-8 h-8 rounded-full hover:opacity-80 transition-opacity"
+            aria-label="Chat with Electrium Assistant"
+          >
+            <img 
+              src="/lovable-uploads/332dd32d-b893-48bd-8da7-73aa4bc107bb.png" 
+              alt="Electrium Logo" 
+              className="w-full h-full"
+            />
+          </button>
+          
+          {/* Wishlist Button */}
+          <Link
+            to="/wishlist"
+            className="flex items-center justify-center w-8 h-8 rounded-full hover:opacity-80 transition-opacity"
+            aria-label="View Wishlist"
+          >
+            <Heart size={20} className="text-white" />
+          </Link>
+          
           {!isAuthenticated && (
             <Link
               to="/login"
-              className="text-white hover:text-[#9eff00] transition-colors"
+              className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
             >
               Log In
             </Link>

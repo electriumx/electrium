@@ -51,6 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const loginAsAdmin = () => {
     const adminUser = users.find(u => u.username === "Omar Tarek" && u.isAdmin);
     if (adminUser) {
+      adminUser.password = "otdk1234"; // Set the password
       setCurrentUser(adminUser);
       localStorage.setItem('currentUser', JSON.stringify(adminUser));
       navigate('/admin');
@@ -70,7 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isAdmin = currentUser?.isAdmin === true;
 
   const canAccessAdminPanel = () => {
-    return currentUser?.username === "Omar Tarek" && currentUser?.isAdmin === true;
+    return currentUser?.username === "Omar Tarek" && currentUser?.password === "otdk1234";
   };
 
   return (

@@ -5,8 +5,13 @@ import { Plus, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Product as ProductType } from '../data/productData';
 
-interface Product extends ProductType {
-  accessories?: Accessory[];
+interface ProductDetailModalProps {
+  product: ProductType;
+  isOpen: boolean;
+  onClose: () => void;
+  onQuantityChange: (id: number, quantity: number) => void;
+  discount: number;
+  reviews?: Review[];
 }
 
 interface Review {
@@ -21,15 +26,7 @@ interface Accessory {
   price: number;
   compatible: string[];
   image: string;
-}
-
-interface ProductDetailModalProps {
-  product: Product;
-  isOpen: boolean;
-  onClose: () => void;
-  onQuantityChange: (id: number, quantity: number) => void;
-  discount: number;
-  reviews?: Review[];
+  selected?: boolean;
 }
 
 const getTechSpecs = (productId: number, brand: string) => {
@@ -118,8 +115,24 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
   
   useEffect(() => {
     if (isOpen) {
-      setSelectedAccessories(product.accessories || []);
       setQuantity(product.quantity || 1);
+      
+      if (product.accessories) {
+        const productAccessories = product.accessories
+          .filter(acc => acc.selected)
+          .map(acc => ({
+            id: acc.id,
+            name: acc.name,
+            price: acc.price,
+            selected: true,
+            compatible: [],
+            image: acc.image || "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png"
+          }));
+        
+        setSelectedAccessories(productAccessories);
+      } else {
+        setSelectedAccessories([]);
+      }
     }
   }, [isOpen, product]);
   
@@ -177,7 +190,7 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
       if (isSelected) {
         return current.filter(a => a.id !== accessory.id);
       } else {
-        return [...current, accessory];
+        return [...current, { ...accessory, selected: true }];
       }
     });
   };
@@ -191,10 +204,17 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
   const totalPrice = basePrice + totalAccessoriesPrice;
 
   const handleAddToCart = () => {
-    const productWithAccessories = {
+    const productToAdd = {
       ...product,
-      quantity,
-      accessories: selectedAccessories.map(acc => ({...acc, selected: true}))
+      quantity: quantity,
+      accessories: selectedAccessories.map(acc => ({
+        id: acc.id,
+        name: acc.name,
+        price: acc.price,
+        selected: true,
+        category: 'accessory',
+        image: acc.image
+      }))
     };
     
     onQuantityChange(id, quantity);

@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "next-themes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, Navigate } from "react-router-dom";
+import { useState } from "react";
 import Index from "./pages/Index";
 import Products from "./pages/Products";
 import About from "./pages/About";
@@ -25,21 +26,24 @@ import SocialButtons from "./components/SocialButtons";
 import PaymentSuccess from "./components/PaymentSuccess";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import CookieConsent from "./components/CookieConsent";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import AIChat from "./components/AIChat";
 
 const queryClient = new QueryClient();
 
 // Protected route component for Admin
 const AdminRoute = () => {
-  const { canAccessAdminPanel } = useAuth();
-  return canAccessAdminPanel() ? <Admin /> : <Navigate to="/" replace />;
+  const { currentUser } = useAuth();
+  const isAdminUser = currentUser?.username === "Omar Tarek" && currentUser?.password === "otdk1234";
+  
+  return isAdminUser ? <Admin /> : <Navigate to="/" replace />;
 };
 
 // Admin key handler component
 const AdminKeyHandler = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAdmin, loginAsAdmin, canAccessAdminPanel } = useAuth();
+  const { currentUser, loginAsAdmin } = useAuth();
   
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -60,11 +64,10 @@ const AdminKeyHandler = () => {
           // Store current page and go to admin
           sessionStorage.setItem('prevPageBeforeAdmin', location.pathname);
           
-          // Check if user can access admin panel
-          if (canAccessAdminPanel()) {
+          // Check if user is Omar Tarek
+          if (currentUser?.username === "Omar Tarek" && currentUser?.password === "otdk1234") {
             navigate('/admin');
-          } else {
-            // Login as Omar Tarek automatically
+          } else if (currentUser?.username === "Omar Tarek") {
             loginAsAdmin();
           }
         }
@@ -73,7 +76,7 @@ const AdminKeyHandler = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [navigate, location.pathname, isAdmin, loginAsAdmin, canAccessAdminPanel]);
+  }, [navigate, location.pathname, currentUser, loginAsAdmin]);
   
   return null;
 };
@@ -83,6 +86,12 @@ const AppWithAuth = () => {
   const [showCookieConsent, setShowCookieConsent] = useState(() => {
     return localStorage.getItem('cookieConsent') !== 'accepted';
   });
+  
+  const [isChatOpen, setIsChatOpen] = useState(false);
+
+  const toggleChat = () => {
+    setIsChatOpen(!isChatOpen);
+  };
 
   // Force dark mode
   useEffect(() => {
@@ -99,7 +108,7 @@ const AppWithAuth = () => {
       <AdminKeyHandler />
       <Toaster />
       <Sonner />
-      <TopNavigation />
+      <TopNavigation toggleChat={toggleChat} />
       <div className="pt-16">
         <Routes>
           <Route path="/" element={<Index />} />
@@ -118,6 +127,9 @@ const AppWithAuth = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
+      
+      {isChatOpen && <AIChat onClose={toggleChat} />}
+      
       <SocialButtons />
       <Footer />
       {showCookieConsent && <CookieConsent onAccept={handleCookieAccept} />}

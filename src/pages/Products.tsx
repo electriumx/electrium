@@ -225,7 +225,7 @@ const Products = () => {
         </div>
       </div>
       
-      {/* Removed CartSummary component */}
+      <CartSummary cart={cart} />
       
       <FloatingActions 
         showCheckout={true}

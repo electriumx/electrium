@@ -13,28 +13,6 @@ const FloatingActions = ({ showCheckout = true, cartItemCount = 0, toggleChat }:
 
   return (
     <div className="fixed bottom-6 right-6 flex flex-col items-end gap-4 z-40">
-      {/* Chatbot Button */}
-      <button
-        onClick={toggleChat}
-        className="flex items-center justify-center w-10 h-10 rounded-full hover:scale-105 transition-transform"
-        aria-label="Chat with Electrium Assistant"
-      >
-        <img 
-          src="/lovable-uploads/332dd32d-b893-48bd-8da7-73aa4bc107bb.png" 
-          alt="Electrium Logo" 
-          className="w-full h-full"
-        />
-      </button>
-      
-      {/* Wishlist Button */}
-      <button
-        onClick={() => navigate('/wishlist')}
-        className="flex items-center justify-center w-10 h-10 rounded-full bg-card shadow-md hover:scale-105 transition-transform"
-        aria-label="View Wishlist"
-      >
-        <Heart size={20} className="text-white" />
-      </button>
-      
       {/* Checkout Button (conditional) */}
       {showCheckout && cartItemCount > 0 && (
         <button
