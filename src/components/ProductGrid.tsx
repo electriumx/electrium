@@ -1,76 +1,162 @@
 
-import ProductCard from './ProductCard';
+import React, { useState, useEffect } from 'react';
 import { Product } from '../data/productData';
-import { useEffect, useState } from 'react';
+import { useToast } from '@/components/ui/use-toast';
+import ProductDetailModal from './ProductDetailModal';
 
 interface ProductGridProps {
   products: Product[];
   onQuantityChange: (id: number, quantity: number) => void;
-  discounts?: Record<string, { value: number, expiresAt: number }>; // Updated discounts format
+  discounts: Record<string, { value: number, expiresAt: number }>;
+  showWishlistButton?: boolean;
 }
 
-const ProductGrid = ({ products, onQuantityChange, discounts = {} }: ProductGridProps) => {
-  const [activeDiscounts, setActiveDiscounts] = useState<Record<string, number>>({});
-  
-  // Check for expired discounts
-  useEffect(() => {
-    const currentTime = Date.now();
-    const validDiscounts: Record<string, number> = {};
-    
-    Object.entries(discounts).forEach(([brand, discountInfo]) => {
-      if (discountInfo.expiresAt > currentTime && discountInfo.value > 0) {
-        validDiscounts[brand] = discountInfo.value;
-      }
-    });
-    
-    setActiveDiscounts(validDiscounts);
-  }, [discounts]);
+const ProductGrid = ({ 
+  products, 
+  onQuantityChange, 
+  discounts,
+  showWishlistButton = true 
+}: ProductGridProps) => {
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [wishlist, setWishlist] = useState<number[]>([]);
+  const { toast } = useToast();
 
-  // Calculate the discounted price for each product
-  const getDiscountedPrice = (product: Product) => {
-    const discount = activeDiscounts[product.brand] || activeDiscounts['All'] || 0;
-    if (discount === 0) return product.price;
-    
-    return product.price * (1 - discount / 100);
+  useEffect(() => {
+    // Load wishlist from localStorage
+    const savedWishlist = localStorage.getItem('wishlist');
+    if (savedWishlist) {
+      try {
+        const wishlistItems = JSON.parse(savedWishlist);
+        setWishlist(wishlistItems.map((item: Product) => item.id));
+      } catch (error) {
+        console.error('Error parsing wishlist:', error);
+      }
+    }
+  }, []);
+
+  const handleProductClick = (product: Product) => {
+    setSelectedProduct(product);
+    setIsDetailModalOpen(true);
   };
 
-  // If no products, show a message
-  if (products.length === 0) {
-    return (
-      <div className="py-10 text-center">
-        <p className="text-lg text-muted-foreground">
-          No products found matching your criteria.
-        </p>
-        <p className="text-muted-foreground mt-2">
-          Try adjusting your filters or search terms.
-        </p>
-      </div>
-    );
-  }
+  const closeModal = () => {
+    setIsDetailModalOpen(false);
+  };
+
+  const getProductPrice = (product: Product) => {
+    let price = product.price;
+    
+    // Add accessory prices if any
+    if (product.accessories) {
+      price += product.accessories
+        .filter(acc => acc.selected)
+        .reduce((sum, acc) => sum + acc.price, 0);
+    }
+    
+    // Apply discount if available
+    const brandDiscount = discounts[product.brand];
+    const allDiscount = discounts['All'];
+    
+    if (brandDiscount && brandDiscount.expiresAt > Date.now() && brandDiscount.value > 0) {
+      price = price * (1 - brandDiscount.value / 100);
+    } else if (allDiscount && allDiscount.expiresAt > Date.now() && allDiscount.value > 0) {
+      price = price * (1 - allDiscount.value / 100);
+    }
+    
+    return price;
+  };
+
+  // Calculate discount percentage for a product
+  const getDiscountPercentage = (product: Product) => {
+    // Product-specific discount
+    if (product.discount && product.discount > 0) {
+      return product.discount;
+    }
+    
+    // Brand-specific discount from discount wheel
+    if (discounts[product.brand]?.expiresAt > Date.now() && discounts[product.brand]?.value > 0) {
+      return discounts[product.brand].value;
+    }
+    
+    // Global discount from discount wheel
+    if (discounts['All']?.expiresAt > Date.now() && discounts['All']?.value > 0) {
+      return discounts['All'].value;
+    }
+    
+    return 0;
+  };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-      {products.map(product => {
-        const discount = activeDiscounts[product.brand] || activeDiscounts['All'] || 0;
-        const discountedPrice = getDiscountedPrice(product);
-        
-        // Skip showing 0% discounts
-        const effectiveDiscount = discount > 0 ? discount : 0;
-        
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {products.map((product) => {
+        const discountPercentage = getDiscountPercentage(product);
+        const hasDiscount = discountPercentage > 0;
+
         return (
-          <ProductCard
+          <div 
             key={product.id}
-            id={product.id}
-            name={product.name}
-            price={product.price}
-            image={product.image}
-            brand={product.brand}
-            discount={effectiveDiscount}
-            discountedPrice={discountedPrice}
-            onQuantityChange={onQuantityChange}
-          />
+            onClick={() => handleProductClick(product)}
+            className="bg-card rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+          >
+            <div className="relative">
+              <img 
+                src={product.imageUrl} 
+                alt={product.name} 
+                className="product-image"
+              />
+              {hasDiscount && (
+                <div className="absolute top-2 right-2 bg-destructive text-white text-xs font-bold px-2 py-1 rounded">
+                  {discountPercentage}% OFF
+                </div>
+              )}
+            </div>
+            <div className="p-4">
+              <h3 className="text-lg font-semibold mb-1 line-clamp-1">{product.name}</h3>
+              <div className="flex justify-between items-center mb-3">
+                <div className="flex items-center">
+                  <span className={`font-bold text-lg ${hasDiscount ? 'text-destructive' : ''}`}>
+                    ${getProductPrice(product).toFixed(2)}
+                  </span>
+                  {hasDiscount && (
+                    <span className="text-muted-foreground line-through text-sm ml-2">
+                      ${product.price.toFixed(2)}
+                    </span>
+                  )}
+                </div>
+                <span className="text-sm text-muted-foreground">
+                  {product.brand}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-muted-foreground">
+                  Click for details
+                </div>
+                <div className="text-sm px-2 py-1 bg-muted rounded-md">
+                  Qty: {product.quantity || 0}
+                </div>
+              </div>
+            </div>
+          </div>
         );
       })}
+      
+      {selectedProduct && (
+        <ProductDetailModal
+          product={selectedProduct}
+          isOpen={isDetailModalOpen}
+          onClose={closeModal}
+          onQuantityChange={onQuantityChange}
+          discount={getDiscountPercentage(selectedProduct)}
+        />
+      )}
+      
+      {products.length === 0 && (
+        <div className="col-span-full py-12 text-center">
+          <h3 className="text-xl font-semibold mb-2">No products found</h3>
+          <p className="text-muted-foreground">Try adjusting your filters or search query.</p>
+        </div>
+      )}
     </div>
   );
 };
