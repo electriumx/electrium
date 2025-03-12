@@ -63,35 +63,77 @@ const AIChat: React.FC<AIChatProps> = ({ onClose }) => {
   const generateResponse = (userInput: string) => {
     const input = userInput.toLowerCase();
     
-    // Check for product information requests
+    // Handle specific product price inquiries
+    const productKeywords = ['how much', 'price', 'cost', 'pricing'];
+    const hasProductPriceQuestion = productKeywords.some(keyword => input.includes(keyword));
+    
+    if (hasProductPriceQuestion) {
+      // Look for product names in the query
+      const productMatch = products.find(product => 
+        input.includes(product.name.toLowerCase()) || 
+        (product.brand.toLowerCase() + ' ' + product.name.toLowerCase()).includes(input)
+      );
+      
+      if (productMatch) {
+        return `The ${productMatch.name} from ${productMatch.brand} costs $${productMatch.price.toFixed(2)}. Would you like more information about this product?`;
+      }
+      
+      // Check for brand inquiries
+      const brandMatches = products.filter(product => 
+        input.includes(product.brand.toLowerCase())
+      );
+      
+      if (brandMatches.length > 0) {
+        const brandName = brandMatches[0].brand;
+        const cheapestProduct = [...brandMatches].sort((a, b) => a.price - b.price)[0];
+        const expensiveProduct = [...brandMatches].sort((a, b) => b.price - a.price)[0];
+        
+        return `${brandName} products range from $${cheapestProduct.price.toFixed(2)} for the ${cheapestProduct.name} to $${expensiveProduct.price.toFixed(2)} for the ${expensiveProduct.name}. What specific ${brandName} product are you interested in?`;
+      }
+    }
+    
+    // Check for product information requests by brand
     if (input.includes('iphone') || input.includes('apple')) {
       const appleProducts = products.filter(p => p.brand === 'Apple');
-      const randomProduct = appleProducts[Math.floor(Math.random() * appleProducts.length)];
-      return `We have several Apple products including the ${randomProduct.name} priced at $${randomProduct.price.toFixed(2)}. Would you like more information on Apple products?`;
+      if (appleProducts.length === 0) return "I'm sorry, we don't have any Apple products in stock at the moment.";
+      
+      const productNames = appleProducts.map(p => `${p.name} ($${p.price.toFixed(2)})`).join(', ');
+      return `We have several Apple products including: ${productNames}. Would you like more information on any specific Apple product?`;
     }
     
     if (input.includes('samsung') || input.includes('galaxy')) {
       const samsungProducts = products.filter(p => p.brand === 'Samsung');
-      const randomProduct = samsungProducts[Math.floor(Math.random() * samsungProducts.length)];
-      return `We have several Samsung products including the ${randomProduct.name} priced at $${randomProduct.price.toFixed(2)}. Would you like more information on Samsung products?`;
+      if (samsungProducts.length === 0) return "I'm sorry, we don't have any Samsung products in stock at the moment.";
+      
+      const productNames = samsungProducts.map(p => `${p.name} ($${p.price.toFixed(2)})`).join(', ');
+      return `We have several Samsung products including: ${productNames}. Would you like more information on any specific Samsung product?`;
     }
     
     if (input.includes('playstation') || input.includes('ps5') || input.includes('ps4') || input.includes('sony')) {
       const playstationProducts = products.filter(p => p.brand === 'PlayStation' || p.brand === 'Sony');
-      const randomProduct = playstationProducts[Math.floor(Math.random() * playstationProducts.length)];
-      return `We have several PlayStation products including the ${randomProduct.name} priced at $${randomProduct.price.toFixed(2)}. Would you like more information on PlayStation products?`;
+      if (playstationProducts.length === 0) return "I'm sorry, we don't have any PlayStation or Sony products in stock at the moment.";
+      
+      const productNames = playstationProducts.map(p => `${p.name} ($${p.price.toFixed(2)})`).join(', ');
+      return `We have several PlayStation/Sony products including: ${productNames}. Would you like more information on any specific PlayStation product?`;
     }
     
     if (input.includes('game') || input.includes('gaming') || input.includes('play')) {
       const gameProducts = products.filter(p => p.brand === 'PlayStation' || p.brand === 'PC Games');
-      const randomProduct = gameProducts[Math.floor(Math.random() * gameProducts.length)];
-      return `We have several gaming products including ${randomProduct.name} priced at $${randomProduct.price.toFixed(2)}. We have games for PlayStation and PC!`;
+      if (gameProducts.length === 0) return "I'm sorry, we don't have any gaming products in stock at the moment.";
+      
+      const productNames = gameProducts.map(p => `${p.name} ($${p.price.toFixed(2)})`).join(', ');
+      return `We have several gaming products including: ${productNames}. We have games for PlayStation and PC!`;
     }
     
-    if (input.includes('price') || input.includes('cost') || input.includes('expensive') || input.includes('cheap')) {
-      const cheapestProduct = [...products].sort((a, b) => a.price - b.price)[0];
-      const expensiveProduct = [...products].sort((a, b) => b.price - a.price)[0];
-      return `Our products range from $${cheapestProduct.price.toFixed(2)} for the ${cheapestProduct.name} to $${expensiveProduct.price.toFixed(2)} for the ${expensiveProduct.name}. Do you have a specific budget in mind?`;
+    if (input.includes('accessory') || input.includes('accessories') || input.includes('headphone') || input.includes('case') || input.includes('charger')) {
+      const categories = ['Headphones', 'Cases', 'Chargers', 'Screen Protectors', 'Cables', 'Memory Cards'];
+      const categoryMatch = categories.find(cat => input.includes(cat.toLowerCase()));
+      
+      if (categoryMatch) {
+        return `We offer various ${categoryMatch} that can be added to compatible products. You can select them when viewing product details. Would you like to browse our products to see compatible ${categoryMatch}?`;
+      }
+      
+      return `We offer various accessories including Headphones, Cases, Chargers, Screen Protectors, Cables, and Memory Cards. These can be added to compatible products during checkout. Which accessories are you interested in?`;
     }
     
     if (input.includes('discount') || input.includes('sale') || input.includes('deal')) {
@@ -107,11 +149,15 @@ const AIChat: React.FC<AIChatProps> = ({ onClose }) => {
     }
     
     if (input.includes('login') || input.includes('account') || input.includes('sign')) {
-      return `You can create an account or log in by clicking the "Log In" button in the top right corner of the page. Having an account allows you to track orders, save favorites, and access exclusive deals!`;
+      return `You can create an account or log in by clicking the "Log In" link in the top right corner of the page. Having an account allows you to track orders, save favorites, and access exclusive deals!`;
     }
     
     if (input.includes('payment') || input.includes('pay') || input.includes('credit card')) {
       return `We accept all major credit cards, PayPal, and Apple Pay. All payment information is securely processed.`;
+    }
+    
+    if (input.includes('wishlist') || input.includes('save for later') || input.includes('favorite')) {
+      return `You can add products to your wishlist by clicking the heart icon on any product card. Your wishlist is saved and you can access it anytime from the Wishlist link in the navigation bar.`;
     }
     
     if (input.includes('hello') || input.includes('hi') || input.includes('hey')) {
@@ -127,7 +173,7 @@ const AIChat: React.FC<AIChatProps> = ({ onClose }) => {
     }
     
     // Default response
-    return "I'm not sure I understand. Could you please rephrase your question? You can ask me about our products, discounts, shipping, returns, or account information.";
+    return "I'm not sure I understand. Could you please rephrase your question? You can ask me about our products, their prices, discounts, shipping, returns, or account information.";
   };
 
   return (
@@ -146,7 +192,7 @@ const AIChat: React.FC<AIChatProps> = ({ onClose }) => {
         {messages.map(message => (
           <div 
             key={message.id} 
-            className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+            className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} chat-bubble-animate`}
           >
             <div 
               className={`max-w-[80%] p-2 rounded-lg ${

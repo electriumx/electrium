@@ -1,156 +1,146 @@
-import { useState, useEffect } from 'react';
-import { Plus, Minus } from 'lucide-react';
-import ProductDetailModal from './ProductDetailModal';
-import ProductReviewModal from './ProductReviewModal';
+
+import { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Minus, Plus, Heart } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+
 interface ProductCardProps {
   id: number;
   name: string;
   price: number;
   image: string;
   brand: string;
+  discountedPrice?: number;
+  discount?: number;
   onQuantityChange: (id: number, quantity: number) => void;
-  discount?: number; // Optional discount percentage
-  discountedPrice?: number; // Optional discounted price
+  onProductClick?: () => void;
 }
-const ProductCard = ({
-  id,
-  name,
-  price,
-  image,
-  brand,
+
+const ProductCard = ({ 
+  id, 
+  name, 
+  price, 
+  image, 
+  brand, 
+  discountedPrice, 
+  discount = 0, 
   onQuantityChange,
-  discount = 0,
-  discountedPrice
+  onProductClick
 }: ProductCardProps) => {
   const [quantity, setQuantity] = useState(0);
-  const [detailModalOpen, setDetailModalOpen] = useState(false);
-  const [reviewModalOpen, setReviewModalOpen] = useState(false);
-  const [reviews, setReviews] = useState<Array<{
-    name: string;
-    rating: number;
-    comment: string;
-  }>>([]);
-
-  // Load initial quantity from localStorage
-  useEffect(() => {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-      try {
-        const parsedCart = JSON.parse(savedCart);
-        const cartItem = parsedCart.find((item: any) => item.id === id);
-        if (cartItem) {
-          setQuantity(cartItem.quantity);
-        }
-      } catch (error) {
-        console.error('Error parsing cart from localStorage:', error);
-      }
+  const [wishlist, setWishlist] = useState(false);
+  const { toast } = useToast();
+  
+  const handleAddToCart = () => {
+    if (quantity === 0) {
+      setQuantity(1);
+      onQuantityChange(id, 1);
+      toast({
+        description: `${name} added to cart`,
+      });
     }
-
-    // Load reviews for this product
-    const savedReviews = localStorage.getItem(`reviews-${id}`);
-    if (savedReviews) {
-      try {
-        setReviews(JSON.parse(savedReviews));
-      } catch (error) {
-        console.error('Error parsing reviews from localStorage:', error);
-      }
-    }
-  }, [id]);
-  const handleIncrement = () => {
-    const newQuantity = quantity + 1;
+  };
+  
+  const handleUpdateQuantity = (newQuantity: number) => {
     setQuantity(newQuantity);
     onQuantityChange(id, newQuantity);
+    
+    if (newQuantity === 0) {
+      toast({
+        description: `${name} removed from cart`,
+      });
+    }
   };
-  const handleDecrement = () => {
-    const newQuantity = Math.max(0, quantity - 1);
-    setQuantity(newQuantity);
-    onQuantityChange(id, newQuantity);
+
+  const toggleWishlist = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setWishlist(!wishlist);
+    toast({
+      description: wishlist ? `${name} removed from wishlist` : `${name} added to wishlist`,
+    });
   };
+
   const handleImageClick = () => {
-    setDetailModalOpen(true);
+    if (onProductClick) {
+      onProductClick();
+    }
   };
-  const handleAddReview = () => {
-    setReviewModalOpen(true);
-  };
-  const handleReviewSubmit = (name: string, rating: number, comment: string) => {
-    const newReview = {
-      name,
-      rating,
-      comment
-    };
-    const updatedReviews = [...reviews, newReview];
-    setReviews(updatedReviews);
-    localStorage.setItem(`reviews-${id}`, JSON.stringify(updatedReviews));
-    setReviewModalOpen(false);
-  };
-
-  // Calculate discounted price if not provided but there's a discount
-  const finalDiscountedPrice = discountedPrice !== undefined ? discountedPrice : discount > 0 ? price * (1 - discount / 100) : price;
-  const averageRating = reviews.length ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length : 0;
-  return <>
-      <div className="bg-card rounded-xl p-6 shadow-sm transition-all duration-300 hover:shadow-md border border-border">
-        <div className="relative aspect-square overflow-hidden rounded-lg mb-4 cursor-pointer" onClick={handleImageClick}>
-          <img src={image} alt={name} className="object-cover w-full h-full transform transition-transform duration-300 hover:scale-105" loading="lazy" />
-          <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-colors flex items-center justify-center mx-0">
-            <span className="text-white text-sm font-medium py-1 px-3 bg-black/60 rounded-full opacity-0 hover:opacity-100 transition-opacity">
-              View Details
-            </span>
+  
+  return (
+    <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
+      <div className="relative">
+        <img 
+          src={image} 
+          alt={name} 
+          className="w-full h-48 object-contain p-4 cursor-pointer"
+          onClick={handleImageClick}
+        />
+        <button 
+          onClick={toggleWishlist}
+          className="absolute top-2 right-2 p-1.5 bg-white/80 dark:bg-card/80 rounded-full text-muted-foreground hover:text-destructive"
+        >
+          <Heart className={wishlist ? "fill-destructive text-destructive" : ""} size={18} />
+        </button>
+        
+        {discount > 0 && (
+          <div className="absolute top-2 left-2 bg-destructive text-destructive-foreground text-xs font-medium py-1 px-2 rounded-full">
+            {discount}% OFF
           </div>
-          
-          {discount > 0 && <div className="absolute top-2 right-2 bg-destructive text-destructive-foreground text-xs font-bold rounded-full px-2 py-1">
-              -{discount}%
-            </div>}
+        )}
+      </div>
+      
+      <div className="p-4">
+        <div className="mb-2">
+          <h3 
+            className="font-medium text-foreground truncate cursor-pointer hover:text-primary"
+            onClick={handleImageClick}
+          >
+            {name}
+          </h3>
+          <p className="text-sm text-muted-foreground">{brand}</p>
         </div>
-        <div className="space-y-2">
-          <h3 className="font-medium text-lg text-foreground">{name}</h3>
+        
+        <div className="flex justify-between items-center mb-3">
           <div>
-            {discount > 0 ? <div className="flex flex-col">
-                <p className="text-muted-foreground line-through text-sm">${price.toFixed(2)}</p>
-                <p className="text-destructive font-medium">${finalDiscountedPrice.toFixed(2)}</p>
-              </div> : <p className="text-muted-foreground">${price.toFixed(2)}</p>}
+            {discount > 0 ? (
+              <>
+                <span className="text-destructive font-semibold">${discountedPrice?.toFixed(2)}</span>
+                <span className="text-muted-foreground text-sm line-through ml-1">${price.toFixed(2)}</span>
+              </>
+            ) : (
+              <span className="font-semibold">${price.toFixed(2)}</span>
+            )}
           </div>
           
-          {/* Reviews summary */}
-          <div className="flex items-center">
-            <div className="flex">
-              {[1, 2, 3, 4, 5].map(star => <svg key={star} xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill={star <= Math.round(averageRating) ? "gold" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-yellow-500">
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                </svg>)}
-            </div>
-            <span className="text-xs ml-1">
-              {reviews.length ? `${averageRating.toFixed(1)} (${reviews.length} ${reviews.length === 1 ? 'review' : 'reviews'})` : 'No reviews yet'}
-            </span>
-          </div>
-          
-          <div className="flex items-center justify-between mt-4">
-            <div className="flex items-center gap-3">
-              <button onClick={handleDecrement} disabled={quantity === 0} className="p-2 rounded-full bg-muted hover:bg-muted/80 transition-colors duration-200 
-                         disabled:opacity-50 disabled:cursor-not-allowed">
-                <Minus className="w-5 h-5 text-foreground" />
+          {quantity === 0 ? (
+            <Button 
+              onClick={handleAddToCart} 
+              variant="default" 
+              size="sm"
+            >
+              Add to Cart
+            </Button>
+          ) : (
+            <div className="flex items-center border border-input rounded-md">
+              <button
+                onClick={() => handleUpdateQuantity(Math.max(0, quantity - 1))}
+                className="px-2 py-1 text-muted-foreground hover:text-foreground"
+              >
+                <Minus size={16} />
               </button>
-              <span className="text-sm text-muted-foreground">{quantity}</span>
-              <button onClick={handleIncrement} className="p-2 rounded-full bg-muted hover:bg-muted/80 transition-colors duration-200">
-                <Plus className="w-5 h-5 text-foreground" />
+              <span className="px-3 py-1">{quantity}</span>
+              <button
+                onClick={() => handleUpdateQuantity(quantity + 1)}
+                className="px-2 py-1 text-muted-foreground hover:text-foreground"
+              >
+                <Plus size={16} />
               </button>
             </div>
-            
-            <button onClick={handleAddReview} className="text-xs text-muted-foreground hover:text-foreground">
-              Add Review
-            </button>
-          </div>
+          )}
         </div>
       </div>
-
-      {detailModalOpen && <ProductDetailModal product={{
-      id,
-      name,
-      price,
-      image,
-      brand,
-      discount
-    }} isOpen={detailModalOpen} onClose={() => setDetailModalOpen(false)} reviews={reviews} />}
-      
-      {reviewModalOpen && <ProductReviewModal productId={id} productName={name} isOpen={reviewModalOpen} onClose={() => setReviewModalOpen(false)} onSubmit={handleReviewSubmit} />}
-    </>;
+    </div>
+  );
 };
+
 export default ProductCard;
