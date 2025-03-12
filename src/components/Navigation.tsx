@@ -10,7 +10,7 @@ const Navigation = () => {
       {!isAuthenticated && (
         <Link
           to="/login"
-          className="px-4 py-2 bg-sage-500 text-white rounded-lg hover:bg-sage-600 transition-colors"
+          className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
         >
           Log In
         </Link>
