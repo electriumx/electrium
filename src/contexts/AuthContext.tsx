@@ -11,6 +11,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isAdmin: boolean;
   loginAsAdmin: () => void;
+  canAccessAdminPanel: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -52,10 +53,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (adminUser) {
       setCurrentUser(adminUser);
       localStorage.setItem('currentUser', JSON.stringify(adminUser));
-      toast({
-        title: "Admin Access Granted",
-        description: "You're now signed in as an administrator"
-      });
       navigate('/admin');
     }
   };
@@ -72,6 +69,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const isAdmin = currentUser?.isAdmin === true;
 
+  const canAccessAdminPanel = () => {
+    return currentUser?.username === "Omar Tarek" && currentUser?.isAdmin === true;
+  };
+
   return (
     <AuthContext.Provider value={{ 
       currentUser, 
@@ -79,7 +80,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       logout, 
       isAuthenticated: !!currentUser,
       isAdmin,
-      loginAsAdmin
+      loginAsAdmin,
+      canAccessAdminPanel
     }}>
       {children}
     </AuthContext.Provider>

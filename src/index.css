@@ -119,3 +119,13 @@ body {
 .bg-sage-500 {
   background-color: #4caf50;
 }
+
+/* Spin wheel button color */
+.spin-wheel-btn {
+  background-color: #0a4d68;
+  color: white;
+}
+
+.spin-wheel-btn:hover {
+  background-color: #085e80;
+}

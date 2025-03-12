@@ -184,7 +184,7 @@ const Products = () => {
       <div className="mb-6 flex justify-center">
         <button
           onClick={() => setShowSpinWheel(!showSpinWheel)}
-          className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+          className="px-4 py-2 bg-[#0a4d68] text-white rounded-md hover:bg-[#085e80] transition-colors"
         >
           {showSpinWheel ? 'Hide Spin Wheel' : 'Try Your Luck with Daily Spin!'}
         </button>
@@ -194,7 +194,7 @@ const Products = () => {
         <div className="mb-8 text-center">
           <SpinWheel onWin={handleSpinWin} />
           <button
-            className="mt-4 px-4 py-2 bg-white text-black rounded-md font-medium hover:bg-gray-100 transition-colors"
+            className="mt-4 px-4 py-2 bg-[#0a4d68] text-white rounded-md font-medium hover:bg-[#085e80] transition-colors"
           >
             Spin
           </button>
@@ -247,7 +247,7 @@ const Products = () => {
       
       <button
         onClick={toggleChat}
-        className="fixed top-20 right-4 z-50 flex items-center justify-center w-10 h-10 bg-transparent rounded-full shadow-lg hover:scale-105 transition-transform"
+        className="fixed top-20 right-4 z-50 flex items-center justify-center w-10 h-10 rounded-full hover:scale-105 transition-transform"
         aria-label="Chat with Electrium Assistant"
       >
         <img 

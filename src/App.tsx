@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "next-themes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate, useLocation, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import Products from "./pages/Products";
 import About from "./pages/About";
@@ -17,6 +17,7 @@ import ThankYou from "./pages/ThankYou";
 import Donation from "./pages/Donation";
 import Settings from "./pages/Settings";
 import Admin from "./pages/Admin";
+import Wishlist from "./pages/Wishlist";
 import Navigation from "./components/Navigation";
 import TopNavigation from "./components/TopNavigation";
 import Footer from "./components/Footer";
@@ -28,11 +29,17 @@ import { useState, useEffect } from "react";
 
 const queryClient = new QueryClient();
 
+// Protected route component for Admin
+const AdminRoute = () => {
+  const { canAccessAdminPanel } = useAuth();
+  return canAccessAdminPanel() ? <Admin /> : <Navigate to="/" replace />;
+};
+
 // Admin key handler component
 const AdminKeyHandler = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAdmin, loginAsAdmin } = useAuth();
+  const { isAdmin, loginAsAdmin, canAccessAdminPanel } = useAuth();
   
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -53,8 +60,8 @@ const AdminKeyHandler = () => {
           // Store current page and go to admin
           sessionStorage.setItem('prevPageBeforeAdmin', location.pathname);
           
-          // Check if user is admin
-          if (isAdmin) {
+          // Check if user can access admin panel
+          if (canAccessAdminPanel()) {
             navigate('/admin');
           } else {
             // Login as Omar Tarek automatically
@@ -66,7 +73,7 @@ const AdminKeyHandler = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [navigate, location.pathname, isAdmin, loginAsAdmin]);
+  }, [navigate, location.pathname, isAdmin, loginAsAdmin, canAccessAdminPanel]);
   
   return null;
 };
@@ -93,7 +100,6 @@ const AppWithAuth = () => {
       <Toaster />
       <Sonner />
       <TopNavigation />
-      <Navigation />
       <div className="pt-16">
         <Routes>
           <Route path="/" element={<Index />} />
@@ -107,7 +113,8 @@ const AppWithAuth = () => {
           <Route path="/thank-you" element={<ThankYou />} />
           <Route path="/donation" element={<Donation />} />
           <Route path="/settings" element={<Settings />} />
-          <Route path="/admin" element={<Admin />} />
+          <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/admin" element={<AdminRoute />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>

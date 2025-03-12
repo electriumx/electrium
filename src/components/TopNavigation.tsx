@@ -1,6 +1,7 @@
 
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { Heart } from 'lucide-react';
 
 const TopNavigation = () => {
   const location = useLocation();
@@ -34,6 +35,10 @@ const TopNavigation = () => {
             <Link to="/discover" className="text-white hover:text-[#9eff00] transition-colors">Discover</Link>
             <a href="#footer" onClick={handleContactClick} className="text-white hover:text-[#9eff00] transition-colors">Contact</a>
             <Link to="/donation" className="text-white hover:text-[#9eff00] transition-colors">Donation</Link>
+            <Link to="/wishlist" className="text-white hover:text-[#9eff00] transition-colors flex items-center gap-1">
+              <Heart size={16} />
+              Wishlist
+            </Link>
           </div>
         )}
         
@@ -41,7 +46,7 @@ const TopNavigation = () => {
           {!isAuthenticated && (
             <Link
               to="/login"
-              className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+              className="text-white hover:text-[#9eff00] transition-colors"
             >
               Log In
             </Link>
