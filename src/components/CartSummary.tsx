@@ -1,101 +1,209 @@
 
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { ShoppingCart, Trash2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Button } from "@/components/ui/button";
+import { ShoppingBag, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Link } from 'react-router-dom';
+import { Product } from '@/data/productData';
+import { useToast } from "@/components/ui/use-toast";
 
-interface CartItem {
-  id: number;
-  name: string;
-  price: number;
-  quantity: number;
+interface CartSummaryProps {
+  cart: Product[];
 }
 
-const CartSummary = ({ cart }: { cart: CartItem[] }) => {
-  const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+const CartSummary = ({ cart }: CartSummaryProps) => {
+  const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
-  const [initialized, setInitialized] = useState(false);
-
-  // Load cart from localStorage on first render
-  useEffect(() => {
-    // Only save the cart to localStorage after initial render
-    if (!initialized) {
-      // Check if localStorage has items
-      const savedCart = localStorage.getItem('cart');
-      if (!savedCart) {
-        localStorage.setItem('cart', JSON.stringify(cart));
-      }
-      setInitialized(true);
-    } else {
-      // Save cart to localStorage whenever it changes after initial load
-      localStorage.setItem('cart', JSON.stringify(cart));
-    }
-  }, [cart, initialized]);
-
-  const itemCount = cart.reduce((total, item) => total + item.quantity, 0);
-  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-  const handleCheckout = () => {
-    if (!isAuthenticated) {
-      toast({
-        title: "Authentication Required",
-        description: "Please sign in or create an account to proceed to checkout",
-      });
-      navigate('/login', { state: { from: '/checkout' } });
-      return;
-    }
-    // Save cart to localStorage before navigating
-    localStorage.setItem('cart', JSON.stringify(cart));
-    navigate('/checkout');
+  
+  const toggleCart = () => {
+    setIsOpen(!isOpen);
   };
 
-  const handleClearCart = () => {
-    // Clear the cart in localStorage
-    localStorage.setItem('cart', JSON.stringify([]));
+  const calculateTotal = () => {
+    return cart.reduce((total, item) => {
+      const itemBasePrice = item.discount && item.discount > 0
+        ? item.price * (1 - item.discount / 100)
+        : item.price;
+        
+      // Add the price of any accessories
+      const accessoriesPrice = (item.accessories || []).reduce(
+        (acc, accessory) => acc + accessory.price,
+        0
+      );
+        
+      return total + ((itemBasePrice + accessoriesPrice) * (item.quantity || 1));
+    }, 0);
+  };
+
+  const clearCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    // Clear cart by dispatching a custom event that the Products component will listen for
+    const cartEvent = new CustomEvent('cartUpdate', { detail: [] });
+    window.dispatchEvent(cartEvent);
     
-    // Show toast notification
+    // Also clear localStorage
+    localStorage.removeItem('cart');
+    
     toast({
-      title: "Cart Cleared",
-      description: "All items have been removed from your cart",
+      description: "Cart has been cleared",
     });
-    
-    // Don't refresh the page, just use window.dispatchEvent to trigger a cart update
-    window.dispatchEvent(new CustomEvent('cartUpdate', { detail: [] }));
   };
 
-  if (itemCount === 0) return null;
-
+  const cartCount = cart.reduce((count, item) => count + (item.quantity || 1), 0);
+  
   return (
-    <div className="sticky bottom-0 bg-background/80 backdrop-blur-md p-6 mt-8 border-t dark:border-gray-800">
-      <div className="container mx-auto max-w-4xl">
-        <div className="flex justify-between items-center mb-4">
-          <span className="text-foreground">Items in cart: {itemCount}</span>
-          <span className="text-lg font-medium text-foreground">Total: ${total.toFixed(2)}</span>
-        </div>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Button
-            onClick={handleCheckout}
-            className="w-full bg-sage-500 text-white py-3 px-6 rounded-lg font-medium 
-                     transition-all duration-200 hover:bg-sage-600 disabled:opacity-50 
-                     disabled:cursor-not-allowed"
-          >
-            <ShoppingCart className="mr-2 h-4 w-4" />
-            Proceed to Checkout
-          </Button>
-          <Button
-            onClick={handleClearCart}
-            variant="destructive"
-            className="w-full py-3 px-6 rounded-lg font-medium"
-          >
-            <Trash2 className="mr-2 h-4 w-4" />
-            Clear All Items
-          </Button>
-        </div>
+    <>
+      <div className="fixed bottom-4 right-4 z-40">
+        <Button
+          onClick={toggleCart}
+          className="rounded-full h-14 w-14 flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow"
+          variant="default"
+        >
+          <ShoppingBag className="h-6 w-6" />
+          {cartCount > 0 && (
+            <span className="absolute -top-2 -right-2 bg-destructive text-white text-xs rounded-full h-6 w-6 flex items-center justify-center">
+              {cartCount}
+            </span>
+          )}
+        </Button>
       </div>
-    </div>
+      
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, x: 300 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 300 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="fixed top-0 right-0 h-full w-full md:w-96 bg-card z-50 shadow-xl border-l border-border overflow-auto"
+          >
+            <div className="p-4 border-b border-border flex justify-between items-center sticky top-0 bg-card z-10">
+              <h2 className="text-lg font-bold flex items-center">
+                <ShoppingBag className="mr-2 h-5 w-5" /> 
+                Your Cart
+              </h2>
+              <button 
+                onClick={toggleCart}
+                className="rounded-full p-1 hover:bg-muted transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            <div className="px-4 py-2 border-b border-border flex justify-between items-center bg-muted/40">
+              <span className="text-sm text-muted-foreground">
+                {cartCount} {cartCount === 1 ? 'item' : 'items'}
+              </span>
+              <button 
+                onClick={clearCart}
+                className="text-sm text-muted-foreground hover:text-destructive"
+              >
+                Clear all
+              </button>
+            </div>
+            
+            <div className="p-4 space-y-4">
+              {cart.length === 0 ? (
+                <div className="text-center py-8">
+                  <ShoppingBag className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground">Your cart is empty</p>
+                  <Button 
+                    onClick={toggleCart} 
+                    variant="outline" 
+                    className="mt-4"
+                  >
+                    Continue Shopping
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  {cart.map((item) => {
+                    const itemBasePrice = item.discount && item.discount > 0
+                      ? item.price * (1 - item.discount / 100)
+                      : item.price;
+                    
+                    // Add the price of any accessories
+                    const accessoriesPrice = (item.accessories || []).reduce(
+                      (acc, accessory) => acc + accessory.price,
+                      0
+                    );
+                    
+                    const totalItemPrice = (itemBasePrice + accessoriesPrice) * (item.quantity || 1);
+                    
+                    return (
+                      <div key={item.id} className="flex gap-3 pb-4 border-b border-border">
+                        <div className="w-20 h-20 bg-muted rounded-md overflow-hidden flex-shrink-0">
+                          <img src={item.image} alt={item.name} className="w-full h-full object-contain" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-medium">{item.name}</h4>
+                          <p className="text-sm text-muted-foreground mb-1">{item.brand}</p>
+                          <div className="flex justify-between">
+                            <span className="text-sm">
+                              Qty: {item.quantity || 1} x ${(itemBasePrice + accessoriesPrice).toFixed(2)}
+                            </span>
+                            <span className="font-medium">
+                              ${totalItemPrice.toFixed(2)}
+                            </span>
+                          </div>
+                          
+                          {item.accessories && item.accessories.length > 0 && (
+                            <div className="mt-2">
+                              <p className="text-xs text-muted-foreground mb-1">Accessories:</p>
+                              <ul className="text-xs text-muted-foreground space-y-1">
+                                {item.accessories.map((acc) => (
+                                  <li key={acc.id} className="flex justify-between">
+                                    <span>{acc.name}</span>
+                                    <span>${acc.price.toFixed(2)}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  
+                  <div className="pt-4 border-t border-border">
+                    <div className="flex justify-between mb-2">
+                      <span className="text-muted-foreground">Subtotal</span>
+                      <span className="font-medium">${calculateTotal().toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between mb-4">
+                      <span className="text-muted-foreground">Shipping</span>
+                      <span className="font-medium">Calculated at checkout</span>
+                    </div>
+                    <Link 
+                      to="/checkout" 
+                      className="block w-full bg-primary text-primary-foreground py-3 text-center rounded-md font-medium hover:bg-primary/90 transition-colors"
+                    >
+                      Proceed to Checkout
+                    </Link>
+                    <button 
+                      onClick={toggleCart}
+                      className="block w-full text-center py-3 text-muted-foreground hover:text-foreground mt-2"
+                    >
+                      Continue Shopping
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={toggleCart}
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40"
+        />
+      )}
+    </>
   );
 };
 

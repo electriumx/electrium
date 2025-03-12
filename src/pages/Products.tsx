@@ -247,10 +247,14 @@ const Products = () => {
       
       <button
         onClick={toggleChat}
-        className="fixed top-4 right-4 z-50 flex items-center justify-center w-10 h-10 bg-primary text-white rounded-full shadow-lg hover:bg-primary/90 transition-transform hover:scale-105"
+        className="fixed top-20 right-4 z-50 flex items-center justify-center w-10 h-10 bg-transparent rounded-full shadow-lg hover:scale-105 transition-transform"
         aria-label="Chat with Electrium Assistant"
       >
-        <span className="text-xs font-medium">Chat</span>
+        <img 
+          src="/lovable-uploads/332dd32d-b893-48bd-8da7-73aa4bc107bb.png" 
+          alt="Electrium Logo" 
+          className="w-full h-full"
+        />
       </button>
       
       {isChatOpen && <AIChat onClose={toggleChat} />}

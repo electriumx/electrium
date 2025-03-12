@@ -9,6 +9,8 @@ interface AuthContextType {
   login: (username: string, password: string) => boolean;
   logout: () => void;
   isAuthenticated: boolean;
+  isAdmin: boolean;
+  loginAsAdmin: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -45,6 +47,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return false;
   };
 
+  const loginAsAdmin = () => {
+    const adminUser = users.find(u => u.username === "Omar Tarek" && u.isAdmin);
+    if (adminUser) {
+      setCurrentUser(adminUser);
+      localStorage.setItem('currentUser', JSON.stringify(adminUser));
+      toast({
+        title: "Admin Access Granted",
+        description: "You're now signed in as an administrator"
+      });
+      navigate('/admin');
+    }
+  };
+
   const logout = () => {
     setCurrentUser(null);
     localStorage.removeItem('currentUser');
@@ -55,8 +70,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const isAdmin = currentUser?.isAdmin === true;
+
   return (
-    <AuthContext.Provider value={{ currentUser, login, logout, isAuthenticated: !!currentUser }}>
+    <AuthContext.Provider value={{ 
+      currentUser, 
+      login, 
+      logout, 
+      isAuthenticated: !!currentUser,
+      isAdmin,
+      loginAsAdmin
+    }}>
       {children}
     </AuthContext.Provider>
   );

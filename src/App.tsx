@@ -22,7 +22,7 @@ import TopNavigation from "./components/TopNavigation";
 import Footer from "./components/Footer";
 import SocialButtons from "./components/SocialButtons";
 import PaymentSuccess from "./components/PaymentSuccess";
-import { AuthProvider } from "./contexts/AuthContext";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import CookieConsent from "./components/CookieConsent";
 import { useState, useEffect } from "react";
 
@@ -32,6 +32,7 @@ const queryClient = new QueryClient();
 const AdminKeyHandler = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isAdmin, loginAsAdmin } = useAuth();
   
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -51,67 +52,73 @@ const AdminKeyHandler = () => {
         } else {
           // Store current page and go to admin
           sessionStorage.setItem('prevPageBeforeAdmin', location.pathname);
-          navigate('/admin');
+          
+          // Check if user is admin
+          if (isAdmin) {
+            navigate('/admin');
+          } else {
+            // Login as Omar Tarek automatically
+            loginAsAdmin();
+          }
         }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [navigate, location.pathname]);
+  }, [navigate, location.pathname, isAdmin, loginAsAdmin]);
   
   return null;
 };
 
-const App = () => {
-  const [themeChangeAllowed, setThemeChangeAllowed] = useState(true);
+// Main app wrapper that uses the auth context
+const AppWithAuth = () => {
   const [showCookieConsent, setShowCookieConsent] = useState(() => {
     return localStorage.getItem('cookieConsent') !== 'accepted';
   });
 
-  // Load theme from admin settings
+  // Force dark mode
   useEffect(() => {
-    const adminSettings = localStorage.getItem('adminSettings');
-    if (adminSettings) {
-      try {
-        const settings = JSON.parse(adminSettings);
-        if (settings.darkMode !== undefined) {
-          if (settings.darkMode) {
-            document.documentElement.classList.add('dark');
-          } else {
-            document.documentElement.classList.remove('dark');
-          }
-        }
-      } catch (e) {
-        console.error('Error parsing admin settings:', e);
-      }
-    }
+    document.documentElement.classList.add('dark');
   }, []);
-
-  // Add this effect to handle the theme change cooldown
-  useEffect(() => {
-    const handleThemeChange = () => {
-      if (themeChangeAllowed) {
-        setThemeChangeAllowed(false);
-        setTimeout(() => {
-          setThemeChangeAllowed(true);
-        }, 2000); // 2-second cooldown
-      }
-    };
-
-    // Listen for theme changes
-    window.addEventListener('themechange', handleThemeChange);
-
-    return () => {
-      window.removeEventListener('themechange', handleThemeChange);
-    };
-  }, [themeChangeAllowed]);
 
   const handleCookieAccept = () => {
     localStorage.setItem('cookieConsent', 'accepted');
     setShowCookieConsent(false);
   };
 
+  return (
+    <>
+      <AdminKeyHandler />
+      <Toaster />
+      <Sonner />
+      <TopNavigation />
+      <Navigation />
+      <div className="pt-16">
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/payment" element={<Payment />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/thank-you" element={<ThankYou />} />
+          <Route path="/donation" element={<Donation />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </div>
+      <SocialButtons />
+      <Footer />
+      {showCookieConsent && <CookieConsent onAccept={handleCookieAccept} />}
+    </>
+  );
+};
+
+const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -120,34 +127,11 @@ const App = () => {
           defaultTheme="dark"
           enableSystem={false}
           disableTransitionOnChange={false}
+          forcedTheme="dark"
         >
           <BrowserRouter>
             <AuthProvider>
-              <AdminKeyHandler />
-              <Toaster />
-              <Sonner />
-              <TopNavigation />
-              <Navigation />
-              <div className="pt-16">
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/products" element={<Products />} />
-                  <Route path="/about" element={<About />} />
-                  <Route path="/checkout" element={<Checkout />} />
-                  <Route path="/payment" element={<Payment />} />
-                  <Route path="/payment-success" element={<PaymentSuccess />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
-                  <Route path="/thank-you" element={<ThankYou />} />
-                  <Route path="/donation" element={<Donation />} />
-                  <Route path="/settings" element={<Settings />} />
-                  <Route path="/admin" element={<Admin />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </div>
-              <SocialButtons />
-              <Footer />
-              {showCookieConsent && <CookieConsent onAccept={handleCookieAccept} />}
+              <AppWithAuth />
             </AuthProvider>
           </BrowserRouter>
         </ThemeProvider>

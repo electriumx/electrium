@@ -1,7 +1,9 @@
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface Product {
   id: number;
@@ -10,6 +12,8 @@ interface Product {
   image: string;
   brand: string;
   discount?: number;
+  quantity?: number;
+  accessories?: Accessory[];
 }
 
 interface Review {
@@ -31,6 +35,7 @@ interface ProductDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   reviews?: Review[];
+  onAddToCart?: (product: Product) => void;
 }
 
 // Mock tech specs since they're not in the product data
@@ -113,11 +118,20 @@ const accessories: Accessory[] = [
   { id: 112, name: "Premium Earbuds", price: 79.99, compatible: ["Apple", "Samsung", "Sony", "Google"], image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" }
 ];
 
-const ProductDetailModal = ({ product, isOpen, onClose, reviews = [] }: ProductDetailModalProps) => {
+const ProductDetailModal = ({ product, isOpen, onClose, reviews = [], onAddToCart }: ProductDetailModalProps) => {
   const { id, name, price, image, brand, discount = 0 } = product;
   const discountedPrice = discount > 0 ? price * (1 - discount / 100) : price;
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedAccessories, setSelectedAccessories] = useState<Accessory[]>([]);
+  const [quantity, setQuantity] = useState(1);
+  
+  // Effect to ensure selectedAccessories is reset when modal is opened with a new product
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedAccessories(product.accessories || []);
+      setQuantity(product.quantity || 1);
+    }
+  }, [isOpen, product]);
   
   const specs = getTechSpecs(id, brand);
   
@@ -125,6 +139,21 @@ const ProductDetailModal = ({ product, isOpen, onClose, reviews = [] }: ProductD
   const compatibleAccessories = accessories.filter(acc => 
     acc.compatible.includes(brand)
   );
+
+  // Group accessories by category
+  const accessoryCategories = {
+    "Headphones": compatibleAccessories.filter(a => a.name.includes("Headphone") || a.name.includes("Headset") || a.name.includes("Earbuds")),
+    "Cases": compatibleAccessories.filter(a => a.name.includes("Case")),
+    "Chargers": compatibleAccessories.filter(a => a.name.includes("Charger")),
+    "Screen Protectors": compatibleAccessories.filter(a => a.name.includes("Screen Protector")),
+    "Cables": compatibleAccessories.filter(a => a.name.includes("Cable")),
+    "Memory Cards": compatibleAccessories.filter(a => a.name.includes("Memory Card")),
+    "Other": compatibleAccessories.filter(a => 
+      !a.name.includes("Headphone") && !a.name.includes("Headset") && !a.name.includes("Earbuds") &&
+      !a.name.includes("Case") && !a.name.includes("Charger") && !a.name.includes("Screen Protector") &&
+      !a.name.includes("Cable") && !a.name.includes("Memory Card")
+    )
+  };
   
   const handleImageClick = () => {
     // Open image in full screen
@@ -166,10 +195,26 @@ const ProductDetailModal = ({ product, isOpen, onClose, reviews = [] }: ProductD
     });
   };
 
-  const totalPrice = selectedAccessories.reduce(
-    (sum, acc) => sum + acc.price, 
-    discount > 0 ? discountedPrice : price
-  );
+  const getTotalAccessoriesPrice = () => {
+    return selectedAccessories.reduce((sum, acc) => sum + acc.price, 0);
+  };
+
+  const totalAccessoriesPrice = getTotalAccessoriesPrice();
+  const basePrice = discount > 0 ? discountedPrice : price;
+  const totalPrice = basePrice + totalAccessoriesPrice;
+
+  const handleAddToCart = () => {
+    if (onAddToCart) {
+      const productWithAccessories = {
+        ...product,
+        price: basePrice,
+        quantity,
+        accessories: selectedAccessories
+      };
+      onAddToCart(productWithAccessories);
+      onClose();
+    }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -220,6 +265,28 @@ const ProductDetailModal = ({ product, isOpen, onClose, reviews = [] }: ProductD
                 {name} is a premium device from {brand}, designed for optimal performance and user experience.
                 Click on the Specifications tab to see detailed technical information.
               </p>
+              
+              <div className="mt-6 flex items-center justify-between">
+                <div className="flex items-center">
+                  <button 
+                    onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
+                    className="px-3 py-1 bg-secondary rounded-l-md border-r border-border"
+                  >
+                    -
+                  </button>
+                  <span className="px-4 py-1 bg-secondary">{quantity}</span>
+                  <button 
+                    onClick={() => setQuantity(prev => prev + 1)}
+                    className="px-3 py-1 bg-secondary rounded-r-md border-l border-border"
+                  >
+                    +
+                  </button>
+                </div>
+                
+                <Button onClick={handleAddToCart} className="ml-4">
+                  Add to Cart
+                </Button>
+              </div>
             </div>
           </TabsContent>
           
@@ -243,32 +310,39 @@ const ProductDetailModal = ({ product, isOpen, onClose, reviews = [] }: ProductD
               <p className="text-muted-foreground">No compatible accessories found for this product.</p>
             ) : (
               <div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                  {compatibleAccessories.map((accessory) => {
-                    const isSelected = selectedAccessories.some(a => a.id === accessory.id);
-                    return (
-                      <div 
-                        key={accessory.id} 
-                        className={`border rounded-lg p-3 cursor-pointer transition-all ${
-                          isSelected ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/50'
-                        }`}
-                        onClick={() => handleToggleAccessory(accessory)}
-                      >
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <h4 className="font-medium">{accessory.name}</h4>
-                            <p className="text-sm text-muted-foreground">${accessory.price.toFixed(2)}</p>
-                          </div>
-                          <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                            isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted'
-                          }`}>
-                            {isSelected ? <Check size={14} /> : <Plus size={14} />}
-                          </div>
-                        </div>
+                {Object.entries(accessoryCategories).map(([category, items]) => 
+                  items.length > 0 && (
+                    <div key={category} className="mb-6">
+                      <h4 className="font-medium text-sm uppercase text-muted-foreground mb-2">{category}</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {items.map((accessory) => {
+                          const isSelected = selectedAccessories.some(a => a.id === accessory.id);
+                          return (
+                            <div 
+                              key={accessory.id} 
+                              className={`border rounded-lg p-3 cursor-pointer transition-all ${
+                                isSelected ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/50'
+                              }`}
+                              onClick={() => handleToggleAccessory(accessory)}
+                            >
+                              <div className="flex justify-between items-start">
+                                <div className="flex-1">
+                                  <h4 className="font-medium">{accessory.name}</h4>
+                                  <p className="text-sm text-muted-foreground">${accessory.price.toFixed(2)}</p>
+                                </div>
+                                <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                                  isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                                }`}>
+                                  {isSelected ? <Check size={14} /> : <Plus size={14} />}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
-                    );
-                  })}
-                </div>
+                    </div>
+                  )
+                )}
                 
                 {selectedAccessories.length > 0 && (
                   <div className="bg-card rounded-lg p-4 mt-4 border border-border">
@@ -276,7 +350,7 @@ const ProductDetailModal = ({ product, isOpen, onClose, reviews = [] }: ProductD
                     <ul className="space-y-2 mb-4">
                       <li className="flex justify-between">
                         <span>{name}</span>
-                        <span>${(discount > 0 ? discountedPrice : price).toFixed(2)}</span>
+                        <span>${basePrice.toFixed(2)}</span>
                       </li>
                       {selectedAccessories.map(accessory => (
                         <li key={accessory.id} className="flex justify-between text-sm">
