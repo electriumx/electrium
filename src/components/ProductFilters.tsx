@@ -133,7 +133,7 @@ const ProductFilters = ({
             >
               {accessory}
             </button>
-          )}
+          ))}
         </div>
       </div>
     </div>
