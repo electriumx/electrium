@@ -1,3 +1,4 @@
+
 export interface Product {
   id: number;
   name: string;
@@ -19,6 +20,7 @@ export interface ProductAccessory {
   price: number;
   category: string;
   selected?: boolean;
+  image?: string; // Added image property
 }
 
 export const products: Product[] = [

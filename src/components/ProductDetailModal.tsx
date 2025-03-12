@@ -1,9 +1,10 @@
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState, useEffect } from "react";
 import { Plus, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Product as ProductType } from '../data/productData';
+import { Product as ProductType, ProductAccessory } from '../data/productData';
 
 interface ProductDetailModalProps {
   product: ProductType;
@@ -121,12 +122,12 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
         const productAccessories = product.accessories
           .filter(acc => acc.selected)
           .map(acc => ({
-            id: acc.id,
+            id: Number(acc.id), // Convert string id to number
             name: acc.name,
             price: acc.price,
             selected: true,
-            compatible: [],
-            image: acc.image || "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png"
+            compatible: [] as string[],
+            image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" // Default image if none exists
           }));
         
         setSelectedAccessories(productAccessories);
@@ -208,7 +209,7 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
       ...product,
       quantity: quantity,
       accessories: selectedAccessories.map(acc => ({
-        id: acc.id,
+        id: String(acc.id), // Convert back to string for ProductAccessory type
         name: acc.name,
         price: acc.price,
         selected: true,
