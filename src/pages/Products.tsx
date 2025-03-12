@@ -5,6 +5,7 @@ import ProductGrid from '../components/ProductGrid';
 import CartSummary from '../components/CartSummary';
 import SpinWheel from '../components/SpinWheel';
 import AIChat from '../components/AIChat';
+import FloatingActions from '../components/FloatingActions';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Product, products } from '../data/productData';
 
@@ -78,33 +79,6 @@ const Products = () => {
     return () => window.removeEventListener('cartUpdate', handleCartUpdate as EventListener);
   }, []);
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === '/') {
-        e.preventDefault();
-        
-        // Store current location or restore previous location
-        const prevPage = sessionStorage.getItem('prevPageBeforeAdmin');
-        
-        if (location.pathname === '/admin') {
-          // If currently on admin page, go back to previous page
-          if (prevPage) {
-            navigate(prevPage);
-          } else {
-            navigate('/');
-          }
-        } else {
-          // Store current page and go to admin
-          sessionStorage.setItem('prevPageBeforeAdmin', location.pathname);
-          navigate('/admin');
-        }
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [navigate, location.pathname]);
-
   const handleFilterChange = (brands: string[]) => {
     setSelectedBrands(brands);
   };
@@ -139,6 +113,12 @@ const Products = () => {
     
     setCart(updatedCart);
     localStorage.setItem('cart', JSON.stringify(updatedCart));
+    
+    // Dispatch custom event to notify other components
+    const event = new CustomEvent('cartUpdate', {
+      detail: updatedCart
+    });
+    window.dispatchEvent(event);
   };
 
   const handleSpinWin = (brand: string, discount: number, expiresAt: number) => {
@@ -176,6 +156,8 @@ const Products = () => {
       product.brand.toLowerCase().includes(query)
     );
   }
+  
+  const cartItemCount = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8">
@@ -243,19 +225,13 @@ const Products = () => {
         </div>
       </div>
       
-      <CartSummary cart={cart} />
+      {/* Removed CartSummary component */}
       
-      <button
-        onClick={toggleChat}
-        className="fixed top-20 right-4 z-50 flex items-center justify-center w-10 h-10 rounded-full hover:scale-105 transition-transform"
-        aria-label="Chat with Electrium Assistant"
-      >
-        <img 
-          src="/lovable-uploads/332dd32d-b893-48bd-8da7-73aa4bc107bb.png" 
-          alt="Electrium Logo" 
-          className="w-full h-full"
-        />
-      </button>
+      <FloatingActions 
+        showCheckout={true}
+        cartItemCount={cartItemCount}
+        toggleChat={toggleChat}
+      />
       
       {isChatOpen && <AIChat onClose={toggleChat} />}
     </div>

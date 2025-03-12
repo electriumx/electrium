@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Product } from '../data/productData';
 import { useToast } from '@/components/ui/use-toast';
@@ -161,38 +162,12 @@ const ProductGrid = ({
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onQuantityChange(product.id, (product.quantity || 0) - 1);
-                    }}
-                    className="px-2 py-1 bg-muted text-foreground rounded-l-md"
-                  >
-                    -
-                  </button>
-                  <span className="px-3 py-1 bg-muted text-foreground">
-                    {product.quantity || 0}
-                  </span>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onQuantityChange(product.id, (product.quantity || 0) + 1);
-                    }}
-                    className="px-2 py-1 bg-muted text-foreground rounded-r-md"
-                  >
-                    +
-                  </button>
+                <div className="text-sm text-muted-foreground">
+                  Click for details
                 </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onQuantityChange(product.id, (product.quantity || 0) + 1);
-                  }}
-                  className="text-xs px-3 py-1 bg-primary text-primary-foreground rounded-md"
-                >
-                  Add to Cart
-                </button>
+                <div className="text-sm px-2 py-1 bg-muted rounded-md">
+                  Qty: {product.quantity || 0}
+                </div>
               </div>
             </div>
           </div>

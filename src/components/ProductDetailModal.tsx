@@ -1,18 +1,11 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState, useEffect } from "react";
 import { Plus, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Product as ProductType } from '../data/productData';
 
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  brand: string;
-  discount?: number;
-  quantity?: number;
+interface Product extends ProductType {
   accessories?: Accessory[];
 }
 
@@ -34,11 +27,11 @@ interface ProductDetailModalProps {
   product: Product;
   isOpen: boolean;
   onClose: () => void;
+  onQuantityChange: (id: number, quantity: number) => void;
+  discount: number;
   reviews?: Review[];
-  onAddToCart?: (product: Product) => void;
 }
 
-// Mock tech specs since they're not in the product data
 const getTechSpecs = (productId: number, brand: string) => {
   const specs = {
     Apple: {
@@ -98,11 +91,9 @@ const getTechSpecs = (productId: number, brand: string) => {
     }
   };
 
-  // Return brand-specific specs or default if brand not found
   return specs[brand as keyof typeof specs] || specs.default;
 };
 
-// Mock accessories data with more detailed categories
 const accessories: Accessory[] = [
   { id: 101, name: "Premium Headphones", price: 99.99, compatible: ["Apple", "Samsung", "Sony"], image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" },
   { id: 102, name: "Wireless Charger", price: 49.99, compatible: ["Apple", "Samsung"], image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" },
@@ -118,14 +109,13 @@ const accessories: Accessory[] = [
   { id: 112, name: "Premium Earbuds", price: 79.99, compatible: ["Apple", "Samsung", "Sony", "Google"], image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" }
 ];
 
-const ProductDetailModal = ({ product, isOpen, onClose, reviews = [], onAddToCart }: ProductDetailModalProps) => {
-  const { id, name, price, image, brand, discount = 0 } = product;
+const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discount = 0, reviews = [] }: ProductDetailModalProps) => {
+  const { id, name, price, imageUrl, brand } = product;
   const discountedPrice = discount > 0 ? price * (1 - discount / 100) : price;
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedAccessories, setSelectedAccessories] = useState<Accessory[]>([]);
   const [quantity, setQuantity] = useState(1);
   
-  // Effect to ensure selectedAccessories is reset when modal is opened with a new product
   useEffect(() => {
     if (isOpen) {
       setSelectedAccessories(product.accessories || []);
@@ -135,12 +125,10 @@ const ProductDetailModal = ({ product, isOpen, onClose, reviews = [], onAddToCar
   
   const specs = getTechSpecs(id, brand);
   
-  // Filter accessories compatible with this product brand
   const compatibleAccessories = accessories.filter(acc => 
     acc.compatible.includes(brand)
   );
 
-  // Group accessories by category
   const accessoryCategories = {
     "Headphones": compatibleAccessories.filter(a => a.name.includes("Headphone") || a.name.includes("Headset") || a.name.includes("Earbuds")),
     "Cases": compatibleAccessories.filter(a => a.name.includes("Case")),
@@ -156,9 +144,8 @@ const ProductDetailModal = ({ product, isOpen, onClose, reviews = [], onAddToCar
   };
   
   const handleImageClick = () => {
-    // Open image in full screen
     const img = new Image();
-    img.src = image;
+    img.src = imageUrl;
     img.style.maxHeight = '90vh';
     img.style.maxWidth = '90vw';
     img.style.objectFit = 'contain';
@@ -204,16 +191,14 @@ const ProductDetailModal = ({ product, isOpen, onClose, reviews = [], onAddToCar
   const totalPrice = basePrice + totalAccessoriesPrice;
 
   const handleAddToCart = () => {
-    if (onAddToCart) {
-      const productWithAccessories = {
-        ...product,
-        price: basePrice,
-        quantity,
-        accessories: selectedAccessories
-      };
-      onAddToCart(productWithAccessories);
-      onClose();
-    }
+    const productWithAccessories = {
+      ...product,
+      quantity,
+      accessories: selectedAccessories.map(acc => ({...acc, selected: true}))
+    };
+    
+    onQuantityChange(id, quantity);
+    onClose();
   };
 
   return (
@@ -240,7 +225,7 @@ const ProductDetailModal = ({ product, isOpen, onClose, reviews = [], onAddToCar
               onClick={handleImageClick}
             >
               <img 
-                src={image} 
+                src={imageUrl} 
                 alt={name} 
                 className="w-full h-auto object-cover"
               />
