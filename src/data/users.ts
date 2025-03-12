@@ -3,7 +3,6 @@ export interface User {
   username: string;
   password: string;
   displayName?: string;
-  isAdmin?: boolean;
 }
 
 export const users: User[] = [
@@ -16,12 +15,6 @@ export const users: User[] = [
     username: 'test@example.com',
     password: 'test123',
     displayName: 'Test User'
-  },
-  {
-    username: 'Omar Tarek',
-    password: 'otdk1234',
-    displayName: 'Omar Tarek',
-    isAdmin: true
   }
 ];
 
