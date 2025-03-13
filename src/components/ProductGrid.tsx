@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { Product } from '../data/productData';
 import { useToast } from '@/components/ui/use-toast';
 import ProductDetailModal from './ProductDetailModal';
-import { Heart } from 'lucide-react';
 
 interface ProductGridProps {
   products: Product[];
@@ -43,29 +42,6 @@ const ProductGrid = ({
 
   const closeModal = () => {
     setIsDetailModalOpen(false);
-  };
-
-  const toggleWishlist = (event: React.MouseEvent, productId: number) => {
-    event.stopPropagation();
-    
-    let newWishlist: number[];
-    if (wishlist.includes(productId)) {
-      newWishlist = wishlist.filter(id => id !== productId);
-      toast({
-        description: "Product removed from wishlist",
-      });
-    } else {
-      newWishlist = [...wishlist, productId];
-      toast({
-        description: "Product added to wishlist",
-      });
-    }
-    
-    setWishlist(newWishlist);
-    
-    // Save updated wishlist to localStorage
-    const wishlistProducts = products.filter(product => newWishlist.includes(product.id));
-    localStorage.setItem('wishlist', JSON.stringify(wishlistProducts));
   };
 
   const getProductPrice = (product: Product) => {
@@ -116,35 +92,26 @@ const ProductGrid = ({
       {products.map((product) => {
         const discountPercentage = getDiscountPercentage(product);
         const hasDiscount = discountPercentage > 0;
-        const isWishlisted = wishlist.includes(product.id);
 
         return (
           <div 
             key={product.id}
+            onClick={() => handleProductClick(product)}
             className="bg-card rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
           >
-            <div className="relative" onClick={() => handleProductClick(product)}>
+            <div className="relative">
               <img 
                 src={product.imageUrl} 
                 alt={product.name} 
                 className="product-image"
               />
-              
-              {/* Wishlist Heart Icon */}
-              <button 
-                onClick={(e) => toggleWishlist(e, product.id)}
-                className="absolute top-2 right-2 p-1.5 bg-white/80 dark:bg-card/80 rounded-full text-muted-foreground hover:text-destructive"
-              >
-                <Heart className={isWishlisted ? "fill-destructive text-destructive" : ""} size={18} />
-              </button>
-              
               {hasDiscount && (
-                <div className="absolute top-2 left-2 bg-destructive text-white text-xs font-bold px-2 py-1 rounded">
+                <div className="absolute top-2 right-2 bg-destructive text-white text-xs font-bold px-2 py-1 rounded">
                   {discountPercentage}% OFF
                 </div>
               )}
             </div>
-            <div className="p-4" onClick={() => handleProductClick(product)}>
+            <div className="p-4">
               <h3 className="text-lg font-semibold mb-1 line-clamp-1">{product.name}</h3>
               <div className="flex justify-between items-center mb-3">
                 <div className="flex items-center">

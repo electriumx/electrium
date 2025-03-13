@@ -1,5 +1,4 @@
-
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Input } from "@/components/ui/input";
@@ -17,13 +16,9 @@ import {
   Edit,
   Trash,
   ChevronDown,
-  ChevronRight,
-  X,
-  Search
+  ChevronRight
 } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
-import { Product, products } from '../data/productData';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Product } from '../data/productData';
 
 interface SavedCard {
   id: string;
@@ -33,18 +28,8 @@ interface SavedCard {
   default?: boolean;
 }
 
-interface ProductSuggestion {
-  id: number;
-  name: string;
-  price: number;
-  imageUrl: string;
-  brand?: string;
-  category: string;
-}
-
 const Payment = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [cardName, setCardName] = useState('');
   const [cardNumber, setCardNumber] = useState('');
@@ -77,27 +62,10 @@ const Payment = () => {
   const [deliveryOption, setDeliveryOption] = useState('normal');
   const [deliveryTime, setDeliveryTime] = useState('');
   const [deliveryLocation, setDeliveryLocation] = useState('');
-  const [tradeItemSearch, setTradeItemSearch] = useState('');
-  const [tradeItems, setTradeItems] = useState<ProductSuggestion[]>([]);
-  const [showTradeItemSuggestions, setShowTradeItemSuggestions] = useState(false);
+  const [tradeItems, setTradeItems] = useState<string[]>([]);
   const [tradeValue, setTradeValue] = useState(0);
   const [tradeDescription, setTradeDescription] = useState('');
   const [tradeItemCondition, setTradeItemCondition] = useState('good');
-  const [tradeValueError, setTradeValueError] = useState<string | null>(null);
-  const [availableCoupons, setAvailableCoupons] = useState<{code: string, discount: number, type: string, target: string}[]>([]);
-  const [productSuggestions, setProductSuggestions] = useState<ProductSuggestion[]>([]);
-  
-  // New states for dynamic delivery options
-  const [deliveryDate, setDeliveryDate] = useState('');
-  const [deliveryTimeWindow, setDeliveryTimeWindow] = useState('');
-  const [deliveryDistance, setDeliveryDistance] = useState(5); // default 5 miles
-
-  const conditionMultipliers = {
-    'like-new': 0.9,
-    'good': 0.7,
-    'fair': 0.5,
-    'poor': 0.3
-  };
 
   useEffect(() => {
     const cartData = localStorage.getItem('cart');
@@ -145,111 +113,23 @@ const Payment = () => {
     if (discountsData) {
       try {
         const parsedDiscounts = JSON.parse(discountsData);
-        setDiscounts(parsedDiscounts);
+        const formattedDiscounts: Record<string, number> = {};
+        Object.entries(parsedDiscounts).forEach(([brand, data]) => {
+          if (typeof data === 'object' && data !== null && 'value' in data && 'expiresAt' in data) {
+            const { value, expiresAt } = data as { value: number, expiresAt: number };
+            if (expiresAt > Date.now()) {
+              formattedDiscounts[brand] = value;
+            }
+          }
+        });
+        setDiscounts(formattedDiscounts);
       } catch (error) {
         console.error('Error parsing discounts:', error);
       }
     }
-
-    const couponsData = localStorage.getItem('coupons');
-    if (couponsData) {
-      try {
-        const parsedCoupons = JSON.parse(couponsData);
-        setAvailableCoupons(parsedCoupons);
-      } catch (error) {
-        console.error('Error parsing coupons:', error);
-      }
-    } else {
-      const defaultCoupons = [
-        { code: 'SAVE10', discount: 10, type: 'percentage', target: 'all' },
-        { code: 'SAVE20', discount: 20, type: 'percentage', target: 'all' }
-      ];
-      setAvailableCoupons(defaultCoupons);
-      localStorage.setItem('coupons', JSON.stringify(defaultCoupons));
-    }
-    
-    if (products) {
-      const suggestions: ProductSuggestion[] = products.map(product => ({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        imageUrl: product.imageUrl,
-        brand: product.brand,
-        category: product.category
-      }));
-      setProductSuggestions(suggestions);
-    }
-    
-    // Set default delivery time
-    updateEstimatedDeliveryTime();
     
     window.scrollTo(0, 0);
   }, []);
-
-  useEffect(() => {
-    updateEstimatedDeliveryTime();
-  }, [deliveryOption, deliveryDistance]);
-
-  useEffect(() => {
-    if (tradeItems.length > 0) {
-      const baseValue = tradeItems.reduce((sum, item) => sum + item.price, 0);
-      const multiplier = conditionMultipliers[tradeItemCondition as keyof typeof conditionMultipliers] || 0.7;
-      setTradeValue(baseValue * multiplier);
-    } else {
-      setTradeValue(0);
-    }
-  }, [tradeItems, tradeItemCondition]);
-
-  useEffect(() => {
-    if (tradeItemSearch && tradeItemSearch.length > 1) {
-      const filtered = productSuggestions.filter(product => 
-        product.name.toLowerCase().includes(tradeItemSearch.toLowerCase()) ||
-        (product.brand && product.brand.toLowerCase().includes(tradeItemSearch.toLowerCase()))
-      );
-      setShowTradeItemSuggestions(filtered.length > 0);
-    } else {
-      setShowTradeItemSuggestions(false);
-    }
-  }, [tradeItemSearch, productSuggestions]);
-
-  useEffect(() => {
-    const total = calculateTotal();
-    if (paymentMethod === 'trade' && tradeValue > 0) {
-      if (tradeValue < total) {
-        setTradeValueError("The item you are trying to trade does not match up with the value of the selected items in your cart.");
-      } else {
-        setTradeValueError(null);
-      }
-    }
-  }, [tradeValue, cart, paymentMethod]);
-
-  const updateEstimatedDeliveryTime = () => {
-    const now = new Date();
-    let deliveryMinutes = 0;
-    let deliveryTimeText = '';
-    
-    if (deliveryOption === 'normal') {
-      // 1-3 days for normal delivery
-      const days = Math.floor(Math.random() * 3) + 1;
-      const deliveryDate = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
-      setDeliveryDate(deliveryDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }));
-      setDeliveryTimeWindow('Between 9 AM and 5 PM');
-      deliveryTimeText = `${days} day${days > 1 ? 's' : ''} (${deliveryDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })})`;
-    } else if (deliveryOption === 'fast') {
-      // 45-90 minutes for fast delivery, adjusted by distance
-      deliveryMinutes = 45 + (deliveryDistance * 3);
-      const maxDeliveryMinutes = deliveryMinutes + 45;
-      
-      const deliveryTime = new Date(now.getTime() + deliveryMinutes * 60 * 1000);
-      const maxDeliveryTime = new Date(now.getTime() + maxDeliveryMinutes * 60 * 60 * 1000);
-      
-      setDeliveryDate('Today');
-      setDeliveryTimeWindow(`Between ${deliveryTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })} and ${maxDeliveryTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`);
-      deliveryTimeText = `${deliveryMinutes}-${maxDeliveryMinutes} minutes`;
-    }
-    
-    setDeliveryTime(deliveryTimeText);
-  };
 
   const getDiscountedPrice = (item: Product) => {
     if (!item.brand) return item.price;
@@ -290,14 +170,18 @@ const Payment = () => {
     if (deliveryOption === 'normal') {
       return 5;
     } else if (deliveryOption === 'fast') {
-      // Base fee is $15, but scales with distance
-      return 15 + (deliveryDistance * 0.5);
+      return 15;
     }
     return 0;
   };
 
   const getEstimatedDeliveryTime = () => {
-    return deliveryTime;
+    if (deliveryOption === 'normal') {
+      return '1-3 days';
+    } else if (deliveryOption === 'fast') {
+      return '45-90 minutes';
+    }
+    return '';
   };
 
   const calculateTradeDiscount = () => {
@@ -317,22 +201,16 @@ const Payment = () => {
   };
 
   const handleApplyCoupon = () => {
-    const coupon = availableCoupons.find(c => c.code === couponCode);
-    if (coupon) {
+    if (couponCode === 'SAVE10') {
       setAppliedCoupon(couponCode);
-      setCouponDiscount(coupon.discount);
-      toast({
-        title: "Coupon applied",
-        description: `${coupon.code} for ${coupon.discount}% off has been applied to your order.`
-      });
+      setCouponDiscount(10);
+    } else if (couponCode === 'SAVE20') {
+      setAppliedCoupon(couponCode);
+      setCouponDiscount(20);
     } else {
       setAppliedCoupon(null);
       setCouponDiscount(0);
-      toast({
-        variant: "destructive",
-        title: "Invalid coupon code",
-        description: "The coupon code you entered is not valid."
-      });
+      alert('Invalid coupon code');
     }
   };
 
@@ -397,47 +275,8 @@ const Payment = () => {
     setCardExpiry(formatted.substring(0, 5));
   };
 
-  const handleTradeItemSearch = (value: string) => {
-    setTradeItemSearch(value);
-    if (value.length > 1) {
-      const filtered = productSuggestions.filter(product => 
-        product.name.toLowerCase().includes(value.toLowerCase()) ||
-        (product.brand && product.brand.toLowerCase().includes(value.toLowerCase()))
-      );
-      setShowTradeItemSuggestions(filtered.length > 0);
-    } else {
-      setShowTradeItemSuggestions(false);
-    }
-  };
-
-  const handleAddTradeItem = (item: ProductSuggestion) => {
-    if (!tradeItems.some(existingItem => existingItem.id === item.id)) {
-      setTradeItems([...tradeItems, item]);
-      setTradeItemSearch('');
-      setShowTradeItemSuggestions(false);
-    }
-  };
-
-  const handleRemoveTradeItem = (itemId: number) => {
-    setTradeItems(tradeItems.filter(item => item.id !== itemId));
-  };
-  
-  const handleDeliveryDistanceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const distance = Number(e.target.value);
-    setDeliveryDistance(distance);
-  };
-
   const handleSubmitPayment = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (paymentMethod === 'trade' && tradeValueError) {
-      toast({
-        variant: "destructive",
-        title: "Trade value insufficient",
-        description: tradeValueError
-      });
-      return;
-    }
     
     setProcessingPayment(true);
     
@@ -462,9 +301,7 @@ const Payment = () => {
     } else if (paymentMethod === 'cash') {
       localStorage.setItem('deliveryPreferences', JSON.stringify({
         option: deliveryOption,
-        location: deliveryLocation,
-        distance: deliveryDistance,
-        estimatedTime: deliveryTime
+        location: deliveryLocation
       }));
     } else if (paymentMethod === 'trade') {
       localStorage.setItem('tradePreferences', JSON.stringify({
@@ -498,20 +335,10 @@ const Payment = () => {
     }
   };
 
-  const filteredProductSuggestions = useMemo(() => {
-    if (!tradeItemSearch || tradeItemSearch.length < 2) return [];
-    
-    return productSuggestions.filter(product => 
-      product.name.toLowerCase().includes(tradeItemSearch.toLowerCase()) ||
-      (product.brand && product.brand.toLowerCase().includes(tradeItemSearch.toLowerCase()))
-    ).slice(0, 5);
-  }, [tradeItemSearch, productSuggestions]);
-
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8">
       <h1 className="text-2xl font-bold mb-8 text-center">Complete Your Payment</h1>
       
-      {/* Main content layout */}
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="lg:w-7/12 space-y-6">
           <div className="lg:hidden mb-6">
@@ -573,7 +400,6 @@ const Payment = () => {
             )}
           </div>
           
-          {/* Payment Method Tabs */}
           <div className="p-6 bg-card rounded-lg border border-border">
             <h2 className="text-xl font-semibold mb-6">Payment Method</h2>
             
@@ -584,7 +410,6 @@ const Payment = () => {
                 <TabsTrigger value="trade">Item Trading</TabsTrigger>
               </TabsList>
               
-              {/* Credit Card Payment */}
               <TabsContent value="card" className="space-y-6">
                 {savedCards.length > 0 && (
                   <div className="space-y-4">
@@ -700,7 +525,6 @@ const Payment = () => {
                 )}
               </TabsContent>
               
-              {/* Cash on Delivery */}
               <TabsContent value="cash" className="space-y-4">
                 <p className="text-muted-foreground mb-4">Choose your delivery speed and provide your location details.</p>
                 
@@ -725,41 +549,12 @@ const Payment = () => {
                         <RadioGroupItem value="fast" id="fast" />
                         <Label htmlFor="fast" className="cursor-pointer">
                           <div>
-                            <p className="font-medium">Fast Delivery ({getEstimatedDeliveryTime()})</p>
-                            <p className="text-sm text-muted-foreground">${getDeliveryFee().toFixed(2)} delivery fee</p>
+                            <p className="font-medium">Fast Delivery (45-90 min)</p>
+                            <p className="text-sm text-muted-foreground">$15.00 delivery fee</p>
                           </div>
                         </Label>
                       </div>
                     </RadioGroup>
-                  </div>
-                  
-                  {deliveryOption === 'fast' && (
-                    <div className="space-y-2">
-                      <Label htmlFor="delivery-distance">Delivery Distance (miles)</Label>
-                      <div className="flex items-center gap-4">
-                        <Input 
-                          id="delivery-distance" 
-                          type="number"
-                          min="1"
-                          max="30"
-                          value={deliveryDistance}
-                          onChange={handleDeliveryDistanceChange}
-                          className="w-24"
-                        />
-                        <span className="text-sm text-muted-foreground">
-                          {deliveryDistance <= 5 ? 'Nearby' : 
-                           deliveryDistance <= 15 ? 'Medium distance' : 'Far distance'}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div className="bg-muted/30 rounded-lg p-4 mt-4">
-                    <h3 className="font-medium mb-2">Estimated Delivery</h3>
-                    <div className="space-y-1 text-sm">
-                      <p><span className="text-muted-foreground">Date:</span> {deliveryDate}</p>
-                      <p><span className="text-muted-foreground">Time:</span> {deliveryTimeWindow}</p>
-                    </div>
                   </div>
                   
                   <div className="space-y-2">
@@ -775,156 +570,90 @@ const Payment = () => {
                   <div className="mt-4 p-3 bg-muted rounded-lg">
                     <p className="text-sm text-muted-foreground">
                       <strong>Note:</strong> Payment will be collected upon delivery. Please have the exact amount ready.
-                      Minimum delivery time is {deliveryOption === 'fast' ? '45 minutes' : '1 day'} for {deliveryOption} delivery option.
+                      Minimum delivery time is 45 minutes for fast delivery option.
                     </p>
                   </div>
                 </div>
               </TabsContent>
               
-              {/* Item Trading */}
               <TabsContent value="trade" className="space-y-4">
                 <p className="text-muted-foreground mb-4">Trade in your items for store credit to use with this purchase.</p>
                 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="trade-items">Search for Items to Trade</Label>
-                    <div className="relative">
-                      <div className="flex">
-                        <div className="relative flex-1">
-                          <Input 
-                            id="trade-items" 
-                            placeholder="Search for products to trade..."
-                            value={tradeItemSearch}
-                            onChange={(e) => handleTradeItemSearch(e.target.value)}
-                            className="pr-8"
-                          />
-                          <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={16} />
-                        </div>
-                      </div>
-                      
-                      {showTradeItemSuggestions && (
-                        <div className="absolute z-50 w-full mt-1 bg-background border border-border rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                          <ul className="py-1">
-                            {filteredProductSuggestions.length === 0 ? (
-                              <li className="px-4 py-2 text-sm text-muted-foreground">No matching products found</li>
-                            ) : (
-                              filteredProductSuggestions.map(product => (
-                                <li 
-                                  key={product.id}
-                                  onClick={() => handleAddTradeItem(product)}
-                                  className="px-4 py-2 hover:bg-muted cursor-pointer flex items-center gap-3"
-                                >
-                                  <div className="w-8 h-8 bg-muted rounded overflow-hidden flex-shrink-0">
-                                    <img 
-                                      src={product.imageUrl} 
-                                      alt={product.name} 
-                                      className="w-full h-full object-cover"
-                                    />
-                                  </div>
-                                  <div>
-                                    <p className="text-sm font-medium">{product.name}</p>
-                                    <p className="text-xs text-muted-foreground">
-                                      {product.brand && `${product.brand} · `}${product.category} · ${product.price.toFixed(2)}
-                                    </p>
-                                  </div>
-                                </li>
-                              ))
-                            )}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
+                    <Label htmlFor="trade-items">Item Name(s) to Trade</Label>
+                    <Input 
+                      id="trade-items" 
+                      placeholder="PlayStation 4, iPhone 12, etc."
+                      value={tradeItems.join(', ')}
+                      onChange={(e) => setTradeItems(e.target.value.split(',').map(item => item.trim()))}
+                    />
                   </div>
                   
-                  {tradeItems.length > 0 && (
-                    <div className="border border-border rounded-lg p-3 space-y-3">
-                      <h3 className="font-medium">Selected Trade Items</h3>
-                      {tradeItems.map(item => (
-                        <div key={item.id} className="flex items-center justify-between p-2 bg-muted rounded">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-background rounded overflow-hidden">
-                              <img 
-                                src={item.imageUrl} 
-                                alt={item.name} 
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium">{item.name}</p>
-                              <p className="text-xs text-muted-foreground">Original value: ${item.price.toFixed(2)}</p>
-                            </div>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleRemoveTradeItem(item.id)}
-                            className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                          >
-                            <X size={16} />
-                          </Button>
-                        </div>
-                      ))}
-                      
-                      <div className="mt-4 pt-3 border-t border-border">
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <p className="font-medium">Condition</p>
-                            <p className="text-xs text-muted-foreground">Select the condition of your trade items</p>
-                          </div>
-                          <RadioGroup 
-                            value={tradeItemCondition} 
-                            onValueChange={setTradeItemCondition}
-                            className="flex gap-2"
-                          >
-                            <div className="flex items-center space-x-1">
-                              <RadioGroupItem value="like-new" id="like-new" />
-                              <Label htmlFor="like-new" className="text-xs cursor-pointer">Like New</Label>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <RadioGroupItem value="good" id="good" />
-                              <Label htmlFor="good" className="text-xs cursor-pointer">Good</Label>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <RadioGroupItem value="fair" id="fair" />
-                              <Label htmlFor="fair" className="text-xs cursor-pointer">Fair</Label>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <RadioGroupItem value="poor" id="poor" />
-                              <Label htmlFor="poor" className="text-xs cursor-pointer">Poor</Label>
-                            </div>
-                          </RadioGroup>
-                        </div>
-                        
-                        <div className="mt-3 flex justify-between items-center font-bold">
-                          <span>Total Trade Value:</span>
-                          <span>${tradeValue.toFixed(2)}</span>
-                        </div>
-                        
-                        {tradeValueError && (
-                          <div className="mt-2 text-sm text-destructive flex items-center gap-1">
-                            <AlertCircle size={14} />
-                            <span>{tradeValueError}</span>
-                          </div>
-                        )}
+                  <div className="space-y-2">
+                    <Label htmlFor="trade-description">Item Description</Label>
+                    <Input 
+                      id="trade-description" 
+                      placeholder="Details about the items you're trading"
+                      value={tradeDescription}
+                      onChange={(e) => setTradeDescription(e.target.value)}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="trade-condition">Item Condition</Label>
+                    <RadioGroup 
+                      value={tradeItemCondition} 
+                      onValueChange={setTradeItemCondition}
+                      className="flex flex-col space-y-2"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="like-new" id="like-new" />
+                        <Label htmlFor="like-new">Like New</Label>
                       </div>
-                    </div>
-                  )}
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="good" id="good" />
+                        <Label htmlFor="good">Good</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="fair" id="fair" />
+                        <Label htmlFor="fair">Fair</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="poor" id="poor" />
+                        <Label htmlFor="poor">Poor</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="trade-value">Estimated Trade Value ($)</Label>
+                    <Input 
+                      id="trade-value" 
+                      type="number"
+                      placeholder="0.00"
+                      value={tradeValue.toString()}
+                      onChange={(e) => setTradeValue(Number(e.target.value))}
+                    />
+                  </div>
+                  
+                  <div className="mt-4 p-3 bg-muted rounded-lg">
+                    <p className="text-sm text-muted-foreground">
+                      <strong>Note:</strong> After placing your order, you'll receive instructions for sending or dropping off your trade items. 
+                      Final trade value will be determined upon inspection.
+                    </p>
+                  </div>
                 </div>
               </TabsContent>
             </Tabs>
           </div>
           
-          {/* Billing Address */}
           <div className="p-6 bg-card rounded-lg border border-border">
             <h2 className="text-xl font-semibold mb-6">Billing Address</h2>
             
             {savedAddresses.length > 0 && (
-              <div className="mb-6 space-y-4">
-                <RadioGroup 
-                  value={selectedAddress || ''} 
-                  onValueChange={handleAddressSelection}
-                  className="space-y-3"
-                >
+              <div className="space-y-4 mb-6">
+                <RadioGroup value={selectedAddress || ''} onValueChange={handleAddressSelection} className="space-y-3">
                   {savedAddresses.map((address, index) => (
                     <div key={index} className="flex items-center space-x-2">
                       <RadioGroupItem value={address} id={`address-${index}`} />
@@ -948,9 +677,10 @@ const Payment = () => {
             {showAddressForm && (
               <form className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
+                  <Label htmlFor="full-name">Full Name</Label>
                   <Input 
-                    id="name" 
+                    id="full-name" 
+                    placeholder="John Doe" 
                     value={billingAddress.name}
                     onChange={(e) => setBillingAddress({...billingAddress, name: e.target.value})}
                     required
@@ -961,6 +691,7 @@ const Payment = () => {
                   <Label htmlFor="street">Street Address</Label>
                   <Input 
                     id="street" 
+                    placeholder="123 Main St" 
                     value={billingAddress.street}
                     onChange={(e) => setBillingAddress({...billingAddress, street: e.target.value})}
                     required
@@ -972,6 +703,7 @@ const Payment = () => {
                     <Label htmlFor="city">City</Label>
                     <Input 
                       id="city" 
+                      placeholder="New York" 
                       value={billingAddress.city}
                       onChange={(e) => setBillingAddress({...billingAddress, city: e.target.value})}
                       required
@@ -982,6 +714,7 @@ const Payment = () => {
                     <Label htmlFor="state">State</Label>
                     <Input 
                       id="state" 
+                      placeholder="NY" 
                       value={billingAddress.state}
                       onChange={(e) => setBillingAddress({...billingAddress, state: e.target.value})}
                       required
@@ -994,6 +727,7 @@ const Payment = () => {
                     <Label htmlFor="zip">ZIP Code</Label>
                     <Input 
                       id="zip" 
+                      placeholder="10001" 
                       value={billingAddress.zip}
                       onChange={(e) => setBillingAddress({...billingAddress, zip: e.target.value})}
                       required
@@ -1004,120 +738,145 @@ const Payment = () => {
                     <Label htmlFor="country">Country</Label>
                     <Input 
                       id="country" 
+                      placeholder="United States" 
                       value={billingAddress.country}
                       onChange={(e) => setBillingAddress({...billingAddress, country: e.target.value})}
                       required
                     />
                   </div>
                 </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Switch 
+                    id="same-address" 
+                    checked={sameAsShipping}
+                    onCheckedChange={setSameAsShipping}
+                  />
+                  <Label htmlFor="same-address">Same as shipping address</Label>
+                </div>
               </form>
             )}
           </div>
+          
+          <div className="p-6 bg-card rounded-lg border border-border">
+            <h2 className="text-xl font-semibold mb-4">Have a Coupon?</h2>
+            
+            <div className="flex gap-2">
+              <Input 
+                placeholder="Enter coupon code" 
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value)}
+                disabled={!!appliedCoupon}
+              />
+              <Button 
+                variant={appliedCoupon ? "outline" : "default"} 
+                onClick={appliedCoupon ? () => {
+                  setAppliedCoupon(null);
+                  setCouponDiscount(0);
+                  setCouponCode('');
+                } : handleApplyCoupon}
+                className="whitespace-nowrap"
+              >
+                {appliedCoupon ? "Remove" : "Apply Coupon"}
+              </Button>
+            </div>
+            
+            {appliedCoupon && (
+              <div className="mt-3 p-2 bg-green-500/10 rounded flex items-center gap-2 text-green-500">
+                <CheckCircle size={16} />
+                <span className="text-sm">Coupon "{appliedCoupon}" applied for {couponDiscount}% discount!</span>
+              </div>
+            )}
+          </div>
+          
+          <Button 
+            onClick={handleSubmitPayment}
+            disabled={processingPayment}
+            className="w-full py-6 text-lg"
+          >
+            {processingPayment ? 'Processing...' : `Pay $${calculateTotal().toFixed(2)}`}
+          </Button>
+          
+          <div className="text-center text-sm text-muted-foreground">
+            <p>By completing this purchase, you agree to our <a href="#" className="underline">Terms of Service</a> and <a href="#" className="underline">Privacy Policy</a>.</p>
+          </div>
         </div>
         
-        {/* Order Summary */}
-        <div className="lg:w-5/12 space-y-6">
-          <div className="hidden lg:block sticky top-20">
-            <div className="p-6 bg-card rounded-lg border border-border">
-              <h2 className="text-xl font-semibold mb-6">Order Summary</h2>
-              
-              <div className="space-y-4 mb-6">
-                {cart.map((item) => (
-                  <div key={item.id} className="flex gap-4">
-                    <div className="flex-shrink-0 w-20 h-20 bg-muted rounded overflow-hidden">
-                      <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-medium">{item.name}</h3>
-                      <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
-                      <p className="font-semibold">${calculateItemTotal(item).toFixed(2)}</p>
-                    </div>
+        <div className="hidden lg:block lg:w-5/12">
+          <div className="sticky top-20 p-6 bg-card rounded-lg border border-border">
+            <h2 className="text-xl font-semibold mb-6">Order Summary</h2>
+            
+            <div className="max-h-[400px] overflow-y-auto pr-2 space-y-4 mb-6">
+              {cart.map((item) => (
+                <div key={item.id} className="flex gap-4">
+                  <div className="flex-shrink-0 w-20 h-20 bg-muted rounded overflow-hidden">
+                    <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
                   </div>
-                ))}
+                  <div className="flex-1">
+                    <h3 className="font-medium">{item.name}</h3>
+                    <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
+                    {item.accessories && item.accessories.length > 0 && (
+                      <p className="text-xs text-muted-foreground">
+                        With: {item.accessories.filter(a => a.selected).map(a => a.name).join(', ')}
+                      </p>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold">${calculateItemTotal(item).toFixed(2)}</p>
+                    {item.brand && discounts[item.brand] && (
+                      <p className="text-xs text-destructive">
+                        {discounts[item.brand]}% off
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <Separator className="my-4" />
+            
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+                <span>${calculateSubtotal().toFixed(2)}</span>
               </div>
               
-              <div className="flex gap-2 mb-6">
-                <Input 
-                  placeholder="Enter coupon code" 
-                  value={couponCode}
-                  onChange={(e) => setCouponCode(e.target.value)}
-                  className="flex-1"
-                />
-                <Button onClick={handleApplyCoupon}>Apply</Button>
+              <div className="flex justify-between">
+                <span>Shipping</span>
+                <span>
+                  {calculateShipping() === 0 ? 'Free' : `$${calculateShipping().toFixed(2)}`}
+                </span>
               </div>
               
-              <div className="space-y-2 mb-6">
-                <div className="flex justify-between">
-                  <span>Subtotal</span>
-                  <span>${calculateSubtotal().toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Shipping</span>
-                  <span>
-                    {calculateShipping() === 0 ? 'Free' : `$${calculateShipping().toFixed(2)}`}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Tax</span>
-                  <span>${calculateTax().toFixed(2)}</span>
-                </div>
-                
-                {paymentMethod === 'cash' && (
-                  <div className="flex justify-between">
-                    <span>Delivery Fee</span>
-                    <span>${getDeliveryFee().toFixed(2)}</span>
-                  </div>
-                )}
-                
-                {appliedCoupon && (
-                  <div className="flex justify-between text-destructive">
-                    <span>Discount ({appliedCoupon})</span>
-                    <span>-${(couponDiscount / 100 * calculateSubtotal()).toFixed(2)}</span>
-                  </div>
-                )}
-                
-                {paymentMethod === 'trade' && tradeValue > 0 && (
-                  <div className="flex justify-between text-green-500">
-                    <span>Trade-in Credit</span>
-                    <span>-${tradeValue.toFixed(2)}</span>
-                  </div>
-                )}
-                
-                <Separator className="my-2" />
-                
-                <div className="flex justify-between text-lg font-bold pt-2">
-                  <span>Total</span>
-                  <span>${calculateTotal().toFixed(2)}</span>
-                </div>
+              <div className="flex justify-between">
+                <span>Tax (8%)</span>
+                <span>${calculateTax().toFixed(2)}</span>
               </div>
               
-              <Button 
-                className="w-full" 
-                size="lg"
-                onClick={handleSubmitPayment}
-                disabled={processingPayment || (paymentMethod === 'trade' && !!tradeValueError)}
-              >
-                {processingPayment ? (
-                  <span className="flex items-center gap-2">
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      className="h-4 w-4 border-2 border-current border-t-transparent rounded-full"
-                    />
-                    Processing...
-                  </span>
-                ) : (
-                  paymentMethod === 'card' ? 'Pay Now' : 
-                  paymentMethod === 'cash' ? 'Place Order' : 
-                  'Complete Trade'
-                )}
-              </Button>
-              
-              <div className="mt-4 flex justify-center">
-                <p className="text-sm text-muted-foreground">
-                  You can review your order before confirming
-                </p>
+              {appliedCoupon && (
+                <div className="flex justify-between text-destructive">
+                  <span>Discount ({appliedCoupon})</span>
+                  <span>-${(couponDiscount / 100 * calculateSubtotal()).toFixed(2)}</span>
+                </div>
+              )}
+            </div>
+            
+            <Separator className="my-4" />
+            
+            <div className="flex justify-between font-bold text-lg">
+              <span>Total</span>
+              <span>${calculateTotal().toFixed(2)}</span>
+            </div>
+            
+            <div className="mt-6 p-3 bg-muted/50 rounded-lg text-sm flex items-start gap-3">
+              <div className="flex-shrink-0 mt-0.5">
+                <AlertCircle size={18} className="text-muted-foreground" />
               </div>
+              <p className="text-muted-foreground">
+                Orders usually ship within 1-2 business days. 
+                Free shipping on orders over $100. 
+                International shipping available.
+              </p>
             </div>
           </div>
         </div>
