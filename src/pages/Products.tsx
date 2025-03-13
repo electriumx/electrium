@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import ProductFilters from '../components/ProductFilters';
 import ProductGrid from '../components/ProductGrid';
@@ -7,8 +8,10 @@ import AIChat from '../components/AIChat';
 import FloatingActions from '../components/FloatingActions';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Product, products } from '../data/productData';
+
 const Products = () => {
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   const [cart, setCart] = useState<Product[]>([]);
   const [discounts, setDiscounts] = useState<Record<string, {
     value: number;
@@ -21,6 +24,7 @@ const Products = () => {
   const navigate = useNavigate();
   const maxPrice = Math.max(...products.map(p => p.price));
   const [priceRange, setPriceRange] = useState<[number, number]>([0, maxPrice]);
+
   useEffect(() => {
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
@@ -31,6 +35,7 @@ const Products = () => {
         console.error('Error parsing cart from localStorage:', error);
       }
     }
+    
     const savedDiscounts = localStorage.getItem('discounts');
     if (savedDiscounts) {
       try {
@@ -39,6 +44,7 @@ const Products = () => {
           value: number;
           expiresAt: number;
         }> = {};
+        
         Object.entries(parsedDiscounts).forEach(([brand, value]) => {
           if (typeof value === 'number') {
             formattedDiscounts[brand] = {
@@ -52,18 +58,21 @@ const Products = () => {
             };
           }
         });
+        
         const currentTime = Date.now();
         Object.keys(formattedDiscounts).forEach(brand => {
           if (formattedDiscounts[brand].expiresAt < currentTime || formattedDiscounts[brand].value === 0) {
             delete formattedDiscounts[brand];
           }
         });
+        
         setDiscounts(formattedDiscounts);
         localStorage.setItem('discounts', JSON.stringify(formattedDiscounts));
       } catch (error) {
         console.error('Error parsing discounts from localStorage:', error);
       }
     }
+    
     window.scrollTo(0, 0);
   }, []);
 
@@ -72,21 +81,31 @@ const Products = () => {
     const handleCartUpdate = (e: CustomEvent) => {
       setCart(e.detail || []);
     };
+    
     window.addEventListener('cartUpdate', handleCartUpdate as EventListener);
     return () => window.removeEventListener('cartUpdate', handleCartUpdate as EventListener);
   }, []);
+
   const handleFilterChange = (brands: string[]) => {
     setSelectedBrands(brands);
   };
+  
+  const handleSubCategoryChange = (subcategories: string[]) => {
+    setSelectedSubcategories(subcategories);
+  };
+
   const handlePriceRangeChange = (range: [number, number]) => {
     setPriceRange(range);
   };
+
   const handleSearch = (query: string) => {
     setSearchQuery(query);
   };
+
   const handleQuantityChange = (id: number, quantity: number) => {
     const updatedCart = [...cart];
     const existingItemIndex = updatedCart.findIndex(item => item.id === id);
+    
     if (existingItemIndex !== -1) {
       if (quantity === 0) {
         updatedCart.splice(existingItemIndex, 1);
@@ -102,6 +121,7 @@ const Products = () => {
         });
       }
     }
+    
     setCart(updatedCart);
     localStorage.setItem('cart', JSON.stringify(updatedCart));
 
@@ -111,6 +131,7 @@ const Products = () => {
     });
     window.dispatchEvent(event);
   };
+
   const handleSpinWin = (brand: string, discount: number, expiresAt: number) => {
     const newDiscounts = {
       ...discounts,
@@ -119,30 +140,53 @@ const Products = () => {
         expiresAt
       }
     };
+    
     setDiscounts(newDiscounts);
     localStorage.setItem('discounts', JSON.stringify(newDiscounts));
   };
-  const handleSpin = () => {
-    // This function would trigger the wheel to spin
-    console.log("Spinning the wheel");
-    // Wheel spinning logic would be in the SpinWheel component
-  };
+
   const toggleChat = () => {
     setIsChatOpen(!isChatOpen);
   };
+
+  // Filter products based on all criteria
   let filteredProducts = products;
+  
+  // Filter by brand/category
   if (selectedBrands.length > 0) {
-    filteredProducts = filteredProducts.filter(product => selectedBrands.includes(product.brand));
+    filteredProducts = filteredProducts.filter(product => selectedBrands.includes(product.brand) || selectedBrands.includes(product.category));
   }
+  
+  // Filter by subcategory (this would require adding subcategory field to products)
+  if (selectedSubcategories.length > 0) {
+    // For demonstration, let's filter by checking if the product name or description contains any of the selected subcategories
+    filteredProducts = filteredProducts.filter(product => {
+      const productText = `${product.name} ${product.description}`.toLowerCase();
+      return selectedSubcategories.some(subcategory => 
+        productText.includes(subcategory.toLowerCase())
+      );
+    });
+  }
+  
+  // Filter by price
   if (priceRange[0] > 0 || priceRange[1] < maxPrice) {
     filteredProducts = filteredProducts.filter(product => product.price >= priceRange[0] && product.price <= priceRange[1]);
   }
+  
+  // Filter by search query
   if (searchQuery) {
     const query = searchQuery.toLowerCase();
-    filteredProducts = filteredProducts.filter(product => product.name.toLowerCase().includes(query) || product.brand.toLowerCase().includes(query));
+    filteredProducts = filteredProducts.filter(product => 
+      product.name.toLowerCase().includes(query) || 
+      product.brand.toLowerCase().includes(query) ||
+      product.description.toLowerCase().includes(query)
+    );
   }
+
   const cartItemCount = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
-  return <div className="container mx-auto max-w-7xl px-4 py-8">
+
+  return (
+    <div className="container mx-auto max-w-7xl px-4 py-8">
       <h1 className="text-2xl font-bold mb-4 text-center text-foreground">Our Products</h1>
       
       <div className="mb-6 flex justify-center">
@@ -151,41 +195,65 @@ const Products = () => {
         </button>
       </div>
       
-      {showSpinWheel && <div className="mb-8 text-center">
+      {showSpinWheel && (
+        <div className="mb-8 text-center">
           <SpinWheel onWin={handleSpinWin} />
-          
-        </div>}
+        </div>
+      )}
       
-      {Object.keys(discounts).length > 0 && <div className="mb-6 p-4 bg-card rounded-lg border border-border">
+      {Object.keys(discounts).length > 0 && (
+        <div className="mb-6 p-4 bg-card rounded-lg border border-border">
           <h2 className="text-lg font-semibold mb-2">Active Discounts</h2>
           <div className="flex flex-wrap gap-2">
             {Object.entries(discounts).map(([brand, discount]) => {
-          if (discount.value <= 0) return null;
-          const now = Date.now();
-          const timeRemaining = discount.expiresAt - now;
-          const hoursRemaining = Math.floor(timeRemaining / (1000 * 60 * 60));
-          return <span key={brand} className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-destructive/20 text-destructive">
+              if (discount.value <= 0) return null;
+              const now = Date.now();
+              const timeRemaining = discount.expiresAt - now;
+              const hoursRemaining = Math.floor(timeRemaining / (1000 * 60 * 60));
+              return (
+                <span key={brand} className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-destructive/20 text-destructive">
                   {brand}: {discount.value}% off ({hoursRemaining}h left)
-                </span>;
-        })}
+                </span>
+              );
+            })}
           </div>
-        </div>}
+        </div>
+      )}
       
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="lg:w-1/4">
-          <ProductFilters onFilterChange={handleFilterChange} selectedBrands={selectedBrands} priceRange={priceRange} onPriceRangeChange={handlePriceRangeChange} maxPrice={maxPrice} onSearch={handleSearch} />
+          <ProductFilters 
+            onFilterChange={handleFilterChange} 
+            selectedBrands={selectedBrands} 
+            priceRange={priceRange} 
+            onPriceRangeChange={handlePriceRangeChange} 
+            maxPrice={maxPrice} 
+            onSearch={handleSearch}
+            onSubCategoryChange={handleSubCategoryChange}
+          />
         </div>
         
         <div className="lg:w-3/4">
-          <ProductGrid products={filteredProducts} onQuantityChange={handleQuantityChange} discounts={discounts} showWishlistButton={false} />
+          <ProductGrid 
+            products={filteredProducts} 
+            onQuantityChange={handleQuantityChange} 
+            discounts={discounts} 
+            showWishlistButton={false} 
+          />
         </div>
       </div>
       
       <CartSummary cart={cart} />
       
-      <FloatingActions showCheckout={true} cartItemCount={cartItemCount} toggleChat={toggleChat} />
+      <FloatingActions 
+        showCheckout={true} 
+        cartItemCount={cartItemCount} 
+        toggleChat={toggleChat} 
+      />
       
       {isChatOpen && <AIChat onClose={toggleChat} />}
-    </div>;
+    </div>
+  );
 };
+
 export default Products;

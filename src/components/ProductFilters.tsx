@@ -1,8 +1,13 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, ChevronDown, ChevronUp } from "lucide-react";
+
+interface SubCategory {
+  name: string;
+  parent: string;
+}
 
 interface ProductFiltersProps {
   selectedBrands: string[];
@@ -11,6 +16,7 @@ interface ProductFiltersProps {
   onPriceRangeChange: (range: [number, number]) => void;
   maxPrice: number;
   onSearch: (query: string) => void;
+  onSubCategoryChange?: (subcategories: string[]) => void;
 }
 
 const ProductFilters = ({ 
@@ -19,11 +25,28 @@ const ProductFilters = ({
   priceRange, 
   onPriceRangeChange, 
   maxPrice,
-  onSearch 
+  onSearch,
+  onSubCategoryChange
 }: ProductFiltersProps) => {
   const brands = ["Apple", "Samsung", "Sony", "Google", "Microsoft", "Xiaomi", "Audio", "PlayStation", "PC Games"];
   const accessories = ["Headphones", "Cases", "Chargers", "Screen Protectors", "Cables", "Memory Cards"];
+  
+  // Define subcategories for each main category
+  const subcategories: Record<string, string[]> = {
+    "Smartphones": ["iPhone", "Android", "Foldable", "Budget", "Premium", "Camera-focused", "Battery-focused"],
+    "Laptops": ["Gaming", "Business", "Ultrabook", "2-in-1", "Budget", "Premium", "Chromebook"],
+    "Gaming Consoles": ["Home Console", "Portable", "Retro", "VR", "Accessories"],
+    "TVs": ["OLED", "QLED", "LED", "Smart TV", "4K", "8K", "Budget"],
+    "Headphones": ["Over-ear", "In-ear", "Wireless", "Noise-cancelling", "Gaming", "Sports"],
+    "PC Accessories": ["Keyboards", "Mice", "Monitors", "Webcams", "Microphones", "Speakers"],
+    "Tablets": ["iOS", "Android", "Windows", "E-readers", "Budget", "Premium"],
+    "Games": ["Action", "RPG", "Strategy", "Sports", "Simulation", "Racing", "Puzzle"]
+  };
+  
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
+  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
   
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,6 +56,36 @@ const ProductFilters = ({
   const handlePriceChange = (values: number[]) => {
     onPriceRangeChange([values[0], values[1]]);
   };
+  
+  const toggleCategory = (category: string) => {
+    setExpandedCategories({
+      ...expandedCategories,
+      [category]: !expandedCategories[category]
+    });
+    
+    if (selectedCategory !== category) {
+      setSelectedCategory(category);
+    }
+  };
+  
+  const handleSubcategoryClick = (subcategory: string) => {
+    let newSelectedSubcategories = [...selectedSubcategories];
+    
+    if (newSelectedSubcategories.includes(subcategory)) {
+      newSelectedSubcategories = newSelectedSubcategories.filter(sc => sc !== subcategory);
+    } else {
+      newSelectedSubcategories.push(subcategory);
+    }
+    
+    setSelectedSubcategories(newSelectedSubcategories);
+    
+    if (onSubCategoryChange) {
+      onSubCategoryChange(newSelectedSubcategories);
+    }
+  };
+  
+  // Get all available categories from the brands
+  const categories = Object.keys(subcategories);
   
   return (
     <div className="space-y-4">
@@ -76,6 +129,48 @@ const ProductFilters = ({
               ${priceRange[1]}
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Categories Filter */}
+      <div className="p-4 rounded-lg bg-card shadow-md">
+        <h3 className="text-lg font-semibold mb-4 text-foreground">Categories</h3>
+        <div className="flex flex-col gap-2">
+          {categories.map((category) => (
+            <div key={category} className="border-b border-border pb-2 last:border-0">
+              <button
+                className="w-full flex justify-between items-center p-2 hover:bg-muted rounded-md transition-colors"
+                onClick={() => toggleCategory(category)}
+              >
+                <span className={`${selectedBrands.includes(category) ? 'text-sage-500 font-semibold' : ''}`}>
+                  {category}
+                </span>
+                {expandedCategories[category] ? (
+                  <ChevronUp size={16} />
+                ) : (
+                  <ChevronDown size={16} />
+                )}
+              </button>
+              
+              {expandedCategories[category] && subcategories[category] && (
+                <div className="ml-4 mt-2 flex flex-col gap-1">
+                  {subcategories[category].map((subcategory) => (
+                    <button
+                      key={subcategory}
+                      onClick={() => handleSubcategoryClick(subcategory)}
+                      className={`text-left p-1 text-sm rounded hover:bg-muted transition-colors ${
+                        selectedSubcategories.includes(subcategory) 
+                          ? 'text-sage-500 font-semibold'
+                          : 'text-muted-foreground'
+                      }`}
+                    >
+                      {subcategory}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       </div>
 

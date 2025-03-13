@@ -1,3 +1,4 @@
+
 export interface Product {
   id: number;
   name: string;
@@ -6,6 +7,7 @@ export interface Product {
   imageUrl: string;
   brand: string;
   category: string;
+  subcategory?: string; // Added for subcategory filtering
   rating: number;
   reviews: number;
   quantity?: number;
@@ -19,9 +21,28 @@ export interface ProductAccessory {
   price: number;
   category: string;
   selected?: boolean;
-  image?: string; // Added image property
+  image?: string;
 }
 
+// Helper function to generate a more reasonable price based on product type
+const generateReasonablePrice = (category: string, premium: boolean = false): number => {
+  const priceRanges: Record<string, [number, number]> = {
+    'Smartphones': premium ? [699, 1299] : [299, 699],
+    'Laptops': premium ? [999, 1999] : [499, 999],
+    'Gaming Consoles': [299, 599],
+    'TVs': premium ? [799, 2499] : [299, 799],
+    'Headphones': premium ? [199, 399] : [49, 199],
+    'PC Accessories': [29, 199],
+    'Tablets': premium ? [499, 999] : [199, 499],
+    'Games': [29, 69],
+    'Accessories': [9, 99]
+  };
+  
+  const [min, max] = priceRanges[category] || [29, 299];
+  return Math.round((Math.random() * (max - min) + min) * 100) / 100;
+}
+
+// Generate original set of base products
 export const products: Product[] = [
   {
     id: 1,
@@ -411,3 +432,219 @@ export const products: Product[] = [
     ]
   }
 ];
+
+// Generate additional products for each category
+const categories = [
+  'Smartphones', 'Laptops', 'Gaming Consoles', 'TVs', 
+  'Headphones', 'PC Accessories', 'Tablets', 'Games'
+];
+
+// Subcategories mapping
+const subcategories: Record<string, string[]> = {
+  "Smartphones": ["iPhone", "Android", "Foldable", "Budget", "Premium", "Camera-focused", "Battery-focused"],
+  "Laptops": ["Gaming", "Business", "Ultrabook", "2-in-1", "Budget", "Premium", "Chromebook"],
+  "Gaming Consoles": ["Home Console", "Portable", "Retro", "VR", "Accessories"],
+  "TVs": ["OLED", "QLED", "LED", "Smart TV", "4K", "8K", "Budget"],
+  "Headphones": ["Over-ear", "In-ear", "Wireless", "Noise-cancelling", "Gaming", "Sports"],
+  "PC Accessories": ["Keyboards", "Mice", "Monitors", "Webcams", "Microphones", "Speakers"],
+  "Tablets": ["iOS", "Android", "Windows", "E-readers", "Budget", "Premium"],
+  "Games": ["Action", "RPG", "Strategy", "Sports", "Simulation", "Racing", "Puzzle"]
+};
+
+// Brand mappings per category
+const brandsByCategory: Record<string, string[]> = {
+  "Smartphones": ["Apple", "Samsung", "Google", "Xiaomi"],
+  "Laptops": ["Apple", "Dell", "HP", "Lenovo", "ASUS", "Microsoft"],
+  "Gaming Consoles": ["PlayStation", "Microsoft", "Nintendo"],
+  "TVs": ["Samsung", "Sony", "LG", "TCL"],
+  "Headphones": ["Sony", "Bose", "Apple", "JBL", "Audio"],
+  "PC Accessories": ["Logitech", "Razer", "Corsair", "SteelSeries"],
+  "Tablets": ["Apple", "Samsung", "Microsoft", "Amazon"],
+  "Games": ["PlayStation", "PC Games", "Microsoft", "Nintendo"]
+};
+
+// Generate accessories for products
+const generateAccessories = (category: string): ProductAccessory[] => {
+  const accessoryCount = Math.floor(Math.random() * 3) + 1; // 1-3 accessories
+  const result: ProductAccessory[] = [];
+  
+  for (let i = 0; i < accessoryCount; i++) {
+    const accessoryType = Math.floor(Math.random() * 6);
+    let accessoryName = "";
+    let accessoryCat = "";
+    let price = 0;
+    
+    switch(accessoryType) {
+      case 0:
+        accessoryName = "Premium Case";
+        accessoryCat = "Cases";
+        price = generateReasonablePrice("Accessories", false);
+        break;
+      case 1:
+        accessoryName = "High-Speed Charger";
+        accessoryCat = "Chargers";
+        price = generateReasonablePrice("Accessories", false);
+        break;
+      case 2:
+        accessoryName = "Screen Protector";
+        accessoryCat = "Screen Protectors";
+        price = generateReasonablePrice("Accessories", false);
+        break;
+      case 3:
+        accessoryName = "Premium Headphones";
+        accessoryCat = "Headphones";
+        price = generateReasonablePrice("Headphones", false);
+        break;
+      case 4:
+        accessoryName = "Extended Warranty";
+        accessoryCat = "Services";
+        price = generateReasonablePrice("Accessories", true);
+        break;
+      case 5:
+        accessoryName = "Connectivity Cable";
+        accessoryCat = "Cables";
+        price = generateReasonablePrice("Accessories", false);
+        break;
+    }
+    
+    result.push({
+      id: `acc-${Date.now()}-${i}-${Math.random().toString(36).substring(2, 9)}`,
+      name: accessoryName,
+      price: price,
+      category: accessoryCat,
+      image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png'
+    });
+  }
+  
+  return result;
+};
+
+// Generate a large number of additional products
+let nextId = 100; // Start from ID 100 to avoid conflicts with existing products
+
+categories.forEach(category => {
+  // Get all subcategories for this category
+  const categorySubcategories = subcategories[category] || [];
+  // Get all brands for this category
+  const categoryBrands = brandsByCategory[category] || ["Generic"];
+  
+  // Generate 100 products for this category
+  for (let i = 0; i < 100; i++) {
+    const isPremium = Math.random() > 0.7; // 30% chance of being a premium product
+    const subcategory = categorySubcategories[Math.floor(Math.random() * categorySubcategories.length)];
+    const brand = categoryBrands[Math.floor(Math.random() * categoryBrands.length)];
+    
+    let productName, productDesc;
+    
+    switch (category) {
+      case 'Smartphones':
+        productName = `${brand} ${subcategory} Phone ${Math.floor(Math.random() * 20 + 1)}`;
+        productDesc = `A powerful ${subcategory.toLowerCase()} smartphone with great battery life and camera performance.`;
+        break;
+      case 'Laptops':
+        productName = `${brand} ${subcategory} Laptop ${String.fromCharCode(65 + Math.floor(Math.random() * 26))}${Math.floor(Math.random() * 900 + 100)}`;
+        productDesc = `High-performance ${subcategory.toLowerCase()} laptop ideal for productivity and entertainment.`;
+        break;
+      case 'Gaming Consoles':
+        productName = `${brand} ${subcategory} ${Math.floor(Math.random() * 10 + 1)}`;
+        productDesc = `Next-generation gaming experience with immersive graphics and fast loading times.`;
+        break;
+      case 'TVs':
+        const size = Math.floor(Math.random() * 30 + 32); // 32-62 inch
+        productName = `${brand} ${size}" ${subcategory} TV`;
+        productDesc = `Crystal clear display with smart features and immersive sound.`;
+        break;
+      case 'Headphones':
+        productName = `${brand} ${subcategory} Headphones ${Math.floor(Math.random() * 1000 + 100)}`;
+        productDesc = `Premium audio experience with comfortable fit and long battery life.`;
+        break;
+      case 'PC Accessories':
+        productName = `${brand} ${subcategory} ${Math.floor(Math.random() * 1000 + 100)}`;
+        productDesc = `High-quality PC accessory designed for gamers and professionals.`;
+        break;
+      case 'Tablets':
+        productName = `${brand} ${subcategory} Tablet ${Math.floor(Math.random() * 20 + 1)}`;
+        productDesc = `Versatile tablet for work and entertainment with a beautiful display.`;
+        break;
+      case 'Games':
+        const gameNames = ["Legend of", "World of", "Rise of", "Call to", "Ultimate", "Horizon", "Eternal", "Epic", "Chronicles of", "Shadow"];
+        const gameSuffixes = ["Champions", "Heroes", "Legends", "Adventure", "Quest", "Warriors", "Conquest", "Realms", "Kings", "Fantasy"];
+        productName = `${gameNames[Math.floor(Math.random() * gameNames.length)]} ${gameSuffixes[Math.floor(Math.random() * gameSuffixes.length)]} - ${subcategory}`;
+        productDesc = `Immersive ${subcategory.toLowerCase()} game with stunning graphics and engaging gameplay.`;
+        break;
+      default:
+        productName = `${brand} ${category} ${Math.floor(Math.random() * 1000 + 100)}`;
+        productDesc = `High-quality ${category.toLowerCase()} product with premium features.`;
+    }
+    
+    // Generate a reasonable price
+    const price = generateReasonablePrice(category, isPremium);
+    
+    // Generate 0-15% discount occasionally
+    const hasDiscount = Math.random() > 0.8; // 20% chance of having a discount
+    const discount = hasDiscount ? Math.floor(Math.random() * 15) + 5 : 0;
+    
+    // Use a placeholder image from the same category if available
+    let imageUrl = '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png';
+    
+    switch (category) {
+      case 'Smartphones':
+        imageUrl = '/lovable-uploads/iphone-13-pro-max.jpg';
+        break;
+      case 'Laptops':
+        imageUrl = '/lovable-uploads/apple-macbook-pro-16.jpg';
+        break;
+      case 'Gaming Consoles':
+        imageUrl = Math.random() > 0.5 ? '/lovable-uploads/sony-playstation-5.jpg' : '/lovable-uploads/microsoft-xbox-series-x.jpg';
+        break;
+      case 'TVs':
+        imageUrl = '/lovable-uploads/samsung-65-qled-8k-tv.jpg';
+        break;
+      case 'Headphones':
+        imageUrl = Math.random() > 0.5 ? '/lovable-uploads/sony-wh-1000xm4-headphones.jpg' : '/lovable-uploads/bose-quietcomfort-45-headphones.jpg';
+        break;
+      case 'Games':
+        const gameImages = [
+          '/lovable-uploads/elden-ring.jpg',
+          '/lovable-uploads/horizon-forbidden-west.jpg',
+          '/lovable-uploads/the-last-of-us-part-ii.jpg',
+          '/lovable-uploads/cyberpunk-2077.jpg',
+          '/lovable-uploads/death-stranding.jpg',
+          '/lovable-uploads/ghost-of-tsushima.jpg'
+        ];
+        imageUrl = gameImages[Math.floor(Math.random() * gameImages.length)];
+        break;
+    }
+    
+    // Create a new product with generated properties
+    const newProduct: Product = {
+      id: nextId++,
+      name: productName,
+      description: productDesc,
+      price: price,
+      imageUrl: imageUrl,
+      brand: brand,
+      category: category,
+      subcategory: subcategory,
+      rating: 3 + Math.random() * 2, // Random rating between 3-5
+      reviews: Math.floor(Math.random() * 400) + 10, // Random number of reviews
+      accessories: generateAccessories(category)
+    };
+    
+    // Add discount if applicable
+    if (discount > 0) {
+      newProduct.discount = discount;
+    }
+    
+    // Add to products array
+    products.push(newProduct);
+  }
+});
+
+// Sort products by category and then by price
+products.sort((a, b) => {
+  if (a.category === b.category) {
+    return a.price - b.price;
+  }
+  return a.category.localeCompare(b.category);
+});

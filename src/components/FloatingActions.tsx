@@ -1,22 +1,37 @@
+
 import { useNavigate } from 'react-router-dom';
-import { ShoppingCart, List } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
+
 interface FloatingActionsProps {
   showCheckout?: boolean;
   cartItemCount?: number;
   toggleChat: () => void;
 }
+
 const FloatingActions = ({
   showCheckout = true,
   cartItemCount = 0,
   toggleChat
 }: FloatingActionsProps) => {
   const navigate = useNavigate();
-  return <div className="fixed bottom-6 right-6 flex flex-col items-end gap-4 z-40">
-      {/* Wishlist Button */}
-      
-      
-      {/* AI Chat Button */}
-      
-    </div>;
+  
+  return (
+    <>
+      {/* Cart Button - Bottom Left */}
+      {showCheckout && cartItemCount > 0 && (
+        <div className="fixed bottom-6 left-6 z-40">
+          <button 
+            onClick={() => navigate('/checkout')}
+            className="flex items-center justify-center bg-green-600 text-white p-3 rounded-full shadow-lg hover:bg-green-700 transition-colors"
+            aria-label="View Cart"
+          >
+            <ShoppingCart className="mr-2" />
+            <span>Your Cart ({cartItemCount})</span>
+          </button>
+        </div>
+      )}
+    </>
+  );
 };
+
 export default FloatingActions;

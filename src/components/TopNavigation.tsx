@@ -1,9 +1,12 @@
+
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Heart } from 'lucide-react';
+
 interface TopNavigationProps {
   toggleChat: () => void;
 }
+
 const TopNavigation = ({
   toggleChat
 }: TopNavigationProps) => {
@@ -12,6 +15,7 @@ const TopNavigation = ({
   const {
     isAuthenticated
   } = useAuth();
+
   const handleContactClick = (e: React.MouseEvent) => {
     e.preventDefault();
     const footer = document.querySelector('footer');
@@ -21,6 +25,7 @@ const TopNavigation = ({
       });
     }
   };
+
   return <nav className="fixed w-full top-0 z-40">
       <div className="container mx-auto flex items-center py-4 px-6">
         <Link to="/" className="text-2xl font-bold text-[#18a66e] flex items-center gap-2">
@@ -31,13 +36,8 @@ const TopNavigation = ({
         {isIndexPage && <div className="flex-1 flex justify-center gap-8">
             <Link to="/" className="text-white hover:text-[#9eff00] transition-colors">Explore</Link>
             <Link to="/about" className="text-white hover:text-[#9eff00] transition-colors">About</Link>
-            <Link to="/discover" className="text-white hover:text-[#9eff00] transition-colors">Discover</Link>
             <a href="#footer" onClick={handleContactClick} className="text-white hover:text-[#9eff00] transition-colors">Contact</a>
             <Link to="/donation" className="text-white hover:text-[#9eff00] transition-colors">Donation</Link>
-            <Link to="/wishlist" className="text-white hover:text-[#9eff00] transition-colors flex items-center gap-1">
-              <Heart size={16} />
-              Wishlist
-            </Link>
           </div>}
         
         <div className="ml-auto flex items-center gap-4">
@@ -58,4 +58,5 @@ const TopNavigation = ({
       </div>
     </nav>;
 };
+
 export default TopNavigation;
