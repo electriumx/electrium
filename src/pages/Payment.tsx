@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -87,10 +86,9 @@ const Payment = () => {
   const [availableCoupons, setAvailableCoupons] = useState<{code: string, discount: number, type: string, target: string}[]>([]);
   const [productSuggestions, setProductSuggestions] = useState<ProductSuggestion[]>([]);
   
-  // New states for dynamic delivery options
   const [deliveryDate, setDeliveryDate] = useState('');
   const [deliveryTimeWindow, setDeliveryTimeWindow] = useState('');
-  const [deliveryDistance, setDeliveryDistance] = useState(5); // default 5 miles
+  const [deliveryDistance, setDeliveryDistance] = useState(5);
 
   const conditionMultipliers = {
     'like-new': 0.9,
@@ -180,7 +178,6 @@ const Payment = () => {
       setProductSuggestions(suggestions);
     }
     
-    // Set default delivery time
     updateEstimatedDeliveryTime();
     
     window.scrollTo(0, 0);
@@ -215,13 +212,14 @@ const Payment = () => {
   useEffect(() => {
     const total = calculateTotal();
     if (paymentMethod === 'trade' && tradeValue > 0) {
-      if (tradeValue < total) {
-        setTradeValueError("The item you are trying to trade does not match up with the value of the selected items in your cart.");
+      const minAcceptableValue = total * 0.6;
+      if (tradeValue < minAcceptableValue) {
+        setTradeValueError("The trade value must be at least 60% of your order total. Add more items or choose items with higher value.");
       } else {
         setTradeValueError(null);
       }
     }
-  }, [tradeValue, cart, paymentMethod]);
+  }, [tradeValue, cart, paymentMethod, calculateTotal]);
 
   const updateEstimatedDeliveryTime = () => {
     const now = new Date();
@@ -229,14 +227,12 @@ const Payment = () => {
     let deliveryTimeText = '';
     
     if (deliveryOption === 'normal') {
-      // 1-3 days for normal delivery
       const days = Math.floor(Math.random() * 3) + 1;
       const deliveryDate = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
       setDeliveryDate(deliveryDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }));
       setDeliveryTimeWindow('Between 9 AM and 5 PM');
       deliveryTimeText = `${days} day${days > 1 ? 's' : ''} (${deliveryDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })})`;
     } else if (deliveryOption === 'fast') {
-      // 45-90 minutes for fast delivery, adjusted by distance
       deliveryMinutes = 45 + (deliveryDistance * 3);
       const maxDeliveryMinutes = deliveryMinutes + 45;
       
@@ -290,7 +286,6 @@ const Payment = () => {
     if (deliveryOption === 'normal') {
       return 5;
     } else if (deliveryOption === 'fast') {
-      // Base fee is $15, but scales with distance
       return 15 + (deliveryDistance * 0.5);
     }
     return 0;
@@ -511,7 +506,6 @@ const Payment = () => {
     <div className="container mx-auto max-w-7xl px-4 py-8">
       <h1 className="text-2xl font-bold mb-8 text-center">Complete Your Payment</h1>
       
-      {/* Main content layout */}
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="lg:w-7/12 space-y-6">
           <div className="lg:hidden mb-6">
@@ -573,7 +567,6 @@ const Payment = () => {
             )}
           </div>
           
-          {/* Payment Method Tabs */}
           <div className="p-6 bg-card rounded-lg border border-border">
             <h2 className="text-xl font-semibold mb-6">Payment Method</h2>
             
@@ -584,7 +577,6 @@ const Payment = () => {
                 <TabsTrigger value="trade">Item Trading</TabsTrigger>
               </TabsList>
               
-              {/* Credit Card Payment */}
               <TabsContent value="card" className="space-y-6">
                 {savedCards.length > 0 && (
                   <div className="space-y-4">
@@ -700,7 +692,6 @@ const Payment = () => {
                 )}
               </TabsContent>
               
-              {/* Cash on Delivery */}
               <TabsContent value="cash" className="space-y-4">
                 <p className="text-muted-foreground mb-4">Choose your delivery speed and provide your location details.</p>
                 
@@ -781,7 +772,6 @@ const Payment = () => {
                 </div>
               </TabsContent>
               
-              {/* Item Trading */}
               <TabsContent value="trade" className="space-y-4">
                 <p className="text-muted-foreground mb-4">Trade in your items for store credit to use with this purchase.</p>
                 
@@ -814,7 +804,7 @@ const Payment = () => {
                                   onClick={() => handleAddTradeItem(product)}
                                   className="px-4 py-2 hover:bg-muted cursor-pointer flex items-center gap-3"
                                 >
-                                  <div className="w-8 h-8 bg-muted rounded overflow-hidden flex-shrink-0">
+                                  <div className="w-8 h-8 bg-muted rounded overflow-hidden">
                                     <img 
                                       src={product.imageUrl} 
                                       alt={product.name} 
@@ -914,7 +904,6 @@ const Payment = () => {
             </Tabs>
           </div>
           
-          {/* Billing Address */}
           <div className="p-6 bg-card rounded-lg border border-border">
             <h2 className="text-xl font-semibold mb-6">Billing Address</h2>
             
@@ -1015,7 +1004,6 @@ const Payment = () => {
           </div>
         </div>
         
-        {/* Order Summary */}
         <div className="lg:w-5/12 space-y-6">
           <div className="hidden lg:block sticky top-20">
             <div className="p-6 bg-card rounded-lg border border-border">
