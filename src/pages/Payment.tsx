@@ -87,80 +87,16 @@ const Payment = () => {
   const [availableCoupons, setAvailableCoupons] = useState<{code: string, discount: number, type: string, target: string}[]>([]);
   const [productSuggestions, setProductSuggestions] = useState<ProductSuggestion[]>([]);
   
+  // New states for dynamic delivery options
   const [deliveryDate, setDeliveryDate] = useState('');
   const [deliveryTimeWindow, setDeliveryTimeWindow] = useState('');
-  const [deliveryDistance, setDeliveryDistance] = useState(5);
+  const [deliveryDistance, setDeliveryDistance] = useState(5); // default 5 miles
 
   const conditionMultipliers = {
     'like-new': 0.9,
     'good': 0.7,
     'fair': 0.5,
     'poor': 0.3
-  };
-
-  // Helper functions
-  const getDiscountedPrice = (item: Product) => {
-    if (!item.brand) return item.price;
-    
-    const discount = discounts[item.brand] || discounts['All'] || 0;
-    if (discount === 0) return item.price;
-    
-    return item.price * (1 - discount / 100);
-  };
-
-  const calculateItemTotal = (item: Product) => {
-    const itemPrice = getDiscountedPrice(item);
-    
-    let accessoriesPrice = 0;
-    if (item.accessories) {
-      accessoriesPrice = item.accessories
-        .filter(acc => acc.selected)
-        .reduce((sum, acc) => sum + acc.price, 0);
-    }
-    
-    return (itemPrice + accessoriesPrice) * item.quantity;
-  };
-
-  const calculateSubtotal = () => {
-    return cart.reduce((sum, item) => sum + calculateItemTotal(item), 0);
-  };
-
-  const calculateTax = () => {
-    return calculateSubtotal() * 0.08;
-  };
-
-  const calculateShipping = () => {
-    const subtotal = calculateSubtotal();
-    return subtotal > 100 ? 0 : 10;
-  };
-
-  const getDeliveryFee = () => {
-    if (deliveryOption === 'normal') {
-      return 5;
-    } else if (deliveryOption === 'fast') {
-      return 15 + (deliveryDistance * 0.5);
-    }
-    return 0;
-  };
-
-  const getEstimatedDeliveryTime = () => {
-    return deliveryTime;
-  };
-
-  const calculateTradeDiscount = () => {
-    return tradeValue;
-  };
-
-  const calculateTotal = () => {
-    const subtotal = calculateSubtotal();
-    const tax = calculateTax();
-    const shipping = calculateShipping();
-    const deliveryFee = paymentMethod === 'cash' ? getDeliveryFee() : 0;
-    
-    const couponDiscountAmount = couponDiscount / 100 * subtotal;
-    const tradeDiscount = paymentMethod === 'trade' ? calculateTradeDiscount() : 0;
-    
-    return subtotal + tax + shipping + deliveryFee - couponDiscountAmount - tradeDiscount;
   };
 
   useEffect(() => {
@@ -244,6 +180,7 @@ const Payment = () => {
       setProductSuggestions(suggestions);
     }
     
+    // Set default delivery time
     updateEstimatedDeliveryTime();
     
     window.scrollTo(0, 0);
@@ -278,14 +215,8 @@ const Payment = () => {
   useEffect(() => {
     const total = calculateTotal();
     if (paymentMethod === 'trade' && tradeValue > 0) {
-      // Changed from 60% to 40% as per request
-      const minAcceptableValue = total * 0.6;
-      const maxAcceptableValue = total * 1.4; // 40% more than total
-      
-      if (tradeValue < minAcceptableValue) {
-        setTradeValueError("The trade value must be at least 60% of your order total. Add more items or choose items with higher value.");
-      } else if (tradeValue > maxAcceptableValue) {
-        setTradeValueError("The trade value can't exceed 40% more than your order total. Please select items with lower value.");
+      if (tradeValue < total) {
+        setTradeValueError("The item you are trying to trade does not match up with the value of the selected items in your cart.");
       } else {
         setTradeValueError(null);
       }
@@ -298,12 +229,14 @@ const Payment = () => {
     let deliveryTimeText = '';
     
     if (deliveryOption === 'normal') {
+      // 1-3 days for normal delivery
       const days = Math.floor(Math.random() * 3) + 1;
       const deliveryDate = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
       setDeliveryDate(deliveryDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }));
       setDeliveryTimeWindow('Between 9 AM and 5 PM');
       deliveryTimeText = `${days} day${days > 1 ? 's' : ''} (${deliveryDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })})`;
     } else if (deliveryOption === 'fast') {
+      // 45-90 minutes for fast delivery, adjusted by distance
       deliveryMinutes = 45 + (deliveryDistance * 3);
       const maxDeliveryMinutes = deliveryMinutes + 45;
       
@@ -316,6 +249,71 @@ const Payment = () => {
     }
     
     setDeliveryTime(deliveryTimeText);
+  };
+
+  const getDiscountedPrice = (item: Product) => {
+    if (!item.brand) return item.price;
+    
+    const discount = discounts[item.brand] || discounts['All'] || 0;
+    if (discount === 0) return item.price;
+    
+    return item.price * (1 - discount / 100);
+  };
+
+  const calculateItemTotal = (item: Product) => {
+    const itemPrice = getDiscountedPrice(item);
+    
+    let accessoriesPrice = 0;
+    if (item.accessories) {
+      accessoriesPrice = item.accessories
+        .filter(acc => acc.selected)
+        .reduce((sum, acc) => sum + acc.price, 0);
+    }
+    
+    return (itemPrice + accessoriesPrice) * item.quantity;
+  };
+
+  const calculateSubtotal = () => {
+    return cart.reduce((sum, item) => sum + calculateItemTotal(item), 0);
+  };
+
+  const calculateTax = () => {
+    return calculateSubtotal() * 0.08;
+  };
+
+  const calculateShipping = () => {
+    const subtotal = calculateSubtotal();
+    return subtotal > 100 ? 0 : 10;
+  };
+
+  const getDeliveryFee = () => {
+    if (deliveryOption === 'normal') {
+      return 5;
+    } else if (deliveryOption === 'fast') {
+      // Base fee is $15, but scales with distance
+      return 15 + (deliveryDistance * 0.5);
+    }
+    return 0;
+  };
+
+  const getEstimatedDeliveryTime = () => {
+    return deliveryTime;
+  };
+
+  const calculateTradeDiscount = () => {
+    return tradeValue;
+  };
+
+  const calculateTotal = () => {
+    const subtotal = calculateSubtotal();
+    const tax = calculateTax();
+    const shipping = calculateShipping();
+    const deliveryFee = paymentMethod === 'cash' ? getDeliveryFee() : 0;
+    
+    const couponDiscountAmount = couponDiscount / 100 * subtotal;
+    const tradeDiscount = paymentMethod === 'trade' ? calculateTradeDiscount() : 0;
+    
+    return subtotal + tax + shipping + deliveryFee - couponDiscountAmount - tradeDiscount;
   };
 
   const handleApplyCoupon = () => {
@@ -435,7 +433,7 @@ const Payment = () => {
     if (paymentMethod === 'trade' && tradeValueError) {
       toast({
         variant: "destructive",
-        title: "Trade value issue",
+        title: "Trade value insufficient",
         description: tradeValueError
       });
       return;
@@ -513,6 +511,7 @@ const Payment = () => {
     <div className="container mx-auto max-w-7xl px-4 py-8">
       <h1 className="text-2xl font-bold mb-8 text-center">Complete Your Payment</h1>
       
+      {/* Main content layout */}
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="lg:w-7/12 space-y-6">
           <div className="lg:hidden mb-6">
@@ -574,6 +573,7 @@ const Payment = () => {
             )}
           </div>
           
+          {/* Payment Method Tabs */}
           <div className="p-6 bg-card rounded-lg border border-border">
             <h2 className="text-xl font-semibold mb-6">Payment Method</h2>
             
@@ -584,6 +584,7 @@ const Payment = () => {
                 <TabsTrigger value="trade">Item Trading</TabsTrigger>
               </TabsList>
               
+              {/* Credit Card Payment */}
               <TabsContent value="card" className="space-y-6">
                 {savedCards.length > 0 && (
                   <div className="space-y-4">
@@ -699,6 +700,7 @@ const Payment = () => {
                 )}
               </TabsContent>
               
+              {/* Cash on Delivery */}
               <TabsContent value="cash" className="space-y-4">
                 <p className="text-muted-foreground mb-4">Choose your delivery speed and provide your location details.</p>
                 
@@ -779,6 +781,7 @@ const Payment = () => {
                 </div>
               </TabsContent>
               
+              {/* Item Trading */}
               <TabsContent value="trade" className="space-y-4">
                 <p className="text-muted-foreground mb-4">Trade in your items for store credit to use with this purchase.</p>
                 
@@ -811,7 +814,7 @@ const Payment = () => {
                                   onClick={() => handleAddTradeItem(product)}
                                   className="px-4 py-2 hover:bg-muted cursor-pointer flex items-center gap-3"
                                 >
-                                  <div className="w-8 h-8 bg-muted rounded overflow-hidden">
+                                  <div className="w-8 h-8 bg-muted rounded overflow-hidden flex-shrink-0">
                                     <img 
                                       src={product.imageUrl} 
                                       alt={product.name} 
@@ -821,7 +824,7 @@ const Payment = () => {
                                   <div>
                                     <p className="text-sm font-medium">{product.name}</p>
                                     <p className="text-xs text-muted-foreground">
-                                      {product.brand && `${product.brand} · `}{product.category} · ${product.price.toFixed(2)}
+                                      {product.brand && `${product.brand} · `}${product.category} · ${product.price.toFixed(2)}
                                     </p>
                                   </div>
                                 </li>
@@ -862,108 +865,163 @@ const Payment = () => {
                         </div>
                       ))}
                       
-                      <div className="pt-2 border-t border-border">
-                        <div className="flex items-center justify-between">
+                      <div className="mt-4 pt-3 border-t border-border">
+                        <div className="flex justify-between items-center">
                           <div>
-                            <h4 className="text-sm font-medium">Condition:</h4>
-                            <RadioGroup 
-                              value={tradeItemCondition} 
-                              onValueChange={value => setTradeItemCondition(value)}
-                              className="flex gap-4 mt-1"
-                            >
-                              <div className="flex items-center gap-1">
-                                <RadioGroupItem value="like-new" id="like-new" />
-                                <Label htmlFor="like-new" className="text-xs">Like New</Label>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <RadioGroupItem value="good" id="good" />
-                                <Label htmlFor="good" className="text-xs">Good</Label>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <RadioGroupItem value="fair" id="fair" />
-                                <Label htmlFor="fair" className="text-xs">Fair</Label>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <RadioGroupItem value="poor" id="poor" />
-                                <Label htmlFor="poor" className="text-xs">Poor</Label>
-                              </div>
-                            </RadioGroup>
+                            <p className="font-medium">Condition</p>
+                            <p className="text-xs text-muted-foreground">Select the condition of your trade items</p>
                           </div>
-                          <div className="text-right">
-                            <p className="text-xs text-muted-foreground">Trade Value:</p>
-                            <p className="text-lg font-bold">${tradeValue.toFixed(2)}</p>
-                          </div>
+                          <RadioGroup 
+                            value={tradeItemCondition} 
+                            onValueChange={setTradeItemCondition}
+                            className="flex gap-2"
+                          >
+                            <div className="flex items-center space-x-1">
+                              <RadioGroupItem value="like-new" id="like-new" />
+                              <Label htmlFor="like-new" className="text-xs cursor-pointer">Like New</Label>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <RadioGroupItem value="good" id="good" />
+                              <Label htmlFor="good" className="text-xs cursor-pointer">Good</Label>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <RadioGroupItem value="fair" id="fair" />
+                              <Label htmlFor="fair" className="text-xs cursor-pointer">Fair</Label>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <RadioGroupItem value="poor" id="poor" />
+                              <Label htmlFor="poor" className="text-xs cursor-pointer">Poor</Label>
+                            </div>
+                          </RadioGroup>
                         </div>
+                        
+                        <div className="mt-3 flex justify-between items-center font-bold">
+                          <span>Total Trade Value:</span>
+                          <span>${tradeValue.toFixed(2)}</span>
+                        </div>
+                        
+                        {tradeValueError && (
+                          <div className="mt-2 text-sm text-destructive flex items-center gap-1">
+                            <AlertCircle size={14} />
+                            <span>{tradeValueError}</span>
+                          </div>
+                        )}
                       </div>
-                      
-                      {tradeValueError && (
-                        <div className="p-2 bg-destructive/10 text-destructive rounded-md text-sm">
-                          {tradeValueError}
-                        </div>
-                      )}
                     </div>
                   )}
-                  
-                  <div className="pt-3">
-                    <Label htmlFor="trade-description">Additional Notes</Label>
-                    <Input
-                      id="trade-description"
-                      placeholder="Any additional details about your items..."
-                      value={tradeDescription}
-                      onChange={(e) => setTradeDescription(e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
                 </div>
               </TabsContent>
             </Tabs>
           </div>
           
-          {/* Coupon Code Section */}
-          <div className="bg-card p-4 rounded-lg border border-border">
-            <h3 className="font-medium mb-3">Have a Coupon?</h3>
-            <div className="flex gap-2">
-              <Input
-                placeholder="Enter coupon code"
-                value={couponCode}
-                onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                className="flex-1"
-              />
-              <Button onClick={handleApplyCoupon}>Apply</Button>
-            </div>
-            {appliedCoupon && (
-              <div className="mt-2 p-2 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 rounded-md flex items-center">
-                <CheckCircle className="w-4 h-4 mr-2" />
-                <span className="text-sm">
-                  Coupon <span className="font-semibold">{appliedCoupon}</span> applied - {couponDiscount}% off
-                </span>
+          {/* Billing Address */}
+          <div className="p-6 bg-card rounded-lg border border-border">
+            <h2 className="text-xl font-semibold mb-6">Billing Address</h2>
+            
+            {savedAddresses.length > 0 && (
+              <div className="mb-6 space-y-4">
+                <RadioGroup 
+                  value={selectedAddress || ''} 
+                  onValueChange={handleAddressSelection}
+                  className="space-y-3"
+                >
+                  {savedAddresses.map((address, index) => (
+                    <div key={index} className="flex items-center space-x-2">
+                      <RadioGroupItem value={address} id={`address-${index}`} />
+                      <Label htmlFor={`address-${index}`} className="cursor-pointer">
+                        {address}
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+                
+                <Button 
+                  variant="outline" 
+                  onClick={handleAddNewAddress}
+                  className="w-full"
+                >
+                  + Add New Address
+                </Button>
               </div>
             )}
-          </div>
-          
-          {/* Payment Button */}
-          <Button 
-            onClick={handleSubmitPayment} 
-            className="w-full py-6 text-lg"
-            disabled={processingPayment}
-          >
-            {processingPayment ? (
-              <>Processing Payment...</>
-            ) : (
-              <>Pay ${calculateTotal().toFixed(2)}</>
+            
+            {showAddressForm && (
+              <form className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input 
+                    id="name" 
+                    value={billingAddress.name}
+                    onChange={(e) => setBillingAddress({...billingAddress, name: e.target.value})}
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="street">Street Address</Label>
+                  <Input 
+                    id="street" 
+                    value={billingAddress.street}
+                    onChange={(e) => setBillingAddress({...billingAddress, street: e.target.value})}
+                    required
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="city">City</Label>
+                    <Input 
+                      id="city" 
+                      value={billingAddress.city}
+                      onChange={(e) => setBillingAddress({...billingAddress, city: e.target.value})}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="state">State</Label>
+                    <Input 
+                      id="state" 
+                      value={billingAddress.state}
+                      onChange={(e) => setBillingAddress({...billingAddress, state: e.target.value})}
+                      required
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="zip">ZIP Code</Label>
+                    <Input 
+                      id="zip" 
+                      value={billingAddress.zip}
+                      onChange={(e) => setBillingAddress({...billingAddress, zip: e.target.value})}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="country">Country</Label>
+                    <Input 
+                      id="country" 
+                      value={billingAddress.country}
+                      onChange={(e) => setBillingAddress({...billingAddress, country: e.target.value})}
+                      required
+                    />
+                  </div>
+                </div>
+              </form>
             )}
-          </Button>
+          </div>
         </div>
         
-        {/* Order Summary (desktop) */}
-        <div className="hidden lg:block lg:w-5/12">
-          <div className="bg-card rounded-lg border border-border overflow-hidden sticky top-20">
-            <div className="p-6 border-b border-border">
-              <h2 className="text-xl font-semibold">Order Summary</h2>
-            </div>
-            
-            <div className="p-6 space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto">
-              <div className="space-y-4">
+        {/* Order Summary */}
+        <div className="lg:w-5/12 space-y-6">
+          <div className="hidden lg:block sticky top-20">
+            <div className="p-6 bg-card rounded-lg border border-border">
+              <h2 className="text-xl font-semibold mb-6">Order Summary</h2>
+              
+              <div className="space-y-4 mb-6">
                 {cart.map((item) => (
                   <div key={item.id} className="flex gap-4">
                     <div className="flex-shrink-0 w-20 h-20 bg-muted rounded overflow-hidden">
@@ -972,42 +1030,35 @@ const Payment = () => {
                     <div className="flex-1">
                       <h3 className="font-medium">{item.name}</h3>
                       <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
-                      <p className="font-semibold mt-1">${calculateItemTotal(item).toFixed(2)}</p>
-                      
-                      {item.accessories && item.accessories.some(acc => acc.selected) && (
-                        <div className="mt-2">
-                          <p className="text-xs text-muted-foreground">Added Accessories:</p>
-                          <ul className="text-xs">
-                            {item.accessories
-                              .filter(acc => acc.selected)
-                              .map(acc => (
-                                <li key={acc.id} className="flex justify-between">
-                                  <span>{acc.name}</span>
-                                  <span>${acc.price.toFixed(2)}</span>
-                                </li>
-                              ))
-                            }
-                          </ul>
-                        </div>
-                      )}
+                      <p className="font-semibold">${calculateItemTotal(item).toFixed(2)}</p>
                     </div>
                   </div>
                 ))}
               </div>
               
-              <Separator />
+              <div className="flex gap-2 mb-6">
+                <Input 
+                  placeholder="Enter coupon code" 
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value)}
+                  className="flex-1"
+                />
+                <Button onClick={handleApplyCoupon}>Apply</Button>
+              </div>
               
-              <div className="space-y-3">
+              <div className="space-y-2 mb-6">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
                   <span>${calculateSubtotal().toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Shipping</span>
-                  <span>{calculateShipping() === 0 ? 'Free' : `$${calculateShipping().toFixed(2)}`}</span>
+                  <span>
+                    {calculateShipping() === 0 ? 'Free' : `$${calculateShipping().toFixed(2)}`}
+                  </span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Tax (8%)</span>
+                  <span>Tax</span>
                   <span>${calculateTax().toFixed(2)}</span>
                 </div>
                 
@@ -1019,37 +1070,54 @@ const Payment = () => {
                 )}
                 
                 {appliedCoupon && (
-                  <div className="flex justify-between text-green-600 dark:text-green-400">
+                  <div className="flex justify-between text-destructive">
                     <span>Discount ({appliedCoupon})</span>
                     <span>-${(couponDiscount / 100 * calculateSubtotal()).toFixed(2)}</span>
                   </div>
                 )}
                 
                 {paymentMethod === 'trade' && tradeValue > 0 && (
-                  <div className="flex justify-between text-green-600 dark:text-green-400">
+                  <div className="flex justify-between text-green-500">
                     <span>Trade-in Credit</span>
                     <span>-${tradeValue.toFixed(2)}</span>
                   </div>
                 )}
-              </div>
-              
-              <Separator />
-              
-              <div className="flex justify-between font-bold text-lg pt-2">
-                <span>Total</span>
-                <span>${calculateTotal().toFixed(2)}</span>
-              </div>
-              
-              {paymentMethod === 'cash' && (
-                <div className="mt-4 p-3 bg-muted rounded-lg">
-                  <h4 className="font-medium text-sm mb-1">Delivery Information</h4>
-                  <p className="text-xs text-muted-foreground">
-                    Estimated delivery: {deliveryDate}
-                    <br />
-                    Delivery time: {deliveryTimeWindow}
-                  </p>
+                
+                <Separator className="my-2" />
+                
+                <div className="flex justify-between text-lg font-bold pt-2">
+                  <span>Total</span>
+                  <span>${calculateTotal().toFixed(2)}</span>
                 </div>
-              )}
+              </div>
+              
+              <Button 
+                className="w-full" 
+                size="lg"
+                onClick={handleSubmitPayment}
+                disabled={processingPayment || (paymentMethod === 'trade' && !!tradeValueError)}
+              >
+                {processingPayment ? (
+                  <span className="flex items-center gap-2">
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      className="h-4 w-4 border-2 border-current border-t-transparent rounded-full"
+                    />
+                    Processing...
+                  </span>
+                ) : (
+                  paymentMethod === 'card' ? 'Pay Now' : 
+                  paymentMethod === 'cash' ? 'Place Order' : 
+                  'Complete Trade'
+                )}
+              </Button>
+              
+              <div className="mt-4 flex justify-center">
+                <p className="text-sm text-muted-foreground">
+                  You can review your order before confirming
+                </p>
+              </div>
             </div>
           </div>
         </div>
