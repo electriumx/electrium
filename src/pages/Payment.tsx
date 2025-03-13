@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -22,9 +21,8 @@ import {
   Search
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { Product } from '../data/productData';
+import { Product, products } from '../data/productData';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { allProducts } from '../data/productData';
 
 interface SavedCard {
   id: string;
@@ -88,7 +86,6 @@ const Payment = () => {
   const [availableCoupons, setAvailableCoupons] = useState<{code: string, discount: number, type: string, target: string}[]>([]);
   const [productSuggestions, setProductSuggestions] = useState<ProductSuggestion[]>([]);
 
-  // Define condition-based value adjustments
   const conditionMultipliers = {
     'like-new': 0.9,
     'good': 0.7,
@@ -107,7 +104,6 @@ const Payment = () => {
       }
     }
     
-    // Load saved cards data
     const savedCardsData = localStorage.getItem('savedCards');
     if (savedCardsData) {
       try {
@@ -124,7 +120,6 @@ const Payment = () => {
       }
     }
     
-    // Load saved addresses
     const addressesData = localStorage.getItem('savedAddresses');
     if (addressesData) {
       try {
@@ -140,7 +135,6 @@ const Payment = () => {
       }
     }
     
-    // Load discounts
     const discountsData = localStorage.getItem('discounts');
     if (discountsData) {
       try {
@@ -151,7 +145,6 @@ const Payment = () => {
       }
     }
 
-    // Load coupons
     const couponsData = localStorage.getItem('coupons');
     if (couponsData) {
       try {
@@ -161,7 +154,6 @@ const Payment = () => {
         console.error('Error parsing coupons:', error);
       }
     } else {
-      // Initialize with default coupons if none exist
       const defaultCoupons = [
         { code: 'SAVE10', discount: 10, type: 'percentage', target: 'all' },
         { code: 'SAVE20', discount: 20, type: 'percentage', target: 'all' }
@@ -170,9 +162,8 @@ const Payment = () => {
       localStorage.setItem('coupons', JSON.stringify(defaultCoupons));
     }
     
-    // Create product suggestions from all products
-    if (allProducts) {
-      const suggestions: ProductSuggestion[] = allProducts.map(product => ({
+    if (products) {
+      const suggestions: ProductSuggestion[] = products.map(product => ({
         id: product.id,
         name: product.name,
         price: product.price,
@@ -186,7 +177,6 @@ const Payment = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Calculate values based on condition
   useEffect(() => {
     if (tradeItems.length > 0) {
       const baseValue = tradeItems.reduce((sum, item) => sum + item.price, 0);
@@ -197,7 +187,6 @@ const Payment = () => {
     }
   }, [tradeItems, tradeItemCondition]);
 
-  // Filter product suggestions based on search term
   useEffect(() => {
     if (tradeItemSearch && tradeItemSearch.length > 1) {
       const filtered = productSuggestions.filter(product => 
@@ -210,7 +199,6 @@ const Payment = () => {
     }
   }, [tradeItemSearch, productSuggestions]);
 
-  // Validate trade value against cart total
   useEffect(() => {
     const total = calculateTotal();
     if (paymentMethod === 'trade' && tradeValue > 0) {
@@ -400,7 +388,6 @@ const Payment = () => {
   const handleSubmitPayment = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate trade value if using trade payment method
     if (paymentMethod === 'trade' && tradeValueError) {
       toast({
         variant: "destructive",
@@ -467,14 +454,13 @@ const Payment = () => {
     }
   };
 
-  // Filter relevant product suggestions for current search
   const filteredProductSuggestions = useMemo(() => {
     if (!tradeItemSearch || tradeItemSearch.length < 2) return [];
     
     return productSuggestions.filter(product => 
       product.name.toLowerCase().includes(tradeItemSearch.toLowerCase()) ||
       (product.brand && product.brand.toLowerCase().includes(tradeItemSearch.toLowerCase()))
-    ).slice(0, 5); // Limit to 5 suggestions
+    ).slice(0, 5);
   }, [tradeItemSearch, productSuggestions]);
 
   return (
