@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -83,9 +82,7 @@ const AdminKeyHandler = () => {
 
 // Main app wrapper that uses the auth context
 const AppWithAuth = () => {
-  const [showCookieConsent, setShowCookieConsent] = useState(() => {
-    return localStorage.getItem('cookieConsent') !== 'accepted';
-  });
+  const [showCookieConsent, setShowCookieConsent] = useState(true);
   
   const [isChatOpen, setIsChatOpen] = useState(false);
 
