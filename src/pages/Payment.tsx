@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Input } from "@/components/ui/input";
@@ -16,9 +17,14 @@ import {
   Edit,
   Trash,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  X,
+  Search
 } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 import { Product } from '../data/productData';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { allProducts } from '../data/productData';
 
 interface SavedCard {
   id: string;
@@ -28,8 +34,18 @@ interface SavedCard {
   default?: boolean;
 }
 
+interface ProductSuggestion {
+  id: number;
+  name: string;
+  price: number;
+  imageUrl: string;
+  brand?: string;
+  category: string;
+}
+
 const Payment = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [cardName, setCardName] = useState('');
   const [cardNumber, setCardNumber] = useState('');
@@ -62,10 +78,23 @@ const Payment = () => {
   const [deliveryOption, setDeliveryOption] = useState('normal');
   const [deliveryTime, setDeliveryTime] = useState('');
   const [deliveryLocation, setDeliveryLocation] = useState('');
-  const [tradeItems, setTradeItems] = useState<string[]>([]);
+  const [tradeItemSearch, setTradeItemSearch] = useState('');
+  const [tradeItems, setTradeItems] = useState<ProductSuggestion[]>([]);
+  const [showTradeItemSuggestions, setShowTradeItemSuggestions] = useState(false);
   const [tradeValue, setTradeValue] = useState(0);
   const [tradeDescription, setTradeDescription] = useState('');
   const [tradeItemCondition, setTradeItemCondition] = useState('good');
+  const [tradeValueError, setTradeValueError] = useState<string | null>(null);
+  const [availableCoupons, setAvailableCoupons] = useState<{code: string, discount: number, type: string, target: string}[]>([]);
+  const [productSuggestions, setProductSuggestions] = useState<ProductSuggestion[]>([]);
+
+  // Define condition-based value adjustments
+  const conditionMultipliers = {
+    'like-new': 0.9,
+    'good': 0.7,
+    'fair': 0.5,
+    'poor': 0.3
+  };
 
   useEffect(() => {
     const cartData = localStorage.getItem('cart');
@@ -78,6 +107,7 @@ const Payment = () => {
       }
     }
     
+    // Load saved cards data
     const savedCardsData = localStorage.getItem('savedCards');
     if (savedCardsData) {
       try {
@@ -94,6 +124,7 @@ const Payment = () => {
       }
     }
     
+    // Load saved addresses
     const addressesData = localStorage.getItem('savedAddresses');
     if (addressesData) {
       try {
@@ -109,27 +140,87 @@ const Payment = () => {
       }
     }
     
+    // Load discounts
     const discountsData = localStorage.getItem('discounts');
     if (discountsData) {
       try {
         const parsedDiscounts = JSON.parse(discountsData);
-        const formattedDiscounts: Record<string, number> = {};
-        Object.entries(parsedDiscounts).forEach(([brand, data]) => {
-          if (typeof data === 'object' && data !== null && 'value' in data && 'expiresAt' in data) {
-            const { value, expiresAt } = data as { value: number, expiresAt: number };
-            if (expiresAt > Date.now()) {
-              formattedDiscounts[brand] = value;
-            }
-          }
-        });
-        setDiscounts(formattedDiscounts);
+        setDiscounts(parsedDiscounts);
       } catch (error) {
         console.error('Error parsing discounts:', error);
       }
     }
+
+    // Load coupons
+    const couponsData = localStorage.getItem('coupons');
+    if (couponsData) {
+      try {
+        const parsedCoupons = JSON.parse(couponsData);
+        setAvailableCoupons(parsedCoupons);
+      } catch (error) {
+        console.error('Error parsing coupons:', error);
+      }
+    } else {
+      // Initialize with default coupons if none exist
+      const defaultCoupons = [
+        { code: 'SAVE10', discount: 10, type: 'percentage', target: 'all' },
+        { code: 'SAVE20', discount: 20, type: 'percentage', target: 'all' }
+      ];
+      setAvailableCoupons(defaultCoupons);
+      localStorage.setItem('coupons', JSON.stringify(defaultCoupons));
+    }
+    
+    // Create product suggestions from all products
+    if (allProducts) {
+      const suggestions: ProductSuggestion[] = allProducts.map(product => ({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        imageUrl: product.imageUrl,
+        brand: product.brand,
+        category: product.category
+      }));
+      setProductSuggestions(suggestions);
+    }
     
     window.scrollTo(0, 0);
   }, []);
+
+  // Calculate values based on condition
+  useEffect(() => {
+    if (tradeItems.length > 0) {
+      const baseValue = tradeItems.reduce((sum, item) => sum + item.price, 0);
+      const multiplier = conditionMultipliers[tradeItemCondition as keyof typeof conditionMultipliers] || 0.7;
+      setTradeValue(baseValue * multiplier);
+    } else {
+      setTradeValue(0);
+    }
+  }, [tradeItems, tradeItemCondition]);
+
+  // Filter product suggestions based on search term
+  useEffect(() => {
+    if (tradeItemSearch && tradeItemSearch.length > 1) {
+      const filtered = productSuggestions.filter(product => 
+        product.name.toLowerCase().includes(tradeItemSearch.toLowerCase()) ||
+        (product.brand && product.brand.toLowerCase().includes(tradeItemSearch.toLowerCase()))
+      );
+      setShowTradeItemSuggestions(filtered.length > 0);
+    } else {
+      setShowTradeItemSuggestions(false);
+    }
+  }, [tradeItemSearch, productSuggestions]);
+
+  // Validate trade value against cart total
+  useEffect(() => {
+    const total = calculateTotal();
+    if (paymentMethod === 'trade' && tradeValue > 0) {
+      if (tradeValue < total) {
+        setTradeValueError("The item you are trying to trade does not match up with the value of the selected items in your cart.");
+      } else {
+        setTradeValueError(null);
+      }
+    }
+  }, [tradeValue, cart, paymentMethod]);
 
   const getDiscountedPrice = (item: Product) => {
     if (!item.brand) return item.price;
@@ -201,16 +292,22 @@ const Payment = () => {
   };
 
   const handleApplyCoupon = () => {
-    if (couponCode === 'SAVE10') {
+    const coupon = availableCoupons.find(c => c.code === couponCode);
+    if (coupon) {
       setAppliedCoupon(couponCode);
-      setCouponDiscount(10);
-    } else if (couponCode === 'SAVE20') {
-      setAppliedCoupon(couponCode);
-      setCouponDiscount(20);
+      setCouponDiscount(coupon.discount);
+      toast({
+        title: "Coupon applied",
+        description: `${coupon.code} for ${coupon.discount}% off has been applied to your order.`
+      });
     } else {
       setAppliedCoupon(null);
       setCouponDiscount(0);
-      alert('Invalid coupon code');
+      toast({
+        variant: "destructive",
+        title: "Invalid coupon code",
+        description: "The coupon code you entered is not valid."
+      });
     }
   };
 
@@ -275,8 +372,43 @@ const Payment = () => {
     setCardExpiry(formatted.substring(0, 5));
   };
 
+  const handleTradeItemSearch = (value: string) => {
+    setTradeItemSearch(value);
+    if (value.length > 1) {
+      const filtered = productSuggestions.filter(product => 
+        product.name.toLowerCase().includes(value.toLowerCase()) ||
+        (product.brand && product.brand.toLowerCase().includes(value.toLowerCase()))
+      );
+      setShowTradeItemSuggestions(filtered.length > 0);
+    } else {
+      setShowTradeItemSuggestions(false);
+    }
+  };
+
+  const handleAddTradeItem = (item: ProductSuggestion) => {
+    if (!tradeItems.some(existingItem => existingItem.id === item.id)) {
+      setTradeItems([...tradeItems, item]);
+      setTradeItemSearch('');
+      setShowTradeItemSuggestions(false);
+    }
+  };
+
+  const handleRemoveTradeItem = (itemId: number) => {
+    setTradeItems(tradeItems.filter(item => item.id !== itemId));
+  };
+
   const handleSubmitPayment = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate trade value if using trade payment method
+    if (paymentMethod === 'trade' && tradeValueError) {
+      toast({
+        variant: "destructive",
+        title: "Trade value insufficient",
+        description: tradeValueError
+      });
+      return;
+    }
     
     setProcessingPayment(true);
     
@@ -334,6 +466,16 @@ const Payment = () => {
       setExpandedSection(section);
     }
   };
+
+  // Filter relevant product suggestions for current search
+  const filteredProductSuggestions = useMemo(() => {
+    if (!tradeItemSearch || tradeItemSearch.length < 2) return [];
+    
+    return productSuggestions.filter(product => 
+      product.name.toLowerCase().includes(tradeItemSearch.toLowerCase()) ||
+      (product.brand && product.brand.toLowerCase().includes(tradeItemSearch.toLowerCase()))
+    ).slice(0, 5); // Limit to 5 suggestions
+  }, [tradeItemSearch, productSuggestions]);
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8">
@@ -581,20 +723,96 @@ const Payment = () => {
                 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="trade-items">Item Name(s) to Trade</Label>
-                    <Input 
-                      id="trade-items" 
-                      placeholder="PlayStation 4, iPhone 12, etc."
-                      value={tradeItems.join(', ')}
-                      onChange={(e) => setTradeItems(e.target.value.split(',').map(item => item.trim()))}
-                    />
+                    <Label htmlFor="trade-items">Search for Items to Trade</Label>
+                    <div className="relative">
+                      <div className="flex">
+                        <div className="relative flex-1">
+                          <Input 
+                            id="trade-items" 
+                            placeholder="Search for products to trade..."
+                            value={tradeItemSearch}
+                            onChange={(e) => handleTradeItemSearch(e.target.value)}
+                            className="pr-8"
+                          />
+                          <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={16} />
+                        </div>
+                      </div>
+                      
+                      {showTradeItemSuggestions && (
+                        <div className="absolute z-50 w-full mt-1 bg-background border border-border rounded-lg shadow-lg">
+                          <Command>
+                            <CommandList>
+                              <CommandGroup>
+                                {filteredProductSuggestions.length === 0 ? (
+                                  <CommandEmpty>No matching products found</CommandEmpty>
+                                ) : (
+                                  filteredProductSuggestions.map(product => (
+                                    <CommandItem 
+                                      key={product.id}
+                                      onSelect={() => handleAddTradeItem(product)}
+                                      className="cursor-pointer"
+                                    >
+                                      <div className="flex items-center gap-3 py-1">
+                                        <div className="w-8 h-8 bg-muted rounded overflow-hidden">
+                                          <img 
+                                            src={product.imageUrl} 
+                                            alt={product.name} 
+                                            className="w-full h-full object-cover"
+                                          />
+                                        </div>
+                                        <div>
+                                          <p className="text-sm font-medium">{product.name}</p>
+                                          <p className="text-xs text-muted-foreground">
+                                            {product.brand && `${product.brand} · `}${product.category} · ${product.price.toFixed(2)}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </CommandItem>
+                                  ))
+                                )}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </div>
+                      )}
+                    </div>
                   </div>
+                  
+                  {tradeItems.length > 0 && (
+                    <div className="border border-border rounded-lg p-3 space-y-3">
+                      <h3 className="font-medium">Selected Trade Items</h3>
+                      {tradeItems.map(item => (
+                        <div key={item.id} className="flex items-center justify-between p-2 bg-muted rounded">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-background rounded overflow-hidden">
+                              <img 
+                                src={item.imageUrl} 
+                                alt={item.name} 
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium">{item.name}</p>
+                              <p className="text-xs text-muted-foreground">Original value: ${item.price.toFixed(2)}</p>
+                            </div>
+                          </div>
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => handleRemoveTradeItem(item.id)}
+                          >
+                            <X size={16} />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                   
                   <div className="space-y-2">
                     <Label htmlFor="trade-description">Item Description</Label>
                     <Input 
                       id="trade-description" 
-                      placeholder="Details about the items you're trading"
+                      placeholder="Additional details about the items you're trading"
                       value={tradeDescription}
                       onChange={(e) => setTradeDescription(e.target.value)}
                     />
@@ -609,32 +827,35 @@ const Payment = () => {
                     >
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="like-new" id="like-new" />
-                        <Label htmlFor="like-new">Like New</Label>
+                        <Label htmlFor="like-new">Like New (90% of value)</Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="good" id="good" />
-                        <Label htmlFor="good">Good</Label>
+                        <Label htmlFor="good">Good (70% of value)</Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="fair" id="fair" />
-                        <Label htmlFor="fair">Fair</Label>
+                        <Label htmlFor="fair">Fair (50% of value)</Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="poor" id="poor" />
-                        <Label htmlFor="poor">Poor</Label>
+                        <Label htmlFor="poor">Poor (30% of value)</Label>
                       </div>
                     </RadioGroup>
                   </div>
                   
-                  <div className="space-y-2">
-                    <Label htmlFor="trade-value">Estimated Trade Value ($)</Label>
-                    <Input 
-                      id="trade-value" 
-                      type="number"
-                      placeholder="0.00"
-                      value={tradeValue.toString()}
-                      onChange={(e) => setTradeValue(Number(e.target.value))}
-                    />
+                  <div className="p-4 bg-card rounded-lg border border-border">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">Estimated Trade Value:</span>
+                      <span className="font-bold text-lg">${tradeValue.toFixed(2)}</span>
+                    </div>
+                    
+                    {tradeValueError && (
+                      <div className="mt-2 p-2 bg-destructive/10 rounded-md text-destructive text-sm">
+                        <AlertCircle size={16} className="inline-block mr-1" />
+                        {tradeValueError}
+                      </div>
+                    )}
                   </div>
                   
                   <div className="mt-4 p-3 bg-muted rounded-lg">
@@ -791,7 +1012,7 @@ const Payment = () => {
           
           <Button 
             onClick={handleSubmitPayment}
-            disabled={processingPayment}
+            disabled={processingPayment || (paymentMethod === 'trade' && !!tradeValueError)}
             className="w-full py-6 text-lg"
           >
             {processingPayment ? 'Processing...' : `Pay $${calculateTotal().toFixed(2)}`}
