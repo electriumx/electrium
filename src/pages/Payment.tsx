@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -854,3 +855,275 @@ const Payment = () => {
                             </div>
                           </div>
                           <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleRemoveTradeItem(item.id)}
+                            className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                          >
+                            <X size={16} />
+                          </Button>
+                        </div>
+                      ))}
+                      
+                      <div className="mt-4 pt-3 border-t border-border">
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <p className="font-medium">Condition</p>
+                            <p className="text-xs text-muted-foreground">Select the condition of your trade items</p>
+                          </div>
+                          <RadioGroup 
+                            value={tradeItemCondition} 
+                            onValueChange={setTradeItemCondition}
+                            className="flex gap-2"
+                          >
+                            <div className="flex items-center space-x-1">
+                              <RadioGroupItem value="like-new" id="like-new" />
+                              <Label htmlFor="like-new" className="text-xs cursor-pointer">Like New</Label>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <RadioGroupItem value="good" id="good" />
+                              <Label htmlFor="good" className="text-xs cursor-pointer">Good</Label>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <RadioGroupItem value="fair" id="fair" />
+                              <Label htmlFor="fair" className="text-xs cursor-pointer">Fair</Label>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <RadioGroupItem value="poor" id="poor" />
+                              <Label htmlFor="poor" className="text-xs cursor-pointer">Poor</Label>
+                            </div>
+                          </RadioGroup>
+                        </div>
+                        
+                        <div className="mt-3 flex justify-between items-center font-bold">
+                          <span>Total Trade Value:</span>
+                          <span>${tradeValue.toFixed(2)}</span>
+                        </div>
+                        
+                        {tradeValueError && (
+                          <div className="mt-2 text-sm text-destructive flex items-center gap-1">
+                            <AlertCircle size={14} />
+                            <span>{tradeValueError}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
+          
+          {/* Billing Address */}
+          <div className="p-6 bg-card rounded-lg border border-border">
+            <h2 className="text-xl font-semibold mb-6">Billing Address</h2>
+            
+            {savedAddresses.length > 0 && (
+              <div className="mb-6 space-y-4">
+                <RadioGroup 
+                  value={selectedAddress || ''} 
+                  onValueChange={handleAddressSelection}
+                  className="space-y-3"
+                >
+                  {savedAddresses.map((address, index) => (
+                    <div key={index} className="flex items-center space-x-2">
+                      <RadioGroupItem value={address} id={`address-${index}`} />
+                      <Label htmlFor={`address-${index}`} className="cursor-pointer">
+                        {address}
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+                
+                <Button 
+                  variant="outline" 
+                  onClick={handleAddNewAddress}
+                  className="w-full"
+                >
+                  + Add New Address
+                </Button>
+              </div>
+            )}
+            
+            {showAddressForm && (
+              <form className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input 
+                    id="name" 
+                    value={billingAddress.name}
+                    onChange={(e) => setBillingAddress({...billingAddress, name: e.target.value})}
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="street">Street Address</Label>
+                  <Input 
+                    id="street" 
+                    value={billingAddress.street}
+                    onChange={(e) => setBillingAddress({...billingAddress, street: e.target.value})}
+                    required
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="city">City</Label>
+                    <Input 
+                      id="city" 
+                      value={billingAddress.city}
+                      onChange={(e) => setBillingAddress({...billingAddress, city: e.target.value})}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="state">State</Label>
+                    <Input 
+                      id="state" 
+                      value={billingAddress.state}
+                      onChange={(e) => setBillingAddress({...billingAddress, state: e.target.value})}
+                      required
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="zip">ZIP Code</Label>
+                    <Input 
+                      id="zip" 
+                      value={billingAddress.zip}
+                      onChange={(e) => setBillingAddress({...billingAddress, zip: e.target.value})}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="country">Country</Label>
+                    <Input 
+                      id="country" 
+                      value={billingAddress.country}
+                      onChange={(e) => setBillingAddress({...billingAddress, country: e.target.value})}
+                      required
+                    />
+                  </div>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+        
+        {/* Order Summary */}
+        <div className="lg:w-5/12 space-y-6">
+          <div className="hidden lg:block sticky top-20">
+            <div className="p-6 bg-card rounded-lg border border-border">
+              <h2 className="text-xl font-semibold mb-6">Order Summary</h2>
+              
+              <div className="space-y-4 mb-6">
+                {cart.map((item) => (
+                  <div key={item.id} className="flex gap-4">
+                    <div className="flex-shrink-0 w-20 h-20 bg-muted rounded overflow-hidden">
+                      <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-medium">{item.name}</h3>
+                      <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
+                      <p className="font-semibold">${calculateItemTotal(item).toFixed(2)}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="flex gap-2 mb-6">
+                <Input 
+                  placeholder="Enter coupon code" 
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value)}
+                  className="flex-1"
+                />
+                <Button onClick={handleApplyCoupon}>Apply</Button>
+              </div>
+              
+              <div className="space-y-2 mb-6">
+                <div className="flex justify-between">
+                  <span>Subtotal</span>
+                  <span>${calculateSubtotal().toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Shipping</span>
+                  <span>
+                    {calculateShipping() === 0 ? 'Free' : `$${calculateShipping().toFixed(2)}`}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Tax</span>
+                  <span>${calculateTax().toFixed(2)}</span>
+                </div>
+                
+                {paymentMethod === 'cash' && (
+                  <div className="flex justify-between">
+                    <span>Delivery Fee</span>
+                    <span>${getDeliveryFee().toFixed(2)}</span>
+                  </div>
+                )}
+                
+                {appliedCoupon && (
+                  <div className="flex justify-between text-destructive">
+                    <span>Discount ({appliedCoupon})</span>
+                    <span>-${(couponDiscount / 100 * calculateSubtotal()).toFixed(2)}</span>
+                  </div>
+                )}
+                
+                {paymentMethod === 'trade' && tradeValue > 0 && (
+                  <div className="flex justify-between text-green-500">
+                    <span>Trade-in Credit</span>
+                    <span>-${tradeValue.toFixed(2)}</span>
+                  </div>
+                )}
+                
+                <Separator className="my-2" />
+                
+                <div className="flex justify-between text-lg font-bold pt-2">
+                  <span>Total</span>
+                  <span>${calculateTotal().toFixed(2)}</span>
+                </div>
+              </div>
+              
+              <Button 
+                className="w-full" 
+                size="lg"
+                onClick={handleSubmitPayment}
+                disabled={processingPayment || (paymentMethod === 'trade' && !!tradeValueError)}
+              >
+                {processingPayment ? (
+                  <span className="flex items-center gap-2">
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      className="h-4 w-4 border-2 border-current border-t-transparent rounded-full"
+                    />
+                    Processing...
+                  </span>
+                ) : (
+                  paymentMethod === 'card' ? 'Pay Now' : 
+                  paymentMethod === 'cash' ? 'Place Order' : 
+                  'Complete Trade'
+                )}
+              </Button>
+              
+              <div className="mt-4 flex justify-center">
+                <p className="text-sm text-muted-foreground">
+                  You can review your order before confirming
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Payment;
