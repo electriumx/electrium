@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -21,8 +22,9 @@ import {
   Search
 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { Product, products } from '../data/productData';
+import { Product } from '../data/productData';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { allProducts } from '../data/productData';
 
 interface SavedCard {
   id: string;
@@ -85,11 +87,8 @@ const Payment = () => {
   const [tradeValueError, setTradeValueError] = useState<string | null>(null);
   const [availableCoupons, setAvailableCoupons] = useState<{code: string, discount: number, type: string, target: string}[]>([]);
   const [productSuggestions, setProductSuggestions] = useState<ProductSuggestion[]>([]);
-  
-  const [deliveryDate, setDeliveryDate] = useState('');
-  const [deliveryTimeWindow, setDeliveryTimeWindow] = useState('');
-  const [deliveryDistance, setDeliveryDistance] = useState(5);
 
+  // Define condition-based value adjustments
   const conditionMultipliers = {
     'like-new': 0.9,
     'good': 0.7,
@@ -108,6 +107,7 @@ const Payment = () => {
       }
     }
     
+    // Load saved cards data
     const savedCardsData = localStorage.getItem('savedCards');
     if (savedCardsData) {
       try {
@@ -124,6 +124,7 @@ const Payment = () => {
       }
     }
     
+    // Load saved addresses
     const addressesData = localStorage.getItem('savedAddresses');
     if (addressesData) {
       try {
@@ -139,6 +140,7 @@ const Payment = () => {
       }
     }
     
+    // Load discounts
     const discountsData = localStorage.getItem('discounts');
     if (discountsData) {
       try {
@@ -149,6 +151,7 @@ const Payment = () => {
       }
     }
 
+    // Load coupons
     const couponsData = localStorage.getItem('coupons');
     if (couponsData) {
       try {
@@ -158,6 +161,7 @@ const Payment = () => {
         console.error('Error parsing coupons:', error);
       }
     } else {
+      // Initialize with default coupons if none exist
       const defaultCoupons = [
         { code: 'SAVE10', discount: 10, type: 'percentage', target: 'all' },
         { code: 'SAVE20', discount: 20, type: 'percentage', target: 'all' }
@@ -166,8 +170,9 @@ const Payment = () => {
       localStorage.setItem('coupons', JSON.stringify(defaultCoupons));
     }
     
-    if (products) {
-      const suggestions: ProductSuggestion[] = products.map(product => ({
+    // Create product suggestions from all products
+    if (allProducts) {
+      const suggestions: ProductSuggestion[] = allProducts.map(product => ({
         id: product.id,
         name: product.name,
         price: product.price,
@@ -178,15 +183,10 @@ const Payment = () => {
       setProductSuggestions(suggestions);
     }
     
-    updateEstimatedDeliveryTime();
-    
     window.scrollTo(0, 0);
   }, []);
 
-  useEffect(() => {
-    updateEstimatedDeliveryTime();
-  }, [deliveryOption, deliveryDistance]);
-
+  // Calculate values based on condition
   useEffect(() => {
     if (tradeItems.length > 0) {
       const baseValue = tradeItems.reduce((sum, item) => sum + item.price, 0);
@@ -197,6 +197,7 @@ const Payment = () => {
     }
   }, [tradeItems, tradeItemCondition]);
 
+  // Filter product suggestions based on search term
   useEffect(() => {
     if (tradeItemSearch && tradeItemSearch.length > 1) {
       const filtered = productSuggestions.filter(product => 
@@ -209,43 +210,17 @@ const Payment = () => {
     }
   }, [tradeItemSearch, productSuggestions]);
 
+  // Validate trade value against cart total
   useEffect(() => {
     const total = calculateTotal();
     if (paymentMethod === 'trade' && tradeValue > 0) {
-      const minAcceptableValue = total * 0.6;
-      if (tradeValue < minAcceptableValue) {
-        setTradeValueError("The trade value must be at least 60% of your order total. Add more items or choose items with higher value.");
+      if (tradeValue < total) {
+        setTradeValueError("The item you are trying to trade does not match up with the value of the selected items in your cart.");
       } else {
         setTradeValueError(null);
       }
     }
-  }, [tradeValue, cart, paymentMethod, calculateTotal]);
-
-  const updateEstimatedDeliveryTime = () => {
-    const now = new Date();
-    let deliveryMinutes = 0;
-    let deliveryTimeText = '';
-    
-    if (deliveryOption === 'normal') {
-      const days = Math.floor(Math.random() * 3) + 1;
-      const deliveryDate = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
-      setDeliveryDate(deliveryDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }));
-      setDeliveryTimeWindow('Between 9 AM and 5 PM');
-      deliveryTimeText = `${days} day${days > 1 ? 's' : ''} (${deliveryDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })})`;
-    } else if (deliveryOption === 'fast') {
-      deliveryMinutes = 45 + (deliveryDistance * 3);
-      const maxDeliveryMinutes = deliveryMinutes + 45;
-      
-      const deliveryTime = new Date(now.getTime() + deliveryMinutes * 60 * 1000);
-      const maxDeliveryTime = new Date(now.getTime() + maxDeliveryMinutes * 60 * 60 * 1000);
-      
-      setDeliveryDate('Today');
-      setDeliveryTimeWindow(`Between ${deliveryTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })} and ${maxDeliveryTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`);
-      deliveryTimeText = `${deliveryMinutes}-${maxDeliveryMinutes} minutes`;
-    }
-    
-    setDeliveryTime(deliveryTimeText);
-  };
+  }, [tradeValue, cart, paymentMethod]);
 
   const getDiscountedPrice = (item: Product) => {
     if (!item.brand) return item.price;
@@ -286,13 +261,18 @@ const Payment = () => {
     if (deliveryOption === 'normal') {
       return 5;
     } else if (deliveryOption === 'fast') {
-      return 15 + (deliveryDistance * 0.5);
+      return 15;
     }
     return 0;
   };
 
   const getEstimatedDeliveryTime = () => {
-    return deliveryTime;
+    if (deliveryOption === 'normal') {
+      return '1-3 days';
+    } else if (deliveryOption === 'fast') {
+      return '45-90 minutes';
+    }
+    return '';
   };
 
   const calculateTradeDiscount = () => {
@@ -416,15 +396,11 @@ const Payment = () => {
   const handleRemoveTradeItem = (itemId: number) => {
     setTradeItems(tradeItems.filter(item => item.id !== itemId));
   };
-  
-  const handleDeliveryDistanceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const distance = Number(e.target.value);
-    setDeliveryDistance(distance);
-  };
 
   const handleSubmitPayment = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validate trade value if using trade payment method
     if (paymentMethod === 'trade' && tradeValueError) {
       toast({
         variant: "destructive",
@@ -457,9 +433,7 @@ const Payment = () => {
     } else if (paymentMethod === 'cash') {
       localStorage.setItem('deliveryPreferences', JSON.stringify({
         option: deliveryOption,
-        location: deliveryLocation,
-        distance: deliveryDistance,
-        estimatedTime: deliveryTime
+        location: deliveryLocation
       }));
     } else if (paymentMethod === 'trade') {
       localStorage.setItem('tradePreferences', JSON.stringify({
@@ -493,13 +467,14 @@ const Payment = () => {
     }
   };
 
+  // Filter relevant product suggestions for current search
   const filteredProductSuggestions = useMemo(() => {
     if (!tradeItemSearch || tradeItemSearch.length < 2) return [];
     
     return productSuggestions.filter(product => 
       product.name.toLowerCase().includes(tradeItemSearch.toLowerCase()) ||
       (product.brand && product.brand.toLowerCase().includes(tradeItemSearch.toLowerCase()))
-    ).slice(0, 5);
+    ).slice(0, 5); // Limit to 5 suggestions
   }, [tradeItemSearch, productSuggestions]);
 
   return (
@@ -716,41 +691,12 @@ const Payment = () => {
                         <RadioGroupItem value="fast" id="fast" />
                         <Label htmlFor="fast" className="cursor-pointer">
                           <div>
-                            <p className="font-medium">Fast Delivery ({getEstimatedDeliveryTime()})</p>
-                            <p className="text-sm text-muted-foreground">${getDeliveryFee().toFixed(2)} delivery fee</p>
+                            <p className="font-medium">Fast Delivery (45-90 min)</p>
+                            <p className="text-sm text-muted-foreground">$15.00 delivery fee</p>
                           </div>
                         </Label>
                       </div>
                     </RadioGroup>
-                  </div>
-                  
-                  {deliveryOption === 'fast' && (
-                    <div className="space-y-2">
-                      <Label htmlFor="delivery-distance">Delivery Distance (miles)</Label>
-                      <div className="flex items-center gap-4">
-                        <Input 
-                          id="delivery-distance" 
-                          type="number"
-                          min="1"
-                          max="30"
-                          value={deliveryDistance}
-                          onChange={handleDeliveryDistanceChange}
-                          className="w-24"
-                        />
-                        <span className="text-sm text-muted-foreground">
-                          {deliveryDistance <= 5 ? 'Nearby' : 
-                           deliveryDistance <= 15 ? 'Medium distance' : 'Far distance'}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div className="bg-muted/30 rounded-lg p-4 mt-4">
-                    <h3 className="font-medium mb-2">Estimated Delivery</h3>
-                    <div className="space-y-1 text-sm">
-                      <p><span className="text-muted-foreground">Date:</span> {deliveryDate}</p>
-                      <p><span className="text-muted-foreground">Time:</span> {deliveryTimeWindow}</p>
-                    </div>
                   </div>
                   
                   <div className="space-y-2">
@@ -766,7 +712,7 @@ const Payment = () => {
                   <div className="mt-4 p-3 bg-muted rounded-lg">
                     <p className="text-sm text-muted-foreground">
                       <strong>Note:</strong> Payment will be collected upon delivery. Please have the exact amount ready.
-                      Minimum delivery time is {deliveryOption === 'fast' ? '45 minutes' : '1 day'} for {deliveryOption} delivery option.
+                      Minimum delivery time is 45 minutes for fast delivery option.
                     </p>
                   </div>
                 </div>
@@ -793,34 +739,40 @@ const Payment = () => {
                       </div>
                       
                       {showTradeItemSuggestions && (
-                        <div className="absolute z-50 w-full mt-1 bg-background border border-border rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                          <ul className="py-1">
-                            {filteredProductSuggestions.length === 0 ? (
-                              <li className="px-4 py-2 text-sm text-muted-foreground">No matching products found</li>
-                            ) : (
-                              filteredProductSuggestions.map(product => (
-                                <li 
-                                  key={product.id}
-                                  onClick={() => handleAddTradeItem(product)}
-                                  className="px-4 py-2 hover:bg-muted cursor-pointer flex items-center gap-3"
-                                >
-                                  <div className="w-8 h-8 bg-muted rounded overflow-hidden">
-                                    <img 
-                                      src={product.imageUrl} 
-                                      alt={product.name} 
-                                      className="w-full h-full object-cover"
-                                    />
-                                  </div>
-                                  <div>
-                                    <p className="text-sm font-medium">{product.name}</p>
-                                    <p className="text-xs text-muted-foreground">
-                                      {product.brand && `${product.brand} · `}${product.category} · ${product.price.toFixed(2)}
-                                    </p>
-                                  </div>
-                                </li>
-                              ))
-                            )}
-                          </ul>
+                        <div className="absolute z-50 w-full mt-1 bg-background border border-border rounded-lg shadow-lg">
+                          <Command>
+                            <CommandList>
+                              <CommandGroup>
+                                {filteredProductSuggestions.length === 0 ? (
+                                  <CommandEmpty>No matching products found</CommandEmpty>
+                                ) : (
+                                  filteredProductSuggestions.map(product => (
+                                    <CommandItem 
+                                      key={product.id}
+                                      onSelect={() => handleAddTradeItem(product)}
+                                      className="cursor-pointer"
+                                    >
+                                      <div className="flex items-center gap-3 py-1">
+                                        <div className="w-8 h-8 bg-muted rounded overflow-hidden">
+                                          <img 
+                                            src={product.imageUrl} 
+                                            alt={product.name} 
+                                            className="w-full h-full object-cover"
+                                          />
+                                        </div>
+                                        <div>
+                                          <p className="text-sm font-medium">{product.name}</p>
+                                          <p className="text-xs text-muted-foreground">
+                                            {product.brand && `${product.brand} · `}${product.category} · ${product.price.toFixed(2)}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </CommandItem>
+                                  ))
+                                )}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
                         </div>
                       )}
                     </div>
@@ -844,61 +796,74 @@ const Payment = () => {
                               <p className="text-xs text-muted-foreground">Original value: ${item.price.toFixed(2)}</p>
                             </div>
                           </div>
-                          <Button
-                            variant="ghost"
+                          <Button 
+                            variant="ghost" 
                             size="icon"
                             onClick={() => handleRemoveTradeItem(item.id)}
-                            className="h-8 w-8 text-muted-foreground hover:text-destructive"
                           >
                             <X size={16} />
                           </Button>
                         </div>
                       ))}
-                      
-                      <div className="mt-4 pt-3 border-t border-border">
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <p className="font-medium">Condition</p>
-                            <p className="text-xs text-muted-foreground">Select the condition of your trade items</p>
-                          </div>
-                          <RadioGroup 
-                            value={tradeItemCondition} 
-                            onValueChange={setTradeItemCondition}
-                            className="flex gap-2"
-                          >
-                            <div className="flex items-center space-x-1">
-                              <RadioGroupItem value="like-new" id="like-new" />
-                              <Label htmlFor="like-new" className="text-xs cursor-pointer">Like New</Label>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <RadioGroupItem value="good" id="good" />
-                              <Label htmlFor="good" className="text-xs cursor-pointer">Good</Label>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <RadioGroupItem value="fair" id="fair" />
-                              <Label htmlFor="fair" className="text-xs cursor-pointer">Fair</Label>
-                            </div>
-                            <div className="flex items-center space-x-1">
-                              <RadioGroupItem value="poor" id="poor" />
-                              <Label htmlFor="poor" className="text-xs cursor-pointer">Poor</Label>
-                            </div>
-                          </RadioGroup>
-                        </div>
-                        
-                        <div className="mt-3 flex justify-between items-center font-bold">
-                          <span>Total Trade Value:</span>
-                          <span>${tradeValue.toFixed(2)}</span>
-                        </div>
-                        
-                        {tradeValueError && (
-                          <div className="mt-2 text-sm text-destructive flex items-center gap-1">
-                            <AlertCircle size={14} />
-                            <span>{tradeValueError}</span>
-                          </div>
-                        )}
-                      </div>
                     </div>
                   )}
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="trade-description">Item Description</Label>
+                    <Input 
+                      id="trade-description" 
+                      placeholder="Additional details about the items you're trading"
+                      value={tradeDescription}
+                      onChange={(e) => setTradeDescription(e.target.value)}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="trade-condition">Item Condition</Label>
+                    <RadioGroup 
+                      value={tradeItemCondition} 
+                      onValueChange={setTradeItemCondition}
+                      className="flex flex-col space-y-2"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="like-new" id="like-new" />
+                        <Label htmlFor="like-new">Like New (90% of value)</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="good" id="good" />
+                        <Label htmlFor="good">Good (70% of value)</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="fair" id="fair" />
+                        <Label htmlFor="fair">Fair (50% of value)</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="poor" id="poor" />
+                        <Label htmlFor="poor">Poor (30% of value)</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+                  
+                  <div className="p-4 bg-card rounded-lg border border-border">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">Estimated Trade Value:</span>
+                      <span className="font-bold text-lg">${tradeValue.toFixed(2)}</span>
+                    </div>
+                    
+                    {tradeValueError && (
+                      <div className="mt-2 p-2 bg-destructive/10 rounded-md text-destructive text-sm">
+                        <AlertCircle size={16} className="inline-block mr-1" />
+                        {tradeValueError}
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="mt-4 p-3 bg-muted rounded-lg">
+                    <p className="text-sm text-muted-foreground">
+                      <strong>Note:</strong> After placing your order, you'll receive instructions for sending or dropping off your trade items. 
+                      Final trade value will be determined upon inspection.
+                    </p>
+                  </div>
                 </div>
               </TabsContent>
             </Tabs>
@@ -908,12 +873,8 @@ const Payment = () => {
             <h2 className="text-xl font-semibold mb-6">Billing Address</h2>
             
             {savedAddresses.length > 0 && (
-              <div className="mb-6 space-y-4">
-                <RadioGroup 
-                  value={selectedAddress || ''} 
-                  onValueChange={handleAddressSelection}
-                  className="space-y-3"
-                >
+              <div className="space-y-4 mb-6">
+                <RadioGroup value={selectedAddress || ''} onValueChange={handleAddressSelection} className="space-y-3">
                   {savedAddresses.map((address, index) => (
                     <div key={index} className="flex items-center space-x-2">
                       <RadioGroupItem value={address} id={`address-${index}`} />
@@ -937,9 +898,10 @@ const Payment = () => {
             {showAddressForm && (
               <form className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
+                  <Label htmlFor="full-name">Full Name</Label>
                   <Input 
-                    id="name" 
+                    id="full-name" 
+                    placeholder="John Doe" 
                     value={billingAddress.name}
                     onChange={(e) => setBillingAddress({...billingAddress, name: e.target.value})}
                     required
@@ -950,6 +912,7 @@ const Payment = () => {
                   <Label htmlFor="street">Street Address</Label>
                   <Input 
                     id="street" 
+                    placeholder="123 Main St" 
                     value={billingAddress.street}
                     onChange={(e) => setBillingAddress({...billingAddress, street: e.target.value})}
                     required
@@ -961,6 +924,7 @@ const Payment = () => {
                     <Label htmlFor="city">City</Label>
                     <Input 
                       id="city" 
+                      placeholder="New York" 
                       value={billingAddress.city}
                       onChange={(e) => setBillingAddress({...billingAddress, city: e.target.value})}
                       required
@@ -971,6 +935,7 @@ const Payment = () => {
                     <Label htmlFor="state">State</Label>
                     <Input 
                       id="state" 
+                      placeholder="NY" 
                       value={billingAddress.state}
                       onChange={(e) => setBillingAddress({...billingAddress, state: e.target.value})}
                       required
@@ -983,6 +948,7 @@ const Payment = () => {
                     <Label htmlFor="zip">ZIP Code</Label>
                     <Input 
                       id="zip" 
+                      placeholder="10001" 
                       value={billingAddress.zip}
                       onChange={(e) => setBillingAddress({...billingAddress, zip: e.target.value})}
                       required
@@ -993,119 +959,145 @@ const Payment = () => {
                     <Label htmlFor="country">Country</Label>
                     <Input 
                       id="country" 
+                      placeholder="United States" 
                       value={billingAddress.country}
                       onChange={(e) => setBillingAddress({...billingAddress, country: e.target.value})}
                       required
                     />
                   </div>
                 </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Switch 
+                    id="same-address" 
+                    checked={sameAsShipping}
+                    onCheckedChange={setSameAsShipping}
+                  />
+                  <Label htmlFor="same-address">Same as shipping address</Label>
+                </div>
               </form>
             )}
           </div>
+          
+          <div className="p-6 bg-card rounded-lg border border-border">
+            <h2 className="text-xl font-semibold mb-4">Have a Coupon?</h2>
+            
+            <div className="flex gap-2">
+              <Input 
+                placeholder="Enter coupon code" 
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value)}
+                disabled={!!appliedCoupon}
+              />
+              <Button 
+                variant={appliedCoupon ? "outline" : "default"} 
+                onClick={appliedCoupon ? () => {
+                  setAppliedCoupon(null);
+                  setCouponDiscount(0);
+                  setCouponCode('');
+                } : handleApplyCoupon}
+                className="whitespace-nowrap"
+              >
+                {appliedCoupon ? "Remove" : "Apply Coupon"}
+              </Button>
+            </div>
+            
+            {appliedCoupon && (
+              <div className="mt-3 p-2 bg-green-500/10 rounded flex items-center gap-2 text-green-500">
+                <CheckCircle size={16} />
+                <span className="text-sm">Coupon "{appliedCoupon}" applied for {couponDiscount}% discount!</span>
+              </div>
+            )}
+          </div>
+          
+          <Button 
+            onClick={handleSubmitPayment}
+            disabled={processingPayment || (paymentMethod === 'trade' && !!tradeValueError)}
+            className="w-full py-6 text-lg"
+          >
+            {processingPayment ? 'Processing...' : `Pay $${calculateTotal().toFixed(2)}`}
+          </Button>
+          
+          <div className="text-center text-sm text-muted-foreground">
+            <p>By completing this purchase, you agree to our <a href="#" className="underline">Terms of Service</a> and <a href="#" className="underline">Privacy Policy</a>.</p>
+          </div>
         </div>
         
-        <div className="lg:w-5/12 space-y-6">
-          <div className="hidden lg:block sticky top-20">
-            <div className="p-6 bg-card rounded-lg border border-border">
-              <h2 className="text-xl font-semibold mb-6">Order Summary</h2>
-              
-              <div className="space-y-4 mb-6">
-                {cart.map((item) => (
-                  <div key={item.id} className="flex gap-4">
-                    <div className="flex-shrink-0 w-20 h-20 bg-muted rounded overflow-hidden">
-                      <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-medium">{item.name}</h3>
-                      <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
-                      <p className="font-semibold">${calculateItemTotal(item).toFixed(2)}</p>
-                    </div>
+        <div className="hidden lg:block lg:w-5/12">
+          <div className="sticky top-20 p-6 bg-card rounded-lg border border-border">
+            <h2 className="text-xl font-semibold mb-6">Order Summary</h2>
+            
+            <div className="max-h-[400px] overflow-y-auto pr-2 space-y-4 mb-6">
+              {cart.map((item) => (
+                <div key={item.id} className="flex gap-4">
+                  <div className="flex-shrink-0 w-20 h-20 bg-muted rounded overflow-hidden">
+                    <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
                   </div>
-                ))}
+                  <div className="flex-1">
+                    <h3 className="font-medium">{item.name}</h3>
+                    <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
+                    {item.accessories && item.accessories.length > 0 && (
+                      <p className="text-xs text-muted-foreground">
+                        With: {item.accessories.filter(a => a.selected).map(a => a.name).join(', ')}
+                      </p>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold">${calculateItemTotal(item).toFixed(2)}</p>
+                    {item.brand && discounts[item.brand] && (
+                      <p className="text-xs text-destructive">
+                        {discounts[item.brand]}% off
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <Separator className="my-4" />
+            
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+                <span>${calculateSubtotal().toFixed(2)}</span>
               </div>
               
-              <div className="flex gap-2 mb-6">
-                <Input 
-                  placeholder="Enter coupon code" 
-                  value={couponCode}
-                  onChange={(e) => setCouponCode(e.target.value)}
-                  className="flex-1"
-                />
-                <Button onClick={handleApplyCoupon}>Apply</Button>
+              <div className="flex justify-between">
+                <span>Shipping</span>
+                <span>
+                  {calculateShipping() === 0 ? 'Free' : `$${calculateShipping().toFixed(2)}`}
+                </span>
               </div>
               
-              <div className="space-y-2 mb-6">
-                <div className="flex justify-between">
-                  <span>Subtotal</span>
-                  <span>${calculateSubtotal().toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Shipping</span>
-                  <span>
-                    {calculateShipping() === 0 ? 'Free' : `$${calculateShipping().toFixed(2)}`}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Tax</span>
-                  <span>${calculateTax().toFixed(2)}</span>
-                </div>
-                
-                {paymentMethod === 'cash' && (
-                  <div className="flex justify-between">
-                    <span>Delivery Fee</span>
-                    <span>${getDeliveryFee().toFixed(2)}</span>
-                  </div>
-                )}
-                
-                {appliedCoupon && (
-                  <div className="flex justify-between text-destructive">
-                    <span>Discount ({appliedCoupon})</span>
-                    <span>-${(couponDiscount / 100 * calculateSubtotal()).toFixed(2)}</span>
-                  </div>
-                )}
-                
-                {paymentMethod === 'trade' && tradeValue > 0 && (
-                  <div className="flex justify-between text-green-500">
-                    <span>Trade-in Credit</span>
-                    <span>-${tradeValue.toFixed(2)}</span>
-                  </div>
-                )}
-                
-                <Separator className="my-2" />
-                
-                <div className="flex justify-between text-lg font-bold pt-2">
-                  <span>Total</span>
-                  <span>${calculateTotal().toFixed(2)}</span>
-                </div>
+              <div className="flex justify-between">
+                <span>Tax (8%)</span>
+                <span>${calculateTax().toFixed(2)}</span>
               </div>
               
-              <Button 
-                className="w-full" 
-                size="lg"
-                onClick={handleSubmitPayment}
-                disabled={processingPayment || (paymentMethod === 'trade' && !!tradeValueError)}
-              >
-                {processingPayment ? (
-                  <span className="flex items-center gap-2">
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      className="h-4 w-4 border-2 border-current border-t-transparent rounded-full"
-                    />
-                    Processing...
-                  </span>
-                ) : (
-                  paymentMethod === 'card' ? 'Pay Now' : 
-                  paymentMethod === 'cash' ? 'Place Order' : 
-                  'Complete Trade'
-                )}
-              </Button>
-              
-              <div className="mt-4 flex justify-center">
-                <p className="text-sm text-muted-foreground">
-                  You can review your order before confirming
-                </p>
+              {appliedCoupon && (
+                <div className="flex justify-between text-destructive">
+                  <span>Discount ({appliedCoupon})</span>
+                  <span>-${(couponDiscount / 100 * calculateSubtotal()).toFixed(2)}</span>
+                </div>
+              )}
+            </div>
+            
+            <Separator className="my-4" />
+            
+            <div className="flex justify-between font-bold text-lg">
+              <span>Total</span>
+              <span>${calculateTotal().toFixed(2)}</span>
+            </div>
+            
+            <div className="mt-6 p-3 bg-muted/50 rounded-lg text-sm flex items-start gap-3">
+              <div className="flex-shrink-0 mt-0.5">
+                <AlertCircle size={18} className="text-muted-foreground" />
               </div>
+              <p className="text-muted-foreground">
+                Orders usually ship within 1-2 business days. 
+                Free shipping on orders over $100. 
+                International shipping available.
+              </p>
             </div>
           </div>
         </div>

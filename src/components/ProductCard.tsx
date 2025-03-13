@@ -14,8 +14,6 @@ interface ProductCardProps {
   discount?: number;
   onQuantityChange: (id: number, quantity: number) => void;
   onProductClick?: () => void;
-  onWishlistToggle?: (id: number, isWishlist: boolean) => void;
-  isWishlisted?: boolean;
 }
 
 const ProductCard = ({ 
@@ -27,12 +25,10 @@ const ProductCard = ({
   discountedPrice, 
   discount = 0, 
   onQuantityChange,
-  onProductClick,
-  onWishlistToggle,
-  isWishlisted = false
+  onProductClick
 }: ProductCardProps) => {
   const [quantity, setQuantity] = useState(0);
-  const [wishlist, setWishlist] = useState(isWishlisted);
+  const [wishlist, setWishlist] = useState(false);
   const { toast } = useToast();
   
   const handleAddToCart = () => {
@@ -58,15 +54,9 @@ const ProductCard = ({
 
   const toggleWishlist = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const newWishlistState = !wishlist;
-    setWishlist(newWishlistState);
-    
-    if (onWishlistToggle) {
-      onWishlistToggle(id, newWishlistState);
-    }
-    
+    setWishlist(!wishlist);
     toast({
-      description: newWishlistState ? `${name} added to wishlist` : `${name} removed from wishlist`,
+      description: wishlist ? `${name} removed from wishlist` : `${name} added to wishlist`,
     });
   };
 
