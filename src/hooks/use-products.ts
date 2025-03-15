@@ -12,7 +12,9 @@ const additionalIPhones: Product[] = [
     brand: "Apple",
     description: "iPhone 7 with A10 Fusion chip, 12MP camera, and water resistance.",
     imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
-    quantity: 0
+    quantity: 0,
+    rating: 4.3,
+    reviews: []
   },
   {
     id: 2002,
@@ -22,7 +24,9 @@ const additionalIPhones: Product[] = [
     brand: "Apple",
     description: "iPhone 8 with A11 Bionic chip, wireless charging, and glass design.",
     imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
-    quantity: 0
+    quantity: 0,
+    rating: 4.4,
+    reviews: []
   },
   {
     id: 2003,
@@ -32,7 +36,9 @@ const additionalIPhones: Product[] = [
     brand: "Apple",
     description: "iPhone X with edge-to-edge Super Retina display, Face ID, and A11 Bionic chip.",
     imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
-    quantity: 0
+    quantity: 0,
+    rating: 4.5,
+    reviews: []
   },
   {
     id: 2004,
@@ -42,7 +48,9 @@ const additionalIPhones: Product[] = [
     brand: "Apple",
     description: "iPhone XS with Super Retina display, A12 Bionic chip, and improved cameras.",
     imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
-    quantity: 0
+    quantity: 0,
+    rating: 4.5,
+    reviews: []
   },
   {
     id: 2005,
@@ -52,7 +60,9 @@ const additionalIPhones: Product[] = [
     brand: "Apple",
     description: "iPhone 11 with A13 Bionic chip, dual-camera system, and all-day battery life.",
     imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
-    quantity: 0
+    quantity: 0,
+    rating: 4.6,
+    reviews: []
   },
   {
     id: 2006,
@@ -62,7 +72,9 @@ const additionalIPhones: Product[] = [
     brand: "Apple",
     description: "iPhone 12 with A14 Bionic chip, Super Retina XDR display, and 5G capability.",
     imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
-    quantity: 0
+    quantity: 0,
+    rating: 4.7,
+    reviews: []
   },
   {
     id: 2007,
@@ -72,7 +84,9 @@ const additionalIPhones: Product[] = [
     brand: "Apple",
     description: "iPhone 13 with A15 Bionic chip, advanced dual-camera system, and improved battery life.",
     imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
-    quantity: 0
+    quantity: 0,
+    rating: 4.8,
+    reviews: []
   },
   {
     id: 2008,
@@ -82,7 +96,9 @@ const additionalIPhones: Product[] = [
     brand: "Apple",
     description: "iPhone 14 with A16 Bionic chip, ProMotion technology, and outstanding camera system.",
     imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
-    quantity: 0
+    quantity: 0,
+    rating: 4.9,
+    reviews: []
   },
   {
     id: 2009,
@@ -92,7 +108,9 @@ const additionalIPhones: Product[] = [
     brand: "Apple",
     description: "iPhone 15 with A17 Pro chip, titanium design, and professional camera features.",
     imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
-    quantity: 0
+    quantity: 0,
+    rating: 4.9,
+    reviews: []
   },
   {
     id: 2010,
@@ -103,7 +121,9 @@ const additionalIPhones: Product[] = [
     description: "iPhone 16 with the latest A18 chip, improved AI capabilities, and advanced camera system.",
     imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
     quantity: 0,
-    discount: 5
+    discount: 5,
+    rating: 5.0,
+    reviews: []
   }
 ];
 

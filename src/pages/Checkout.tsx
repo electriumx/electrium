@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction } from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
 
 interface Product {
   id: number;
@@ -19,6 +20,7 @@ const Checkout = () => {
   const [discounts, setDiscounts] = useState<Record<string, number>>({});
   const [showOutOfStockAlert, setShowOutOfStockAlert] = useState(false);
   const [outOfStockItem, setOutOfStockItem] = useState<string>("");
+  const { toast } = useToast();
   
   useEffect(() => {
     // Load cart data
@@ -93,6 +95,17 @@ const Checkout = () => {
       // Proceed to payment
       navigate('/payment');
     }
+  };
+
+  const handleClearItems = () => {
+    // Clear cart
+    localStorage.setItem('cart', JSON.stringify([]));
+    setCartData([]);
+    
+    toast({
+      title: "Cart cleared",
+      description: "All items have been removed from your cart.",
+    });
   };
 
   return (
@@ -179,6 +192,14 @@ const Checkout = () => {
                            transition-all duration-200 hover:bg-sage-50 dark:hover:bg-sage-900/30"
                 >
                   Continue Shopping
+                </button>
+                <button
+                  onClick={handleClearItems}
+                  className="w-full bg-card text-destructive py-3 px-6 rounded-lg font-medium 
+                           border border-destructive/20
+                           transition-all duration-200 hover:bg-destructive/10"
+                >
+                  Clear All Items
                 </button>
               </div>
             </>
