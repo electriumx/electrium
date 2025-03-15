@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Trash2, Edit, Plus, Tag } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface Coupon {
   id: string;
@@ -15,6 +16,7 @@ interface Coupon {
   expiresAt: number | null;
   description: string;
   isActive: boolean;
+  category?: string;
 }
 
 const CouponManagement = () => {
@@ -27,8 +29,22 @@ const CouponManagement = () => {
     discount: 0,
     expiresAt: null,
     description: '',
-    isActive: true
+    isActive: true,
+    category: 'all'
   });
+  
+  const formRef = useRef<HTMLDivElement>(null);
+
+  // Available categories
+  const categories = [
+    { value: 'all', label: 'All Products' },
+    { value: 'electronics', label: 'Electronics' },
+    { value: 'smartphones', label: 'Smartphones' },
+    { value: 'laptops', label: 'Laptops' },
+    { value: 'accessories', label: 'Accessories' },
+    { value: 'audio', label: 'Audio' },
+    { value: 'wearables', label: 'Wearables' }
+  ];
 
   // Load coupons from localStorage
   useEffect(() => {
@@ -56,7 +72,8 @@ const CouponManagement = () => {
         discount: 10,
         expiresAt: null,
         description: 'Welcome discount for new users',
-        isActive: true
+        isActive: true,
+        category: 'all'
       },
       {
         id: '2',
@@ -64,7 +81,8 @@ const CouponManagement = () => {
         discount: 25,
         expiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000, // 30 days from now
         description: 'Summer sale discount',
-        isActive: true
+        isActive: true,
+        category: 'all'
       },
       {
         id: '3',
@@ -72,7 +90,8 @@ const CouponManagement = () => {
         discount: 50,
         expiresAt: Date.now() + 2 * 24 * 60 * 60 * 1000, // 2 days from now
         description: 'Flash sale - 50% off',
-        isActive: true
+        isActive: true,
+        category: 'all'
       },
       {
         id: '4',
@@ -80,7 +99,8 @@ const CouponManagement = () => {
         discount: 15,
         expiresAt: null,
         description: 'Special discount for Apple products',
-        isActive: true
+        isActive: true,
+        category: 'smartphones'
       },
       {
         id: '5',
@@ -88,7 +108,8 @@ const CouponManagement = () => {
         discount: 20,
         expiresAt: null,
         description: 'Special discount for Samsung products',
-        isActive: true
+        isActive: true,
+        category: 'smartphones'
       },
       {
         id: '6',
@@ -96,7 +117,8 @@ const CouponManagement = () => {
         discount: 30,
         expiresAt: null,
         description: 'Loyalty program discount',
-        isActive: true
+        isActive: true,
+        category: 'all'
       },
       {
         id: '7',
@@ -104,7 +126,8 @@ const CouponManagement = () => {
         discount: 40,
         expiresAt: Date.now() + 15 * 24 * 60 * 60 * 1000, // 15 days from now
         description: 'Holiday season special discount',
-        isActive: true
+        isActive: true,
+        category: 'all'
       },
       {
         id: '8',
@@ -112,7 +135,8 @@ const CouponManagement = () => {
         discount: 10,
         expiresAt: null,
         description: 'Student discount',
-        isActive: true
+        isActive: true,
+        category: 'all'
       },
       {
         id: '9',
@@ -120,7 +144,8 @@ const CouponManagement = () => {
         discount: 25,
         expiresAt: null,
         description: 'Staff discount',
-        isActive: true
+        isActive: true,
+        category: 'all'
       },
       {
         id: '10',
@@ -128,7 +153,8 @@ const CouponManagement = () => {
         discount: 15,
         expiresAt: null,
         description: 'Refer a friend discount',
-        isActive: true
+        isActive: true,
+        category: 'all'
       },
       {
         id: '11',
@@ -136,7 +162,8 @@ const CouponManagement = () => {
         discount: 50,
         expiresAt: null,
         description: 'VIP customer discount',
-        isActive: true
+        isActive: true,
+        category: 'all'
       },
       {
         id: '12',
@@ -144,7 +171,8 @@ const CouponManagement = () => {
         discount: 20,
         expiresAt: null,
         description: 'New user registration discount',
-        isActive: true
+        isActive: true,
+        category: 'all'
       },
       {
         id: '13',
@@ -152,7 +180,8 @@ const CouponManagement = () => {
         discount: 60,
         expiresAt: Date.now() + 10 * 24 * 60 * 60 * 1000, // 10 days from now
         description: 'Black Friday special discount',
-        isActive: true
+        isActive: true,
+        category: 'all'
       },
       {
         id: '14',
@@ -160,7 +189,8 @@ const CouponManagement = () => {
         discount: 45,
         expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days from now
         description: 'Cyber Monday special discount',
-        isActive: true
+        isActive: true,
+        category: 'all'
       },
       {
         id: '15',
@@ -168,7 +198,8 @@ const CouponManagement = () => {
         discount: 30,
         expiresAt: null,
         description: 'Birthday special discount',
-        isActive: true
+        isActive: true,
+        category: 'all'
       },
       {
         id: '16',
@@ -176,7 +207,8 @@ const CouponManagement = () => {
         discount: 25,
         expiresAt: null,
         description: 'Anniversary special discount',
-        isActive: true
+        isActive: true,
+        category: 'all'
       },
       {
         id: '17',
@@ -184,7 +216,8 @@ const CouponManagement = () => {
         discount: 15,
         expiresAt: null,
         description: 'Comeback discount for inactive users',
-        isActive: true
+        isActive: true,
+        category: 'all'
       },
       {
         id: '18',
@@ -192,7 +225,8 @@ const CouponManagement = () => {
         discount: 10,
         expiresAt: null,
         description: 'Mobile app usage discount',
-        isActive: true
+        isActive: true,
+        category: 'all'
       },
       {
         id: '19',
@@ -200,7 +234,8 @@ const CouponManagement = () => {
         discount: 5,
         expiresAt: null,
         description: 'Social media follower discount',
-        isActive: true
+        isActive: true,
+        category: 'all'
       },
       {
         id: '20',
@@ -208,7 +243,8 @@ const CouponManagement = () => {
         discount: 5,
         expiresAt: null,
         description: 'Newsletter signup discount',
-        isActive: true
+        isActive: true,
+        category: 'all'
       }
     ];
     
@@ -233,6 +269,13 @@ const CouponManagement = () => {
     }));
   };
 
+  const handleSelectChange = (value: string) => {
+    setCurrentCoupon(prev => ({
+      ...prev,
+      category: value
+    }));
+  };
+
   const handleAddCoupon = () => {
     setIsEditing(false);
     setCurrentCoupon({
@@ -241,13 +284,24 @@ const CouponManagement = () => {
       discount: 0,
       expiresAt: null,
       description: '',
-      isActive: true
+      isActive: true,
+      category: 'all'
     });
+    
+    // Scroll to form
+    if (formRef.current) {
+      formRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   const handleEditCoupon = (coupon: Coupon) => {
     setIsEditing(true);
     setCurrentCoupon(coupon);
+    
+    // Scroll to form
+    if (formRef.current) {
+      formRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   const handleDeleteCoupon = (id: string) => {
@@ -314,7 +368,8 @@ const CouponManagement = () => {
       discount: 0,
       expiresAt: null,
       description: '',
-      isActive: true
+      isActive: true,
+      category: 'all'
     });
     setIsEditing(false);
   };
@@ -327,94 +382,131 @@ const CouponManagement = () => {
     return expirationDate.toLocaleDateString();
   };
 
+  // Get category label
+  const getCategoryLabel = (categoryValue: string | undefined) => {
+    const category = categories.find(cat => cat.value === categoryValue);
+    return category ? category.label : 'All Products';
+  };
+
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>{isEditing ? 'Edit Coupon' : 'Add New Coupon'}</CardTitle>
-          <CardDescription>
-            {isEditing ? 'Modify existing coupon details' : 'Create a new discount coupon for customers'}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form id="coupon-form" className="space-y-4" onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="code">Coupon Code</Label>
-                <Input
-                  id="code"
-                  name="code"
-                  value={currentCoupon.code}
-                  onChange={handleInputChange}
-                  placeholder="e.g., SUMMER25"
-                />
+      <div ref={formRef}>
+        <Card>
+          <CardHeader>
+            <CardTitle>{isEditing ? 'Edit Coupon' : 'Add New Coupon'}</CardTitle>
+            <CardDescription>
+              {isEditing ? 'Modify existing coupon details' : 'Create a new discount coupon for customers'}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form id="coupon-form" className="space-y-4" onSubmit={handleSubmit}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="code">Coupon Code</Label>
+                  <Input
+                    id="code"
+                    name="code"
+                    value={currentCoupon.code}
+                    onChange={handleInputChange}
+                    placeholder="e.g., SUMMER25"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="discount">Discount Percentage (%)</Label>
+                  <Input
+                    id="discount"
+                    name="discount"
+                    type="number"
+                    min="1"
+                    max="100"
+                    value={currentCoupon.discount}
+                    onChange={handleInputChange}
+                  />
+                </div>
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="discount">Discount Percentage (%)</Label>
+                <Label htmlFor="category">Category</Label>
+                <Select 
+                  value={currentCoupon.category} 
+                  onValueChange={handleSelectChange}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map(category => (
+                      <SelectItem key={category.value} value={category.value}>
+                        {category.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
                 <Input
-                  id="discount"
-                  name="discount"
-                  type="number"
-                  min="1"
-                  max="100"
-                  value={currentCoupon.discount}
+                  id="description"
+                  name="description"
+                  value={currentCoupon.description}
                   onChange={handleInputChange}
+                  placeholder="Describe what this coupon is for"
                 />
               </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Input
-                id="description"
-                name="description"
-                value={currentCoupon.description}
-                onChange={handleInputChange}
-                placeholder="Describe what this coupon is for"
-              />
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="isActive"
-                name="isActive"
-                checked={currentCoupon.isActive}
-                onChange={handleInputChange}
-                className="h-4 w-4 rounded border-gray-300"
-              />
-              <Label htmlFor="isActive">Active</Label>
-            </div>
-          </form>
-        </CardContent>
-        <CardFooter className="flex justify-between">
-          <Button 
-            variant="outline" 
-            onClick={() => {
-              setIsEditing(false);
-              setCurrentCoupon({
-                id: '',
-                code: '',
-                discount: 0,
-                expiresAt: null,
-                description: '',
-                isActive: true
-              });
-            }}
-          >
-            Cancel
-          </Button>
-          <Button type="submit" form="coupon-form">
-            {isEditing ? 'Update Coupon' : 'Add Coupon'}
-          </Button>
-        </CardFooter>
-      </Card>
+              
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="isActive"
+                  name="isActive"
+                  checked={currentCoupon.isActive}
+                  onChange={handleInputChange}
+                  className="h-4 w-4 rounded border-gray-300"
+                />
+                <Label htmlFor="isActive">Active</Label>
+              </div>
+            </form>
+          </CardContent>
+          <CardFooter className="flex justify-between">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setIsEditing(false);
+                setCurrentCoupon({
+                  id: '',
+                  code: '',
+                  discount: 0,
+                  expiresAt: null,
+                  description: '',
+                  isActive: true,
+                  category: 'all'
+                });
+              }}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" form="coupon-form">
+              {isEditing ? 'Update Coupon' : 'Add Coupon'}
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
       
       <Card>
-        <CardHeader>
-          <CardTitle>Active Coupons</CardTitle>
-          <CardDescription>Manage your discount coupons</CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Active Coupons</CardTitle>
+            <CardDescription>Manage your discount coupons</CardDescription>
+          </div>
+          <Button 
+            onClick={handleAddCoupon}
+            className="ml-auto"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Add New Coupon
+          </Button>
         </CardHeader>
         <CardContent>
           {coupons.length > 0 ? (
@@ -423,6 +515,7 @@ const CouponManagement = () => {
                 <TableRow>
                   <TableHead>Code</TableHead>
                   <TableHead>Discount</TableHead>
+                  <TableHead className="hidden md:table-cell">Category</TableHead>
                   <TableHead className="hidden md:table-cell">Description</TableHead>
                   <TableHead className="hidden md:table-cell">Expires</TableHead>
                   <TableHead>Status</TableHead>
@@ -434,6 +527,9 @@ const CouponManagement = () => {
                   <TableRow key={coupon.id}>
                     <TableCell className="font-medium">{coupon.code}</TableCell>
                     <TableCell>{coupon.discount}%</TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      {getCategoryLabel(coupon.category)}
+                    </TableCell>
                     <TableCell className="hidden md:table-cell max-w-[200px] truncate">
                       {coupon.description}
                     </TableCell>
@@ -485,17 +581,6 @@ const CouponManagement = () => {
             </div>
           )}
         </CardContent>
-        {coupons.length > 0 && (
-          <CardFooter>
-            <Button 
-              className="w-full"
-              onClick={handleAddCoupon}
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Add New Coupon
-            </Button>
-          </CardFooter>
-        )}
       </Card>
     </div>
   );

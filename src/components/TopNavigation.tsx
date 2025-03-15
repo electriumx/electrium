@@ -41,15 +41,16 @@ const TopNavigation = ({
           </div>}
         
         <div className="ml-auto flex items-center gap-4">
-          {/* Chatbot Button */}
-          <button onClick={toggleChat} className="flex items-center justify-center w-8 h-8 rounded-full hover:opacity-80 transition-opacity" aria-label="Chat with Electrium Assistant">
-            <img src="/lovable-uploads/332dd32d-b893-48bd-8da7-73aa4bc107bb.png" alt="Electrium Logo" className="w-full h-full" />
-          </button>
-          
-          {/* Settings Button */}
-          <Link to="/settings" className="flex items-center justify-center w-8 h-8 rounded-full hover:opacity-80 transition-opacity" aria-label="Settings">
-            <Settings size={20} className="text-white" />
-          </Link>
+          {/* Chatbot and Settings Buttons */}
+          <div className="flex items-center gap-2">
+            <button onClick={toggleChat} className="flex items-center justify-center w-8 h-8 rounded-full hover:opacity-80 transition-opacity" aria-label="Chat with Electrium Assistant">
+              <img src="/lovable-uploads/332dd32d-b893-48bd-8da7-73aa4bc107bb.png" alt="Electrium Logo" className="w-full h-full" />
+            </button>
+            
+            <Link to="/settings" className="flex items-center justify-center w-8 h-8 rounded-full hover:opacity-80 transition-opacity" aria-label="Settings">
+              <Settings size={20} className="text-white" />
+            </Link>
+          </div>
           
           {/* Wishlist Button */}
           <Link to="/wishlist" className="flex items-center justify-center w-8 h-8 rounded-full hover:opacity-80 transition-opacity" aria-label="View Wishlist">

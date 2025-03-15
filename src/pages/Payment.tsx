@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -19,6 +20,7 @@ import {
   ChevronRight
 } from "lucide-react";
 import { Product } from '../data/productData';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface SavedCard {
   id: string;
@@ -60,12 +62,27 @@ const Payment = () => {
   const [discounts, setDiscounts] = useState<Record<string, number>>({});
   const [expandedSection, setExpandedSection] = useState<string | null>('items');
   const [deliveryOption, setDeliveryOption] = useState('normal');
-  const [deliveryTime, setDeliveryTime] = useState('');
+  const [deliveryTime, setDeliveryTime] = useState('standard');
   const [deliveryLocation, setDeliveryLocation] = useState('');
   const [tradeItems, setTradeItems] = useState<string[]>([]);
+  const [selectedTradeItem, setSelectedTradeItem] = useState('');
   const [tradeValue, setTradeValue] = useState(0);
   const [tradeDescription, setTradeDescription] = useState('');
   const [tradeItemCondition, setTradeItemCondition] = useState('good');
+  const [estimatedDeliveryTime, setEstimatedDeliveryTime] = useState('');
+
+  // Define the calculateTotal function at the beginning to avoid TS error
+  const calculateTotal = () => {
+    const subtotal = calculateSubtotal();
+    const tax = calculateTax();
+    const shipping = calculateShipping();
+    const deliveryFee = paymentMethod === 'cash' ? getDeliveryFee() : 0;
+    
+    const couponDiscountAmount = couponDiscount / 100 * subtotal;
+    const tradeDiscount = paymentMethod === 'trade' ? calculateTradeDiscount() : 0;
+    
+    return subtotal + tax + shipping + deliveryFee - couponDiscountAmount - tradeDiscount;
+  };
 
   useEffect(() => {
     const cartData = localStorage.getItem('cart');
@@ -129,7 +146,45 @@ const Payment = () => {
     }
     
     window.scrollTo(0, 0);
+    
+    // Initialize estimated delivery time
+    updateEstimatedDeliveryTime();
   }, []);
+
+  // Update delivery time estimation when options change
+  useEffect(() => {
+    updateEstimatedDeliveryTime();
+  }, [deliveryOption, deliveryTime, deliveryLocation]);
+
+  const updateEstimatedDeliveryTime = () => {
+    let baseTime = '';
+    
+    if (deliveryOption === 'normal') {
+      baseTime = '1-3 days';
+    } else if (deliveryOption === 'fast') {
+      if (deliveryTime === 'standard') {
+        baseTime = '45-90 minutes';
+      } else if (deliveryTime === 'express') {
+        baseTime = '30-45 minutes';
+      } else if (deliveryTime === 'priority') {
+        baseTime = '15-30 minutes';
+      }
+      
+      // Adjust based on location complexity
+      if (deliveryLocation.length > 30) {
+        // Complex delivery instructions might add time
+        if (deliveryTime === 'standard') {
+          baseTime = '60-120 minutes';
+        } else if (deliveryTime === 'express') {
+          baseTime = '45-60 minutes';
+        } else if (deliveryTime === 'priority') {
+          baseTime = '30-45 minutes';
+        }
+      }
+    }
+    
+    setEstimatedDeliveryTime(baseTime);
+  };
 
   const getDiscountedPrice = (item: Product) => {
     if (!item.brand) return item.price;
@@ -170,34 +225,38 @@ const Payment = () => {
     if (deliveryOption === 'normal') {
       return 5;
     } else if (deliveryOption === 'fast') {
-      return 15;
+      // Scale fee based on delivery time and complexity
+      let baseFee = 15;
+      
+      if (deliveryTime === 'express') {
+        baseFee = 20;
+      } else if (deliveryTime === 'priority') {
+        baseFee = 30;
+      }
+      
+      // Location complexity adds cost
+      if (deliveryLocation.length > 30) {
+        baseFee += 5;
+      }
+      
+      return baseFee;
     }
     return 0;
-  };
-
-  const getEstimatedDeliveryTime = () => {
-    if (deliveryOption === 'normal') {
-      return '1-3 days';
-    } else if (deliveryOption === 'fast') {
-      return '45-90 minutes';
-    }
-    return '';
   };
 
   const calculateTradeDiscount = () => {
     return tradeValue;
   };
 
-  const calculateTotal = () => {
-    const subtotal = calculateSubtotal();
-    const tax = calculateTax();
-    const shipping = calculateShipping();
-    const deliveryFee = paymentMethod === 'cash' ? getDeliveryFee() : 0;
-    
-    const couponDiscountAmount = couponDiscount / 100 * subtotal;
-    const tradeDiscount = paymentMethod === 'trade' ? calculateTradeDiscount() : 0;
-    
-    return subtotal + tax + shipping + deliveryFee - couponDiscountAmount - tradeDiscount;
+  const handleAddTradeItem = () => {
+    if (selectedTradeItem && !tradeItems.includes(selectedTradeItem)) {
+      setTradeItems([...tradeItems, selectedTradeItem]);
+      setSelectedTradeItem('');
+    }
+  };
+
+  const handleRemoveTradeItem = (item: string) => {
+    setTradeItems(tradeItems.filter(i => i !== item));
   };
 
   const handleApplyCoupon = () => {
@@ -301,7 +360,9 @@ const Payment = () => {
     } else if (paymentMethod === 'cash') {
       localStorage.setItem('deliveryPreferences', JSON.stringify({
         option: deliveryOption,
-        location: deliveryLocation
+        time: deliveryTime,
+        location: deliveryLocation,
+        estimatedTime: estimatedDeliveryTime
       }));
     } else if (paymentMethod === 'trade') {
       localStorage.setItem('tradePreferences', JSON.stringify({
@@ -549,13 +610,52 @@ const Payment = () => {
                         <RadioGroupItem value="fast" id="fast" />
                         <Label htmlFor="fast" className="cursor-pointer">
                           <div>
-                            <p className="font-medium">Fast Delivery (45-90 min)</p>
-                            <p className="text-sm text-muted-foreground">$15.00 delivery fee</p>
+                            <p className="font-medium">Fast Delivery</p>
+                            <p className="text-sm text-muted-foreground">Fees vary based on urgency</p>
                           </div>
                         </Label>
                       </div>
                     </RadioGroup>
                   </div>
+                  
+                  {deliveryOption === 'fast' && (
+                    <div className="space-y-2 pl-6">
+                      <Label htmlFor="delivery-time">Delivery Time Preference</Label>
+                      <RadioGroup 
+                        value={deliveryTime} 
+                        onValueChange={setDeliveryTime}
+                        className="flex flex-col space-y-2"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="standard" id="standard" />
+                          <Label htmlFor="standard" className="cursor-pointer">
+                            <div>
+                              <p className="font-medium">Standard (45-90 min)</p>
+                              <p className="text-sm text-muted-foreground">${getDeliveryFee()} delivery fee</p>
+                            </div>
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="express" id="express" />
+                          <Label htmlFor="express" className="cursor-pointer">
+                            <div>
+                              <p className="font-medium">Express (30-45 min)</p>
+                              <p className="text-sm text-muted-foreground">${deliveryTime === 'express' ? getDeliveryFee() : 20} delivery fee</p>
+                            </div>
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="priority" id="priority" />
+                          <Label htmlFor="priority" className="cursor-pointer">
+                            <div>
+                              <p className="font-medium">Priority (15-30 min)</p>
+                              <p className="text-sm text-muted-foreground">${deliveryTime === 'priority' ? getDeliveryFee() : 30} delivery fee</p>
+                            </div>
+                          </Label>
+                        </div>
+                      </RadioGroup>
+                    </div>
+                  )}
                   
                   <div className="space-y-2">
                     <Label htmlFor="delivery-location">Delivery Notes</Label>
@@ -569,8 +669,11 @@ const Payment = () => {
                   
                   <div className="mt-4 p-3 bg-muted rounded-lg">
                     <p className="text-sm text-muted-foreground">
+                      <strong>Estimated Delivery Time:</strong> {estimatedDeliveryTime}
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-2">
                       <strong>Note:</strong> Payment will be collected upon delivery. Please have the exact amount ready.
-                      Minimum delivery time is 45 minutes for fast delivery option.
+                      Minimum delivery time depends on your location and selected options.
                     </p>
                   </div>
                 </div>
@@ -581,14 +684,43 @@ const Payment = () => {
                 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="trade-items">Item Name(s) to Trade</Label>
-                    <Input 
-                      id="trade-items" 
-                      placeholder="PlayStation 4, iPhone 12, etc."
-                      value={tradeItems.join(', ')}
-                      onChange={(e) => setTradeItems(e.target.value.split(',').map(item => item.trim()))}
-                    />
+                    <Label htmlFor="trade-item-input">Item to Trade</Label>
+                    <div className="flex gap-2">
+                      <Input 
+                        id="trade-item-input" 
+                        placeholder="PlayStation 4, iPhone 12, etc."
+                        value={selectedTradeItem}
+                        onChange={(e) => setSelectedTradeItem(e.target.value)}
+                      />
+                      <Button 
+                        onClick={handleAddTradeItem}
+                        type="button"
+                        disabled={!selectedTradeItem}
+                      >
+                        Add
+                      </Button>
+                    </div>
                   </div>
+                  
+                  {tradeItems.length > 0 && (
+                    <div className="space-y-2">
+                      <Label>Selected Trade Items</Label>
+                      <div className="space-y-2">
+                        {tradeItems.map((item, index) => (
+                          <div key={index} className="flex justify-between items-center p-2 bg-muted rounded-md">
+                            <span>{item}</span>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={() => handleRemoveTradeItem(item)}
+                            >
+                              <Trash size={16} />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   
                   <div className="space-y-2">
                     <Label htmlFor="trade-description">Item Description</Label>

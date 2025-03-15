@@ -2,7 +2,8 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, Heart } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from 'react-router-dom';
 
 interface ProductCardProps {
   id: number;
@@ -30,6 +31,7 @@ const ProductCard = ({
   const [quantity, setQuantity] = useState(0);
   const [wishlist, setWishlist] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
   
   const handleAddToCart = () => {
     if (quantity === 0) {
@@ -54,11 +56,44 @@ const ProductCard = ({
 
   const toggleWishlist = (e: React.MouseEvent) => {
     e.stopPropagation();
+    
+    // Get existing wishlist from localStorage
+    const existingWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+    
+    if (wishlist) {
+      // Remove from wishlist
+      const updatedWishlist = existingWishlist.filter((item: any) => item.id !== id);
+      localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
+      toast({
+        description: `${name} removed from wishlist`,
+      });
+    } else {
+      // Add to wishlist
+      const productToAdd = {
+        id,
+        name,
+        price,
+        image,
+        brand,
+        discount
+      };
+      
+      const updatedWishlist = [...existingWishlist, productToAdd];
+      localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
+      toast({
+        description: `${name} added to wishlist`,
+      });
+    }
+    
     setWishlist(!wishlist);
-    toast({
-      description: wishlist ? `${name} removed from wishlist` : `${name} added to wishlist`,
-    });
   };
+
+  // Check if the product is already in the wishlist when the component mounts
+  useState(() => {
+    const existingWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+    const isInWishlist = existingWishlist.some((item: any) => item.id === id);
+    setWishlist(isInWishlist);
+  });
 
   const handleImageClick = () => {
     if (onProductClick) {
@@ -78,6 +113,7 @@ const ProductCard = ({
         <button 
           onClick={toggleWishlist}
           className="absolute top-2 right-2 p-1.5 bg-white/80 dark:bg-card/80 rounded-full text-muted-foreground hover:text-destructive"
+          aria-label={wishlist ? "Remove from wishlist" : "Add to wishlist"}
         >
           <Heart className={wishlist ? "fill-destructive text-destructive" : ""} size={18} />
         </button>
