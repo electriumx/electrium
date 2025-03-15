@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState, useEffect } from "react";
@@ -13,6 +12,7 @@ interface ProductDetailModalProps {
   onQuantityChange: (id: number, quantity: number) => void;
   discount: number;
   reviews?: Review[];
+  stock: number;
 }
 
 interface Review {
@@ -107,7 +107,7 @@ const accessories: Accessory[] = [
   { id: 112, name: "Premium Earbuds", price: 79.99, compatible: ["Apple", "Samsung", "Sony", "Google"], image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" }
 ];
 
-const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discount = 0, reviews = [] }: ProductDetailModalProps) => {
+const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discount = 0, reviews = [], stock = 0 }: ProductDetailModalProps) => {
   const { id, name, price, imageUrl, brand } = product;
   const discountedPrice = discount > 0 ? price * (1 - discount / 100) : price;
   const [activeTab, setActiveTab] = useState("overview");
@@ -122,12 +122,12 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
         const productAccessories = product.accessories
           .filter(acc => acc.selected)
           .map(acc => ({
-            id: Number(acc.id), // Convert string id to number
+            id: Number(acc.id),
             name: acc.name,
             price: acc.price,
             selected: true,
             compatible: [] as string[],
-            image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" // Default image if none exists
+            image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png"
           }));
         
         setSelectedAccessories(productAccessories);
@@ -209,7 +209,7 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
       ...product,
       quantity: quantity,
       accessories: selectedAccessories.map(acc => ({
-        id: String(acc.id), // Convert back to string for ProductAccessory type
+        id: String(acc.id),
         name: acc.name,
         price: acc.price,
         selected: true,
@@ -270,6 +270,10 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
               <p className="mt-4">
                 {name} is a premium device from {brand}, designed for optimal performance and user experience.
                 Click on the Specifications tab to see detailed technical information.
+              </p>
+              
+              <p className="mt-2 text-sm text-muted-foreground">
+                In Stock: {stock}
               </p>
               
               <div className="mt-6 flex items-center justify-between">
