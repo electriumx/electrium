@@ -1,45 +1,39 @@
-
 import { useState, useEffect } from 'react';
 import { Globe, Mail, Phone, Facebook, Instagram, Linkedin } from 'lucide-react';
-
 const Footer = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [currentTimeUTC, setCurrentTimeUTC] = useState('');
-  
   useEffect(() => {
     // Update time every minute
     const interval = setInterval(() => {
       const now = new Date();
       setCurrentTime(now);
-      
+
       // Format UTC time
       const utcHours = now.getUTCHours().toString().padStart(2, '0');
       const utcMinutes = now.getUTCMinutes().toString().padStart(2, '0');
       setCurrentTimeUTC(`${utcHours}:${utcMinutes} UTC`);
     }, 60000);
-    
+
     // Initial setting
     const now = new Date();
     const utcHours = now.getUTCHours().toString().padStart(2, '0');
     const utcMinutes = now.getUTCMinutes().toString().padStart(2, '0');
     setCurrentTimeUTC(`${utcHours}:${utcMinutes} UTC`);
-    
     return () => clearInterval(interval);
   }, []);
-  
+
   // Format time based on user's locale
   const formattedTime = currentTime.toLocaleTimeString(undefined, {
     hour: '2-digit',
     minute: '2-digit',
     hour12: true
   });
-  
-  return (
-    <footer id="footer" className="bg-black text-white py-8 mt-16">
+  return <footer id="footer" className="bg-black text-white py-8 mt-16">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-xl font-bold mb-4 text-[#9eff00]">Electrium</h3>
+            <h3 className="text-xl font-bold mb-4 text-[#18a66e]">Electrium</h3>
             <p className="text-gray-300">Your one-stop shop for premium electronics</p>
             <div className="flex flex-col text-gray-400 mt-2 space-y-1">
               <p>Local Time: {formattedTime}</p>
@@ -84,30 +78,15 @@ const Footer = () => {
               
               {/* Social Media Links */}
               <div className="flex space-x-4 mt-4">
-                <a
-                  href="https://www.instagram.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 bg-black/20 backdrop-blur-sm rounded-full hover:scale-110 transition-transform"
-                >
+                <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" className="p-2 bg-black/20 backdrop-blur-sm rounded-full hover:scale-110 transition-transform">
                   <Instagram className="w-5 h-5 text-white" />
                 </a>
                 
-                <a
-                  href="https://www.linkedin.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 bg-black/20 backdrop-blur-sm rounded-full hover:scale-110 transition-transform"
-                >
+                <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" className="p-2 bg-black/20 backdrop-blur-sm rounded-full hover:scale-110 transition-transform">
                   <Linkedin className="w-5 h-5 text-white" />
                 </a>
                 
-                <a
-                  href="https://www.facebook.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 bg-black/20 backdrop-blur-sm rounded-full hover:scale-110 transition-transform"
-                >
+                <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" className="p-2 bg-black/20 backdrop-blur-sm rounded-full hover:scale-110 transition-transform">
                   <Facebook className="w-5 h-5 text-white" />
                 </a>
               </div>
@@ -118,8 +97,6 @@ const Footer = () => {
           <p>&copy; {new Date().getFullYear()} Electrium. All rights reserved.</p>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;
