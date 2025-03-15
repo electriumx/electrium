@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Globe, Mail, Phone } from 'lucide-react';
+import { Globe, Mail, Phone, Facebook, Instagram, Linkedin } from 'lucide-react';
 
 const Footer = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -81,6 +81,36 @@ const Footer = () => {
                 <Globe size={16} />
                 <span>www.electrium.com</span>
               </p>
+              
+              {/* Social Media Links */}
+              <div className="flex space-x-4 mt-4">
+                <a
+                  href="https://www.instagram.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 bg-black/20 backdrop-blur-sm rounded-full hover:scale-110 transition-transform"
+                >
+                  <Instagram className="w-5 h-5 text-white" />
+                </a>
+                
+                <a
+                  href="https://www.linkedin.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 bg-black/20 backdrop-blur-sm rounded-full hover:scale-110 transition-transform"
+                >
+                  <Linkedin className="w-5 h-5 text-white" />
+                </a>
+                
+                <a
+                  href="https://www.facebook.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 bg-black/20 backdrop-blur-sm rounded-full hover:scale-110 transition-transform"
+                >
+                  <Facebook className="w-5 h-5 text-white" />
+                </a>
+              </div>
             </div>
           </div>
         </div>

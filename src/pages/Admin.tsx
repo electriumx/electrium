@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import CouponManagement from '../components/admin/CouponManagement';
 
 // Get all unique brands from the products for discount settings
 const productBrands = ['Apple', 'Samsung', 'Sony', 'Google', 'Microsoft', 'Xiaomi', 'Audio', 'Accessories', 'PlayStation', 'PC Games', 'Games', 'All'];
@@ -282,10 +283,11 @@ const Admin = () => {
       </div>
       
       <Tabs defaultValue="dashboard">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
           <TabsTrigger value="discounts">Discounts</TabsTrigger>
+          <TabsTrigger value="coupons">Coupons</TabsTrigger>
           <TabsTrigger value="developer">Developer</TabsTrigger>
           <TabsTrigger value="database">Database</TabsTrigger>
         </TabsList>
@@ -555,6 +557,10 @@ const Admin = () => {
               </Button>
             </CardFooter>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="coupons" className="mt-6">
+          <CouponManagement />
         </TabsContent>
         
         <TabsContent value="developer" className="mt-6 space-y-6">
