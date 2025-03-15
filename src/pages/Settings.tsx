@@ -1,10 +1,12 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
 import { users } from "@/data/users";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 const Settings = () => {
   const { toast } = useToast();
@@ -12,6 +14,9 @@ const Settings = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [selectedLanguage, setSelectedLanguage] = useState("");
+  const [showTranslateButton, setShowTranslateButton] = useState(false);
+  const [showTranslateDialog, setShowTranslateDialog] = useState(false);
 
   if (!isAuthenticated) {
     return (
@@ -66,6 +71,25 @@ const Settings = () => {
     setConfirmPassword("");
   };
 
+  const handleLanguageChange = (value: string) => {
+    setSelectedLanguage(value);
+    setShowTranslateButton(value !== "");
+  };
+  
+  const handleTranslate = () => {
+    setShowTranslateDialog(true);
+    
+    // In a real application, you would implement actual translation here
+    // For demo purposes, we're just showing a dialog
+    
+    // If Arabic is selected, we would apply RTL direction
+    if (selectedLanguage === "arabic") {
+      document.documentElement.dir = "rtl";
+    } else {
+      document.documentElement.dir = "ltr";
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 min-h-screen transition-colors duration-300">
       <h1 className="text-4xl font-bold mb-8">Settings</h1>
@@ -83,6 +107,37 @@ const Settings = () => {
               <label className="text-sm font-medium">Display Name</label>
               <p className="text-muted-foreground">{currentUser?.displayName}</p>
             </div>
+          </div>
+        </div>
+
+        {/* Language Selection */}
+        <div className="bg-card p-6 rounded-lg shadow-lg">
+          <h2 className="text-xl font-semibold mb-4">Language Settings</h2>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Select Language</label>
+              <Select onValueChange={handleLanguageChange} value={selectedLanguage}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a language" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="english">English</SelectItem>
+                  <SelectItem value="arabic">Arabic</SelectItem>
+                  <SelectItem value="french">French</SelectItem>
+                  <SelectItem value="german">German</SelectItem>
+                  <SelectItem value="spanish">Spanish</SelectItem>
+                  <SelectItem value="chinese">Chinese</SelectItem>
+                  <SelectItem value="hindi">Hindi</SelectItem>
+                  <SelectItem value="japanese">Japanese</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            {showTranslateButton && (
+              <Button onClick={handleTranslate} className="w-full">
+                Translate to {selectedLanguage.charAt(0).toUpperCase() + selectedLanguage.slice(1)}
+              </Button>
+            )}
           </div>
         </div>
 
@@ -130,6 +185,33 @@ const Settings = () => {
           </Button>
         </div>
       </div>
+      
+      <AlertDialog open={showTranslateDialog} onOpenChange={setShowTranslateDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {selectedLanguage === "arabic" ? "تم التغيير بنجاح" : 
+               selectedLanguage === "french" ? "Changement réussi" :
+               selectedLanguage === "german" ? "Änderung erfolgreich" :
+               "Language Changed"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {selectedLanguage === "arabic" ? "تم تغيير لغة الموقع بنجاح" : 
+               selectedLanguage === "french" ? "La langue du site a été changée avec succès" :
+               selectedLanguage === "german" ? "Die Sprache der Website wurde erfolgreich geändert" :
+               "The website language has been successfully changed"}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction>
+              {selectedLanguage === "arabic" ? "موافق" : 
+               selectedLanguage === "french" ? "OK" :
+               selectedLanguage === "german" ? "OK" :
+               "OK"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

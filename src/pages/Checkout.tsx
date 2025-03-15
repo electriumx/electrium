@@ -2,6 +2,7 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction } from "@/components/ui/alert-dialog";
 
 interface Product {
   id: number;
@@ -16,6 +17,8 @@ const Checkout = () => {
   const navigate = useNavigate();
   const [cartData, setCartData] = useState<Product[]>([]);
   const [discounts, setDiscounts] = useState<Record<string, number>>({});
+  const [showOutOfStockAlert, setShowOutOfStockAlert] = useState(false);
+  const [outOfStockItem, setOutOfStockItem] = useState<string>("");
   
   useEffect(() => {
     // Load cart data
@@ -56,6 +59,41 @@ const Checkout = () => {
     month: 'long',
     day: 'numeric'
   });
+
+  const handleProceedToPayment = () => {
+    // Check stock availability for all items
+    let stockIssue = false;
+    
+    // Get product stocks from localStorage
+    const productStocks = JSON.parse(localStorage.getItem('productStocks') || '{}');
+    
+    // Check each item
+    for (const item of purchasedItems) {
+      const currentStock = productStocks[item.id] || 0;
+      
+      // If not enough stock
+      if (currentStock < item.quantity) {
+        stockIssue = true;
+        setOutOfStockItem(item.name);
+        setShowOutOfStockAlert(true);
+        return;
+      }
+    }
+    
+    if (!stockIssue) {
+      // Update stock for each item
+      for (const item of purchasedItems) {
+        const currentStock = productStocks[item.id] || 0;
+        productStocks[item.id] = Math.max(0, currentStock - item.quantity);
+      }
+      
+      // Save updated stocks
+      localStorage.setItem('productStocks', JSON.stringify(productStocks));
+      
+      // Proceed to payment
+      navigate('/payment');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background py-16 px-4">
@@ -128,7 +166,7 @@ const Checkout = () => {
               
               <div className="mt-8 space-y-4">
                 <button
-                  onClick={() => navigate('/payment')}
+                  onClick={handleProceedToPayment}
                   className="w-full bg-sage-500 text-white py-3 px-6 rounded-lg font-medium 
                            transition-all duration-200 hover:bg-sage-600"
                 >
@@ -147,6 +185,22 @@ const Checkout = () => {
           )}
         </motion.div>
       </div>
+      
+      <AlertDialog open={showOutOfStockAlert} onOpenChange={setShowOutOfStockAlert}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Out of Stock</AlertDialogTitle>
+            <AlertDialogDescription>
+              The desired item "{outOfStockItem}" is currently not in stock.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setShowOutOfStockAlert(false)}>
+              OK
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

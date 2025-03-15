@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Product } from '../data/productData';
 import { useToast } from '@/hooks/use-toast';
@@ -40,13 +39,36 @@ const ProductGrid = ({
       }
     }
 
-    // Generate random stock for products
+    // Load or generate product stocks
+    const savedStocks = localStorage.getItem('productStocks');
+    if (savedStocks) {
+      try {
+        setProductStock(JSON.parse(savedStocks));
+      } catch (error) {
+        console.error('Error parsing product stocks:', error);
+        generateRandomStocks();
+      }
+    } else {
+      generateRandomStocks();
+    }
+  }, [products]);
+
+  const generateRandomStocks = () => {
     const stockMap: {[key: number]: number} = {};
     products.forEach(product => {
       stockMap[product.id] = Math.floor(Math.random() * 50) + 1; // Random stock between 1-50
     });
     setProductStock(stockMap);
-  }, [products]);
+    localStorage.setItem('productStocks', JSON.stringify(stockMap));
+  };
+
+  const updateStock = (id: number, newStock: number) => {
+    setProductStock(prev => {
+      const updated = { ...prev, [id]: newStock };
+      localStorage.setItem('productStocks', JSON.stringify(updated));
+      return updated;
+    });
+  };
 
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);
@@ -145,6 +167,24 @@ const ProductGrid = ({
     return 0;
   };
 
+  // Handle quantity change with stock update
+  const handleDetailQuantityChange = (id: number, quantity: number) => {
+    onQuantityChange(id, quantity);
+    
+    // If we're adding to cart, update the stock
+    const product = products.find(p => p.id === id);
+    if (product) {
+      const oldQuantity = product.quantity || 0;
+      const quantityDiff = quantity - oldQuantity;
+      
+      if (quantityDiff !== 0) {
+        const currentStock = productStock[id] || 0;
+        const newStock = Math.max(0, currentStock - quantityDiff);
+        updateStock(id, newStock);
+      }
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {products.map((product) => {
@@ -217,7 +257,7 @@ const ProductGrid = ({
           product={selectedProduct}
           isOpen={isDetailModalOpen}
           onClose={closeModal}
-          onQuantityChange={onQuantityChange}
+          onQuantityChange={handleDetailQuantityChange}
           discount={getDiscountPercentage(selectedProduct)}
           stock={productStock[selectedProduct.id] || 0}
         />

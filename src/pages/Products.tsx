@@ -7,9 +7,11 @@ import SpinWheel from '../components/SpinWheel';
 import AIChat from '../components/AIChat';
 import FloatingActions from '../components/FloatingActions';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Product, products } from '../data/productData';
+import { Product } from '../data/productData';
+import { useProducts } from '../hooks/use-products';
 
 const Products = () => {
+  const { products: allProducts } = useProducts(); // Use our new hook for products
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   const [cart, setCart] = useState<Product[]>([]);
@@ -22,8 +24,9 @@ const Products = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const maxPrice = Math.max(...products.map(p => p.price));
+  const maxPrice = allProducts.length > 0 ? Math.max(...allProducts.map(p => p.price)) : 2000;
   const [priceRange, setPriceRange] = useState<[number, number]>([0, maxPrice]);
+  const [productStocks, setProductStocks] = useState<Record<number, number>>({});
 
   useEffect(() => {
     const savedCart = localStorage.getItem('cart');
@@ -73,8 +76,33 @@ const Products = () => {
       }
     }
     
+    // Load product stocks from localStorage
+    const savedStocks = localStorage.getItem('productStocks');
+    if (savedStocks) {
+      try {
+        setProductStocks(JSON.parse(savedStocks));
+      } catch (error) {
+        console.error('Error parsing product stocks:', error);
+        // Generate random stocks if parsing fails
+        generateRandomStocks();
+      }
+    } else {
+      // Generate random stocks if none exist
+      generateRandomStocks();
+    }
+    
     window.scrollTo(0, 0);
-  }, []);
+  }, [allProducts.length]);
+
+  // Generate random stocks for all products
+  const generateRandomStocks = () => {
+    const stockMap: Record<number, number> = {};
+    allProducts.forEach(product => {
+      stockMap[product.id] = Math.floor(Math.random() * 50) + 1; // Random stock between 1-50
+    });
+    setProductStocks(stockMap);
+    localStorage.setItem('productStocks', JSON.stringify(stockMap));
+  };
 
   // Listen for cart update events
   useEffect(() => {
@@ -113,7 +141,7 @@ const Products = () => {
         updatedCart[existingItemIndex].quantity = quantity;
       }
     } else if (quantity > 0) {
-      const product = products.find(p => p.id === id);
+      const product = allProducts.find(p => p.id === id);
       if (product) {
         updatedCart.push({
           ...product,
@@ -150,16 +178,15 @@ const Products = () => {
   };
 
   // Filter products based on all criteria
-  let filteredProducts = products;
+  let filteredProducts = allProducts;
   
   // Filter by brand/category
   if (selectedBrands.length > 0) {
     filteredProducts = filteredProducts.filter(product => selectedBrands.includes(product.brand) || selectedBrands.includes(product.category));
   }
   
-  // Filter by subcategory (this would require adding subcategory field to products)
+  // Filter by subcategory
   if (selectedSubcategories.length > 0) {
-    // For demonstration, let's filter by checking if the product name or description contains any of the selected subcategories
     filteredProducts = filteredProducts.filter(product => {
       const productText = `${product.name} ${product.description}`.toLowerCase();
       return selectedSubcategories.some(subcategory => 
@@ -238,7 +265,7 @@ const Products = () => {
             products={filteredProducts} 
             onQuantityChange={handleQuantityChange} 
             discounts={discounts} 
-            showWishlistButton={false} 
+            showWishlistButton={true}
           />
         </div>
       </div>
