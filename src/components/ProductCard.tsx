@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, Heart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -15,6 +15,7 @@ interface ProductCardProps {
   discount?: number;
   onQuantityChange: (id: number, quantity: number) => void;
   onProductClick?: () => void;
+  stock?: number;
 }
 
 const ProductCard = ({ 
@@ -26,12 +27,20 @@ const ProductCard = ({
   discountedPrice, 
   discount = 0, 
   onQuantityChange,
-  onProductClick
+  onProductClick,
+  stock = Math.floor(Math.random() * 50) + 1 // Default random stock if not provided
 }: ProductCardProps) => {
   const [quantity, setQuantity] = useState(0);
   const [wishlist, setWishlist] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  
+  useEffect(() => {
+    // Check if the product is already in the wishlist when the component mounts
+    const existingWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+    const isInWishlist = existingWishlist.some((item: any) => item.id === id);
+    setWishlist(isInWishlist);
+  }, [id]);
   
   const handleAddToCart = () => {
     if (quantity === 0) {
@@ -88,13 +97,6 @@ const ProductCard = ({
     setWishlist(!wishlist);
   };
 
-  // Check if the product is already in the wishlist when the component mounts
-  useState(() => {
-    const existingWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
-    const isInWishlist = existingWishlist.some((item: any) => item.id === id);
-    setWishlist(isInWishlist);
-  });
-
   const handleImageClick = () => {
     if (onProductClick) {
       onProductClick();
@@ -146,6 +148,7 @@ const ProductCard = ({
             ) : (
               <span className="font-semibold">${price.toFixed(2)}</span>
             )}
+            <span className="text-xs text-muted-foreground block">In Stock: {stock}</span>
           </div>
           
           {quantity === 0 ? (

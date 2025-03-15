@@ -1,8 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { Product } from '../data/productData';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import ProductDetailModal from './ProductDetailModal';
+import { Heart } from 'lucide-react';
 
 interface ProductGridProps {
   products: Product[];
@@ -19,8 +20,9 @@ const ProductGrid = ({
 }: ProductGridProps) => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [wishlist, setWishlist] = useState<number[]>([]);
+  const [wishlist, setWishlist] = useState<{[key: number]: boolean}>({});
   const { toast } = useToast();
+  const [productStock, setProductStock] = useState<{[key: number]: number}>({});
 
   useEffect(() => {
     // Load wishlist from localStorage
@@ -28,12 +30,23 @@ const ProductGrid = ({
     if (savedWishlist) {
       try {
         const wishlistItems = JSON.parse(savedWishlist);
-        setWishlist(wishlistItems.map((item: Product) => item.id));
+        const wishlistMap: {[key: number]: boolean} = {};
+        wishlistItems.forEach((item: any) => {
+          wishlistMap[item.id] = true;
+        });
+        setWishlist(wishlistMap);
       } catch (error) {
         console.error('Error parsing wishlist:', error);
       }
     }
-  }, []);
+
+    // Generate random stock for products
+    const stockMap: {[key: number]: number} = {};
+    products.forEach(product => {
+      stockMap[product.id] = Math.floor(Math.random() * 50) + 1; // Random stock between 1-50
+    });
+    setProductStock(stockMap);
+  }, [products]);
 
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);
@@ -42,6 +55,51 @@ const ProductGrid = ({
 
   const closeModal = () => {
     setIsDetailModalOpen(false);
+  };
+
+  const toggleWishlist = (e: React.MouseEvent, product: Product) => {
+    e.stopPropagation();
+    
+    // Get existing wishlist from localStorage
+    const existingWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+    const isInWishlist = wishlist[product.id] || false;
+    
+    if (isInWishlist) {
+      // Remove from wishlist
+      const updatedWishlist = existingWishlist.filter((item: any) => item.id !== product.id);
+      localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
+      
+      setWishlist(prev => ({
+        ...prev,
+        [product.id]: false
+      }));
+      
+      toast({
+        description: `${product.name} removed from wishlist`,
+      });
+    } else {
+      // Add to wishlist
+      const productToAdd = {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.imageUrl,
+        brand: product.brand,
+        discount: product.discount || 0
+      };
+      
+      const updatedWishlist = [...existingWishlist, productToAdd];
+      localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
+      
+      setWishlist(prev => ({
+        ...prev,
+        [product.id]: true
+      }));
+      
+      toast({
+        description: `${product.name} added to wishlist`,
+      });
+    }
   };
 
   const getProductPrice = (product: Product) => {
@@ -92,6 +150,8 @@ const ProductGrid = ({
       {products.map((product) => {
         const discountPercentage = getDiscountPercentage(product);
         const hasDiscount = discountPercentage > 0;
+        const isInWishlist = wishlist[product.id] || false;
+        const stock = productStock[product.id] || 0;
 
         return (
           <div 
@@ -105,8 +165,19 @@ const ProductGrid = ({
                 alt={product.name} 
                 className="product-image"
               />
+              
+              {showWishlistButton && (
+                <button 
+                  onClick={(e) => toggleWishlist(e, product)}
+                  className="absolute top-2 right-2 p-1.5 bg-white/80 dark:bg-card/80 rounded-full text-muted-foreground hover:text-destructive z-10"
+                  aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
+                >
+                  <Heart className={isInWishlist ? "fill-destructive text-destructive" : ""} size={18} />
+                </button>
+              )}
+              
               {hasDiscount && (
-                <div className="absolute top-2 right-2 bg-destructive text-white text-xs font-bold px-2 py-1 rounded">
+                <div className="absolute top-2 left-2 bg-destructive text-white text-xs font-bold px-2 py-1 rounded">
                   {discountPercentage}% OFF
                 </div>
               )}
@@ -130,7 +201,7 @@ const ProductGrid = ({
               </div>
               <div className="flex items-center justify-between">
                 <div className="text-sm text-muted-foreground">
-                  Click for details
+                  In Stock: {stock}
                 </div>
                 <div className="text-sm px-2 py-1 bg-muted rounded-md">
                   Qty: {product.quantity || 0}
@@ -148,6 +219,7 @@ const ProductGrid = ({
           onClose={closeModal}
           onQuantityChange={onQuantityChange}
           discount={getDiscountPercentage(selectedProduct)}
+          stock={productStock[selectedProduct.id] || 0}
         />
       )}
       

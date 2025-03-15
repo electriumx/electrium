@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Input } from "@/components/ui/input";
@@ -17,10 +16,13 @@ import {
   Edit,
   Trash,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  Search
 } from "lucide-react";
 import { Product } from '../data/productData';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { applyCoupon } from '@/components/admin/CouponUtils';
+import { useToast } from '@/hooks/use-toast';
 
 interface SavedCard {
   id: string;
@@ -32,6 +34,7 @@ interface SavedCard {
 
 const Payment = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [cardName, setCardName] = useState('');
   const [cardNumber, setCardNumber] = useState('');
@@ -70,8 +73,10 @@ const Payment = () => {
   const [tradeDescription, setTradeDescription] = useState('');
   const [tradeItemCondition, setTradeItemCondition] = useState('good');
   const [estimatedDeliveryTime, setEstimatedDeliveryTime] = useState('');
+  const [searchValue, setSearchValue] = useState('');
+  const [searchResults, setSearchResults] = useState<string[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
 
-  // Define the calculateTotal function at the beginning to avoid TS error
   const calculateTotal = () => {
     const subtotal = calculateSubtotal();
     const tax = calculateTax();
@@ -145,13 +150,21 @@ const Payment = () => {
       }
     }
     
+    const productsData = localStorage.getItem('products');
+    if (productsData) {
+      try {
+        const parsedProducts = JSON.parse(productsData);
+        setProducts(parsedProducts);
+      } catch (error) {
+        console.error('Error parsing products:', error);
+      }
+    }
+    
     window.scrollTo(0, 0);
     
-    // Initialize estimated delivery time
     updateEstimatedDeliveryTime();
   }, []);
 
-  // Update delivery time estimation when options change
   useEffect(() => {
     updateEstimatedDeliveryTime();
   }, [deliveryOption, deliveryTime, deliveryLocation]);
@@ -170,9 +183,7 @@ const Payment = () => {
         baseTime = '15-30 minutes';
       }
       
-      // Adjust based on location complexity
       if (deliveryLocation.length > 30) {
-        // Complex delivery instructions might add time
         if (deliveryTime === 'standard') {
           baseTime = '60-120 minutes';
         } else if (deliveryTime === 'express') {
@@ -225,7 +236,6 @@ const Payment = () => {
     if (deliveryOption === 'normal') {
       return 5;
     } else if (deliveryOption === 'fast') {
-      // Scale fee based on delivery time and complexity
       let baseFee = 15;
       
       if (deliveryTime === 'express') {
@@ -234,7 +244,6 @@ const Payment = () => {
         baseFee = 30;
       }
       
-      // Location complexity adds cost
       if (deliveryLocation.length > 30) {
         baseFee += 5;
       }
@@ -252,6 +261,8 @@ const Payment = () => {
     if (selectedTradeItem && !tradeItems.includes(selectedTradeItem)) {
       setTradeItems([...tradeItems, selectedTradeItem]);
       setSelectedTradeItem('');
+      setSearchValue('');
+      setSearchResults([]);
     }
   };
 
@@ -260,17 +271,59 @@ const Payment = () => {
   };
 
   const handleApplyCoupon = () => {
-    if (couponCode === 'SAVE10') {
+    if (!couponCode.trim()) {
+      toast({
+        description: "Please enter a coupon code",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const mainCategory = cart.length > 0 ? cart[0].category : undefined;
+    
+    const { valid, discount } = applyCoupon(couponCode, mainCategory);
+    
+    if (valid) {
       setAppliedCoupon(couponCode);
-      setCouponDiscount(10);
-    } else if (couponCode === 'SAVE20') {
-      setAppliedCoupon(couponCode);
-      setCouponDiscount(20);
+      setCouponDiscount(discount);
+      toast({
+        title: "Coupon Applied",
+        description: `${couponCode} - ${discount}% discount applied successfully!`,
+      });
     } else {
       setAppliedCoupon(null);
       setCouponDiscount(0);
-      alert('Invalid coupon code');
+      toast({
+        title: "Invalid Coupon",
+        description: "This coupon is invalid or cannot be applied to your current purchase.",
+        variant: "destructive",
+      });
     }
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchValue(query);
+    
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    
+    const productNames = products.length > 0 
+      ? products.map((p: any) => p.name) 
+      : [
+          "iPhone 13", "Samsung Galaxy S21", "Google Pixel 6", "OnePlus 9",
+          "MacBook Pro", "Dell XPS 13", "HP Spectre", "Lenovo ThinkPad",
+          "iPad Pro", "Samsung Galaxy Tab", "Amazon Fire HD", "Microsoft Surface",
+          "AirPods Pro", "Sony WH-1000XM4", "Bose QuietComfort", "Jabra Elite",
+          "Apple Watch", "Samsung Galaxy Watch", "Fitbit Versa", "Garmin Forerunner"
+        ];
+    
+    const filteredResults = productNames.filter(name => 
+      name.toLowerCase().includes(query.toLowerCase())
+    );
+    
+    setSearchResults(filteredResults);
   };
 
   const handleCardSelection = (cardId: string) => {
@@ -686,12 +739,31 @@ const Payment = () => {
                   <div className="space-y-2">
                     <Label htmlFor="trade-item-input">Item to Trade</Label>
                     <div className="flex gap-2">
-                      <Input 
-                        id="trade-item-input" 
-                        placeholder="PlayStation 4, iPhone 12, etc."
-                        value={selectedTradeItem}
-                        onChange={(e) => setSelectedTradeItem(e.target.value)}
-                      />
+                      <div className="relative flex-1">
+                        <Input 
+                          id="trade-item-input" 
+                          placeholder="PlayStation 4, iPhone 12, etc."
+                          value={searchValue}
+                          onChange={(e) => handleSearch(e.target.value)}
+                        />
+                        {searchResults.length > 0 && (
+                          <div className="absolute z-10 mt-1 w-full bg-background border border-border rounded-md shadow-lg max-h-60 overflow-auto">
+                            {searchResults.map((result, idx) => (
+                              <div 
+                                key={idx} 
+                                className="px-4 py-2 hover:bg-accent cursor-pointer"
+                                onClick={() => {
+                                  setSelectedTradeItem(result);
+                                  setSearchValue(result);
+                                  setSearchResults([]);
+                                }}
+                              >
+                                {result}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                       <Button 
                         onClick={handleAddTradeItem}
                         type="button"
@@ -700,6 +772,11 @@ const Payment = () => {
                         Add
                       </Button>
                     </div>
+                    {selectedTradeItem && (
+                      <p className="text-sm text-green-500 mt-1">
+                        Selected: {selectedTradeItem} (In Stock: Yes)
+                      </p>
+                    )}
                   </div>
                   
                   {tradeItems.length > 0 && (
