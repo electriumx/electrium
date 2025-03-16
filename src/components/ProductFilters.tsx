@@ -55,9 +55,7 @@ const ProductFilters = ({
   const [maxPriceValue, setMaxPriceValue] = useState(maxPrice);
   
   useEffect(() => {
-    if (priceRange[1] === 0 || priceRange[1] === maxPrice) {
-      onPriceRangeChange([0, maxPrice]);
-    }
+    setMaxPriceValue(maxPrice);
   }, [maxPrice]);
   
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -66,8 +64,8 @@ const ProductFilters = ({
   };
 
   const handlePriceChange = (values: number[]) => {
-    setMaxPriceValue(values[1]);
-    onPriceRangeChange([0, values[1]]);
+    setMaxPriceValue(values[0]);
+    onPriceRangeChange([0, values[0]]);
   };
   
   const toggleCategory = (category: string) => {
@@ -123,8 +121,8 @@ const ProductFilters = ({
         <h3 className="text-lg font-semibold mb-4 text-foreground">Price Range</h3>
         <div className="px-2">
           <Slider
-            defaultValue={[0, maxPrice]}
-            value={[0, priceRange[1]]}
+            defaultValue={[maxPrice]}
+            value={[maxPriceValue]}
             max={maxPrice}
             step={10}
             onValueChange={handlePriceChange}
