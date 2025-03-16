@@ -9,6 +9,7 @@ import FloatingActions from '../components/FloatingActions';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Product } from '../data/productData';
 import { useProducts } from '../hooks/use-products';
+import { useToast } from '@/hooks/use-toast';
 
 const Products = () => {
   const { products: allProducts } = useProducts(); // Use our new hook for products
@@ -27,6 +28,33 @@ const Products = () => {
   const maxPrice = allProducts.length > 0 ? Math.max(...allProducts.map(p => p.price)) : 2000;
   const [priceRange, setPriceRange] = useState<[number, number]>([0, maxPrice]);
   const [productStocks, setProductStocks] = useState<Record<number, number>>({});
+  const { toast } = useToast();
+
+  // Function to set all product stocks to 100
+  const resetStocks = () => {
+    const stockMap: Record<number, number> = {};
+    allProducts.forEach(product => {
+      stockMap[product.id] = 100; // Set stock to 100 for each product
+    });
+    setProductStocks(stockMap);
+    localStorage.setItem('productStocks', JSON.stringify(stockMap));
+    localStorage.setItem('lastStockReset', Date.now().toString());
+    
+    toast({
+      title: "Stock Reset",
+      description: "All product stocks have been reset to 100 units.",
+    });
+  };
+
+  // Check if stock needs to be reset (every 12 hours)
+  const checkStockReset = () => {
+    const lastReset = localStorage.getItem('lastStockReset');
+    const now = Date.now();
+    
+    if (!lastReset || (now - parseInt(lastReset)) > 12 * 60 * 60 * 1000) { // 12 hours in milliseconds
+      resetStocks();
+    }
+  };
 
   useEffect(() => {
     const savedCart = localStorage.getItem('cart');
@@ -76,33 +104,31 @@ const Products = () => {
       }
     }
     
-    // Load product stocks from localStorage
+    // Load product stocks from localStorage or reset them
     const savedStocks = localStorage.getItem('productStocks');
     if (savedStocks) {
       try {
         setProductStocks(JSON.parse(savedStocks));
+        // Check if stocks need to be reset
+        checkStockReset();
       } catch (error) {
         console.error('Error parsing product stocks:', error);
-        // Generate random stocks if parsing fails
-        generateRandomStocks();
+        resetStocks();
       }
     } else {
-      // Generate random stocks if none exist
-      generateRandomStocks();
+      // No stocks exist, reset them
+      resetStocks();
     }
     
+    // Set up interval to check for stock reset every hour
+    const stockResetInterval = setInterval(checkStockReset, 60 * 60 * 1000); // Check every hour
+    
     window.scrollTo(0, 0);
+    
+    return () => {
+      clearInterval(stockResetInterval);
+    };
   }, [allProducts.length]);
-
-  // Generate random stocks for all products
-  const generateRandomStocks = () => {
-    const stockMap: Record<number, number> = {};
-    allProducts.forEach(product => {
-      stockMap[product.id] = Math.floor(Math.random() * 50) + 1; // Random stock between 1-50
-    });
-    setProductStocks(stockMap);
-    localStorage.setItem('productStocks', JSON.stringify(stockMap));
-  };
 
   // Listen for cart update events
   useEffect(() => {
@@ -113,6 +139,26 @@ const Products = () => {
     window.addEventListener('cartUpdate', handleCartUpdate as EventListener);
     return () => window.removeEventListener('cartUpdate', handleCartUpdate as EventListener);
   }, []);
+
+  // When the number of products changes, make sure all have stock assigned
+  useEffect(() => {
+    if (allProducts.length > 0) {
+      const updatedStocks = { ...productStocks };
+      let needsUpdate = false;
+      
+      allProducts.forEach(product => {
+        if (updatedStocks[product.id] === undefined) {
+          updatedStocks[product.id] = 100;
+          needsUpdate = true;
+        }
+      });
+      
+      if (needsUpdate) {
+        setProductStocks(updatedStocks);
+        localStorage.setItem('productStocks', JSON.stringify(updatedStocks));
+      }
+    }
+  }, [allProducts, productStocks]);
 
   const handleFilterChange = (brands: string[]) => {
     setSelectedBrands(brands);
@@ -175,6 +221,16 @@ const Products = () => {
 
   const toggleChat = () => {
     setIsChatOpen(!isChatOpen);
+  };
+
+  // Update stock for a product
+  const updateStock = (id: number, newStock: number) => {
+    const updatedStocks = {
+      ...productStocks,
+      [id]: newStock
+    };
+    setProductStocks(updatedStocks);
+    localStorage.setItem('productStocks', JSON.stringify(updatedStocks));
   };
 
   // Filter products based on all criteria
@@ -266,6 +322,8 @@ const Products = () => {
             onQuantityChange={handleQuantityChange} 
             discounts={discounts} 
             showWishlistButton={true}
+            productStocks={productStocks}
+            updateStock={updateStock}
           />
         </div>
       </div>
