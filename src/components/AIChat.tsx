@@ -1,7 +1,19 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { products } from '../data/productData';
+
+const categories = Array.from(new Set(products.map(p => p.category)));
+const brandsByCategory: Record<string, string[]> = {};
+
+products.forEach(product => {
+  if (!brandsByCategory[product.brand]) {
+    brandsByCategory[product.brand] = [];
+  }
+  
+  if (!brandsByCategory[product.brand].includes(product.category)) {
+    brandsByCategory[product.brand].push(product.category);
+  }
+});
 
 interface Message {
   id: string;
@@ -22,12 +34,10 @@ const AIChat: React.FC<AIChatProps> = ({ onClose }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    // Scroll to the bottom of the messages
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
     
-    // Focus the input field
     if (inputRef.current) {
       inputRef.current.focus();
     }
@@ -37,7 +47,6 @@ const AIChat: React.FC<AIChatProps> = ({ onClose }) => {
     e.preventDefault();
     if (!input.trim()) return;
 
-    // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
       text: input,
@@ -47,7 +56,6 @@ const AIChat: React.FC<AIChatProps> = ({ onClose }) => {
     setMessages(prev => [...prev, userMessage]);
     setInput('');
 
-    // Simulate AI thinking
     setTimeout(() => {
       const botResponse = generateResponse(input);
       const botMessage: Message = {
@@ -63,12 +71,10 @@ const AIChat: React.FC<AIChatProps> = ({ onClose }) => {
   const generateResponse = (userInput: string) => {
     const input = userInput.toLowerCase();
     
-    // Handle specific product price inquiries
     const productKeywords = ['how much', 'price', 'cost', 'pricing', 'how much is', 'what is the price'];
     const hasProductPriceQuestion = productKeywords.some(keyword => input.includes(keyword));
     
     if (hasProductPriceQuestion) {
-      // Look for product names in the query
       const productMatch = products.find(product => 
         input.includes(product.name.toLowerCase()) || 
         (product.brand.toLowerCase() + ' ' + product.name.toLowerCase()).includes(input)
@@ -87,7 +93,6 @@ const AIChat: React.FC<AIChatProps> = ({ onClose }) => {
         }
       }
       
-      // Check for brand or category inquiries
       const brandMatches = products.filter(product => 
         input.includes(product.brand.toLowerCase())
       );
@@ -100,7 +105,6 @@ const AIChat: React.FC<AIChatProps> = ({ onClose }) => {
         return `${brandName} products range from $${cheapestProduct.price.toFixed(2)} for the ${cheapestProduct.name} to $${expensiveProduct.price.toFixed(2)} for the ${expensiveProduct.name}. We have ${brandMatches.length} ${brandName} products available. What specific ${brandName} product or category are you interested in?`;
       }
       
-      // Check for category inquiries
       const categoryKeywords = categories.map(cat => cat.toLowerCase());
       const categoryMatch = categoryKeywords.find(cat => input.includes(cat));
       
@@ -120,7 +124,6 @@ const AIChat: React.FC<AIChatProps> = ({ onClose }) => {
       return "I couldn't find specific pricing information for that product. Could you be more specific about which product, brand, or category you're interested in?";
     }
     
-    // Check for product information requests by brand or category
     for (const brand of Object.keys(brandsByCategory)) {
       if (input.includes(brand.toLowerCase())) {
         const brandProducts = products.filter(p => p.brand === brand);
@@ -150,7 +153,6 @@ const AIChat: React.FC<AIChatProps> = ({ onClose }) => {
       }
     }
     
-    // Check for category-specific queries
     for (const category of categories) {
       if (input.includes(category.toLowerCase())) {
         const categoryProducts = products.filter(p => p.category === category);
@@ -235,7 +237,6 @@ const AIChat: React.FC<AIChatProps> = ({ onClose }) => {
       return "I'd be happy to provide recommendations! To give you the best suggestions, could you tell me more about what you're looking for? For example, which category of product, your budget range, or any specific features that are important to you?";
     }
     
-    // Default response
     return "I'm not sure I understand. Could you please rephrase your question? You can ask me about our products, their prices, features, discounts, shipping, returns, or account information.";
   };
 
