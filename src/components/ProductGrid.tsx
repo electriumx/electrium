@@ -9,22 +9,26 @@ interface ProductGridProps {
   onQuantityChange: (id: number, quantity: number) => void;
   discounts: Record<string, { value: number, expiresAt: number }>;
   showWishlistButton?: boolean;
+  productStocks?: Record<number, number>;
+  updateStock?: (id: number, newStock: number) => void;
 }
 
 const ProductGrid = ({ 
   products, 
   onQuantityChange, 
   discounts,
-  showWishlistButton = true 
+  showWishlistButton = true,
+  productStocks = {}, 
+  updateStock
 }: ProductGridProps) => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [wishlist, setWishlist] = useState<{[key: number]: boolean}>({});
   const { toast } = useToast();
-  const [productStock, setProductStock] = useState<{[key: number]: number}>({});
+  
 
   useEffect(() => {
-    // Load wishlist from localStorage
+    
     const savedWishlist = localStorage.getItem('wishlist');
     if (savedWishlist) {
       try {
@@ -38,36 +42,17 @@ const ProductGrid = ({
         console.error('Error parsing wishlist:', error);
       }
     }
-
-    // Load or generate product stocks
-    const savedStocks = localStorage.getItem('productStocks');
-    if (savedStocks) {
-      try {
-        setProductStock(JSON.parse(savedStocks));
-      } catch (error) {
-        console.error('Error parsing product stocks:', error);
-        generateRandomStocks();
-      }
-    } else {
-      generateRandomStocks();
-    }
+    
+    
   }, [products]);
 
-  const generateRandomStocks = () => {
-    const stockMap: {[key: number]: number} = {};
-    products.forEach(product => {
-      stockMap[product.id] = Math.floor(Math.random() * 50) + 1; // Random stock between 1-50
-    });
-    setProductStock(stockMap);
-    localStorage.setItem('productStocks', JSON.stringify(stockMap));
-  };
+  
 
-  const updateStock = (id: number, newStock: number) => {
-    setProductStock(prev => {
-      const updated = { ...prev, [id]: newStock };
-      localStorage.setItem('productStocks', JSON.stringify(updated));
-      return updated;
-    });
+  
+  const handleUpdateStock = (id: number, newStock: number) => {
+    if (updateStock) {
+      updateStock(id, newStock);
+    }
   };
 
   const handleProductClick = (product: Product) => {
@@ -79,15 +64,16 @@ const ProductGrid = ({
     setIsDetailModalOpen(false);
   };
 
+  
   const toggleWishlist = (e: React.MouseEvent, product: Product) => {
     e.stopPropagation();
     
-    // Get existing wishlist from localStorage
+    
     const existingWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
     const isInWishlist = wishlist[product.id] || false;
     
     if (isInWishlist) {
-      // Remove from wishlist
+      
       const updatedWishlist = existingWishlist.filter((item: any) => item.id !== product.id);
       localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
       
@@ -100,7 +86,7 @@ const ProductGrid = ({
         description: `${product.name} removed from wishlist`,
       });
     } else {
-      // Add to wishlist
+      
       const productToAdd = {
         id: product.id,
         name: product.name,
@@ -127,14 +113,14 @@ const ProductGrid = ({
   const getProductPrice = (product: Product) => {
     let price = product.price;
     
-    // Add accessory prices if any
+    
     if (product.accessories) {
       price += product.accessories
         .filter(acc => acc.selected)
         .reduce((sum, acc) => sum + acc.price, 0);
     }
     
-    // Apply discount if available
+    
     const brandDiscount = discounts[product.brand];
     const allDiscount = discounts['All'];
     
@@ -147,19 +133,19 @@ const ProductGrid = ({
     return price;
   };
 
-  // Calculate discount percentage for a product
+  
   const getDiscountPercentage = (product: Product) => {
-    // Product-specific discount
+    
     if (product.discount && product.discount > 0) {
       return product.discount;
     }
     
-    // Brand-specific discount from discount wheel
+    
     if (discounts[product.brand]?.expiresAt > Date.now() && discounts[product.brand]?.value > 0) {
       return discounts[product.brand].value;
     }
     
-    // Global discount from discount wheel
+    
     if (discounts['All']?.expiresAt > Date.now() && discounts['All']?.value > 0) {
       return discounts['All'].value;
     }
@@ -167,20 +153,20 @@ const ProductGrid = ({
     return 0;
   };
 
-  // Handle quantity change with stock update
+  
   const handleDetailQuantityChange = (id: number, quantity: number) => {
     onQuantityChange(id, quantity);
     
-    // If we're adding to cart, update the stock
+    
     const product = products.find(p => p.id === id);
     if (product) {
       const oldQuantity = product.quantity || 0;
       const quantityDiff = quantity - oldQuantity;
       
       if (quantityDiff !== 0) {
-        const currentStock = productStock[id] || 0;
+        const currentStock = productStocks[id] || 0;
         const newStock = Math.max(0, currentStock - quantityDiff);
-        updateStock(id, newStock);
+        handleUpdateStock(id, newStock);
       }
     }
   };
@@ -191,7 +177,7 @@ const ProductGrid = ({
         const discountPercentage = getDiscountPercentage(product);
         const hasDiscount = discountPercentage > 0;
         const isInWishlist = wishlist[product.id] || false;
-        const stock = productStock[product.id] || 0;
+        const stock = productStocks[product.id] || 0;
 
         return (
           <div 
@@ -259,7 +245,7 @@ const ProductGrid = ({
           onClose={closeModal}
           onQuantityChange={handleDetailQuantityChange}
           discount={getDiscountPercentage(selectedProduct)}
-          stock={productStock[selectedProduct.id] || 0}
+          stock={productStocks[selectedProduct.id] || 0}
         />
       )}
       
