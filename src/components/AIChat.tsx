@@ -64,7 +64,7 @@ const AIChat: React.FC<AIChatProps> = ({ onClose }) => {
     const input = userInput.toLowerCase();
     
     // Handle specific product price inquiries
-    const productKeywords = ['how much', 'price', 'cost', 'pricing'];
+    const productKeywords = ['how much', 'price', 'cost', 'pricing', 'how much is', 'what is the price'];
     const hasProductPriceQuestion = productKeywords.some(keyword => input.includes(keyword));
     
     if (hasProductPriceQuestion) {
@@ -75,10 +75,19 @@ const AIChat: React.FC<AIChatProps> = ({ onClose }) => {
       );
       
       if (productMatch) {
-        return `The ${productMatch.name} from ${productMatch.brand} costs $${productMatch.price.toFixed(2)}. Would you like more information about this product?`;
+        const originalPrice = productMatch.price.toFixed(2);
+        const discountedPrice = productMatch.discount ? 
+          (productMatch.price * (1 - productMatch.discount/100)).toFixed(2) : 
+          originalPrice;
+        
+        if (productMatch.discount) {
+          return `The ${productMatch.name} from ${productMatch.brand} regularly costs $${originalPrice}, but it's currently on sale for $${discountedPrice} (${productMatch.discount}% off). It's in the ${productMatch.category} category. Would you like to know more about its features?`;
+        } else {
+          return `The ${productMatch.name} from ${productMatch.brand} costs $${originalPrice}. It's in the ${productMatch.category} category. Would you like to see similar products or know more about its features?`;
+        }
       }
       
-      // Check for brand inquiries
+      // Check for brand or category inquiries
       const brandMatches = products.filter(product => 
         input.includes(product.brand.toLowerCase())
       );
@@ -88,41 +97,70 @@ const AIChat: React.FC<AIChatProps> = ({ onClose }) => {
         const cheapestProduct = [...brandMatches].sort((a, b) => a.price - b.price)[0];
         const expensiveProduct = [...brandMatches].sort((a, b) => b.price - a.price)[0];
         
-        return `${brandName} products range from $${cheapestProduct.price.toFixed(2)} for the ${cheapestProduct.name} to $${expensiveProduct.price.toFixed(2)} for the ${expensiveProduct.name}. What specific ${brandName} product are you interested in?`;
+        return `${brandName} products range from $${cheapestProduct.price.toFixed(2)} for the ${cheapestProduct.name} to $${expensiveProduct.price.toFixed(2)} for the ${expensiveProduct.name}. We have ${brandMatches.length} ${brandName} products available. What specific ${brandName} product or category are you interested in?`;
+      }
+      
+      // Check for category inquiries
+      const categoryKeywords = categories.map(cat => cat.toLowerCase());
+      const categoryMatch = categoryKeywords.find(cat => input.includes(cat));
+      
+      if (categoryMatch) {
+        const category = categories.find(cat => cat.toLowerCase() === categoryMatch);
+        if (category) {
+          const categoryProducts = products.filter(p => p.category === category);
+          if (categoryProducts.length > 0) {
+            const cheapest = [...categoryProducts].sort((a, b) => a.price - b.price)[0];
+            const mostExpensive = [...categoryProducts].sort((a, b) => b.price - a.price)[0];
+            
+            return `We have ${categoryProducts.length} ${category} products available, ranging from the ${cheapest.name} at $${cheapest.price.toFixed(2)} to the ${mostExpensive.name} at $${mostExpensive.price.toFixed(2)}. Would you like to see our top-rated ${category} products?`;
+          }
+        }
+      }
+      
+      return "I couldn't find specific pricing information for that product. Could you be more specific about which product, brand, or category you're interested in?";
+    }
+    
+    // Check for product information requests by brand or category
+    for (const brand of Object.keys(brandsByCategory)) {
+      if (input.includes(brand.toLowerCase())) {
+        const brandProducts = products.filter(p => p.brand === brand);
+        if (brandProducts.length === 0) return `I'm sorry, we don't have any ${brand} products in stock at the moment.`;
+        
+        const productsByCategory = {};
+        brandProducts.forEach(p => {
+          if (!productsByCategory[p.category]) {
+            productsByCategory[p.category] = [];
+          }
+          productsByCategory[p.category].push(p);
+        });
+        
+        let response = `We have several ${brand} products including: `;
+        const categories = Object.keys(productsByCategory);
+        
+        categories.forEach((category, i) => {
+          const categoryProducts = productsByCategory[category];
+          const exampleProducts = categoryProducts.slice(0, 2).map(p => `${p.name} ($${p.price.toFixed(2)})`).join(', ');
+          
+          response += `${category}: ${exampleProducts}${i < categories.length - 1 ? '; ' : '.'}`;
+        });
+        
+        response += ` Would you like more information on any specific ${brand} product or category?`;
+        
+        return response;
       }
     }
     
-    // Check for product information requests by brand
-    if (input.includes('iphone') || input.includes('apple')) {
-      const appleProducts = products.filter(p => p.brand === 'Apple');
-      if (appleProducts.length === 0) return "I'm sorry, we don't have any Apple products in stock at the moment.";
-      
-      const productNames = appleProducts.map(p => `${p.name} ($${p.price.toFixed(2)})`).join(', ');
-      return `We have several Apple products including: ${productNames}. Would you like more information on any specific Apple product?`;
-    }
-    
-    if (input.includes('samsung') || input.includes('galaxy')) {
-      const samsungProducts = products.filter(p => p.brand === 'Samsung');
-      if (samsungProducts.length === 0) return "I'm sorry, we don't have any Samsung products in stock at the moment.";
-      
-      const productNames = samsungProducts.map(p => `${p.name} ($${p.price.toFixed(2)})`).join(', ');
-      return `We have several Samsung products including: ${productNames}. Would you like more information on any specific Samsung product?`;
-    }
-    
-    if (input.includes('playstation') || input.includes('ps5') || input.includes('ps4') || input.includes('sony')) {
-      const playstationProducts = products.filter(p => p.brand === 'PlayStation' || p.brand === 'Sony');
-      if (playstationProducts.length === 0) return "I'm sorry, we don't have any PlayStation or Sony products in stock at the moment.";
-      
-      const productNames = playstationProducts.map(p => `${p.name} ($${p.price.toFixed(2)})`).join(', ');
-      return `We have several PlayStation/Sony products including: ${productNames}. Would you like more information on any specific PlayStation product?`;
-    }
-    
-    if (input.includes('game') || input.includes('gaming') || input.includes('play')) {
-      const gameProducts = products.filter(p => p.brand === 'PlayStation' || p.brand === 'PC Games');
-      if (gameProducts.length === 0) return "I'm sorry, we don't have any gaming products in stock at the moment.";
-      
-      const productNames = gameProducts.map(p => `${p.name} ($${p.price.toFixed(2)})`).join(', ');
-      return `We have several gaming products including: ${productNames}. We have games for PlayStation and PC!`;
+    // Check for category-specific queries
+    for (const category of categories) {
+      if (input.includes(category.toLowerCase())) {
+        const categoryProducts = products.filter(p => p.category === category);
+        if (categoryProducts.length === 0) return `I'm sorry, we don't have any ${category} products in stock at the moment.`;
+        
+        const topRated = [...categoryProducts].sort((a, b) => b.rating - a.rating).slice(0, 3);
+        const topRatedText = topRated.map(p => `${p.brand} ${p.name} (rated ${p.rating}/5 by ${p.reviews} customers)`).join(', ');
+        
+        return `We have ${categoryProducts.length} ${category} products available. Our top-rated ${category} products are: ${topRatedText}. Would you like information about a specific brand or model?`;
+      }
     }
     
     if (input.includes('accessory') || input.includes('accessories') || input.includes('headphone') || input.includes('case') || input.includes('charger')) {
@@ -130,50 +168,75 @@ const AIChat: React.FC<AIChatProps> = ({ onClose }) => {
       const categoryMatch = categories.find(cat => input.includes(cat.toLowerCase()));
       
       if (categoryMatch) {
+        const accessoryProducts = products.filter(p => p.category === categoryMatch);
+        if (accessoryProducts.length > 0) {
+          const topAccessories = accessoryProducts.slice(0, 3).map(p => `${p.brand} ${p.name} ($${p.price.toFixed(2)})`).join(', ');
+          return `We offer various ${categoryMatch} including ${topAccessories}. Many products also have compatible accessories you can add during checkout. Would you like to see our full range of ${categoryMatch}?`;
+        }
+        
         return `We offer various ${categoryMatch} that can be added to compatible products. You can select them when viewing product details. Would you like to browse our products to see compatible ${categoryMatch}?`;
       }
       
       return `We offer various accessories including Headphones, Cases, Chargers, Screen Protectors, Cables, and Memory Cards. These can be added to compatible products during checkout. Which accessories are you interested in?`;
     }
     
-    if (input.includes('discount') || input.includes('sale') || input.includes('deal')) {
+    if (input.includes('discount') || input.includes('sale') || input.includes('deal') || input.includes('offer')) {
+      const discountedProducts = products.filter(p => p.discount && p.discount > 0);
+      
+      if (discountedProducts.length > 0) {
+        const topDeals = discountedProducts
+          .sort((a, b) => (b.discount || 0) - (a.discount || 0))
+          .slice(0, 3)
+          .map(p => `${p.brand} ${p.name} (${p.discount}% off)`);
+          
+        return `We currently have ${discountedProducts.length} products on sale! Our best deals include: ${topDeals.join(', ')}. You can also try your luck with our spin wheel promotion to win discounts of up to 30% on selected brands!`;
+      }
+      
       return `We regularly offer discounts through our spin wheel promotion. Visit our products page to try your luck and win discounts of up to 30% on selected brands!`;
     }
     
     if (input.includes('delivery') || input.includes('shipping')) {
-      return `We offer free shipping on all orders over $50. Standard delivery takes 3-5 business days, and express delivery is available for an additional fee.`;
+      return `We offer free shipping on all orders over $50. Standard delivery takes 3-5 business days, and express delivery (1-2 business days) is available for an additional $9.99. International shipping is also available to select countries, with rates calculated at checkout.`;
     }
     
     if (input.includes('return') || input.includes('warranty')) {
-      return `We offer a 30-day return policy on all products. Many of our electronics also come with manufacturer warranties ranging from 1-2 years.`;
+      return `We offer a 30-day return policy on all products in new condition with original packaging. Most electronics come with manufacturer warranties ranging from 1-2 years. Extended warranty options are available at checkout for many products. Would you like more details about our return process?`;
     }
     
     if (input.includes('login') || input.includes('account') || input.includes('sign')) {
-      return `You can create an account or log in by clicking the "Log In" link in the top right corner of the page. Having an account allows you to track orders, save favorites, and access exclusive deals!`;
+      return `You can create an account or log in by clicking the "Log In" link in the top right corner of the page. Having an account allows you to track orders, save favorites, manage your wishlist, receive personalized recommendations, and access exclusive deals!`;
     }
     
-    if (input.includes('payment') || input.includes('pay') || input.includes('credit card')) {
-      return `We accept all major credit cards, PayPal, and Apple Pay. All payment information is securely processed.`;
+    if (input.includes('payment') || input.includes('pay') || input.includes('credit card') || input.includes('checkout')) {
+      return `We accept all major credit cards (Visa, Mastercard, American Express, Discover), PayPal, Apple Pay, and Google Pay. All payment information is securely processed using industry-standard encryption. We also offer financing options on purchases over $500 through Affirm.`;
     }
     
     if (input.includes('wishlist') || input.includes('save for later') || input.includes('favorite')) {
-      return `You can add products to your wishlist by clicking the heart icon on any product card. Your wishlist is saved and you can access it anytime from the Wishlist link in the navigation bar.`;
+      return `You can add products to your wishlist by clicking the heart icon on any product card. Your wishlist is saved to your account and you can access it anytime from the Wishlist link in the navigation bar. You'll also receive notifications if items in your wishlist go on sale!`;
     }
     
     if (input.includes('hello') || input.includes('hi') || input.includes('hey')) {
-      return 'Hello! How can I help you with your Electrium shopping experience today?';
+      return 'Hello! Welcome to Electrium! How can I help you today? I can assist with product information, pricing, shipping options, or recommend products based on your needs.';
     }
     
     if (input.includes('thanks') || input.includes('thank you')) {
-      return 'You\'re welcome! Is there anything else I can help you with?';
+      return 'You\'re welcome! I\'m happy to help. Is there anything else you\'d like to know about our products or services?';
     }
     
     if (input.includes('bye') || input.includes('goodbye')) {
-      return 'Thank you for chatting with us! Feel free to return if you have more questions. Have a great day!';
+      return 'Thank you for chatting with us! Feel free to return if you have more questions. Have a great day, and don\'t forget to check out our latest deals!';
+    }
+    
+    if (input.includes('compare') || input.includes('difference') || input.includes('better')) {
+      return "I'd be happy to help you compare products! Could you specify which products or brands you'd like to compare? I can provide information on features, pricing, and customer ratings to help you make an informed decision.";
+    }
+    
+    if (input.includes('recommend') || input.includes('suggestion') || input.includes('best')) {
+      return "I'd be happy to provide recommendations! To give you the best suggestions, could you tell me more about what you're looking for? For example, which category of product, your budget range, or any specific features that are important to you?";
     }
     
     // Default response
-    return "I'm not sure I understand. Could you please rephrase your question? You can ask me about our products, their prices, discounts, shipping, returns, or account information.";
+    return "I'm not sure I understand. Could you please rephrase your question? You can ask me about our products, their prices, features, discounts, shipping, returns, or account information.";
   };
 
   return (

@@ -6,21 +6,24 @@ import { addUser } from '../data/users';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Apple, Facebook } from 'lucide-react';
+import { Apple, Facebook, Eye, EyeOff } from 'lucide-react';
 
 const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
-  const [errors, setErrors] = useState({ email: '', password: '', name: '' });
+  const [errors, setErrors] = useState({ email: '', password: '', name: '', confirmPassword: '' });
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { login } = useAuth();
 
   const validateForm = () => {
-    const newErrors = { email: '', password: '', name: '' };
+    const newErrors = { email: '', password: '', name: '', confirmPassword: '' };
     let isValid = true;
 
+    // Validate name
     if (!name.trim()) {
       newErrors.name = 'Name is required';
       isValid = false;
@@ -29,6 +32,7 @@ const Register = () => {
       isValid = false;
     }
 
+    // Validate email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) {
       newErrors.email = 'Email is required';
@@ -38,11 +42,27 @@ const Register = () => {
       isValid = false;
     }
 
+    // Validate password
     if (!password) {
       newErrors.password = 'Password is required';
       isValid = false;
-    } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+    } else if (password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
+      isValid = false;
+    } else if (!/(?=.*[A-Z])/.test(password)) {
+      newErrors.password = 'Password must include at least one uppercase letter';
+      isValid = false;
+    } else if (!/(?=.*[0-9])/.test(password)) {
+      newErrors.password = 'Password must include at least one number';
+      isValid = false;
+    } else if (!/(?=.*[!@#$%^&*])/.test(password)) {
+      newErrors.password = 'Password must include at least one special character (!@#$%^&*)';
+      isValid = false;
+    }
+
+    // Validate password confirmation
+    if (password !== confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
       isValid = false;
     }
 
@@ -77,16 +97,36 @@ const Register = () => {
           description: "Please try again with different credentials.",
         });
       }
+    } else {
+      // Show toast with validation errors
+      const errorMessages = Object.values(errors).filter(error => error !== '');
+      if (errorMessages.length > 0) {
+        toast({
+          variant: "destructive",
+          title: "Validation failed",
+          description: errorMessages[0],
+        });
+      }
     }
   };
 
   const handleSocialRegister = (provider: string) => {
     // In a real app, we would implement OAuth registration here
-    // For now, we'll just create and log in as a demo user
+    // For now, just create a demo user with validation
+    if (!name.trim()) {
+      setErrors(prev => ({ ...prev, name: 'Name is required, even for social login' }));
+      toast({
+        variant: "destructive",
+        title: "Validation failed",
+        description: "Please enter your name before continuing with social login",
+      });
+      return;
+    }
+    
     const demoUser = {
       username: `demo_${Date.now()}`,
-      password: 'demo123',
-      displayName: `Demo User (${provider})`
+      password: 'Demo123!@#',
+      displayName: name || `Demo User (${provider})`
     };
     
     try {
@@ -171,13 +211,13 @@ const Register = () => {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium mb-1">Full name</label>
+              <label htmlFor="name" className="block text-sm font-medium mb-1">Full name<span className="text-destructive">*</span></label>
               <input
                 id="name"
                 name="name"
                 type="text"
                 required
-                className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-input bg-background placeholder-muted-foreground focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+                className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-input bg-background placeholder-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm"
                 placeholder="Full name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -187,13 +227,13 @@ const Register = () => {
               )}
             </div>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium mb-1">Email address</label>
+              <label htmlFor="email" className="block text-sm font-medium mb-1">Email address<span className="text-destructive">*</span></label>
               <input
                 id="email"
                 name="email"
                 type="email"
                 required
-                className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-input bg-background placeholder-muted-foreground focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
+                className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-input bg-background placeholder-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm"
                 placeholder="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -203,19 +243,47 @@ const Register = () => {
               )}
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium mb-1">Password</label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-input bg-background placeholder-muted-foreground focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <label htmlFor="password" className="block text-sm font-medium mb-1">Password<span className="text-destructive">*</span></label>
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-input bg-background placeholder-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm pr-10"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
               {errors.password && (
                 <p className="text-destructive text-sm mt-1">{errors.password}</p>
+              )}
+              <p className="text-xs text-muted-foreground mt-1">
+                Password must be at least 8 characters and include uppercase letter, number, and special character.
+              </p>
+            </div>
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1">Confirm Password<span className="text-destructive">*</span></label>
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type={showPassword ? "text" : "password"}
+                required
+                className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-input bg-background placeholder-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm"
+                placeholder="Confirm password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+              {errors.confirmPassword && (
+                <p className="text-destructive text-sm mt-1">{errors.confirmPassword}</p>
               )}
             </div>
           </div>

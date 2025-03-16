@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
@@ -28,10 +27,10 @@ const ProductFilters = ({
   onSearch,
   onSubCategoryChange
 }: ProductFiltersProps) => {
-  const brands = ["Apple", "Samsung", "Sony", "Google", "Microsoft", "Xiaomi", "Audio", "PlayStation", "PC Games"];
-  const accessories = ["Headphones", "Cases", "Chargers", "Screen Protectors", "Cables", "Memory Cards"];
+  const brands = ["Apple", "Samsung", "Sony", "Google", "Microsoft", "Xiaomi", "Audio", "PlayStation", "PC Games", "LG", "Whirlpool", "Dyson", "Bosch", "Panasonic"];
   
-  // Define subcategories for each main category
+  const accessories = ["Headphones", "Cases", "Chargers", "Screen Protectors", "Cables", "Memory Cards", "Warranties", "Installation Kits"];
+  
   const subcategories: Record<string, string[]> = {
     "Smartphones": ["iPhone", "Android", "Foldable", "Budget", "Premium", "Camera-focused", "Battery-focused"],
     "Laptops": ["Gaming", "Business", "Ultrabook", "2-in-1", "Budget", "Premium", "Chromebook"],
@@ -40,13 +39,26 @@ const ProductFilters = ({
     "Headphones": ["Over-ear", "In-ear", "Wireless", "Noise-cancelling", "Gaming", "Sports"],
     "PC Accessories": ["Keyboards", "Mice", "Monitors", "Webcams", "Microphones", "Speakers"],
     "Tablets": ["iOS", "Android", "Windows", "E-readers", "Budget", "Premium"],
-    "Games": ["Action", "RPG", "Strategy", "Sports", "Simulation", "Racing", "Puzzle"]
+    "Games": ["Action", "RPG", "Strategy", "Sports", "Simulation", "Racing", "Puzzle"],
+    "Microwaves": ["Countertop", "Built-in", "Convection", "Smart", "Compact"],
+    "Washing Machines": ["Front Load", "Top Load", "Compact", "Smart", "Commercial"],
+    "Refrigerators": ["French Door", "Side-by-Side", "Top Freezer", "Bottom Freezer", "Mini", "Smart"],
+    "Smart Screens": ["Digital Frames", "Smart Displays", "Interactive Panels", "Digital Signage"],
+    "Air Conditioners": ["Window", "Split", "Portable", "Central", "Smart"],
+    "Vacuum Cleaners": ["Robot", "Upright", "Canister", "Handheld", "Stick"]
   };
   
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
+  const [maxPriceValue, setMaxPriceValue] = useState(maxPrice);
+  
+  useEffect(() => {
+    if (priceRange[1] === 0 || priceRange[1] === maxPrice) {
+      onPriceRangeChange([0, maxPrice]);
+    }
+  }, [maxPrice]);
   
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +66,8 @@ const ProductFilters = ({
   };
 
   const handlePriceChange = (values: number[]) => {
-    onPriceRangeChange([values[0], values[1]]);
+    setMaxPriceValue(values[1]);
+    onPriceRangeChange([0, values[1]]);
   };
   
   const toggleCategory = (category: string) => {
@@ -84,12 +97,10 @@ const ProductFilters = ({
     }
   };
   
-  // Get all available categories from the brands
   const categories = Object.keys(subcategories);
   
   return (
     <div className="space-y-4">
-      {/* Search Bar */}
       <div className="p-4 rounded-lg bg-card shadow-md">
         <form onSubmit={handleSearchSubmit} className="relative">
           <Input
@@ -108,13 +119,12 @@ const ProductFilters = ({
         </form>
       </div>
 
-      {/* Price Range Filter */}
       <div className="p-4 rounded-lg bg-card shadow-md">
         <h3 className="text-lg font-semibold mb-4 text-foreground">Price Range</h3>
         <div className="px-2">
           <Slider
             defaultValue={[0, maxPrice]}
-            value={[priceRange[0], priceRange[1]]}
+            value={[0, priceRange[1]]}
             max={maxPrice}
             step={10}
             onValueChange={handlePriceChange}
@@ -122,17 +132,16 @@ const ProductFilters = ({
           />
           <div className="flex justify-between items-center">
             <div className="px-3 py-1 bg-secondary rounded-md">
-              ${priceRange[0]}
+              $0
             </div>
             <div className="text-muted-foreground">to</div>
             <div className="px-3 py-1 bg-secondary rounded-md">
-              ${priceRange[1]}
+              ${maxPriceValue}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Categories Filter */}
       <div className="p-4 rounded-lg bg-card shadow-md">
         <h3 className="text-lg font-semibold mb-4 text-foreground">Categories</h3>
         <div className="flex flex-col gap-2">
@@ -174,7 +183,6 @@ const ProductFilters = ({
         </div>
       </div>
 
-      {/* Brand Filter */}
       <div className="p-4 rounded-lg bg-card shadow-md">
         <h3 className="text-lg font-semibold mb-4 text-foreground">Brands</h3>
         <div className="flex flex-wrap gap-2">
@@ -207,7 +215,6 @@ const ProductFilters = ({
         </div>
       </div>
 
-      {/* Accessories Filter */}
       <div className="p-4 rounded-lg bg-card shadow-md">
         <h3 className="text-lg font-semibold mb-4 text-foreground">Accessories</h3>
         <div className="flex flex-wrap gap-2">

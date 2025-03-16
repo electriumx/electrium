@@ -1,4 +1,3 @@
-
 export interface Product {
   id: number;
   name: string;
@@ -7,7 +6,7 @@ export interface Product {
   imageUrl: string;
   brand: string;
   category: string;
-  subcategory?: string; // Added for subcategory filtering
+  subcategory?: string;
   rating: number;
   reviews: number;
   quantity?: number;
@@ -24,7 +23,6 @@ export interface ProductAccessory {
   image?: string;
 }
 
-// Helper function to generate a more reasonable price based on product type
 const generateReasonablePrice = (category: string, premium: boolean = false): number => {
   const priceRanges: Record<string, [number, number]> = {
     'Smartphones': premium ? [699, 1299] : [299, 699],
@@ -42,7 +40,6 @@ const generateReasonablePrice = (category: string, premium: boolean = false): nu
   return Math.round((Math.random() * (max - min) + min) * 100) / 100;
 }
 
-// Generate original set of base products
 export const products: Product[] = [
   {
     id: 1,
@@ -433,13 +430,13 @@ export const products: Product[] = [
   }
 ];
 
-// Generate additional products for each category
 const categories = [
   'Smartphones', 'Laptops', 'Gaming Consoles', 'TVs', 
-  'Headphones', 'PC Accessories', 'Tablets', 'Games'
+  'Headphones', 'PC Accessories', 'Tablets', 'Games',
+  'Microwaves', 'Washing Machines', 'Refrigerators', 'Smart Screens', 
+  'Air Conditioners', 'Vacuum Cleaners'
 ];
 
-// Subcategories mapping
 const subcategories: Record<string, string[]> = {
   "Smartphones": ["iPhone", "Android", "Foldable", "Budget", "Premium", "Camera-focused", "Battery-focused"],
   "Laptops": ["Gaming", "Business", "Ultrabook", "2-in-1", "Budget", "Premium", "Chromebook"],
@@ -448,10 +445,15 @@ const subcategories: Record<string, string[]> = {
   "Headphones": ["Over-ear", "In-ear", "Wireless", "Noise-cancelling", "Gaming", "Sports"],
   "PC Accessories": ["Keyboards", "Mice", "Monitors", "Webcams", "Microphones", "Speakers"],
   "Tablets": ["iOS", "Android", "Windows", "E-readers", "Budget", "Premium"],
-  "Games": ["Action", "RPG", "Strategy", "Sports", "Simulation", "Racing", "Puzzle"]
+  "Games": ["Action", "RPG", "Strategy", "Sports", "Simulation", "Racing", "Puzzle"],
+  "Microwaves": ["Countertop", "Built-in", "Convection", "Smart", "Compact"],
+  "Washing Machines": ["Front Load", "Top Load", "Compact", "Smart", "Commercial"],
+  "Refrigerators": ["French Door", "Side-by-Side", "Top Freezer", "Bottom Freezer", "Mini", "Smart"],
+  "Smart Screens": ["Digital Frames", "Smart Displays", "Interactive Panels", "Digital Signage"],
+  "Air Conditioners": ["Window", "Split", "Portable", "Central", "Smart"],
+  "Vacuum Cleaners": ["Robot", "Upright", "Canister", "Handheld", "Stick"]
 };
 
-// Brand mappings per category
 const brandsByCategory: Record<string, string[]> = {
   "Smartphones": ["Apple", "Samsung", "Google", "Xiaomi"],
   "Laptops": ["Apple", "Dell", "HP", "Lenovo", "ASUS", "Microsoft"],
@@ -460,12 +462,17 @@ const brandsByCategory: Record<string, string[]> = {
   "Headphones": ["Sony", "Bose", "Apple", "JBL", "Audio"],
   "PC Accessories": ["Logitech", "Razer", "Corsair", "SteelSeries"],
   "Tablets": ["Apple", "Samsung", "Microsoft", "Amazon"],
-  "Games": ["PlayStation", "PC Games", "Microsoft", "Nintendo"]
+  "Games": ["PlayStation", "PC Games", "Microsoft", "Nintendo"],
+  "Microwaves": ["Samsung", "LG", "Whirlpool", "Panasonic", "GE"],
+  "Washing Machines": ["Samsung", "LG", "Whirlpool", "Maytag", "Bosch"],
+  "Refrigerators": ["Samsung", "LG", "Whirlpool", "GE", "Frigidaire"],
+  "Smart Screens": ["Samsung", "Google", "Amazon", "Facebook", "Lenovo"],
+  "Air Conditioners": ["LG", "Samsung", "Carrier", "Daikin", "Frigidaire"],
+  "Vacuum Cleaners": ["Dyson", "Shark", "iRobot", "Miele", "Bissell"]
 };
 
-// Generate accessories for products
 const generateAccessories = (category: string): ProductAccessory[] => {
-  const accessoryCount = Math.floor(Math.random() * 3) + 1; // 1-3 accessories
+  const accessoryCount = Math.floor(Math.random() * 3) + 1;
   const result: ProductAccessory[] = [];
   
   for (let i = 0; i < accessoryCount; i++) {
@@ -519,18 +526,14 @@ const generateAccessories = (category: string): ProductAccessory[] => {
   return result;
 };
 
-// Generate a large number of additional products
-let nextId = 100; // Start from ID 100 to avoid conflicts with existing products
+let nextId = 100;
 
 categories.forEach(category => {
-  // Get all subcategories for this category
   const categorySubcategories = subcategories[category] || [];
-  // Get all brands for this category
   const categoryBrands = brandsByCategory[category] || ["Generic"];
   
-  // Generate 100 products for this category
   for (let i = 0; i < 100; i++) {
-    const isPremium = Math.random() > 0.7; // 30% chance of being a premium product
+    const isPremium = Math.random() > 0.7;
     const subcategory = categorySubcategories[Math.floor(Math.random() * categorySubcategories.length)];
     const brand = categoryBrands[Math.floor(Math.random() * categoryBrands.length)];
     
@@ -550,7 +553,7 @@ categories.forEach(category => {
         productDesc = `Next-generation gaming experience with immersive graphics and fast loading times.`;
         break;
       case 'TVs':
-        const size = Math.floor(Math.random() * 30 + 32); // 32-62 inch
+        const size = Math.floor(Math.random() * 30 + 32);
         productName = `${brand} ${size}" ${subcategory} TV`;
         productDesc = `Crystal clear display with smart features and immersive sound.`;
         break;
@@ -572,19 +575,40 @@ categories.forEach(category => {
         productName = `${gameNames[Math.floor(Math.random() * gameNames.length)]} ${gameSuffixes[Math.floor(Math.random() * gameSuffixes.length)]} - ${subcategory}`;
         productDesc = `Immersive ${subcategory.toLowerCase()} game with stunning graphics and engaging gameplay.`;
         break;
+      case 'Microwaves':
+        productName = `${brand} ${subcategory} Microwave ${Math.floor(Math.random() * 1000 + 100)}`;
+        productDesc = `High-efficiency ${subcategory.toLowerCase()} with multiple cooking presets.`;
+        break;
+      case 'Washing Machines':
+        productName = `${brand} ${subcategory} Washing Machine ${Math.floor(Math.random() * 1000 + 100)}`;
+        productDesc = `Energy-efficient ${subcategory.toLowerCase()} with steam cleaning technology.`;
+        break;
+      case 'Refrigerators':
+        productName = `${brand} ${subcategory} Refrigerator ${Math.floor(Math.random() * 1000 + 100)}`;
+        productDesc = `Smart refrigerator with touchscreen and camera to see inside from your phone.`;
+        break;
+      case 'Smart Screens':
+        productName = `${brand} ${subcategory} Smart Screen ${Math.floor(Math.random() * 1000 + 100)}`;
+        productDesc = `High-quality ${subcategory.toLowerCase()} display with Google Assistant integration.`;
+        break;
+      case 'Air Conditioners':
+        productName = `${brand} ${subcategory} Air Conditioner ${Math.floor(Math.random() * 1000 + 100)}`;
+        productDesc = `Energy-efficient ${subcategory.toLowerCase()} with smart controls and quiet operation.`;
+        break;
+      case 'Vacuum Cleaners':
+        productName = `${brand} ${subcategory} Vacuum Cleaner ${Math.floor(Math.random() * 1000 + 100)}`;
+        productDesc = `Powerful cordless vacuum with advanced filtration and up to 60 minutes of runtime.`;
+        break;
       default:
         productName = `${brand} ${category} ${Math.floor(Math.random() * 1000 + 100)}`;
         productDesc = `High-quality ${category.toLowerCase()} product with premium features.`;
     }
     
-    // Generate a reasonable price
     const price = generateReasonablePrice(category, isPremium);
     
-    // Generate 0-15% discount occasionally
-    const hasDiscount = Math.random() > 0.8; // 20% chance of having a discount
+    const hasDiscount = Math.random() > 0.8;
     const discount = hasDiscount ? Math.floor(Math.random() * 15) + 5 : 0;
     
-    // Use a placeholder image from the same category if available
     let imageUrl = '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png';
     
     switch (category) {
@@ -614,9 +638,26 @@ categories.forEach(category => {
         ];
         imageUrl = gameImages[Math.floor(Math.random() * gameImages.length)];
         break;
+      case 'Microwaves':
+        imageUrl = Math.random() > 0.5 ? '/lovable-uploads/samsung-65-qled-8k-tv.jpg' : '/lovable-uploads/sony-wh-1000xm4-headphones.jpg';
+        break;
+      case 'Washing Machines':
+        imageUrl = Math.random() > 0.5 ? '/lovable-uploads/samsung-65-qled-8k-tv.jpg' : '/lovable-uploads/sony-wh-1000xm4-headphones.jpg';
+        break;
+      case 'Refrigerators':
+        imageUrl = Math.random() > 0.5 ? '/lovable-uploads/samsung-65-qled-8k-tv.jpg' : '/lovable-uploads/sony-wh-1000xm4-headphones.jpg';
+        break;
+      case 'Smart Screens':
+        imageUrl = Math.random() > 0.5 ? '/lovable-uploads/samsung-65-qled-8k-tv.jpg' : '/lovable-uploads/sony-wh-1000xm4-headphones.jpg';
+        break;
+      case 'Air Conditioners':
+        imageUrl = Math.random() > 0.5 ? '/lovable-uploads/samsung-65-qled-8k-tv.jpg' : '/lovable-uploads/sony-wh-1000xm4-headphones.jpg';
+        break;
+      case 'Vacuum Cleaners':
+        imageUrl = Math.random() > 0.5 ? '/lovable-uploads/samsung-65-qled-8k-tv.jpg' : '/lovable-uploads/sony-wh-1000xm4-headphones.jpg';
+        break;
     }
     
-    // Create a new product with generated properties
     const newProduct: Product = {
       id: nextId++,
       name: productName,
@@ -626,22 +667,138 @@ categories.forEach(category => {
       brand: brand,
       category: category,
       subcategory: subcategory,
-      rating: 3 + Math.random() * 2, // Random rating between 3-5
-      reviews: Math.floor(Math.random() * 400) + 10, // Random number of reviews
+      rating: 3 + Math.random() * 2,
+      reviews: Math.floor(Math.random() * 400) + 10,
       accessories: generateAccessories(category)
     };
     
-    // Add discount if applicable
     if (discount > 0) {
       newProduct.discount = discount;
     }
     
-    // Add to products array
     products.push(newProduct);
   }
 });
 
-// Sort products by category and then by price
+const applianceProducts: Product[] = [
+  {
+    id: 1001,
+    name: "Samsung Smart Microwave",
+    description: "Smart microwave with voice control and multiple cooking presets.",
+    price: 299.99,
+    imageUrl: '/lovable-uploads/samsung-65-qled-8k-tv.jpg',
+    brand: "Samsung",
+    category: "Microwaves",
+    subcategory: "Smart",
+    rating: 4.5,
+    reviews: 128,
+    accessories: [{
+      id: 'acc-microwave-1',
+      name: 'Extended Warranty',
+      price: 49.99,
+      category: 'Services',
+      image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png'
+    }]
+  },
+  {
+    id: 1002,
+    name: "LG Front Load Washing Machine",
+    description: "Energy efficient washing machine with steam cleaning technology.",
+    price: 899.99,
+    imageUrl: '/lovable-uploads/samsung-65-qled-8k-tv.jpg',
+    brand: "LG",
+    category: "Washing Machines",
+    subcategory: "Front Load",
+    rating: 4.7,
+    reviews: 215,
+    accessories: [{
+      id: 'acc-washer-1',
+      name: 'Installation Kit',
+      price: 29.99,
+      category: 'Accessories',
+      image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png'
+    }]
+  },
+  {
+    id: 1003,
+    name: "Samsung Family Hub Refrigerator",
+    description: "Smart refrigerator with touchscreen and camera to see inside from your phone.",
+    price: 2899.99,
+    imageUrl: '/lovable-uploads/samsung-65-qled-8k-tv.jpg',
+    brand: "Samsung",
+    category: "Refrigerators",
+    subcategory: "Smart",
+    rating: 4.8,
+    reviews: 178,
+    accessories: [{
+      id: 'acc-fridge-1',
+      name: 'Water Filter',
+      price: 49.99,
+      category: 'Accessories',
+      image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png'
+    }]
+  },
+  {
+    id: 1004,
+    name: "Google Nest Hub",
+    description: "Smart display with Google Assistant to control your smart home.",
+    price: 129.99,
+    imageUrl: '/lovable-uploads/google-pixel-6-pro.jpg',
+    brand: "Google",
+    category: "Smart Screens",
+    subcategory: "Smart Displays",
+    rating: 4.6,
+    reviews: 310,
+    accessories: [{
+      id: 'acc-display-1',
+      name: 'Wall Mount',
+      price: 19.99,
+      category: 'Accessories',
+      image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png'
+    }]
+  },
+  {
+    id: 1005,
+    name: "LG Dual Inverter Window AC",
+    description: "Energy efficient air conditioner with smart controls and quiet operation.",
+    price: 549.99,
+    imageUrl: '/lovable-uploads/samsung-65-qled-8k-tv.jpg',
+    brand: "LG",
+    category: "Air Conditioners",
+    subcategory: "Window",
+    rating: 4.4,
+    reviews: 156,
+    accessories: [{
+      id: 'acc-ac-1',
+      name: 'Installation Kit',
+      price: 39.99,
+      category: 'Accessories',
+      image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png'
+    }]
+  },
+  {
+    id: 1006,
+    name: "Dyson V11 Stick Vacuum",
+    description: "Powerful cordless vacuum with advanced filtration and up to 60 minutes of runtime.",
+    price: 599.99,
+    imageUrl: '/lovable-uploads/logitech-mx-master-3-mouse.jpg',
+    brand: "Dyson",
+    category: "Vacuum Cleaners",
+    subcategory: "Stick",
+    rating: 4.9,
+    reviews: 412,
+    accessories: [{
+      id: 'acc-vacuum-1',
+      name: 'Extra Battery',
+      price: 129.99,
+      category: 'Accessories',
+      image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png'
+    }]
+  }
+];
+
+applianceProducts.forEach(product => products.push(product));
+
 products.sort((a, b) => {
   if (a.category === b.category) {
     return a.price - b.price;

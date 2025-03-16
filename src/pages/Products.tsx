@@ -207,6 +207,16 @@ const Products = () => {
   };
 
   const handleSpinWin = (brand: string, discount: number, expiresAt: number) => {
+    // Ensure discount is valid and less than original price
+    if (discount <= 0 || discount > 100) {
+      toast({
+        variant: "destructive",
+        title: "Invalid Discount",
+        description: "The discount must be between 1% and 100%.",
+      });
+      return;
+    }
+
     const newDiscounts = {
       ...discounts,
       [brand]: {
@@ -217,6 +227,11 @@ const Products = () => {
     
     setDiscounts(newDiscounts);
     localStorage.setItem('discounts', JSON.stringify(newDiscounts));
+    
+    toast({
+      title: "Discount Applied!",
+      description: `You've won a ${discount}% discount on all ${brand} products.`,
+    });
   };
 
   const toggleChat = () => {
@@ -267,6 +282,11 @@ const Products = () => {
   }
 
   const cartItemCount = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
+  
+  // Get active discounts sorted by value (highest first)
+  const activeDiscounts = Object.entries(discounts)
+    .filter(([_, discount]) => discount.value > 0 && discount.expiresAt > Date.now())
+    .sort((a, b) => b[1].value - a[1].value);
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8">
@@ -279,29 +299,31 @@ const Products = () => {
       </div>
       
       {showSpinWheel && (
-        <div className="mb-8 text-center">
+        <div className="mb-4 text-center">
           <SpinWheel onWin={handleSpinWin} />
         </div>
       )}
       
-      {Object.keys(discounts).length > 0 && (
-        <div className="mb-6 p-4 bg-card rounded-lg border border-border">
-          <h2 className="text-lg font-semibold mb-2">Active Discounts</h2>
-          <div className="flex flex-wrap gap-2">
-            {Object.entries(discounts).map(([brand, discount]) => {
-              if (discount.value <= 0) return null;
+      {/* Active Discounts Bar */}
+      <div className="mb-6 p-4 bg-card rounded-lg border border-border">
+        <h2 className="text-lg font-semibold mb-2 text-center">Active Discounts</h2>
+        <div className="flex flex-wrap gap-2 justify-center">
+          {activeDiscounts.length > 0 ? (
+            activeDiscounts.map(([brand, discount]) => {
               const now = Date.now();
               const timeRemaining = discount.expiresAt - now;
               const hoursRemaining = Math.floor(timeRemaining / (1000 * 60 * 60));
               return (
-                <span key={brand} className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-destructive/20 text-destructive">
+                <span key={brand} className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-destructive text-white">
                   {brand}: {discount.value}% off ({hoursRemaining}h left)
                 </span>
               );
-            })}
-          </div>
+            })
+          ) : (
+            <p className="text-muted-foreground">No active discounts. Spin the wheel to win discounts!</p>
+          )}
         </div>
-      )}
+      </div>
       
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="lg:w-1/4">

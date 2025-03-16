@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Product } from '../data/productData';
 import { useToast } from '@/hooks/use-toast';
@@ -28,7 +29,6 @@ const ProductGrid = ({
   
 
   useEffect(() => {
-    
     const savedWishlist = localStorage.getItem('wishlist');
     if (savedWishlist) {
       try {
@@ -42,13 +42,8 @@ const ProductGrid = ({
         console.error('Error parsing wishlist:', error);
       }
     }
-    
-    
   }, [products]);
 
-  
-
-  
   const handleUpdateStock = (id: number, newStock: number) => {
     if (updateStock) {
       updateStock(id, newStock);
@@ -63,17 +58,14 @@ const ProductGrid = ({
   const closeModal = () => {
     setIsDetailModalOpen(false);
   };
-
   
   const toggleWishlist = (e: React.MouseEvent, product: Product) => {
     e.stopPropagation();
-    
     
     const existingWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
     const isInWishlist = wishlist[product.id] || false;
     
     if (isInWishlist) {
-      
       const updatedWishlist = existingWishlist.filter((item: any) => item.id !== product.id);
       localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
       
@@ -86,7 +78,6 @@ const ProductGrid = ({
         description: `${product.name} removed from wishlist`,
       });
     } else {
-      
       const productToAdd = {
         id: product.id,
         name: product.name,
@@ -113,14 +104,14 @@ const ProductGrid = ({
   const getProductPrice = (product: Product) => {
     let price = product.price;
     
-    
+    // Add price of selected accessories
     if (product.accessories) {
       price += product.accessories
         .filter(acc => acc.selected)
         .reduce((sum, acc) => sum + acc.price, 0);
     }
     
-    
+    // Apply brand discount if available
     const brandDiscount = discounts[product.brand];
     const allDiscount = discounts['All'];
     
@@ -128,24 +119,27 @@ const ProductGrid = ({
       price = price * (1 - brandDiscount.value / 100);
     } else if (allDiscount && allDiscount.expiresAt > Date.now() && allDiscount.value > 0) {
       price = price * (1 - allDiscount.value / 100);
+    } else if (product.discount && product.discount > 0) {
+      // Apply product-specific discount if no brand discount
+      price = price * (1 - product.discount / 100);
     }
     
-    return price;
+    // Make sure discounted price is less than original price
+    return price < product.price ? price : price;
   };
 
-  
   const getDiscountPercentage = (product: Product) => {
-    
+    // Product-specific discount
     if (product.discount && product.discount > 0) {
       return product.discount;
     }
     
-    
+    // Brand-specific discount
     if (discounts[product.brand]?.expiresAt > Date.now() && discounts[product.brand]?.value > 0) {
       return discounts[product.brand].value;
     }
     
-    
+    // Global discount
     if (discounts['All']?.expiresAt > Date.now() && discounts['All']?.value > 0) {
       return discounts['All'].value;
     }
@@ -153,11 +147,10 @@ const ProductGrid = ({
     return 0;
   };
 
-  
   const handleDetailQuantityChange = (id: number, quantity: number) => {
     onQuantityChange(id, quantity);
     
-    
+    // Update stock based on quantity change
     const product = products.find(p => p.id === id);
     if (product) {
       const oldQuantity = product.quantity || 0;
@@ -178,6 +171,7 @@ const ProductGrid = ({
         const hasDiscount = discountPercentage > 0;
         const isInWishlist = wishlist[product.id] || false;
         const stock = productStocks[product.id] || 0;
+        const finalPrice = getProductPrice(product);
 
         return (
           <div 
@@ -189,7 +183,7 @@ const ProductGrid = ({
               <img 
                 src={product.imageUrl} 
                 alt={product.name} 
-                className="product-image"
+                className="product-image w-full h-48 object-contain"
               />
               
               {showWishlistButton && (
@@ -213,7 +207,7 @@ const ProductGrid = ({
               <div className="flex justify-between items-center mb-3">
                 <div className="flex items-center">
                   <span className={`font-bold text-lg ${hasDiscount ? 'text-destructive' : ''}`}>
-                    ${getProductPrice(product).toFixed(2)}
+                    ${finalPrice.toFixed(2)}
                   </span>
                   {hasDiscount && (
                     <span className="text-muted-foreground line-through text-sm ml-2">
