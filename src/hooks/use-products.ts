@@ -14,7 +14,7 @@ const additionalIPhones: Product[] = [
     imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
     quantity: 0,
     rating: 4.3,
-    reviews: [] // This is correct, reviews should be an array
+    reviews: 142
   },
   {
     id: 2002,
@@ -26,7 +26,7 @@ const additionalIPhones: Product[] = [
     imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
     quantity: 0,
     rating: 4.4,
-    reviews: [] // This is correct, reviews should be an array
+    reviews: 156
   },
   {
     id: 2003,
@@ -38,7 +38,7 @@ const additionalIPhones: Product[] = [
     imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
     quantity: 0,
     rating: 4.5,
-    reviews: [] // This is correct, reviews should be an array
+    reviews: 178
   },
   {
     id: 2004,
@@ -50,7 +50,7 @@ const additionalIPhones: Product[] = [
     imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
     quantity: 0,
     rating: 4.5,
-    reviews: [] // This is correct, reviews should be an array
+    reviews: 192
   },
   {
     id: 2005,
@@ -62,7 +62,7 @@ const additionalIPhones: Product[] = [
     imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
     quantity: 0,
     rating: 4.6,
-    reviews: [] // This is correct, reviews should be an array
+    reviews: 215
   },
   {
     id: 2006,
@@ -74,7 +74,7 @@ const additionalIPhones: Product[] = [
     imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
     quantity: 0,
     rating: 4.7,
-    reviews: [] // This is correct, reviews should be an array
+    reviews: 235
   },
   {
     id: 2007,
@@ -86,7 +86,7 @@ const additionalIPhones: Product[] = [
     imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
     quantity: 0,
     rating: 4.8,
-    reviews: [] // This is correct, reviews should be an array
+    reviews: 248
   },
   {
     id: 2008,
@@ -98,7 +98,7 @@ const additionalIPhones: Product[] = [
     imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
     quantity: 0,
     rating: 4.9,
-    reviews: [] // This is correct, reviews should be an array
+    reviews: 256
   },
   {
     id: 2009,
@@ -110,7 +110,7 @@ const additionalIPhones: Product[] = [
     imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
     quantity: 0,
     rating: 4.9,
-    reviews: [] // This is correct, reviews should be an array
+    reviews: 243
   },
   {
     id: 2010,
@@ -123,7 +123,7 @@ const additionalIPhones: Product[] = [
     quantity: 0,
     discount: 5,
     rating: 5.0,
-    reviews: [] // This is correct, reviews should be an array
+    reviews: 212
   }
 ];
 
