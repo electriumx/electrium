@@ -13,7 +13,7 @@ export const saveCartToLocalStorage = (cart: Product[]) => {
 };
 
 // Add product to cart with accessories
-export const addProductToCart = (product: Product, quantity: number, accessories?: { id: number, selected: boolean }[]) => {
+export const addProductToCart = (product: Product, quantity: number, accessories?: { id: number | string, selected: boolean }[]) => {
   const cart = JSON.parse(localStorage.getItem('cart') || '[]');
   const existingProductIndex = cart.findIndex((item: Product) => item.id === product.id);
   
@@ -21,7 +21,7 @@ export const addProductToCart = (product: Product, quantity: number, accessories
   const productToAdd = { ...product };
   if (accessories && productToAdd.accessories) {
     productToAdd.accessories = productToAdd.accessories.map(acc => {
-      const matchingAcc = accessories.find(a => a.id === acc.id);
+      const matchingAcc = accessories.find(a => String(a.id) === String(acc.id));
       return matchingAcc ? { ...acc, selected: matchingAcc.selected } : acc;
     });
   }
