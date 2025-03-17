@@ -1,14 +1,15 @@
+
 import { useState, useEffect } from 'react';
 import ProductFilters from '../components/ProductFilters';
 import ProductGrid from '../components/ProductGrid';
 import CartSummary from '../components/CartSummary';
 import SpinWheel from '../components/SpinWheel';
-import AIChat from '../components/AIChat';
 import FloatingActions from '../components/FloatingActions';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Product } from '../data/productData';
 import { useProducts } from '../hooks/use-products';
 import { useToast } from '@/hooks/use-toast';
+import { translateText } from '@/utils/translation';
 
 const Products = () => {
   const { products: allProducts } = useProducts();
@@ -22,6 +23,7 @@ const Products = () => {
   const [showSpinWheel, setShowSpinWheel] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState('english');
   const location = useLocation();
   const navigate = useNavigate();
   const maxPrice = allProducts.length > 0 ? Math.max(...allProducts.map(p => p.price)) : 2000;
@@ -54,6 +56,17 @@ const Products = () => {
   };
 
   useEffect(() => {
+    const savedLanguage = localStorage.getItem('preferredLanguage');
+    if (savedLanguage) {
+      setCurrentLanguage(savedLanguage);
+    }
+    
+    const handleLanguageChange = (e: CustomEvent) => {
+      setCurrentLanguage(e.detail);
+    };
+    
+    window.addEventListener('languageChange', handleLanguageChange as EventListener);
+    
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
       try {
@@ -119,6 +132,7 @@ const Products = () => {
     
     return () => {
       clearInterval(stockResetInterval);
+      window.removeEventListener('languageChange', handleLanguageChange as EventListener);
     };
   }, [allProducts.length]);
 
@@ -222,10 +236,6 @@ const Products = () => {
     });
   };
 
-  const toggleChat = () => {
-    setIsChatOpen(!isChatOpen);
-  };
-
   const updateStock = (id: number, newStock: number) => {
     const updatedStocks = {
       ...productStocks,
@@ -271,11 +281,13 @@ const Products = () => {
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8">
-      <h1 className="text-2xl font-bold mb-4 text-center text-foreground">Our Products</h1>
+      <h1 className="text-2xl font-bold mb-4 text-center text-foreground">
+        {translateText("our_products", currentLanguage)}
+      </h1>
       
       <div className="mb-6 flex justify-center">
         <button onClick={() => setShowSpinWheel(!showSpinWheel)} className="px-4 py-2 bg-card text-foreground rounded-md border border-border hover:bg-accent transition-colors">
-          {showSpinWheel ? 'Hide Spin Wheel' : 'Try Your Luck with Daily Spin!'}
+          {showSpinWheel ? translateText("hide_spin", currentLanguage) : translateText("try_luck", currentLanguage)}
         </button>
       </div>
       
@@ -286,7 +298,7 @@ const Products = () => {
       )}
       
       <div className="mb-6 p-4 bg-card rounded-lg border border-border">
-        <h2 className="text-lg font-semibold mb-2 text-center">Active Discounts</h2>
+        <h2 className="text-lg font-semibold mb-2 text-center">{translateText("active_discounts", currentLanguage)}</h2>
         <div className="flex flex-wrap gap-2 justify-center">
           {activeDiscounts.length > 0 ? (
             activeDiscounts.map(([brand, discount]) => {
@@ -295,12 +307,12 @@ const Products = () => {
               const hoursRemaining = Math.floor(timeRemaining / (1000 * 60 * 60));
               return (
                 <span key={brand} className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-destructive text-white">
-                  {brand}: {discount.value}% off ({hoursRemaining}h left)
+                  {brand}: {discount.value}% {translateText("off", currentLanguage)} ({hoursRemaining}h {translateText("left", currentLanguage)})
                 </span>
               );
             })
           ) : (
-            <p className="text-muted-foreground">No active discounts. Spin the wheel to win discounts!</p>
+            <p className="text-muted-foreground">{translateText("no_active_discounts", currentLanguage)}</p>
           )}
         </div>
       </div>
@@ -323,7 +335,7 @@ const Products = () => {
             products={filteredProducts} 
             onQuantityChange={handleQuantityChange} 
             discounts={discounts} 
-            showWishlistButton={true}
+            showWishlistButton={false}
             productStocks={productStocks}
             updateStock={updateStock}
           />
@@ -336,8 +348,6 @@ const Products = () => {
         showCheckout={true} 
         cartItemCount={cartItemCount} 
       />
-      
-      {isChatOpen && <AIChat onClose={toggleChat} />}
     </div>
   );
 };

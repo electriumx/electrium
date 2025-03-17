@@ -4,25 +4,32 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  quantity: number;
-  brand?: string;
-}
+import { translateText } from '@/utils/translation';
+import { Product } from '../data/productData';
 
 const Checkout = () => {
   const navigate = useNavigate();
   const [cartData, setCartData] = useState<Product[]>([]);
-  const [discounts, setDiscounts] = useState<Record<string, number>>({});
+  const [discounts, setDiscounts] = useState<Record<string, any>>({});
   const [showOutOfStockAlert, setShowOutOfStockAlert] = useState(false);
   const [outOfStockItem, setOutOfStockItem] = useState<string>("");
+  const [currentLanguage, setCurrentLanguage] = useState("english");
   const { toast } = useToast();
   
   useEffect(() => {
+    // Get language preference
+    const savedLanguage = localStorage.getItem('preferredLanguage');
+    if (savedLanguage) {
+      setCurrentLanguage(savedLanguage);
+    }
+    
+    // Listen for language changes
+    const handleLanguageChange = (e: CustomEvent) => {
+      setCurrentLanguage(e.detail);
+    };
+    
+    window.addEventListener('languageChange', handleLanguageChange as EventListener);
+    
     // Load cart data
     const cart = localStorage.getItem('cart');
     if (cart) {
@@ -32,25 +39,49 @@ const Checkout = () => {
     // Load discounts
     const savedDiscounts = localStorage.getItem('discounts');
     if (savedDiscounts) {
-      setDiscounts(JSON.parse(savedDiscounts));
+      const parsedDiscounts = JSON.parse(savedDiscounts);
+      const formattedDiscounts: Record<string, any> = {};
+      
+      Object.entries(parsedDiscounts).forEach(([brand, value]) => {
+        if (typeof value === 'object' && value !== null && 'value' in value) {
+          formattedDiscounts[brand] = value;
+        } else {
+          formattedDiscounts[brand] = { value };
+        }
+      });
+      
+      setDiscounts(formattedDiscounts);
     }
     
     // Add auto-scroll to top when page loads
     window.scrollTo(0, 0);
+    
+    return () => {
+      window.removeEventListener('languageChange', handleLanguageChange as EventListener);
+    };
   }, []);
 
   const getDiscountedPrice = (item: Product) => {
     if (!item.brand) return item.price;
     
-    const discount = discounts[item.brand] || discounts['All'] || 0;
+    const discount = discounts[item.brand]?.value || discounts['All']?.value || 0;
     if (discount === 0) return item.price;
     
     return item.price * (1 - discount / 100);
   };
 
+  const getAccessoriesPrice = (item: Product) => {
+    if (!item.accessories) return 0;
+    
+    return item.accessories
+      .filter(acc => acc.selected)
+      .reduce((sum, acc) => sum + acc.price, 0);
+  };
+
   const calculateItemTotal = (item: Product) => {
     const discountedPrice = getDiscountedPrice(item);
-    return discountedPrice * item.quantity;
+    const accessoriesPrice = getAccessoriesPrice(item);
+    return (discountedPrice + accessoriesPrice) * item.quantity;
   };
 
   const purchasedItems = cartData.filter(item => item.quantity > 0);
@@ -103,8 +134,8 @@ const Checkout = () => {
     setCartData([]);
     
     toast({
-      title: "Cart cleared",
-      description: "All items have been removed from your cart.",
+      title: translateText("cart_cleared", currentLanguage) || "Cart cleared",
+      description: translateText("all_items_removed", currentLanguage) || "All items have been removed from your cart.",
     });
   };
 
@@ -116,53 +147,86 @@ const Checkout = () => {
           animate={{ opacity: 1, y: 0 }}
           className="bg-card rounded-xl shadow-lg p-8 border border-border"
         >
-          <h1 className="text-3xl font-medium text-foreground mb-8">Order Summary</h1>
+          <h1 className="text-3xl font-medium text-foreground mb-8">
+            {translateText("order_summary", currentLanguage) || "Order Summary"}
+          </h1>
           
           {purchasedItems.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-muted-foreground">Your cart is empty</p>
+              <p className="text-muted-foreground">
+                {translateText("cart_empty", currentLanguage) || "Your cart is empty"}
+              </p>
               <button
                 onClick={() => navigate('/products')}
                 className="mt-4 text-sage-600 hover:text-sage-700 dark:text-sage-400 dark:hover:text-sage-300 font-medium"
               >
-                Continue Shopping
+                {translateText("continue_shopping", currentLanguage) || "Continue Shopping"}
               </button>
             </div>
           ) : (
             <>
               <div className="space-y-6">
                 {purchasedItems.map((item: Product) => {
-                  const hasDiscount = item.brand && (discounts[item.brand] || discounts['All']);
-                  const discount = item.brand ? (discounts[item.brand] || discounts['All'] || 0) : 0;
+                  const hasDiscount = item.brand && (discounts[item.brand]?.value || discounts['All']?.value);
+                  const discount = item.brand ? (discounts[item.brand]?.value || discounts['All']?.value || 0) : 0;
                   const discountedPrice = getDiscountedPrice(item);
+                  const accessoriesPrice = getAccessoriesPrice(item);
+                  const selectedAccessories = item.accessories?.filter(acc => acc.selected) || [];
                   
                   return (
                     <div key={item.id} className="flex gap-4 items-center p-4 border rounded-lg border-border">
                       <img
-                        src={item.image}
+                        src={item.imageUrl}
                         alt={item.name}
                         className="w-20 h-20 object-cover rounded-lg"
                       />
                       <div className="flex-1">
-                        <h3 className="font-medium text-foreground">{item.name}</h3>
-                        <p className="text-muted-foreground">Quantity: {item.quantity}</p>
-                        <p className="text-muted-foreground text-sm">Purchase Date: {purchaseDate}</p>
+                        <h3 className={`font-medium text-foreground ${hasDiscount ? 'pl-2' : ''}`}>
+                          {translateText(item.name, currentLanguage) || item.name}
+                        </h3>
+                        <p className="text-muted-foreground">
+                          {translateText("quantity", currentLanguage)}: {item.quantity}
+                        </p>
+                        <p className="text-muted-foreground text-sm">
+                          {translateText("purchase_date", currentLanguage) || "Purchase Date"}: {purchaseDate}
+                        </p>
+                        
+                        {selectedAccessories.length > 0 && (
+                          <div className="mt-2">
+                            <p className="text-sm text-muted-foreground">
+                              {translateText("with", currentLanguage)}:
+                            </p>
+                            <ul className="text-sm text-muted-foreground list-disc ml-5">
+                              {selectedAccessories.map((acc, index) => (
+                                <li key={index}>
+                                  {translateText(acc.name, currentLanguage) || acc.name} (+${acc.price.toFixed(2)})
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
                       </div>
                       <div className="text-right">
                         <p className="font-medium text-sage-600 dark:text-sage-400">
-                          Item Total: ${calculateItemTotal(item).toFixed(2)}
+                          {translateText("item_total", currentLanguage) || "Item Total"}: ${calculateItemTotal(item).toFixed(2)}
                         </p>
                         {hasDiscount ? (
                           <div>
                             <p className="text-sm line-through text-muted-foreground">
-                              ${item.price.toFixed(2)} each
+                              ${item.price.toFixed(2)} {translateText("each", currentLanguage) || "each"}
                             </p>
                             <p className="text-sm text-destructive font-medium">
-                              ${discountedPrice.toFixed(2)} each ({discount}% off)
+                              ${discountedPrice.toFixed(2)} {translateText("each", currentLanguage) || "each"} ({discount}% {translateText("off", currentLanguage) || "off"})
                             </p>
                           </div>
                         ) : (
-                          <p className="text-sm text-muted-foreground">${item.price.toFixed(2)} each</p>
+                          <p className="text-sm text-muted-foreground">${item.price.toFixed(2)} {translateText("each", currentLanguage) || "each"}</p>
+                        )}
+                        
+                        {accessoriesPrice > 0 && (
+                          <p className="text-sm text-muted-foreground">
+                            +${accessoriesPrice.toFixed(2)} {translateText("accessories", currentLanguage) || "accessories"}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -172,7 +236,7 @@ const Checkout = () => {
               
               <div className="mt-8 pt-6 border-t border-border">
                 <div className="flex justify-between items-center text-lg font-medium">
-                  <span className="text-foreground">Total</span>
+                  <span className="text-foreground">{translateText("total", currentLanguage)}</span>
                   <span className="text-sage-600 dark:text-sage-400">${total.toFixed(2)}</span>
                 </div>
               </div>
@@ -183,7 +247,7 @@ const Checkout = () => {
                   className="w-full bg-sage-500 text-white py-3 px-6 rounded-lg font-medium 
                            transition-all duration-200 hover:bg-sage-600"
                 >
-                  Proceed to Payment
+                  {translateText("proceed_to_payment", currentLanguage)}
                 </button>
                 <button
                   onClick={() => navigate('/products')}
@@ -191,7 +255,7 @@ const Checkout = () => {
                            border border-sage-200 dark:border-sage-800
                            transition-all duration-200 hover:bg-sage-50 dark:hover:bg-sage-900/30"
                 >
-                  Continue Shopping
+                  {translateText("continue_shopping", currentLanguage)}
                 </button>
                 <button
                   onClick={handleClearItems}
@@ -199,7 +263,7 @@ const Checkout = () => {
                            border border-destructive/20
                            transition-all duration-200 hover:bg-destructive/10"
                 >
-                  Clear All Items
+                  {translateText("clear_all_items", currentLanguage) || "Clear All Items"}
                 </button>
               </div>
             </>
@@ -210,14 +274,14 @@ const Checkout = () => {
       <AlertDialog open={showOutOfStockAlert} onOpenChange={setShowOutOfStockAlert}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Out of Stock</AlertDialogTitle>
+            <AlertDialogTitle>{translateText("out_of_stock", currentLanguage) || "Out of Stock"}</AlertDialogTitle>
             <AlertDialogDescription>
-              The desired item "{outOfStockItem}" is currently not in stock.
+              {translateText("desired_item_not_in_stock", currentLanguage) || "The desired item"} "{outOfStockItem}" {translateText("is_not_in_stock", currentLanguage) || "is currently not in stock"}.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogAction onClick={() => setShowOutOfStockAlert(false)}>
-              OK
+              {translateText("ok", currentLanguage)}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

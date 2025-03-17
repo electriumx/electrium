@@ -1,12 +1,12 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
 import { users } from "@/data/users";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { translateText } from "@/utils/translation";
 
 const Settings = () => {
   const { toast } = useToast();
@@ -14,14 +14,28 @@ const Settings = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [selectedLanguage, setSelectedLanguage] = useState("");
-  const [showTranslateButton, setShowTranslateButton] = useState(false);
-  const [showTranslateDialog, setShowTranslateDialog] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState("english");
+
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem('preferredLanguage');
+    if (savedLanguage) {
+      setCurrentLanguage(savedLanguage);
+    }
+    
+    const handleLanguageChange = (e: CustomEvent) => {
+      setCurrentLanguage(e.detail);
+    };
+    
+    window.addEventListener('languageChange', handleLanguageChange as EventListener);
+    return () => window.removeEventListener('languageChange', handleLanguageChange as EventListener);
+  }, []);
 
   if (!isAuthenticated) {
     return (
       <div className="container mx-auto px-4 py-8 min-h-screen">
-        <h1 className="text-4xl font-bold mb-8 text-center">Please sign in to access settings</h1>
+        <h1 className="text-4xl font-bold mb-8 text-center">
+          {translateText("please_sign_in", currentLanguage) || "Please sign in to access settings"}
+        </h1>
       </div>
     );
   }
@@ -33,7 +47,7 @@ const Settings = () => {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Current password is incorrect",
+        description: translateText("incorrect_password", currentLanguage) || "Current password is incorrect",
       });
       return;
     }
@@ -43,7 +57,7 @@ const Settings = () => {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "New passwords do not match",
+        description: translateText("passwords_mismatch", currentLanguage) || "New passwords do not match",
       });
       return;
     }
@@ -52,7 +66,7 @@ const Settings = () => {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "New password must be at least 6 characters long",
+        description: translateText("password_short", currentLanguage) || "New password must be at least 6 characters long",
       });
       return;
     }
@@ -61,8 +75,8 @@ const Settings = () => {
     user.password = newPassword;
     
     toast({
-      title: "Success",
-      description: "Password updated successfully",
+      title: translateText("success", currentLanguage) || "Success",
+      description: translateText("password_updated", currentLanguage) || "Password updated successfully",
     });
 
     // Clear form
@@ -71,40 +85,21 @@ const Settings = () => {
     setConfirmPassword("");
   };
 
-  const handleLanguageChange = (value: string) => {
-    setSelectedLanguage(value);
-    setShowTranslateButton(value !== "");
-  };
-  
-  const handleTranslate = () => {
-    setShowTranslateDialog(true);
-    
-    // In a real application, you would implement actual translation here
-    // For demo purposes, we're just showing a dialog
-    
-    // If Arabic is selected, we would apply RTL direction
-    if (selectedLanguage === "arabic") {
-      document.documentElement.dir = "rtl";
-    } else {
-      document.documentElement.dir = "ltr";
-    }
-  };
-
   return (
     <div className="container mx-auto px-4 py-8 min-h-screen transition-colors duration-300">
-      <h1 className="text-4xl font-bold mb-8">Settings</h1>
+      <h1 className="text-4xl font-bold mb-8">{translateText("settings_title", currentLanguage)}</h1>
       
       <div className="max-w-md mx-auto space-y-6">
         {/* Account Information */}
         <div className="bg-card p-6 rounded-lg shadow-lg">
-          <h2 className="text-xl font-semibold mb-4">Account Information</h2>
+          <h2 className="text-xl font-semibold mb-4">{translateText("account_information", currentLanguage)}</h2>
           <div className="space-y-3">
             <div>
-              <label className="text-sm font-medium">Username / Email</label>
+              <label className="text-sm font-medium">{translateText("username_email", currentLanguage)}</label>
               <p className="text-muted-foreground">{currentUser?.username}</p>
             </div>
             <div>
-              <label className="text-sm font-medium">Display Name</label>
+              <label className="text-sm font-medium">{translateText("display_name", currentLanguage)}</label>
               <p className="text-muted-foreground">{currentUser?.displayName}</p>
             </div>
           </div>
@@ -112,41 +107,16 @@ const Settings = () => {
 
         {/* Language Selection */}
         <div className="bg-card p-6 rounded-lg shadow-lg">
-          <h2 className="text-xl font-semibold mb-4">Language Settings</h2>
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium mb-2 block">Select Language</label>
-              <Select onValueChange={handleLanguageChange} value={selectedLanguage}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a language" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="english">English</SelectItem>
-                  <SelectItem value="arabic">Arabic</SelectItem>
-                  <SelectItem value="french">French</SelectItem>
-                  <SelectItem value="german">German</SelectItem>
-                  <SelectItem value="spanish">Spanish</SelectItem>
-                  <SelectItem value="chinese">Chinese</SelectItem>
-                  <SelectItem value="hindi">Hindi</SelectItem>
-                  <SelectItem value="japanese">Japanese</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            {showTranslateButton && (
-              <Button onClick={handleTranslate} className="w-full">
-                Translate to {selectedLanguage.charAt(0).toUpperCase() + selectedLanguage.slice(1)}
-              </Button>
-            )}
-          </div>
+          <h2 className="text-xl font-semibold mb-4">{translateText("language_settings", currentLanguage)}</h2>
+          <LanguageSwitcher />
         </div>
 
         {/* Password Change */}
         <div className="bg-card p-6 rounded-lg shadow-lg">
-          <h2 className="text-xl font-semibold mb-4">Change Password</h2>
+          <h2 className="text-xl font-semibold mb-4">{translateText("change_password", currentLanguage)}</h2>
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium">Current Password</label>
+              <label className="text-sm font-medium">{translateText("current_password", currentLanguage)}</label>
               <Input
                 type="password"
                 value={currentPassword}
@@ -155,7 +125,7 @@ const Settings = () => {
               />
             </div>
             <div>
-              <label className="text-sm font-medium">New Password</label>
+              <label className="text-sm font-medium">{translateText("new_password", currentLanguage)}</label>
               <Input
                 type="password"
                 value={newPassword}
@@ -164,7 +134,7 @@ const Settings = () => {
               />
             </div>
             <div>
-              <label className="text-sm font-medium">Confirm New Password</label>
+              <label className="text-sm font-medium">{translateText("confirm_new_password", currentLanguage)}</label>
               <Input
                 type="password"
                 value={confirmPassword}
@@ -173,7 +143,7 @@ const Settings = () => {
               />
             </div>
             <Button onClick={handlePasswordChange} className="w-full">
-              Update Password
+              {translateText("update_password", currentLanguage)}
             </Button>
           </div>
         </div>
@@ -181,37 +151,10 @@ const Settings = () => {
         {/* Logout Button */}
         <div className="flex justify-center">
           <Button variant="destructive" onClick={logout}>
-            Sign Out
+            {translateText("sign_out", currentLanguage)}
           </Button>
         </div>
       </div>
-      
-      <AlertDialog open={showTranslateDialog} onOpenChange={setShowTranslateDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {selectedLanguage === "arabic" ? "تم التغيير بنجاح" : 
-               selectedLanguage === "french" ? "Changement réussi" :
-               selectedLanguage === "german" ? "Änderung erfolgreich" :
-               "Language Changed"}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {selectedLanguage === "arabic" ? "تم تغيير لغة الموقع بنجاح" : 
-               selectedLanguage === "french" ? "La langue du site a été changée avec succès" :
-               selectedLanguage === "german" ? "Die Sprache der Website wurde erfolgreich geändert" :
-               "The website language has been successfully changed"}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction>
-              {selectedLanguage === "arabic" ? "موافق" : 
-               selectedLanguage === "french" ? "OK" :
-               selectedLanguage === "german" ? "OK" :
-               "OK"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 };
