@@ -196,13 +196,7 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
     });
   };
 
-  const getTotalAccessoriesPrice = () => {
-    return selectedAccessories.reduce((sum, acc) => sum + acc.price, 0);
-  };
-
-  const totalAccessoriesPrice = getTotalAccessoriesPrice();
   const basePrice = discount > 0 ? discountedPrice : price;
-  const totalPrice = basePrice + totalAccessoriesPrice;
 
   const handleAddToCart = () => {
     const productToAdd = {
@@ -357,11 +351,10 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
                 {selectedAccessories.length > 0 && (
                   <div className="bg-card rounded-lg p-4 mt-4 border border-border">
                     <h4 className="font-medium mb-2">Selected Accessories</h4>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      These accessories will be added to your cart separately without affecting the product price.
+                    </p>
                     <ul className="space-y-2 mb-4">
-                      <li className="flex justify-between">
-                        <span>{name}</span>
-                        <span>${basePrice.toFixed(2)}</span>
-                      </li>
                       {selectedAccessories.map(accessory => (
                         <li key={accessory.id} className="flex justify-between text-sm">
                           <span>{accessory.name}</span>
@@ -369,10 +362,6 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
                         </li>
                       ))}
                     </ul>
-                    <div className="flex justify-between font-bold pt-2 border-t">
-                      <span>Total</span>
-                      <span>${totalPrice.toFixed(2)}</span>
-                    </div>
                   </div>
                 )}
               </div>

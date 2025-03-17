@@ -1,17 +1,18 @@
 
 import { useNavigate } from 'react-router-dom';
 import { ShoppingCart, Heart } from 'lucide-react';
+
 interface FloatingActionsProps {
   showCheckout?: boolean;
   cartItemCount?: number;
-  toggleChat: () => void;
 }
+
 const FloatingActions = ({
   showCheckout = true,
-  cartItemCount = 0,
-  toggleChat
+  cartItemCount = 0
 }: FloatingActionsProps) => {
   const navigate = useNavigate();
+  
   return <>
       {/* Cart Button - Bottom Left */}
       {showCheckout && cartItemCount > 0 && <div className="fixed bottom-6 left-6 z-40">
@@ -34,4 +35,5 @@ const FloatingActions = ({
       </div>
     </>;
 };
+
 export default FloatingActions;

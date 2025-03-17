@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, Heart } from "lucide-react";
@@ -96,40 +95,6 @@ const ProductCard = ({
     }
   };
 
-  const toggleWishlist = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    
-    // Get existing wishlist from localStorage
-    const existingWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
-    
-    if (wishlist) {
-      // Remove from wishlist
-      const updatedWishlist = existingWishlist.filter((item: any) => item.id !== id);
-      localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
-      toast({
-        description: `${name} removed from wishlist`,
-      });
-    } else {
-      // Add to wishlist
-      const productToAdd = {
-        id,
-        name,
-        price,
-        image,
-        brand,
-        discount
-      };
-      
-      const updatedWishlist = [...existingWishlist, productToAdd];
-      localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
-      toast({
-        description: `${name} added to wishlist`,
-      });
-    }
-    
-    setWishlist(!wishlist);
-  };
-
   const handleImageClick = () => {
     if (onProductClick) {
       onProductClick();
@@ -146,13 +111,6 @@ const ProductCard = ({
             className="w-full h-48 object-contain p-4 cursor-pointer"
             onClick={handleImageClick}
           />
-          <button 
-            onClick={toggleWishlist}
-            className="absolute top-2 right-2 p-1.5 bg-white/80 dark:bg-card/80 rounded-full text-muted-foreground hover:text-destructive"
-            aria-label={wishlist ? "Remove from wishlist" : "Add to wishlist"}
-          >
-            <Heart className={wishlist ? "fill-destructive text-destructive" : ""} size={18} />
-          </button>
           
           {discount > 0 && (
             <div className="absolute top-2 left-2 bg-destructive text-destructive-foreground text-xs font-medium py-1 px-2 rounded-full">

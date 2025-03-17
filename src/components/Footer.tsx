@@ -1,5 +1,6 @@
+
 import { useState, useEffect } from 'react';
-import { Globe, Mail, Phone, Facebook, Instagram, Linkedin } from 'lucide-react';
+import { Globe, Mail, Phone, Instagram, Linkedin } from 'lucide-react';
 
 const Footer = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -82,10 +83,6 @@ const Footer = () => {
                 
                 <a href="https://www.linkedin.com/in/electruim-x-a84988354/" target="_blank" rel="noopener noreferrer" className="p-2 bg-black/20 backdrop-blur-sm rounded-full hover:scale-110 transition-transform">
                   <Linkedin className="w-5 h-5 text-white" />
-                </a>
-                
-                <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" className="p-2 bg-black/20 backdrop-blur-sm rounded-full hover:scale-110 transition-transform">
-                  <Facebook className="w-5 h-5 text-white" />
                 </a>
               </div>
             </div>

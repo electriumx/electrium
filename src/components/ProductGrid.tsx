@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Product } from '../data/productData';
 import { useToast } from '@/hooks/use-toast';
@@ -18,7 +17,7 @@ const ProductGrid = ({
   products, 
   onQuantityChange, 
   discounts,
-  showWishlistButton = true,
+  showWishlistButton = false,
   productStocks = {}, 
   updateStock
 }: ProductGridProps) => {
@@ -104,12 +103,7 @@ const ProductGrid = ({
   const getProductPrice = (product: Product) => {
     let price = product.price;
     
-    // Add price of selected accessories
-    if (product.accessories) {
-      price += product.accessories
-        .filter(acc => acc.selected)
-        .reduce((sum, acc) => sum + acc.price, 0);
-    }
+    // We're not adding accessory prices to the product price anymore
     
     // Apply brand discount if available
     const brandDiscount = discounts[product.brand];
