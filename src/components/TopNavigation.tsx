@@ -1,12 +1,9 @@
-
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Heart, Settings } from 'lucide-react';
-
 interface TopNavigationProps {
   toggleChat: () => void;
 }
-
 const TopNavigation = ({
   toggleChat
 }: TopNavigationProps) => {
@@ -15,7 +12,6 @@ const TopNavigation = ({
   const {
     isAuthenticated
   } = useAuth();
-
   const handleContactClick = (e: React.MouseEvent) => {
     e.preventDefault();
     const footer = document.querySelector('footer');
@@ -25,7 +21,6 @@ const TopNavigation = ({
       });
     }
   };
-
   return <nav className="fixed w-full top-0 z-40">
       <div className="container mx-auto flex items-center py-4 px-6">
         <Link to="/" className="text-2xl font-bold text-[#18a66e] flex items-center gap-2">
@@ -44,7 +39,7 @@ const TopNavigation = ({
           {/* Chatbot and Settings Buttons */}
           <div className="flex items-center gap-2">
             <button onClick={toggleChat} className="flex items-center justify-center w-8 h-8 rounded-full hover:opacity-80 transition-opacity" aria-label="Chat with Electrium Assistant">
-              <img src="/lovable-uploads/332dd32d-b893-48bd-8da7-73aa4bc107bb.png" alt="Electrium Logo" className="w-full h-full" />
+              
             </button>
             
             <Link to="/settings" className="flex items-center justify-center w-8 h-8 rounded-full hover:opacity-80 transition-opacity" aria-label="Settings">
@@ -64,5 +59,4 @@ const TopNavigation = ({
       </div>
     </nav>;
 };
-
 export default TopNavigation;
