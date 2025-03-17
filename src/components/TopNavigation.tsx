@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ShoppingCart, User, Heart, LogOut, Settings, Info, Home, Package, Gift, Search } from "lucide-react";
+import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
+import { ShoppingCart, User, Heart, LogOut, Settings, Info, Home, Package, Gift } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/AuthContext";
 import { translateText } from '@/utils/translation';
@@ -134,7 +135,7 @@ const TopNavigation = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
             <button type="submit" className="absolute right-2 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground">
-              <Search className="h-4 w-4" />
+              <MagnifyingGlassIcon className="h-4 w-4" />
             </button>
           </form>
           
@@ -224,7 +225,7 @@ const TopNavigation = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
               <button type="submit" className="absolute right-2 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground">
-                <Search className="h-4 w-4" />
+                <MagnifyingGlassIcon className="h-4 w-4" />
               </button>
             </form>
             
