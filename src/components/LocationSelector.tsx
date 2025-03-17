@@ -9,6 +9,14 @@ interface LocationSelectorProps {
   onLocationSelect: (country: string, city: string, fee: number) => void;
 }
 
+// Helper function to format display names
+const formatDisplayName = (name: string) => {
+  return name
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+};
+
 const LocationSelector = ({ onLocationSelect }: LocationSelectorProps) => {
   const [selectedCountry, setSelectedCountry] = useState('United States');
   const [selectedCity, setSelectedCity] = useState('');
@@ -60,7 +68,7 @@ const LocationSelector = ({ onLocationSelect }: LocationSelectorProps) => {
           <SelectContent>
             {countries.map((country) => (
               <SelectItem key={country} value={country}>
-                {country}
+                {translateText(country, currentLanguage) || country}
               </SelectItem>
             ))}
           </SelectContent>
@@ -76,7 +84,7 @@ const LocationSelector = ({ onLocationSelect }: LocationSelectorProps) => {
           <SelectContent>
             {cities.map((city) => (
               <SelectItem key={city.name} value={city.name}>
-                {city.name} (${city.fee.toFixed(2)} {translateText("delivery_fee", currentLanguage)})
+                {translateText(city.name, currentLanguage) || formatDisplayName(city.name)} (${city.fee.toFixed(2)} {translateText("delivery_fee", currentLanguage)})
               </SelectItem>
             ))}
           </SelectContent>
@@ -86,7 +94,7 @@ const LocationSelector = ({ onLocationSelect }: LocationSelectorProps) => {
       {selectedCountry && selectedCity && (
         <div className="p-3 bg-muted rounded-md">
           <p className="text-sm">
-            {translateText("delivery_to", currentLanguage) || "Delivery to"} {selectedCity}, {selectedCountry}
+            {translateText("delivery_to", currentLanguage) || "Delivery to"} {translateText(selectedCity, currentLanguage) || selectedCity}, {translateText(selectedCountry, currentLanguage) || selectedCountry}
           </p>
           <p className="text-sm font-medium mt-1">
             {translateText("delivery_fee", currentLanguage)}: ${getLocationFee(selectedCountry, selectedCity).toFixed(2)}

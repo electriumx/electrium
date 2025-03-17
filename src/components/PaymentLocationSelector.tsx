@@ -60,18 +60,29 @@ const PaymentLocationSelector = ({
     setSelectedDeliveryTime(value);
     let timeFee = 0;
     
+    // Apply different fees based on selected country and urgency
+    const baseFee = selectedCity ? getLocationFee(selectedCountry, selectedCity) : 0;
+    
     if (value === 'express') {
-      timeFee = 10;
+      // Express is 1.5x the base fee or minimum $10
+      timeFee = Math.max(10, baseFee * 0.5);
     } else if (value === 'priority') {
-      timeFee = 20;
+      // Priority is 2x the base fee or minimum $20
+      timeFee = Math.max(20, baseFee);
     }
     
     onDeliveryTimeChange(value, timeFee);
   };
   
   const getTimeFee = () => {
-    if (selectedDeliveryTime === 'express') return 10;
-    if (selectedDeliveryTime === 'priority') return 20;
+    const baseFee = selectedCity ? getLocationFee(selectedCountry, selectedCity) : 0;
+    
+    if (selectedDeliveryTime === 'express') {
+      return Math.max(10, baseFee * 0.5);
+    }
+    if (selectedDeliveryTime === 'priority') {
+      return Math.max(20, baseFee);
+    }
     return 0;
   };
   
@@ -146,7 +157,9 @@ const PaymentLocationSelector = ({
             <Label htmlFor="express-delivery" className="flex-1 cursor-pointer">
               <div>
                 <p className="font-medium">{translateText("express", currentLanguage)}</p>
-                <p className="text-sm text-muted-foreground">+$10.00 {translateText("delivery_fee", currentLanguage)}</p>
+                <p className="text-sm text-muted-foreground">
+                  +${deliveryTimeFee.toFixed(2)} {translateText("delivery_fee", currentLanguage)}
+                </p>
               </div>
             </Label>
           </div>
@@ -156,7 +169,9 @@ const PaymentLocationSelector = ({
             <Label htmlFor="priority-delivery" className="flex-1 cursor-pointer">
               <div>
                 <p className="font-medium">{translateText("priority", currentLanguage)}</p>
-                <p className="text-sm text-muted-foreground">+$20.00 {translateText("delivery_fee", currentLanguage)}</p>
+                <p className="text-sm text-muted-foreground">
+                  +${deliveryTimeFee.toFixed(2)} {translateText("delivery_fee", currentLanguage)}
+                </p>
               </div>
             </Label>
           </div>

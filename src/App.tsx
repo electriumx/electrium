@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -27,7 +26,6 @@ import PaymentSuccess from "./components/PaymentSuccess";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import CookieConsent from "./components/CookieConsent";
 import { useEffect } from "react";
-import AIChat from "./components/AIChat";
 
 const queryClient = new QueryClient();
 
@@ -86,12 +84,6 @@ const AppWithAuth = () => {
   const [showCookieConsent, setShowCookieConsent] = useState(() => {
     return localStorage.getItem('cookieConsent') !== 'accepted';
   });
-  
-  const [isChatOpen, setIsChatOpen] = useState(false);
-
-  const toggleChat = () => {
-    setIsChatOpen(!isChatOpen);
-  };
 
   // Force dark mode
   useEffect(() => {
@@ -108,7 +100,7 @@ const AppWithAuth = () => {
       <AdminKeyHandler />
       <Toaster />
       <Sonner />
-      <TopNavigation toggleChat={toggleChat} />
+      <TopNavigation />
       <div className="pt-16">
         <Routes>
           <Route path="/" element={<Index />} />
@@ -127,8 +119,6 @@ const AppWithAuth = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
-      
-      {isChatOpen && <AIChat onClose={toggleChat} />}
       
       <SocialButtons />
       <Footer />
