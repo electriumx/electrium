@@ -11,14 +11,6 @@ interface CartSummaryProps {
   cart: Product[];
 }
 
-// Helper function to format display names
-const formatDisplayName = (name: string) => {
-  return name
-    .split('_')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ');
-};
-
 const CartSummary = ({
   cart
 }: CartSummaryProps) => {
@@ -119,43 +111,36 @@ const CartSummary = ({
         <div className={`max-h-96 overflow-y-auto ${isOpen ? 'block' : 'hidden'}`}>
           <div className="p-4 space-y-4">
             <div className="space-y-2">
-              {cart.map(item => {
-                // Format the item name correctly
-                const displayName = translateText(item.name, currentLanguage) || formatDisplayName(item.name);
-                return (
-                  <div key={item.id} className="flex justify-between items-center py-2 border-b border-border">
-                    <div className="flex gap-3 items-center">
-                      <div className="flex-shrink-0 w-10 h-10 bg-muted rounded overflow-hidden">
-                        <img src={item.imageUrl} alt={displayName} className="w-full h-full object-cover" />
-                      </div>
-                      <div>
-                        <h4 className={`text-sm font-medium ${item.discount && item.discount > 0 ? 'pl-2' : ''}`}>
-                          {displayName}
-                        </h4>
-                        <div className="text-xs text-muted-foreground">
-                          {translateText("quantity", currentLanguage)}: {item.quantity} × ${getItemPrice(item).toFixed(2)}
-                          {item.discount && item.discount > 0 && (
-                            <span className="ml-1 text-destructive">
-                              (-{item.discount}% {translateText("off", currentLanguage)})
-                            </span>
-                          )}
-                        </div>
-                        {item.accessories && item.accessories.filter(acc => acc.selected).length > 0 && (
-                          <div className="text-xs text-muted-foreground">
-                            {translateText("with", currentLanguage)}: {item.accessories.filter(acc => acc.selected).map(acc => {
-                              const accessoryName = translateText(acc.name, currentLanguage) || formatDisplayName(acc.name);
-                              return accessoryName;
-                            }).join(', ')}
-                          </div>
+              {cart.map(item => (
+                <div key={item.id} className="flex justify-between items-center py-2 border-b border-border">
+                  <div className="flex gap-3 items-center">
+                    <div className="flex-shrink-0 w-10 h-10 bg-muted rounded overflow-hidden">
+                      <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+                    </div>
+                    <div>
+                      <h4 className={`text-sm font-medium ${item.discount && item.discount > 0 ? 'pl-2' : ''}`}>
+                        {translateText(item.name, currentLanguage) || item.name}
+                      </h4>
+                      <div className="text-xs text-muted-foreground">
+                        {translateText("quantity", currentLanguage)}: {item.quantity} × ${getItemPrice(item).toFixed(2)}
+                        {item.discount && item.discount > 0 && (
+                          <span className="ml-1 text-destructive">
+                            (-{item.discount}% {translateText("off", currentLanguage)})
+                          </span>
                         )}
                       </div>
-                    </div>
-                    <div className="text-sm font-semibold">
-                      ${getItemTotal(item).toFixed(2)}
+                      {item.accessories && item.accessories.filter(acc => acc.selected).length > 0 && (
+                        <div className="text-xs text-muted-foreground">
+                          {translateText("with", currentLanguage)}: {item.accessories.filter(acc => acc.selected).map(acc => translateText(acc.name, currentLanguage) || acc.name).join(', ')}
+                        </div>
+                      )}
                     </div>
                   </div>
-                );
-              })}
+                  <div className="text-sm font-semibold">
+                    ${getItemTotal(item).toFixed(2)}
+                  </div>
+                </div>
+              ))}
             </div>
             
             <div className="space-y-1 text-sm">

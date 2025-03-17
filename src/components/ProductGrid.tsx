@@ -1,21 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { Product } from '../data/productData';
 import { useToast } from '@/hooks/use-toast';
 import ProductDetailModal from './ProductDetailModal';
 import { Heart } from 'lucide-react';
-import { translateText } from '@/utils/translation';
-
-// Helper function to format display names
-const formatDisplayName = (name: string, currentLanguage: string) => {
-  const translated = translateText(name, currentLanguage);
-  if (translated) return translated;
-  
-  return name
-    .split('_')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ');
-};
 
 interface ProductGridProps {
   products: Product[];
@@ -37,23 +24,10 @@ const ProductGrid = ({
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [wishlist, setWishlist] = useState<{[key: number]: boolean}>({});
-  const [currentLanguage, setCurrentLanguage] = useState('english');
   const { toast } = useToast();
   
+
   useEffect(() => {
-    // Get language preference
-    const savedLanguage = localStorage.getItem('preferredLanguage');
-    if (savedLanguage) {
-      setCurrentLanguage(savedLanguage);
-    }
-    
-    // Listen for language changes
-    const handleLanguageChange = (e: CustomEvent) => {
-      setCurrentLanguage(e.detail);
-    };
-    
-    window.addEventListener('languageChange', handleLanguageChange as EventListener);
-    
     const savedWishlist = localStorage.getItem('wishlist');
     if (savedWishlist) {
       try {
@@ -67,10 +41,6 @@ const ProductGrid = ({
         console.error('Error parsing wishlist:', error);
       }
     }
-    
-    return () => {
-      window.removeEventListener('languageChange', handleLanguageChange as EventListener);
-    };
   }, [products]);
 
   const handleUpdateStock = (id: number, newStock: number) => {
@@ -104,7 +74,7 @@ const ProductGrid = ({
       }));
       
       toast({
-        description: `${formatDisplayName(product.name, currentLanguage)} removed from wishlist`,
+        description: `${product.name} removed from wishlist`,
       });
     } else {
       const productToAdd = {
@@ -125,13 +95,15 @@ const ProductGrid = ({
       }));
       
       toast({
-        description: `${formatDisplayName(product.name, currentLanguage)} added to wishlist`,
+        description: `${product.name} added to wishlist`,
       });
     }
   };
 
   const getProductPrice = (product: Product) => {
     let price = product.price;
+    
+    // We're not adding accessory prices to the product price anymore
     
     // Apply brand discount if available
     const brandDiscount = discounts[product.brand];
@@ -194,7 +166,6 @@ const ProductGrid = ({
         const isInWishlist = wishlist[product.id] || false;
         const stock = productStocks[product.id] || 0;
         const finalPrice = getProductPrice(product);
-        const displayName = formatDisplayName(product.name, currentLanguage);
 
         return (
           <div 
@@ -205,7 +176,7 @@ const ProductGrid = ({
             <div className="relative">
               <img 
                 src={product.imageUrl} 
-                alt={displayName} 
+                alt={product.name} 
                 className="product-image w-full h-48 object-contain"
               />
               
@@ -221,14 +192,12 @@ const ProductGrid = ({
               
               {hasDiscount && (
                 <div className="absolute top-2 left-2 bg-destructive text-white text-xs font-bold px-2 py-1 rounded">
-                  {discountPercentage}% {translateText("off", currentLanguage)}
+                  {discountPercentage}% OFF
                 </div>
               )}
             </div>
             <div className="p-4">
-              <h3 className={`text-lg font-semibold mb-1 line-clamp-1 ${hasDiscount ? 'pl-2' : ''}`}>
-                {displayName}
-              </h3>
+              <h3 className="text-lg font-semibold mb-1 line-clamp-1">{product.name}</h3>
               <div className="flex justify-between items-center mb-3">
                 <div className="flex items-center">
                   <span className={`font-bold text-lg ${hasDiscount ? 'text-destructive' : ''}`}>
@@ -241,15 +210,15 @@ const ProductGrid = ({
                   )}
                 </div>
                 <span className="text-sm text-muted-foreground">
-                  {translateText(product.brand, currentLanguage) || product.brand}
+                  {product.brand}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <div className="text-sm text-muted-foreground">
-                  {translateText("in_stock", currentLanguage) || "In Stock"}: {stock}
+                  In Stock: {stock}
                 </div>
                 <div className="text-sm px-2 py-1 bg-muted rounded-md">
-                  {translateText("qty", currentLanguage) || "Qty"}: {product.quantity || 0}
+                  Qty: {product.quantity || 0}
                 </div>
               </div>
             </div>
@@ -270,8 +239,8 @@ const ProductGrid = ({
       
       {products.length === 0 && (
         <div className="col-span-full py-12 text-center">
-          <h3 className="text-xl font-semibold mb-2">{translateText("no_products_found", currentLanguage) || "No products found"}</h3>
-          <p className="text-muted-foreground">{translateText("adjust_filters", currentLanguage) || "Try adjusting your filters or search query."}</p>
+          <h3 className="text-xl font-semibold mb-2">No products found</h3>
+          <p className="text-muted-foreground">Try adjusting your filters or search query.</p>
         </div>
       )}
     </div>

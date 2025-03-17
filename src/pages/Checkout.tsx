@@ -7,14 +7,6 @@ import { useToast } from "@/hooks/use-toast";
 import { translateText } from '@/utils/translation';
 import { Product } from '../data/productData';
 
-// Helper function to capitalize and format text
-const formatDisplayName = (name: string) => {
-  return name
-    .split('_')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ');
-};
-
 const Checkout = () => {
   const navigate = useNavigate();
   const [cartData, setCartData] = useState<Product[]>([]);
@@ -181,19 +173,16 @@ const Checkout = () => {
                   const accessoriesPrice = getAccessoriesPrice(item);
                   const selectedAccessories = item.accessories?.filter(acc => acc.selected) || [];
                   
-                  // Format the product name to remove underscores and capitalize properly
-                  const displayName = translateText(item.name, currentLanguage) || formatDisplayName(item.name);
-                  
                   return (
                     <div key={item.id} className="flex gap-4 items-center p-4 border rounded-lg border-border">
                       <img
                         src={item.imageUrl}
-                        alt={displayName}
+                        alt={item.name}
                         className="w-20 h-20 object-cover rounded-lg"
                       />
                       <div className="flex-1">
                         <h3 className={`font-medium text-foreground ${hasDiscount ? 'pl-2' : ''}`}>
-                          {displayName}
+                          {translateText(item.name, currentLanguage) || item.name}
                         </h3>
                         <p className="text-muted-foreground">
                           {translateText("quantity", currentLanguage)}: {item.quantity}
@@ -208,14 +197,11 @@ const Checkout = () => {
                               {translateText("with", currentLanguage)}:
                             </p>
                             <ul className="text-sm text-muted-foreground list-disc ml-5">
-                              {selectedAccessories.map((acc, index) => {
-                                const accessoryName = translateText(acc.name, currentLanguage) || formatDisplayName(acc.name);
-                                return (
-                                  <li key={index}>
-                                    {accessoryName} (+${acc.price.toFixed(2)})
-                                  </li>
-                                );
-                              })}
+                              {selectedAccessories.map((acc, index) => (
+                                <li key={index}>
+                                  {translateText(acc.name, currentLanguage) || acc.name} (+${acc.price.toFixed(2)})
+                                </li>
+                              ))}
                             </ul>
                           </div>
                         )}
