@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import ProductFilters from '../components/ProductFilters';
 import ProductGrid from '../components/ProductGrid';
@@ -12,7 +11,7 @@ import { useProducts } from '../hooks/use-products';
 import { useToast } from '@/hooks/use-toast';
 
 const Products = () => {
-  const { products: allProducts } = useProducts(); // Use our new hook for products
+  const { products: allProducts } = useProducts();
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   const [cart, setCart] = useState<Product[]>([]);
@@ -30,11 +29,10 @@ const Products = () => {
   const [productStocks, setProductStocks] = useState<Record<number, number>>({});
   const { toast } = useToast();
 
-  // Function to set all product stocks to 100
   const resetStocks = () => {
     const stockMap: Record<number, number> = {};
     allProducts.forEach(product => {
-      stockMap[product.id] = 100; // Set stock to 100 for each product
+      stockMap[product.id] = 100;
     });
     setProductStocks(stockMap);
     localStorage.setItem('productStocks', JSON.stringify(stockMap));
@@ -46,12 +44,11 @@ const Products = () => {
     });
   };
 
-  // Check if stock needs to be reset (every 12 hours)
   const checkStockReset = () => {
     const lastReset = localStorage.getItem('lastStockReset');
     const now = Date.now();
     
-    if (!lastReset || (now - parseInt(lastReset)) > 12 * 60 * 60 * 1000) { // 12 hours in milliseconds
+    if (!lastReset || (now - parseInt(lastReset)) > 12 * 60 * 60 * 1000) {
       resetStocks();
     }
   };
@@ -104,25 +101,20 @@ const Products = () => {
       }
     }
     
-    // Load product stocks from localStorage or reset them
     const savedStocks = localStorage.getItem('productStocks');
     if (savedStocks) {
       try {
         setProductStocks(JSON.parse(savedStocks));
-        // Check if stocks need to be reset
         checkStockReset();
       } catch (error) {
         console.error('Error parsing product stocks:', error);
         resetStocks();
       }
     } else {
-      // No stocks exist, reset them
       resetStocks();
     }
     
-    // Set up interval to check for stock reset every hour
-    const stockResetInterval = setInterval(checkStockReset, 60 * 60 * 1000); // Check every hour
-    
+    const stockResetInterval = setInterval(checkStockReset, 60 * 60 * 1000);
     window.scrollTo(0, 0);
     
     return () => {
@@ -130,7 +122,6 @@ const Products = () => {
     };
   }, [allProducts.length]);
 
-  // Listen for cart update events
   useEffect(() => {
     const handleCartUpdate = (e: CustomEvent) => {
       setCart(e.detail || []);
@@ -140,7 +131,6 @@ const Products = () => {
     return () => window.removeEventListener('cartUpdate', handleCartUpdate as EventListener);
   }, []);
 
-  // When the number of products changes, make sure all have stock assigned
   useEffect(() => {
     if (allProducts.length > 0) {
       const updatedStocks = { ...productStocks };
@@ -199,7 +189,6 @@ const Products = () => {
     setCart(updatedCart);
     localStorage.setItem('cart', JSON.stringify(updatedCart));
 
-    // Dispatch custom event to notify other components
     const event = new CustomEvent('cartUpdate', {
       detail: updatedCart
     });
@@ -207,7 +196,6 @@ const Products = () => {
   };
 
   const handleSpinWin = (brand: string, discount: number, expiresAt: number) => {
-    // Ensure discount is valid and less than original price
     if (discount <= 0 || discount > 100) {
       toast({
         variant: "destructive",
@@ -238,7 +226,6 @@ const Products = () => {
     setIsChatOpen(!isChatOpen);
   };
 
-  // Update stock for a product
   const updateStock = (id: number, newStock: number) => {
     const updatedStocks = {
       ...productStocks,
@@ -248,15 +235,12 @@ const Products = () => {
     localStorage.setItem('productStocks', JSON.stringify(updatedStocks));
   };
 
-  // Filter products based on all criteria
   let filteredProducts = allProducts;
   
-  // Filter by brand/category
   if (selectedBrands.length > 0) {
     filteredProducts = filteredProducts.filter(product => selectedBrands.includes(product.brand) || selectedBrands.includes(product.category));
   }
   
-  // Filter by subcategory
   if (selectedSubcategories.length > 0) {
     filteredProducts = filteredProducts.filter(product => {
       const productText = `${product.name} ${product.description}`.toLowerCase();
@@ -266,12 +250,10 @@ const Products = () => {
     });
   }
   
-  // Filter by price
   if (priceRange[0] > 0 || priceRange[1] < maxPrice) {
     filteredProducts = filteredProducts.filter(product => product.price >= priceRange[0] && product.price <= priceRange[1]);
   }
   
-  // Filter by search query
   if (searchQuery) {
     const query = searchQuery.toLowerCase();
     filteredProducts = filteredProducts.filter(product => 
@@ -283,7 +265,6 @@ const Products = () => {
 
   const cartItemCount = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
   
-  // Get active discounts sorted by value (highest first)
   const activeDiscounts = Object.entries(discounts)
     .filter(([_, discount]) => discount.value > 0 && discount.expiresAt > Date.now())
     .sort((a, b) => b[1].value - a[1].value);
@@ -304,7 +285,6 @@ const Products = () => {
         </div>
       )}
       
-      {/* Active Discounts Bar */}
       <div className="mb-6 p-4 bg-card rounded-lg border border-border">
         <h2 className="text-lg font-semibold mb-2 text-center">Active Discounts</h2>
         <div className="flex flex-wrap gap-2 justify-center">
@@ -355,7 +335,6 @@ const Products = () => {
       <FloatingActions 
         showCheckout={true} 
         cartItemCount={cartItemCount} 
-        toggleChat={toggleChat} 
       />
       
       {isChatOpen && <AIChat onClose={toggleChat} />}
