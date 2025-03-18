@@ -5,6 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import ProductDetailModal from './ProductDetailModal';
 import ProductReviewModal from './ProductReviewModal';
 import { Heart, Star } from 'lucide-react';
+import { translateText } from '@/utils/translation';
 
 interface ProductGridProps {
   products: Product[];
@@ -19,7 +20,7 @@ const ProductGrid = ({
   products, 
   onQuantityChange, 
   discounts,
-  showWishlistButton = true,  // Changed default to true
+  showWishlistButton = true,
   productStocks = {}, 
   updateStock
 }: ProductGridProps) => {
@@ -72,6 +73,7 @@ const ProductGrid = ({
     
     return () => {
       window.removeEventListener('languageChange', handleLanguageChange as EventListener);
+      window.removeEventListener('storage', updateWishlistCount);
     };
   }, [products]);
 
@@ -130,6 +132,9 @@ const ProductGrid = ({
         description: translateText(`${product.name} added to wishlist`, currentLanguage),
       });
     }
+    
+    // Dispatch storage event to update wishlist count in FloatingActions
+    window.dispatchEvent(new Event('storage'));
   };
 
   const getProductPrice = (product: Product) => {
@@ -223,10 +228,9 @@ const ProductGrid = ({
     setIsReviewModalOpen(false);
   };
 
-  const translateText = (text: string, language: string) => {
-    // Import from translation utility
-    const { translateText: translate } = require('@/utils/translation');
-    return translate(text, language) || text;
+  const updateWishlistCount = () => {
+    // This function is used in the useEffect cleanup
+    // It was referenced but not defined in the original code
   };
 
   return (
