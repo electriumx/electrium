@@ -1,9 +1,11 @@
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState, useEffect } from "react";
 import { Plus, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Product as ProductType, ProductAccessory } from '../data/productData';
+import { translateText } from '@/utils/translation';
 
 interface ProductDetailModalProps {
   product: ProductType;
@@ -109,12 +111,23 @@ const accessories: Accessory[] = [
 
 const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discount = 0, reviews = [], stock = 0 }: ProductDetailModalProps) => {
   const { id, name, price, imageUrl, brand } = product;
-  const discountedPrice = discount > 0 ? price * (1 - discount / 100) : price;
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedAccessories, setSelectedAccessories] = useState<Accessory[]>([]);
   const [quantity, setQuantity] = useState(1);
+  const [currentLanguage, setCurrentLanguage] = useState('english');
   
   useEffect(() => {
+    const savedLanguage = localStorage.getItem('preferredLanguage');
+    if (savedLanguage) {
+      setCurrentLanguage(savedLanguage);
+    }
+    
+    const handleLanguageChange = (e: CustomEvent) => {
+      setCurrentLanguage(e.detail);
+    };
+    
+    window.addEventListener('languageChange', handleLanguageChange as EventListener);
+    
     if (isOpen) {
       setQuantity(product.quantity || 1);
       
@@ -135,6 +148,10 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
         setSelectedAccessories([]);
       }
     }
+    
+    return () => {
+      window.removeEventListener('languageChange', handleLanguageChange as EventListener);
+    };
   }, [isOpen, product]);
   
   const specs = getTechSpecs(id, brand);
@@ -196,7 +213,23 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
     });
   };
 
-  const basePrice = discount > 0 ? discountedPrice : price;
+  // Calculate the total price including accessories and discounts
+  const calculateTotalPrice = () => {
+    let basePrice = price;
+    
+    // Add the price of selected accessories
+    const accessoriesPrice = selectedAccessories.reduce((sum, acc) => sum + acc.price, 0);
+    basePrice += accessoriesPrice;
+    
+    // Apply discount if available
+    if (discount > 0) {
+      basePrice = basePrice * (1 - discount / 100);
+    }
+    
+    return basePrice;
+  };
+  
+  const finalPrice = calculateTotalPrice();
 
   const handleAddToCart = () => {
     const productToAdd = {
@@ -222,16 +255,16 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
         <DialogHeader>
           <DialogTitle>{name}</DialogTitle>
           <DialogDescription>
-            Detailed information about {name} by {brand}
+            {translateText("Detailed information about", currentLanguage)} {name} {translateText("by", currentLanguage)} {brand}
           </DialogDescription>
         </DialogHeader>
         
         <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="mt-4">
           <TabsList className="grid grid-cols-4 mb-4">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="specs">Specifications</TabsTrigger>
-            <TabsTrigger value="accessories">Accessories</TabsTrigger>
-            <TabsTrigger value="reviews">Reviews ({reviews.length})</TabsTrigger>
+            <TabsTrigger value="overview">{translateText("Overview", currentLanguage)}</TabsTrigger>
+            <TabsTrigger value="specs">{translateText("Specifications", currentLanguage)}</TabsTrigger>
+            <TabsTrigger value="accessories">{translateText("accessories", currentLanguage)}</TabsTrigger>
+            <TabsTrigger value="reviews">{translateText("Reviews", currentLanguage)} ({reviews.length})</TabsTrigger>
           </TabsList>
           
           <TabsContent value="overview" className="space-y-4">
@@ -251,23 +284,38 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
                 {discount > 0 ? (
                   <>
                     <span className="line-through text-muted-foreground mr-2">${price.toFixed(2)}</span>
-                    <span className="text-destructive">${discountedPrice.toFixed(2)}</span>
+                    <span className="text-destructive">${finalPrice.toFixed(2)}</span>
                     <span className="ml-2 text-xs bg-destructive text-white px-2 py-1 rounded-full">
-                      {discount}% OFF
+                      {discount}% {translateText("off", currentLanguage)}
                     </span>
                   </>
                 ) : (
-                  <span>${price.toFixed(2)}</span>
+                  <span>${finalPrice.toFixed(2)}</span>
                 )}
               </p>
-              <p className="text-muted-foreground">Brand: {brand}</p>
+              <p className="text-muted-foreground">{translateText("Brand", currentLanguage)}: {brand}</p>
+              
+              {selectedAccessories.length > 0 && (
+                <div className="mt-2">
+                  <p className="text-sm font-medium">{translateText("with", currentLanguage)}:</p>
+                  <ul className="text-sm text-muted-foreground">
+                    {selectedAccessories.map(acc => (
+                      <li key={acc.id} className="flex justify-between">
+                        <span>{acc.name}</span>
+                        <span>${acc.price.toFixed(2)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
               <p className="mt-4">
-                {name} is a premium device from {brand}, designed for optimal performance and user experience.
-                Click on the Specifications tab to see detailed technical information.
+                {name} {translateText("is a premium device from", currentLanguage)} {brand}, {translateText("designed for optimal performance and user experience", currentLanguage)}.
+                {translateText("Click on the Specifications tab to see detailed technical information", currentLanguage)}.
               </p>
               
               <p className="mt-2 text-sm text-muted-foreground">
-                In Stock: {stock}
+                {translateText("In Stock", currentLanguage)}: {stock}
               </p>
               
               <div className="mt-6 flex items-center justify-between">
@@ -288,7 +336,7 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
                 </div>
                 
                 <Button onClick={handleAddToCart} className="ml-4">
-                  Add to Cart
+                  {translateText("Add to Cart", currentLanguage)}
                 </Button>
               </div>
             </div>
@@ -296,7 +344,7 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
           
           <TabsContent value="specs">
             <div className="space-y-4">
-              <h3 className="text-lg font-medium">Technical Specifications</h3>
+              <h3 className="text-lg font-medium">{translateText("Technical Specifications", currentLanguage)}</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {Object.entries(specs).map(([key, value]) => (
                   <div key={key} className="flex justify-between py-2 border-b">
@@ -309,15 +357,15 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
           </TabsContent>
           
           <TabsContent value="accessories" className="space-y-4">
-            <h3 className="text-lg font-medium">Compatible Accessories</h3>
+            <h3 className="text-lg font-medium">{translateText("Compatible Accessories", currentLanguage)}</h3>
             {compatibleAccessories.length === 0 ? (
-              <p className="text-muted-foreground">No compatible accessories found for this product.</p>
+              <p className="text-muted-foreground">{translateText("No compatible accessories found for this product", currentLanguage)}.</p>
             ) : (
               <div>
                 {Object.entries(accessoryCategories).map(([category, items]) => 
                   items.length > 0 && (
                     <div key={category} className="mb-6">
-                      <h4 className="font-medium text-sm uppercase text-muted-foreground mb-2">{category}</h4>
+                      <h4 className="font-medium text-sm uppercase text-muted-foreground mb-2">{translateText(category, currentLanguage)}</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {items.map((accessory) => {
                           const isSelected = selectedAccessories.some(a => a.id === accessory.id);
@@ -350,9 +398,9 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
                 
                 {selectedAccessories.length > 0 && (
                   <div className="bg-card rounded-lg p-4 mt-4 border border-border">
-                    <h4 className="font-medium mb-2">Selected Accessories</h4>
+                    <h4 className="font-medium mb-2">{translateText("Selected Accessories", currentLanguage)}</h4>
                     <p className="text-sm text-muted-foreground mb-4">
-                      These accessories will be added to your cart separately without affecting the product price.
+                      {translateText("These accessories will be added to your cart with the product", currentLanguage)}.
                     </p>
                     <ul className="space-y-2 mb-4">
                       {selectedAccessories.map(accessory => (
@@ -370,10 +418,10 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
           
           <TabsContent value="reviews">
             <div>
-              <h3 className="text-lg font-medium mb-3">Customer Reviews ({reviews.length})</h3>
+              <h3 className="text-lg font-medium mb-3">{translateText("Customer Reviews", currentLanguage)} ({reviews.length})</h3>
               
               {reviews.length === 0 ? (
-                <p className="text-muted-foreground">No reviews yet. Be the first to review this product!</p>
+                <p className="text-muted-foreground">{translateText("No reviews yet. Be the first to review this product!", currentLanguage)}</p>
               ) : (
                 <div className="space-y-4">
                   {reviews.map((review, index) => (

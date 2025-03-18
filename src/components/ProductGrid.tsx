@@ -1,8 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { Product } from '../data/productData';
 import { useToast } from '@/hooks/use-toast';
 import ProductDetailModal from './ProductDetailModal';
-import { Heart } from 'lucide-react';
+import ProductReviewModal from './ProductReviewModal';
+import { Heart, Star } from 'lucide-react';
 
 interface ProductGridProps {
   products: Product[];
@@ -17,17 +19,33 @@ const ProductGrid = ({
   products, 
   onQuantityChange, 
   discounts,
-  showWishlistButton = false,
+  showWishlistButton = true,  // Changed default to true
   productStocks = {}, 
   updateStock
 }: ProductGridProps) => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [wishlist, setWishlist] = useState<{[key: number]: boolean}>({});
+  const [reviewProduct, setReviewProduct] = useState<Product | null>(null);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [productReviews, setProductReviews] = useState<Record<number, { name: string, rating: number, comment: string }[]>>({});
   const { toast } = useToast();
+  const [currentLanguage, setCurrentLanguage] = useState('english');
   
 
   useEffect(() => {
+    const savedLanguage = localStorage.getItem('preferredLanguage');
+    if (savedLanguage) {
+      setCurrentLanguage(savedLanguage);
+    }
+    
+    const handleLanguageChange = (e: CustomEvent) => {
+      setCurrentLanguage(e.detail);
+    };
+    
+    window.addEventListener('languageChange', handleLanguageChange as EventListener);
+    
+    // Check if the product is already in the wishlist when the component mounts
     const savedWishlist = localStorage.getItem('wishlist');
     if (savedWishlist) {
       try {
@@ -41,6 +59,20 @@ const ProductGrid = ({
         console.error('Error parsing wishlist:', error);
       }
     }
+    
+    // Load saved reviews
+    const savedReviews = localStorage.getItem('productReviews');
+    if (savedReviews) {
+      try {
+        setProductReviews(JSON.parse(savedReviews));
+      } catch (error) {
+        console.error('Error parsing product reviews:', error);
+      }
+    }
+    
+    return () => {
+      window.removeEventListener('languageChange', handleLanguageChange as EventListener);
+    };
   }, [products]);
 
   const handleUpdateStock = (id: number, newStock: number) => {
@@ -74,14 +106,14 @@ const ProductGrid = ({
       }));
       
       toast({
-        description: `${product.name} removed from wishlist`,
+        description: translateText(`${product.name} removed from wishlist`, currentLanguage),
       });
     } else {
       const productToAdd = {
         id: product.id,
         name: product.name,
         price: product.price,
-        image: product.imageUrl,
+        imageUrl: product.imageUrl,
         brand: product.brand,
         discount: product.discount || 0
       };
@@ -95,7 +127,7 @@ const ProductGrid = ({
       }));
       
       toast({
-        description: `${product.name} added to wishlist`,
+        description: translateText(`${product.name} added to wishlist`, currentLanguage),
       });
     }
   };
@@ -103,7 +135,10 @@ const ProductGrid = ({
   const getProductPrice = (product: Product) => {
     let price = product.price;
     
-    // We're not adding accessory prices to the product price anymore
+    // Add accessory prices to the product price if there are selected accessories
+    if (product.accessories) {
+      price += product.accessories.filter(acc => acc.selected).reduce((sum, acc) => sum + acc.price, 0);
+    }
     
     // Apply brand discount if available
     const brandDiscount = discounts[product.brand];
@@ -157,6 +192,42 @@ const ProductGrid = ({
       }
     }
   };
+  
+  const handleReviewClick = (e: React.MouseEvent, product: Product) => {
+    e.stopPropagation();
+    setReviewProduct(product);
+    setIsReviewModalOpen(true);
+  };
+  
+  const handleReviewSubmit = (name: string, rating: number, comment: string) => {
+    if (!reviewProduct) return;
+    
+    const updatedReviews = { ...productReviews };
+    if (!updatedReviews[reviewProduct.id]) {
+      updatedReviews[reviewProduct.id] = [];
+    }
+    
+    updatedReviews[reviewProduct.id].push({
+      name,
+      rating,
+      comment
+    });
+    
+    setProductReviews(updatedReviews);
+    localStorage.setItem('productReviews', JSON.stringify(updatedReviews));
+    
+    toast({
+      description: translateText("Thank you for your review!", currentLanguage),
+    });
+    
+    setIsReviewModalOpen(false);
+  };
+
+  const translateText = (text: string, language: string) => {
+    // Import from translation utility
+    const { translateText: translate } = require('@/utils/translation');
+    return translate(text, language) || text;
+  };
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -166,6 +237,7 @@ const ProductGrid = ({
         const isInWishlist = wishlist[product.id] || false;
         const stock = productStocks[product.id] || 0;
         const finalPrice = getProductPrice(product);
+        const reviews = productReviews[product.id] || [];
 
         return (
           <div 
@@ -184,7 +256,7 @@ const ProductGrid = ({
                 <button 
                   onClick={(e) => toggleWishlist(e, product)}
                   className="absolute top-2 right-2 p-1.5 bg-white/80 dark:bg-card/80 rounded-full text-muted-foreground hover:text-destructive z-10"
-                  aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
+                  aria-label={isInWishlist ? translateText("Remove from wishlist", currentLanguage) : translateText("Add to wishlist", currentLanguage)}
                 >
                   <Heart className={isInWishlist ? "fill-destructive text-destructive" : ""} size={18} />
                 </button>
@@ -192,7 +264,7 @@ const ProductGrid = ({
               
               {hasDiscount && (
                 <div className="absolute top-2 left-2 bg-destructive text-white text-xs font-bold px-2 py-1 rounded">
-                  {discountPercentage}% OFF
+                  {discountPercentage}% {translateText("off", currentLanguage)}
                 </div>
               )}
             </div>
@@ -215,11 +287,22 @@ const ProductGrid = ({
               </div>
               <div className="flex items-center justify-between">
                 <div className="text-sm text-muted-foreground">
-                  In Stock: {stock}
+                  {translateText("In Stock", currentLanguage)}: {stock}
                 </div>
                 <div className="text-sm px-2 py-1 bg-muted rounded-md">
-                  Qty: {product.quantity || 0}
+                  {translateText("Quantity", currentLanguage)}: {product.quantity || 0}
                 </div>
+              </div>
+              
+              {/* Review button in bottom right */}
+              <div className="mt-3 flex justify-end">
+                <button
+                  onClick={(e) => handleReviewClick(e, product)}
+                  className="text-sm flex items-center gap-1 text-muted-foreground hover:text-foreground"
+                >
+                  <Star size={14} />
+                  <span>{reviews.length > 0 ? `${reviews.length} ${translateText("reviews", currentLanguage)}` : translateText("Write a review", currentLanguage)}</span>
+                </button>
               </div>
             </div>
           </div>
@@ -234,13 +317,24 @@ const ProductGrid = ({
           onQuantityChange={handleDetailQuantityChange}
           discount={getDiscountPercentage(selectedProduct)}
           stock={productStocks[selectedProduct.id] || 0}
+          reviews={productReviews[selectedProduct.id] || []}
+        />
+      )}
+      
+      {reviewProduct && (
+        <ProductReviewModal
+          productId={reviewProduct.id}
+          productName={reviewProduct.name}
+          isOpen={isReviewModalOpen}
+          onClose={() => setIsReviewModalOpen(false)}
+          onSubmit={handleReviewSubmit}
         />
       )}
       
       {products.length === 0 && (
         <div className="col-span-full py-12 text-center">
-          <h3 className="text-xl font-semibold mb-2">No products found</h3>
-          <p className="text-muted-foreground">Try adjusting your filters or search query.</p>
+          <h3 className="text-xl font-semibold mb-2">{translateText("No products found", currentLanguage)}</h3>
+          <p className="text-muted-foreground">{translateText("Try adjusting your filters or search query", currentLanguage)}</p>
         </div>
       )}
     </div>

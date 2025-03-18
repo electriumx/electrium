@@ -1,12 +1,25 @@
 
 import { useState, useEffect } from 'react';
 import { Globe, Mail, Phone, Instagram, Linkedin } from 'lucide-react';
+import { translateText } from '@/utils/translation';
 
 const Footer = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [currentTimeUTC, setCurrentTimeUTC] = useState('');
+  const [currentLanguage, setCurrentLanguage] = useState('english');
 
   useEffect(() => {
+    const savedLanguage = localStorage.getItem('preferredLanguage');
+    if (savedLanguage) {
+      setCurrentLanguage(savedLanguage);
+    }
+    
+    const handleLanguageChange = (e: CustomEvent) => {
+      setCurrentLanguage(e.detail);
+    };
+    
+    window.addEventListener('languageChange', handleLanguageChange as EventListener);
+    
     const interval = setInterval(() => {
       const now = new Date();
       setCurrentTime(now);
@@ -20,7 +33,11 @@ const Footer = () => {
     const utcHours = now.getUTCHours().toString().padStart(2, '0');
     const utcMinutes = now.getUTCMinutes().toString().padStart(2, '0');
     setCurrentTimeUTC(`${utcHours}:${utcMinutes} UTC`);
-    return () => clearInterval(interval);
+    
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('languageChange', handleLanguageChange as EventListener);
+    };
   }, []);
 
   const formattedTime = currentTime.toLocaleTimeString(undefined, {
@@ -34,23 +51,22 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <h3 className="text-xl font-bold mb-4 text-[#18a66e]">Electrium</h3>
-            <p className="text-gray-300">Your one-stop shop for premium electronics</p>
+            <p className="text-gray-300">{translateText("Your one-stop shop for premium electronics", currentLanguage)}</p>
             <div className="flex flex-col text-gray-400 mt-2 space-y-1">
-              <p>Local Time: {formattedTime}</p>
-              <p>Universal Time: {currentTimeUTC}</p>
+              <p>{translateText("Local Time", currentLanguage)}: {formattedTime}</p>
+              <p>{translateText("Universal Time", currentLanguage)}: {currentTimeUTC}</p>
             </div>
           </div>
           <div>
-            <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+            <h4 className="text-lg font-semibold mb-4">{translateText("Quick Links", currentLanguage)}</h4>
             <ul className="space-y-2">
-              <li><a href="/" className="text-gray-300 hover:text-[#9eff00]">Home</a></li>
-              <li><a href="/about" className="text-gray-300 hover:text-[#9eff00]">About</a></li>
-              <li><a href="/products" className="text-gray-300 hover:text-[#9eff00]">Products</a></li>
-              <li><a href="/contact" className="text-gray-300 hover:text-[#9eff00]">Contact</a></li>
+              <li><a href="/" className="text-gray-300 hover:text-[#9eff00]">{translateText("Home", currentLanguage)}</a></li>
+              <li><a href="/about" className="text-gray-300 hover:text-[#9eff00]">{translateText("About", currentLanguage)}</a></li>
+              <li><a href="/products" className="text-gray-300 hover:text-[#9eff00]">{translateText("products", currentLanguage)}</a></li>
             </ul>
           </div>
           <div>
-            <h4 className="text-lg font-semibold mb-4">Categories</h4>
+            <h4 className="text-lg font-semibold mb-4">{translateText("Categories", currentLanguage)}</h4>
             <ul className="space-y-2">
               <li className="text-gray-300">Apple</li>
               <li className="text-gray-300">Samsung</li>
@@ -61,7 +77,7 @@ const Footer = () => {
             </ul>
           </div>
           <div>
-            <h4 className="text-lg font-semibold mb-4">Contact</h4>
+            <h4 className="text-lg font-semibold mb-4">{translateText("Contact", currentLanguage)}</h4>
             <div className="space-y-3">
               <p className="text-gray-300 flex items-center gap-2">
                 <Mail size={16} />
@@ -89,7 +105,7 @@ const Footer = () => {
           </div>
         </div>
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; {new Date().getFullYear()} Electrium. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Electrium. {translateText("All rights reserved", currentLanguage)}.</p>
         </div>
       </div>
     </footer>;
