@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
@@ -5,9 +6,11 @@ import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { Product } from '../data/productData';
 import { translateText } from '@/utils/translation';
+
 interface CartSummaryProps {
   cart: Product[];
 }
+
 const CartSummary = ({
   cart
 }: CartSummaryProps) => {
@@ -17,6 +20,7 @@ const CartSummary = ({
     toast
   } = useToast();
   const navigate = useNavigate();
+
   useEffect(() => {
     const savedLanguage = localStorage.getItem('preferredLanguage');
     if (savedLanguage) {
@@ -28,6 +32,7 @@ const CartSummary = ({
     window.addEventListener('languageChange', handleLanguageChange as EventListener);
     return () => window.removeEventListener('languageChange', handleLanguageChange as EventListener);
   }, []);
+
   const toggleCart = () => {
     setIsOpen(!isOpen);
   };
@@ -36,6 +41,7 @@ const CartSummary = ({
   const formatProductName = (name: string) => {
     return name.replace(/_/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   };
+
   const getItemPrice = (product: Product) => {
     let price = product.price;
 
@@ -50,18 +56,23 @@ const CartSummary = ({
     }
     return price;
   };
+
   const getItemTotal = (product: Product) => {
     return getItemPrice(product) * (product.quantity || 1);
   };
+
   const calculateSubtotal = () => {
     return cart.reduce((sum, item) => sum + getItemTotal(item), 0);
   };
+
   const calculateTax = () => {
     return calculateSubtotal() * 0.08; // 8% tax
   };
+
   const calculateTotal = () => {
     return calculateSubtotal() + calculateTax();
   };
+
   const clearCart = () => {
     localStorage.setItem('cart', JSON.stringify([]));
 
@@ -71,14 +82,17 @@ const CartSummary = ({
     });
     window.dispatchEvent(event);
     toast({
-      title: translateText("cart_cleared", currentLanguage) || "Cart cleared",
-      description: translateText("all_items_removed", currentLanguage) || "All items have been removed from your cart."
+      title: translateText("Cart Cleared", currentLanguage) || "Cart Cleared",
+      description: translateText("All Items Removed", currentLanguage) || "All items have been removed from your cart."
     });
   };
+
   const handleCheckout = () => {
     navigate('/checkout');
   };
+
   if (cart.length === 0) return null;
+
   return <div className={`fixed bottom-0 right-0 z-40 transition-transform duration-300 transform ${isOpen ? 'translate-y-0' : 'translate-y-[calc(100%-3.5rem)]'}`}>
       <div className="bg-card rounded-tl-lg shadow-lg border border-border max-w-md w-full">
         
@@ -96,13 +110,13 @@ const CartSummary = ({
                         {translateText(item.name, currentLanguage) ? formatProductName(translateText(item.name, currentLanguage)) : formatProductName(item.name)}
                       </h4>
                       <div className="text-xs text-muted-foreground">
-                        {translateText("quantity", currentLanguage)}: {item.quantity} × ${getItemPrice(item).toFixed(2)}
+                        {translateText("Quantity", currentLanguage)}: {item.quantity} × ${getItemPrice(item).toFixed(2)}
                         {item.discount && item.discount > 0 && <span className="ml-1 text-destructive">
-                            (-{item.discount}% {translateText("off", currentLanguage)})
+                            (-{item.discount}% {translateText("Off", currentLanguage)})
                           </span>}
                       </div>
                       {item.accessories && item.accessories.filter(acc => acc.selected).length > 0 && <div className="text-xs text-muted-foreground">
-                          {translateText("with", currentLanguage)}: {item.accessories.filter(acc => acc.selected).map(acc => translateText(acc.name, currentLanguage) ? formatProductName(translateText(acc.name, currentLanguage)) : formatProductName(acc.name)).join(', ')}
+                          {translateText("With", currentLanguage)}: {item.accessories.filter(acc => acc.selected).map(acc => translateText(acc.name, currentLanguage) ? formatProductName(translateText(acc.name, currentLanguage)) : formatProductName(acc.name)).join(', ')}
                         </div>}
                     </div>
                   </div>
@@ -114,25 +128,25 @@ const CartSummary = ({
             
             <div className="space-y-1 text-sm">
               <div className="flex justify-between">
-                <span>{translateText("subtotal", currentLanguage)}</span>
+                <span>{translateText("Subtotal", currentLanguage)}</span>
                 <span>${calculateSubtotal().toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span>{translateText("tax", currentLanguage)} (8%)</span>
+                <span>{translateText("Tax", currentLanguage)} (8%)</span>
                 <span>${calculateTax().toFixed(2)}</span>
               </div>
               <div className="flex justify-between font-bold pt-1 border-t border-border">
-                <span>{translateText("total", currentLanguage)}</span>
+                <span>{translateText("Total", currentLanguage)}</span>
                 <span>${calculateTotal().toFixed(2)}</span>
               </div>
             </div>
             
             <div className="flex space-x-2">
               <Button className="w-full" onClick={handleCheckout}>
-                {translateText("proceed_to_payment", currentLanguage)}
+                {translateText("Proceed To Payment", currentLanguage)}
               </Button>
               <Button variant="outline" className="w-full" onClick={clearCart}>
-                {translateText("clear_all", currentLanguage) || "Clear All Items"}
+                {translateText("Clear All Items", currentLanguage) || "Clear All Items"}
               </Button>
             </div>
           </div>
@@ -140,4 +154,5 @@ const CartSummary = ({
       </div>
     </div>;
 };
+
 export default CartSummary;
