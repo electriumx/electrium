@@ -62,7 +62,7 @@ const Footer = () => {
             <ul className="space-y-2">
               <li><a href="/" className="text-gray-300 hover:text-[#9eff00]">{translateText("Home", currentLanguage)}</a></li>
               <li><a href="/about" className="text-gray-300 hover:text-[#9eff00]">{translateText("About", currentLanguage)}</a></li>
-              <li><a href="/products" className="text-gray-300 hover:text-[#9eff00]">{translateText("products", currentLanguage)}</a></li>
+              <li><a href="/products" className="text-gray-300 hover:text-[#9eff00]">{translateText("Products", currentLanguage)}</a></li>
             </ul>
           </div>
           <div>
@@ -77,30 +77,15 @@ const Footer = () => {
             </ul>
           </div>
           <div>
-            <h4 className="text-lg font-semibold mb-4">{translateText("Contact", currentLanguage)}</h4>
-            <div className="space-y-3">
-              <p className="text-gray-300 flex items-center gap-2">
-                <Mail size={16} />
-                <span>electriumx@gmail.com</span>
-              </p>
-              <p className="text-gray-300 flex items-center gap-2">
-                <Phone size={16} />
-                <span>+20 011 5468 4095</span>
-              </p>
-              <p className="text-gray-300 flex items-center gap-2">
-                <Globe size={16} />
-                <span>www.electrium.com</span>
-              </p>
+            <h4 className="text-lg font-semibold mb-4">{translateText("Social Media", currentLanguage)}</h4>
+            <div className="flex space-x-4 mt-4">
+              <a href="https://www.instagram.com/electruim/" target="_blank" rel="noopener noreferrer" className="p-2 bg-black/20 backdrop-blur-sm rounded-full hover:scale-110 transition-transform">
+                <Instagram className="w-5 h-5 text-white" />
+              </a>
               
-              <div className="flex space-x-4 mt-4">
-                <a href="https://www.instagram.com/electruim/" target="_blank" rel="noopener noreferrer" className="p-2 bg-black/20 backdrop-blur-sm rounded-full hover:scale-110 transition-transform">
-                  <Instagram className="w-5 h-5 text-white" />
-                </a>
-                
-                <a href="https://www.linkedin.com/in/electruim-x-a84988354/" target="_blank" rel="noopener noreferrer" className="p-2 bg-black/20 backdrop-blur-sm rounded-full hover:scale-110 transition-transform">
-                  <Linkedin className="w-5 h-5 text-white" />
-                </a>
-              </div>
+              <a href="https://www.linkedin.com/in/electruim-x-a84988354/" target="_blank" rel="noopener noreferrer" className="p-2 bg-black/20 backdrop-blur-sm rounded-full hover:scale-110 transition-transform">
+                <Linkedin className="w-5 h-5 text-white" />
+              </a>
             </div>
           </div>
         </div>
