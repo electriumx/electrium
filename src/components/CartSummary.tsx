@@ -37,6 +37,15 @@ const CartSummary = ({
     setIsOpen(!isOpen);
   };
 
+  // Function to format product name (capitalize each word and remove underscores)
+  const formatProductName = (name: string) => {
+    return name
+      .replace(/_/g, ' ')
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
   const getItemPrice = (product: Product) => {
     let price = product.price;
 
@@ -77,8 +86,8 @@ const CartSummary = ({
     });
     window.dispatchEvent(event);
     toast({
-      title: "Cart cleared",
-      description: "All items have been removed from your cart."
+      title: translateText("cart_cleared", currentLanguage) || "Cart cleared",
+      description: translateText("all_items_removed", currentLanguage) || "All items have been removed from your cart."
     });
   };
 
@@ -119,7 +128,9 @@ const CartSummary = ({
                     </div>
                     <div>
                       <h4 className={`text-sm font-medium ${item.discount && item.discount > 0 ? 'pl-2' : ''}`}>
-                        {translateText(item.name, currentLanguage) || item.name}
+                        {translateText(item.name, currentLanguage) ? 
+                          formatProductName(translateText(item.name, currentLanguage)) : 
+                          formatProductName(item.name)}
                       </h4>
                       <div className="text-xs text-muted-foreground">
                         {translateText("quantity", currentLanguage)}: {item.quantity} × ${getItemPrice(item).toFixed(2)}
@@ -131,7 +142,11 @@ const CartSummary = ({
                       </div>
                       {item.accessories && item.accessories.filter(acc => acc.selected).length > 0 && (
                         <div className="text-xs text-muted-foreground">
-                          {translateText("with", currentLanguage)}: {item.accessories.filter(acc => acc.selected).map(acc => translateText(acc.name, currentLanguage) || acc.name).join(', ')}
+                          {translateText("with", currentLanguage)}: {item.accessories.filter(acc => acc.selected).map(acc => 
+                            translateText(acc.name, currentLanguage) ? 
+                              formatProductName(translateText(acc.name, currentLanguage)) : 
+                              formatProductName(acc.name)
+                          ).join(', ')}
                         </div>
                       )}
                     </div>

@@ -1,3 +1,4 @@
+
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Heart, Settings } from 'lucide-react';
@@ -29,17 +30,14 @@ const TopNavigation = ({
         </Link>
         
         {isIndexPage && <div className="flex-1 flex justify-center gap-8">
-            <Link to="/" className="text-white hover:text-[#9eff00] transition-colors">Explore</Link>
             <Link to="/about" className="text-white hover:text-[#9eff00] transition-colors">About</Link>
             <a href="#footer" onClick={handleContactClick} className="text-white hover:text-[#9eff00] transition-colors">Contact</a>
             <Link to="/donation" className="text-white hover:text-[#9eff00] transition-colors">Donation</Link>
           </div>}
         
         <div className="ml-auto flex items-center gap-4">
-          {/* Chatbot and Settings Buttons */}
+          {/* Settings Button */}
           <div className="flex items-center gap-2">
-            
-            
             <Link to="/settings" className="flex items-center justify-center w-8 h-8 rounded-full hover:opacity-80 transition-opacity" aria-label="Settings">
               <Settings size={20} className="text-white" />
             </Link>

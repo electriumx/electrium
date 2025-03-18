@@ -61,6 +61,15 @@ const Checkout = () => {
     };
   }, []);
 
+  // Function to format product name (capitalize each word and remove underscores)
+  const formatProductName = (name: string) => {
+    return name
+      .replace(/_/g, ' ')
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
   const getDiscountedPrice = (item: Product) => {
     if (!item.brand) return item.price;
     
@@ -182,7 +191,9 @@ const Checkout = () => {
                       />
                       <div className="flex-1">
                         <h3 className={`font-medium text-foreground ${hasDiscount ? 'pl-2' : ''}`}>
-                          {translateText(item.name, currentLanguage) || item.name}
+                          {translateText(item.name, currentLanguage) ? 
+                            formatProductName(translateText(item.name, currentLanguage)) : 
+                            formatProductName(item.name)}
                         </h3>
                         <p className="text-muted-foreground">
                           {translateText("quantity", currentLanguage)}: {item.quantity}
@@ -199,7 +210,9 @@ const Checkout = () => {
                             <ul className="text-sm text-muted-foreground list-disc ml-5">
                               {selectedAccessories.map((acc, index) => (
                                 <li key={index}>
-                                  {translateText(acc.name, currentLanguage) || acc.name} (+${acc.price.toFixed(2)})
+                                  {translateText(acc.name, currentLanguage) ? 
+                                    formatProductName(translateText(acc.name, currentLanguage)) : 
+                                    formatProductName(acc.name)} (+${acc.price.toFixed(2)})
                                 </li>
                               ))}
                             </ul>
@@ -222,7 +235,6 @@ const Checkout = () => {
                         ) : (
                           <p className="text-sm text-muted-foreground">${item.price.toFixed(2)} {translateText("each", currentLanguage) || "each"}</p>
                         )}
-                        
                         {accessoriesPrice > 0 && (
                           <p className="text-sm text-muted-foreground">
                             +${accessoriesPrice.toFixed(2)} {translateText("accessories", currentLanguage) || "accessories"}
@@ -276,7 +288,7 @@ const Checkout = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>{translateText("out_of_stock", currentLanguage) || "Out of Stock"}</AlertDialogTitle>
             <AlertDialogDescription>
-              {translateText("desired_item_not_in_stock", currentLanguage) || "The desired item"} "{outOfStockItem}" {translateText("is_not_in_stock", currentLanguage) || "is currently not in stock"}.
+              {translateText("desired_item_not_in_stock", currentLanguage) || "The desired item"} "{formatProductName(outOfStockItem)}" {translateText("is_not_in_stock", currentLanguage) || "is currently not in stock"}.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
