@@ -38,9 +38,7 @@ const TopNavigation = ({
         <div className="ml-auto flex items-center gap-4">
           {/* Chatbot and Settings Buttons */}
           <div className="flex items-center gap-2">
-            <button onClick={toggleChat} className="flex items-center justify-center w-8 h-8 rounded-full hover:opacity-80 transition-opacity" aria-label="Chat with Electrium Assistant">
-              
-            </button>
+            
             
             <Link to="/settings" className="flex items-center justify-center w-8 h-8 rounded-full hover:opacity-80 transition-opacity" aria-label="Settings">
               <Settings size={20} className="text-white" />
