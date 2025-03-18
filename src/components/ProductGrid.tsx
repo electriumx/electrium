@@ -5,7 +5,6 @@ import { useToast } from '@/hooks/use-toast';
 import ProductDetailModal from './ProductDetailModal';
 import ProductReviewModal from './ProductReviewModal';
 import { Heart, Star } from 'lucide-react';
-import { translateText } from '@/utils/translation';
 
 interface ProductGridProps {
   products: Product[];
@@ -20,7 +19,7 @@ const ProductGrid = ({
   products, 
   onQuantityChange, 
   discounts,
-  showWishlistButton = true,  
+  showWishlistButton = true,  // Changed default to true
   productStocks = {}, 
   updateStock
 }: ProductGridProps) => {
@@ -222,6 +221,12 @@ const ProductGrid = ({
     });
     
     setIsReviewModalOpen(false);
+  };
+
+  const translateText = (text: string, language: string) => {
+    // Import from translation utility
+    const { translateText: translate } = require('@/utils/translation');
+    return translate(text, language) || text;
   };
 
   return (

@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { ShoppingCart, Heart } from 'lucide-react';
 import { translateText } from '@/utils/translation';
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 
 interface FloatingActionsProps {
   showCheckout?: boolean;
@@ -53,29 +52,27 @@ const FloatingActions = ({
       {/* Cart Button - Bottom Left */}
       {showCheckout && cartItemCount > 0 && (
         <div className="fixed bottom-6 left-6 z-40">
-          <Button 
+          <button 
             onClick={() => navigate('/checkout')} 
             aria-label={translateText("View Cart", currentLanguage)} 
-            variant="default"
-            className="flex items-center justify-center px-4 py-3 rounded-full shadow-lg"
+            className="flex items-center justify-center bg-green-600 text-white p-3 rounded-full shadow-lg hover:bg-green-700 transition-colors px-[12px] py-[12px] text-base"
           >
             <ShoppingCart className="mr-2" />
             <span>{translateText("Your Cart", currentLanguage)} ({cartItemCount})</span>
-          </Button>
+          </button>
         </div>
       )}
       
       {/* Wishlist Button - Bottom Right */}
       <div className="fixed bottom-6 right-6 z-40">
-        <Button 
+        <button 
           onClick={() => navigate('/wishlist')} 
           aria-label={translateText("View Wishlist", currentLanguage)} 
-          variant="outline"
-          className="flex items-center justify-center px-4 py-3 rounded-full shadow-lg"
+          className="flex items-center justify-center bg-card text-foreground p-3 rounded-full shadow-lg hover:bg-accent transition-colors"
         >
           <Heart className="mr-2" />
           <span>{translateText("Wishlist", currentLanguage)} ({wishlistCount})</span>
-        </Button>
+        </button>
       </div>
     </>
   );
