@@ -1,51 +1,40 @@
-
 import { useState, useEffect } from 'react';
 import { Globe, Mail, Phone, Instagram, Linkedin } from 'lucide-react';
 import { translateText } from '@/utils/translation';
-
 const Footer = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [currentTimeUTC, setCurrentTimeUTC] = useState('');
   const [currentLanguage, setCurrentLanguage] = useState('english');
-
   useEffect(() => {
     const savedLanguage = localStorage.getItem('preferredLanguage');
     if (savedLanguage) {
       setCurrentLanguage(savedLanguage);
     }
-    
     const handleLanguageChange = (e: CustomEvent) => {
       setCurrentLanguage(e.detail);
     };
-    
     window.addEventListener('languageChange', handleLanguageChange as EventListener);
-    
     const interval = setInterval(() => {
       const now = new Date();
       setCurrentTime(now);
-
       const utcHours = now.getUTCHours().toString().padStart(2, '0');
       const utcMinutes = now.getUTCMinutes().toString().padStart(2, '0');
       setCurrentTimeUTC(`${utcHours}:${utcMinutes} UTC`);
     }, 60000);
-
     const now = new Date();
     const utcHours = now.getUTCHours().toString().padStart(2, '0');
     const utcMinutes = now.getUTCMinutes().toString().padStart(2, '0');
     setCurrentTimeUTC(`${utcHours}:${utcMinutes} UTC`);
-    
     return () => {
       clearInterval(interval);
       window.removeEventListener('languageChange', handleLanguageChange as EventListener);
     };
   }, []);
-
   const formattedTime = currentTime.toLocaleTimeString(undefined, {
     hour: '2-digit',
     minute: '2-digit',
     hour12: true
   });
-
   return <footer id="footer" className="bg-black text-white py-8 mt-16">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -63,7 +52,7 @@ const Footer = () => {
             <ul className="space-y-2 text-gray-300">
               <li className="flex items-center">
                 <Mail className="mr-2 h-4 w-4" />
-                <a href="mailto:info@electrium.com" className="hover:text-[#9eff00]">info@electrium.com</a>
+                <a href="mailto:info@electrium.com" className="hover:text-[#9eff00]">electruimx@gmail.com</a>
               </li>
               <li className="flex items-center">
                 <Phone className="mr-2 h-4 w-4" />
@@ -71,7 +60,8 @@ const Footer = () => {
               </li>
               <li className="flex items-center">
                 <Instagram className="mr-2 h-4 w-4" />
-                <a href="https://instagram.com/electrium" target="_blank" rel="noopener noreferrer" className="hover:text-[#9eff00]">@electrium</a>
+                <a href="https://instagram.com/electrium" target="_blank" rel="noopener noreferrer" className="hover:text-[#9eff00]">
+              </a>
               </li>
               <li className="flex items-center">
                 <Linkedin className="mr-2 h-4 w-4" />
@@ -107,5 +97,4 @@ const Footer = () => {
       </div>
     </footer>;
 };
-
 export default Footer;
