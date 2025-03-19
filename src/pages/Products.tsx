@@ -282,12 +282,12 @@ const Products = () => {
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8">
       <h1 className="text-2xl font-bold mb-4 text-center text-foreground">
-        {translateText("Our Products", currentLanguage)}
+        {translateText("our_products", currentLanguage)}
       </h1>
       
       <div className="mb-6 flex justify-center">
         <button onClick={() => setShowSpinWheel(!showSpinWheel)} className="px-4 py-2 bg-card text-foreground rounded-md border border-border hover:bg-accent transition-colors">
-          {showSpinWheel ? translateText("Hide Spin", currentLanguage) : translateText("Try Your Luck", currentLanguage)}
+          {showSpinWheel ? translateText("hide_spin", currentLanguage) : translateText("try_luck", currentLanguage)}
         </button>
       </div>
       
@@ -298,7 +298,7 @@ const Products = () => {
       )}
       
       <div className="mb-6 p-4 bg-card rounded-lg border border-border">
-        <h2 className="text-lg font-semibold mb-2 text-center">{translateText("Active Discounts", currentLanguage)}</h2>
+        <h2 className="text-lg font-semibold mb-2 text-center">{translateText("active_discounts", currentLanguage)}</h2>
         <div className="flex flex-wrap gap-2 justify-center">
           {activeDiscounts.length > 0 ? (
             activeDiscounts.map(([brand, discount]) => {
@@ -312,7 +312,7 @@ const Products = () => {
               );
             })
           ) : (
-            <p className="text-muted-foreground">{translateText("No active discounts", currentLanguage)}</p>
+            <p className="text-muted-foreground">{translateText("no_active_discounts", currentLanguage)}</p>
           )}
         </div>
       </div>
@@ -335,7 +335,7 @@ const Products = () => {
             products={filteredProducts} 
             onQuantityChange={handleQuantityChange} 
             discounts={discounts} 
-            showWishlistButton={true}
+            showWishlistButton={false}
             productStocks={productStocks}
             updateStock={updateStock}
           />

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
@@ -29,6 +28,8 @@ const ProductFilters = ({
   onSubCategoryChange
 }: ProductFiltersProps) => {
   const brands = ["Apple", "Samsung", "Sony", "Google", "Microsoft", "Xiaomi", "Audio", "PlayStation", "PC Games", "LG", "Whirlpool", "Dyson", "Bosch", "Panasonic"];
+  
+  const accessories = ["Headphones", "Cases", "Chargers", "Screen Protectors", "Cables", "Memory Cards", "Warranties", "Installation Kits"];
   
   const subcategories: Record<string, string[]> = {
     "Smartphones": ["iPhone", "Android", "Foldable", "Budget", "Premium", "Camera-focused", "Battery-focused"],
@@ -209,6 +210,30 @@ const ProductFilters = ({
               Clear All
             </button>
           )}
+        </div>
+      </div>
+
+      <div className="p-4 rounded-lg bg-card shadow-md">
+        <h3 className="text-lg font-semibold mb-4 text-foreground">Accessories</h3>
+        <div className="flex flex-wrap gap-2">
+          {accessories.map((accessory) => (
+            <button
+              key={accessory}
+              onClick={() => {
+                const newSelectedBrands = selectedBrands.includes(accessory)
+                  ? selectedBrands.filter(b => b !== accessory)
+                  : [...selectedBrands, accessory];
+                onFilterChange(newSelectedBrands);
+              }}
+              className={`px-3 py-1 text-sm rounded-full transition-all ${
+                selectedBrands.includes(accessory) 
+                  ? 'bg-sage-500 text-white'
+                  : 'bg-secondary text-foreground border border-border hover:bg-muted'
+              }`}
+            >
+              {accessory}
+            </button>
+          ))}
         </div>
       </div>
     </div>

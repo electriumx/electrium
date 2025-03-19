@@ -30,7 +30,6 @@ const CartSummary = ({
     };
     
     window.addEventListener('languageChange', handleLanguageChange as EventListener);
-    
     return () => window.removeEventListener('languageChange', handleLanguageChange as EventListener);
   }, []);
 
@@ -40,7 +39,11 @@ const CartSummary = ({
 
   // Function to format product name (capitalize each word and remove underscores)
   const formatProductName = (name: string) => {
-    return name.replace(/_/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    return name
+      .replace(/_/g, ' ')
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   };
 
   const getItemPrice = (product: Product) => {
@@ -55,7 +58,6 @@ const CartSummary = ({
     if (product.accessories) {
       price += product.accessories.filter(acc => acc.selected).reduce((sum, acc) => sum + acc.price, 0);
     }
-    
     return price;
   };
 
@@ -83,7 +85,6 @@ const CartSummary = ({
       detail: []
     });
     window.dispatchEvent(event);
-
     toast({
       title: translateText("cart_cleared", currentLanguage) || "Cart cleared",
       description: translateText("all_items_removed", currentLanguage) || "All items have been removed from your cart."
@@ -95,17 +96,26 @@ const CartSummary = ({
   };
 
   if (cart.length === 0) return null;
-
+  
   return (
     <div className={`fixed bottom-0 right-0 z-40 transition-transform duration-300 transform ${isOpen ? 'translate-y-0' : 'translate-y-[calc(100%-3.5rem)]'}`}>
       <div className="bg-card rounded-tl-lg shadow-lg border border-border max-w-md w-full">
-        <button 
-          onClick={toggleCart} 
-          className="w-full p-3 font-medium flex justify-between items-center border-b border-border"
+        <div 
+          className="flex justify-between items-center px-4 py-3 cursor-pointer"
+          onClick={toggleCart}
         >
-          <span>{translateText("cart", currentLanguage) || "Cart"} ({cart.length})</span>
-          <span className="text-muted-foreground text-sm">${calculateTotal().toFixed(2)}</span>
-        </button>
+          <div className="flex items-center gap-2">
+            <span className="font-medium">{translateText("cart", currentLanguage)}</span>
+            <span className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-xs">
+              {cart.length} {cart.length === 1 ? translateText("item", currentLanguage) : translateText("items", currentLanguage)}
+            </span>
+          </div>
+          <div className="h-6 w-6 flex items-center justify-center rounded-full bg-muted hover:bg-muted-foreground/20">
+            <span className="transform transition-transform duration-200">
+              {isOpen ? '-' : '+'}
+            </span>
+          </div>
+        </div>
         
         <div className={`max-h-96 overflow-y-auto ${isOpen ? 'block' : 'hidden'}`}>
           <div className="p-4 space-y-4">
@@ -118,7 +128,9 @@ const CartSummary = ({
                     </div>
                     <div>
                       <h4 className={`text-sm font-medium ${item.discount && item.discount > 0 ? 'pl-2' : ''}`}>
-                        {translateText(item.name, currentLanguage) ? formatProductName(translateText(item.name, currentLanguage)) : formatProductName(item.name)}
+                        {translateText(item.name, currentLanguage) ? 
+                          formatProductName(translateText(item.name, currentLanguage)) : 
+                          formatProductName(item.name)}
                       </h4>
                       <div className="text-xs text-muted-foreground">
                         {translateText("quantity", currentLanguage)}: {item.quantity} × ${getItemPrice(item).toFixed(2)}
@@ -130,7 +142,11 @@ const CartSummary = ({
                       </div>
                       {item.accessories && item.accessories.filter(acc => acc.selected).length > 0 && (
                         <div className="text-xs text-muted-foreground">
-                          {translateText("with", currentLanguage)}: {item.accessories.filter(acc => acc.selected).map(acc => translateText(acc.name, currentLanguage) ? formatProductName(translateText(acc.name, currentLanguage)) : formatProductName(acc.name)).join(', ')}
+                          {translateText("with", currentLanguage)}: {item.accessories.filter(acc => acc.selected).map(acc => 
+                            translateText(acc.name, currentLanguage) ? 
+                              formatProductName(translateText(acc.name, currentLanguage)) : 
+                              formatProductName(acc.name)
+                          ).join(', ')}
                         </div>
                       )}
                     </div>
