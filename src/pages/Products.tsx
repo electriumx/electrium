@@ -31,6 +31,11 @@ const Products = () => {
   const [productStocks, setProductStocks] = useState<Record<number, number>>({});
   const { toast } = useToast();
 
+  // Function to capitalize first letter of each word and remove underscores
+  const formatText = (text: string) => {
+    return text.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
+  };
+
   const resetStocks = () => {
     const stockMap: Record<number, number> = {};
     allProducts.forEach(product => {
@@ -88,10 +93,8 @@ const Products = () => {
         
         Object.entries(parsedDiscounts).forEach(([brand, value]) => {
           if (typeof value === 'number') {
-            formattedDiscounts[brand] = {
-              value,
-              expiresAt: Date.now() + 48 * 60 * 60 * 1000
-            };
+            // Skip discounts that don't have an expiresAt (not set by admin or wheel)
+            return;
           } else if (typeof value === 'object' && value !== null && 'value' in value && 'expiresAt' in value) {
             formattedDiscounts[brand] = value as {
               value: number;
@@ -282,12 +285,12 @@ const Products = () => {
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8">
       <h1 className="text-2xl font-bold mb-4 text-center text-foreground">
-        {translateText("our_products", currentLanguage)}
+        {formatText(translateText("our_products", currentLanguage) || "Our Products")}
       </h1>
       
       <div className="mb-6 flex justify-center">
         <button onClick={() => setShowSpinWheel(!showSpinWheel)} className="px-4 py-2 bg-card text-foreground rounded-md border border-border hover:bg-accent transition-colors">
-          {showSpinWheel ? translateText("hide_spin", currentLanguage) : translateText("try_luck", currentLanguage)}
+          {showSpinWheel ? formatText(translateText("hide_spin", currentLanguage) || "Hide Spin") : "Try Your Luck With A Daily Spin!"}
         </button>
       </div>
       
@@ -298,7 +301,7 @@ const Products = () => {
       )}
       
       <div className="mb-6 p-4 bg-card rounded-lg border border-border">
-        <h2 className="text-lg font-semibold mb-2 text-center">{translateText("active_discounts", currentLanguage)}</h2>
+        <h2 className="text-lg font-semibold mb-2 text-center">{formatText(translateText("active_discounts", currentLanguage) || "Active Discounts")}</h2>
         <div className="flex flex-wrap gap-2 justify-center">
           {activeDiscounts.length > 0 ? (
             activeDiscounts.map(([brand, discount]) => {
@@ -307,12 +310,12 @@ const Products = () => {
               const hoursRemaining = Math.floor(timeRemaining / (1000 * 60 * 60));
               return (
                 <span key={brand} className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-destructive text-white">
-                  {brand}: {discount.value}% {translateText("off", currentLanguage)} ({hoursRemaining}h {translateText("left", currentLanguage)})
+                  {brand}: {discount.value}% {formatText(translateText("off", currentLanguage) || "Off")} ({hoursRemaining}h {formatText(translateText("left", currentLanguage) || "Left")})
                 </span>
               );
             })
           ) : (
-            <p className="text-muted-foreground">{translateText("no_active_discounts", currentLanguage)}</p>
+            <p className="text-muted-foreground">{formatText(translateText("no_active_discounts", currentLanguage) || "No Active Discounts")}</p>
           )}
         </div>
       </div>
@@ -335,7 +338,7 @@ const Products = () => {
             products={filteredProducts} 
             onQuantityChange={handleQuantityChange} 
             discounts={discounts} 
-            showWishlistButton={false}
+            showWishlistButton={true}
             productStocks={productStocks}
             updateStock={updateStock}
           />

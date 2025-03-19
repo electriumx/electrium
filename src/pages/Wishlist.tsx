@@ -12,6 +12,11 @@ const Wishlist = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   
+  // Function to capitalize first letter of each word and remove underscores
+  const formatText = (text: string) => {
+    return text.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
+  };
+  
   useEffect(() => {
     const savedWishlist = localStorage.getItem('wishlist');
     if (savedWishlist) {
@@ -31,7 +36,7 @@ const Wishlist = () => {
       if (quantity === 0) {
         updatedWishlist.splice(existingItemIndex, 1);
         toast({
-          title: "Item removed",
+          title: "Item Removed",
           description: "Item removed from your wishlist"
         });
       } else {
@@ -88,7 +93,7 @@ const Wishlist = () => {
       
       {wishlistItems.length === 0 ? (
         <div className="text-center py-12">
-          <h2 className="text-xl mb-4">Your wishlist is empty</h2>
+          <h2 className="text-xl mb-4">Your Wishlist Is Empty</h2>
           <p className="text-muted-foreground mb-6">Add items to your wishlist by clicking the heart icon on products.</p>
           <Button onClick={() => navigate('/products')}>
             <ShoppingCart className="mr-2 h-4 w-4" />
@@ -101,7 +106,7 @@ const Wishlist = () => {
             products={wishlistItems} 
             onQuantityChange={handleQuantityChange}
             discounts={{}}
-            showWishlistButton={false}
+            showWishlistButton={true}
           />
           
           <div className="mt-8 flex justify-center">

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, Heart } from "lucide-react";
@@ -100,6 +101,44 @@ const ProductCard = ({
       onProductClick();
     }
   };
+
+  const toggleWishlist = () => {
+    const existingWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+    
+    if (wishlist) {
+      // Remove from wishlist
+      const updatedWishlist = existingWishlist.filter((item: any) => item.id !== id);
+      localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
+      setWishlist(false);
+      
+      toast({
+        description: `${name} removed from wishlist`,
+      });
+    } else {
+      // Add to wishlist
+      const productToAdd = {
+        id,
+        name,
+        price,
+        imageUrl: image,
+        brand,
+        discount: discount || 0
+      };
+      
+      const updatedWishlist = [...existingWishlist, productToAdd];
+      localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
+      setWishlist(true);
+      
+      toast({
+        description: `${name} added to wishlist`,
+      });
+    }
+  };
+  
+  // Function to capitalize first letter of each word
+  const capitalizeWords = (text: string) => {
+    return text.replace(/\b\w/g, char => char.toUpperCase()).replace(/_/g, ' ');
+  };
   
   return (
     <>
@@ -117,6 +156,15 @@ const ProductCard = ({
               {discount}% OFF
             </div>
           )}
+          
+          {/* Wishlist button */}
+          <button
+            onClick={toggleWishlist}
+            className="absolute top-2 right-2 p-1.5 bg-white/80 dark:bg-card/80 rounded-full text-muted-foreground hover:text-destructive"
+            aria-label={wishlist ? "Remove from wishlist" : "Add to wishlist"}
+          >
+            <Heart className={wishlist ? "fill-destructive text-destructive" : ""} size={18} />
+          </button>
         </div>
         
         <div className="p-4">
@@ -125,7 +173,7 @@ const ProductCard = ({
               className="font-medium text-foreground truncate cursor-pointer hover:text-primary"
               onClick={handleImageClick}
             >
-              {name}
+              {capitalizeWords(name)}
             </h3>
             <p className="text-sm text-muted-foreground">{brand}</p>
           </div>
@@ -150,7 +198,7 @@ const ProductCard = ({
                 size="sm"
                 disabled={currentStock <= 0}
               >
-                {currentStock > 0 ? 'Add to Cart' : 'Out of Stock'}
+                {currentStock > 0 ? 'Add To Cart' : 'Out Of Stock'}
               </Button>
             ) : (
               <div className="flex items-center border border-input rounded-md">
@@ -177,7 +225,7 @@ const ProductCard = ({
       <AlertDialog open={showOutOfStockAlert} onOpenChange={setShowOutOfStockAlert}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Out of Stock</AlertDialogTitle>
+            <AlertDialogTitle>Out Of Stock</AlertDialogTitle>
             <AlertDialogDescription>
               The desired item is currently not in stock.
             </AlertDialogDescription>

@@ -1,6 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { Product } from '../data/productData';
 import { useToast } from '@/hooks/use-toast';
+import { translateText } from '@/utils/translation';
 import ProductDetailModal from './ProductDetailModal';
 import { Heart } from 'lucide-react';
 
@@ -17,7 +19,7 @@ const ProductGrid = ({
   products, 
   onQuantityChange, 
   discounts,
-  showWishlistButton = false,
+  showWishlistButton = true,
   productStocks = {}, 
   updateStock
 }: ProductGridProps) => {
@@ -26,6 +28,10 @@ const ProductGrid = ({
   const [wishlist, setWishlist] = useState<{[key: number]: boolean}>({});
   const { toast } = useToast();
   
+  // Function to capitalize first letter of each word and remove underscores
+  const formatText = (text: string) => {
+    return text.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
+  };
 
   useEffect(() => {
     const savedWishlist = localStorage.getItem('wishlist');
@@ -81,7 +87,7 @@ const ProductGrid = ({
         id: product.id,
         name: product.name,
         price: product.price,
-        image: product.imageUrl,
+        imageUrl: product.imageUrl,
         brand: product.brand,
         discount: product.discount || 0
       };
@@ -103,12 +109,11 @@ const ProductGrid = ({
   const getProductPrice = (product: Product) => {
     let price = product.price;
     
-    // We're not adding accessory prices to the product price anymore
-    
-    // Apply brand discount if available
+    // Apply brand discount if available and valid
     const brandDiscount = discounts[product.brand];
     const allDiscount = discounts['All'];
     
+    // Only apply discounts if they're set by admin or wheel (valid discounts have expiresAt)
     if (brandDiscount && brandDiscount.expiresAt > Date.now() && brandDiscount.value > 0) {
       price = price * (1 - brandDiscount.value / 100);
     } else if (allDiscount && allDiscount.expiresAt > Date.now() && allDiscount.value > 0) {
@@ -123,6 +128,8 @@ const ProductGrid = ({
   };
 
   const getDiscountPercentage = (product: Product) => {
+    // Only apply discounts if they're set by admin or wheel (valid discounts have expiresAt)
+    
     // Product-specific discount
     if (product.discount && product.discount > 0) {
       return product.discount;
@@ -197,7 +204,7 @@ const ProductGrid = ({
               )}
             </div>
             <div className="p-4">
-              <h3 className="text-lg font-semibold mb-1 line-clamp-1">{product.name}</h3>
+              <h3 className="text-lg font-semibold mb-1 line-clamp-1">{formatText(product.name)}</h3>
               <div className="flex justify-between items-center mb-3">
                 <div className="flex items-center">
                   <span className={`font-bold text-lg ${hasDiscount ? 'text-destructive' : ''}`}>
@@ -239,7 +246,7 @@ const ProductGrid = ({
       
       {products.length === 0 && (
         <div className="col-span-full py-12 text-center">
-          <h3 className="text-xl font-semibold mb-2">No products found</h3>
+          <h3 className="text-xl font-semibold mb-2">No Products Found</h3>
           <p className="text-muted-foreground">Try adjusting your filters or search query.</p>
         </div>
       )}
