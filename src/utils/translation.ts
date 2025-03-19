@@ -1,4 +1,3 @@
-
 interface TranslationData {
   [key: string]: {
     [key: string]: string;
@@ -113,7 +112,7 @@ export const translations: TranslationData = {
     "arabic": "المدينة"
   },
   "proceed_to_payment": {
-    "english": "Proceed to Payment",
+    "english": "Proceed To Payment",
     "french": "Procéder au paiement",
     "arabic": "المتابعة إلى الدفع"
   },
@@ -167,7 +166,6 @@ export const translations: TranslationData = {
     "french": "restant",
     "arabic": "متبقي"
   },
-  // Pages
   "settings_title": {
     "english": "Settings",
     "french": "Paramètres",
@@ -223,7 +221,6 @@ export const translations: TranslationData = {
     "french": "Mettre à jour le mot de passe",
     "arabic": "تحديث كلمة المرور"
   },
-  // Payment page
   "payment_method": {
     "english": "Payment Method",
     "french": "Méthode de paiement",
@@ -348,6 +345,41 @@ export const translations: TranslationData = {
     "english": "Payment will be collected upon delivery. Please have the exact amount ready. Minimum delivery time depends on your location and selected options.",
     "french": "Le paiement sera effectué à la livraison. Veuillez avoir le montant exact prêt. Le temps de livraison minimum dépend de votre emplacement et des options sélectionnées.",
     "arabic": "سيتم تحصيل الدفع عند التسليم. يرجى تجهيز المبلغ المطلوب بالضبط. يعتمد الحد الأدنى لوقت التسليم على موقعك والخيارات المحددة."
+  },
+  "continue_shopping": {
+    "english": "Continue Shopping",
+    "french": "Continuer vos achats",
+    "arabic": "مواصلة التسوق"
+  },
+  "clear_all_items": {
+    "english": "Clear All Items",
+    "french": "Effacer tous les articles",
+    "arabic": "مسح جميع العناصر"
+  },
+  "clear_all": {
+    "english": "Clear All Items",
+    "french": "Effacer tout",
+    "arabic": "مسح الكل"
+  },
+  "make_donation": {
+    "english": "Make Donation",
+    "french": "Faire un don",
+    "arabic": "قم بالتبرع"
+  },
+  "total_raised": {
+    "english": "Total Raised",
+    "french": "Total collecté",
+    "arabic": "إجمالي ما تم جمعه"
+  },
+  "support_mission": {
+    "english": "Support Mission",
+    "french": "Soutenir la mission",
+    "arabic": "دعم المهمة"
+  },
+  "donation_amount": {
+    "english": "Donation Amount",
+    "french": "Montant du don",
+    "arabic": "مبلغ التبرع"
   }
 };
 

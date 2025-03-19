@@ -152,7 +152,7 @@ const CartSummary = ({
                 {formatProductName(translateText("proceed_to_payment", currentLanguage) || "Proceed To Payment")}
               </Button>
               <Button variant="outline" className="w-full" onClick={clearCart}>
-                {formatProductName(translateText("clear_all", currentLanguage) || "Clear All Items")}
+                {translateText("clear_all", currentLanguage) ? "Clear All Items" : "Clear All Items"}
               </Button>
             </div>
           </div>

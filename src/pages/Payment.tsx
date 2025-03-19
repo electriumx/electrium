@@ -390,6 +390,58 @@ const Payment = () => {
   const handleSubmitPayment = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validate form fields based on payment method
+    if (paymentMethod === 'card' && showCardForm) {
+      if (!cardName || !cardNumber || !cardExpiry || !cardCVV) {
+        toast({
+          variant: "destructive",
+          title: "Missing Information",
+          description: "Please fill in all card details"
+        });
+        return;
+      }
+    } else if (paymentMethod === 'cash') {
+      if (deliveryOption === 'fast' && !deliveryLocation) {
+        toast({
+          variant: "destructive",
+          title: "Missing Information",
+          description: "Please provide delivery location details"
+        });
+        return;
+      }
+    } else if (paymentMethod === 'trade') {
+      if (tradeItems.length === 0) {
+        toast({
+          variant: "destructive",
+          title: "Missing Information",
+          description: "Please add at least one item to trade"
+        });
+        return;
+      }
+      
+      if (!tradeDescription || !tradeValue) {
+        toast({
+          variant: "destructive",
+          title: "Missing Information",
+          description: "Please provide item description and trade value"
+        });
+        return;
+      }
+    }
+    
+    // Validate billing address
+    if (showAddressForm) {
+      const { name, street, city, state, zip, country } = billingAddress;
+      if (!name || !street || !city || !state || !zip || !country) {
+        toast({
+          variant: "destructive",
+          title: "Missing Information",
+          description: "Please fill in all billing address fields"
+        });
+        return;
+      }
+    }
+    
     setProcessingPayment(true);
     
     if (paymentMethod === 'card' && saveCard && showCardForm) {

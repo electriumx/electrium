@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -37,6 +36,13 @@ const AdminRoute = () => {
   const isAdminUser = currentUser?.username === "Omar Tarek" && currentUser?.password === "otdk1234";
   
   return isAdminUser ? <Admin /> : <Navigate to="/" replace />;
+};
+
+// Protected route component for payment page
+const ProtectedPaymentRoute = () => {
+  const { isAuthenticated } = useAuth();
+  
+  return isAuthenticated ? <Payment /> : <Navigate to="/login" replace />;
 };
 
 // Admin key handler component
@@ -115,7 +121,7 @@ const AppWithAuth = () => {
           <Route path="/products" element={<Products />} />
           <Route path="/about" element={<About />} />
           <Route path="/checkout" element={<Checkout />} />
-          <Route path="/payment" element={<Payment />} />
+          <Route path="/payment" element={<ProtectedPaymentRoute />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

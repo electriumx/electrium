@@ -20,7 +20,7 @@ const Cart = ({ total, itemCount }: CartProps) => {
     if (!isAuthenticated) {
       toast({
         variant: "destructive",
-        title: "Authentication required",
+        title: "Authentication Required",
         description: "Please sign in to proceed with checkout"
       });
       navigate('/login', { state: { from: location } });

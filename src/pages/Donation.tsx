@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -21,17 +20,14 @@ const Donation = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Increased donation cap
   const MAX_DONATION = 1000000;
 
   useEffect(() => {
-    // Get language preference
     const savedLanguage = localStorage.getItem('preferredLanguage');
     if (savedLanguage) {
       setCurrentLanguage(savedLanguage);
     }
     
-    // Listen for language changes
     const handleLanguageChange = (e: CustomEvent) => {
       setCurrentLanguage(e.detail);
     };
@@ -130,12 +126,10 @@ const Donation = () => {
       return;
     }
 
-    // Update total donations amount
     const newTotal = totalDonations + donationAmount;
     setTotalDonations(newTotal);
     localStorage.setItem('totalDonations', newTotal.toString());
     
-    // Update donation count
     const newCount = donationCount + 1;
     setDonationCount(newCount);
     localStorage.setItem('donationCount', newCount.toString());
@@ -157,7 +151,7 @@ const Donation = () => {
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 bg-card/60 backdrop-blur-sm p-8 rounded-xl shadow-lg relative">
         <div>
-          <h2 className="text-center text-3xl font-bold mb-2">{translateText("make_donation", currentLanguage) || "Make a Donation"}</h2>
+          <h2 className="text-center text-3xl font-bold mb-2">{translateText("make_donation", currentLanguage) || "Make Donation"}</h2>
           <div className="flex justify-center gap-6 mb-4">
             <div className="text-center">
               <p className="text-muted-foreground text-sm">{translateText("total_raised", currentLanguage) || "Total Raised"}</p>
@@ -169,7 +163,7 @@ const Donation = () => {
             </div>
           </div>
           <p className="mt-2 text-center text-sm text-muted-foreground">
-            {translateText("support_mission", currentLanguage) || `Support our mission with a donation between $1 and $${MAX_DONATION.toLocaleString()}`}
+            {translateText("support_mission", currentLanguage) || `Support Mission with a donation between $1 and $${MAX_DONATION.toLocaleString()}`}
           </p>
           {isOnCooldown && (
             <p className="mt-2 text-center text-sm text-yellow-400">
