@@ -1,34 +1,27 @@
-
 import { useState, useEffect } from 'react';
 import { Globe, Mail, Phone, Instagram, Linkedin } from 'lucide-react';
-
 const Footer = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [currentTimeUTC, setCurrentTimeUTC] = useState('');
-
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
       setCurrentTime(now);
-
       const utcHours = now.getUTCHours().toString().padStart(2, '0');
       const utcMinutes = now.getUTCMinutes().toString().padStart(2, '0');
       setCurrentTimeUTC(`${utcHours}:${utcMinutes} UTC`);
     }, 60000);
-
     const now = new Date();
     const utcHours = now.getUTCHours().toString().padStart(2, '0');
     const utcMinutes = now.getUTCMinutes().toString().padStart(2, '0');
     setCurrentTimeUTC(`${utcHours}:${utcMinutes} UTC`);
     return () => clearInterval(interval);
   }, []);
-
   const formattedTime = currentTime.toLocaleTimeString(undefined, {
     hour: '2-digit',
     minute: '2-digit',
     hour12: true
   });
-
   return <footer id="footer" className="bg-black text-white py-8 mt-16">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -73,7 +66,7 @@ const Footer = () => {
               </p>
               <p className="text-gray-300 flex items-center gap-2">
                 <Globe size={16} />
-                <span>www.electrium.com</span>
+                <span>https://electrium.lovable.app/</span>
               </p>
               
               <div className="flex space-x-4 mt-4">
@@ -94,5 +87,4 @@ const Footer = () => {
       </div>
     </footer>;
 };
-
 export default Footer;
