@@ -10,7 +10,6 @@ import { Product } from '../data/productData';
 import { useProducts } from '../hooks/use-products';
 import { useToast } from '@/hooks/use-toast';
 import { translateText } from '@/utils/translation';
-import { Button } from '@/components/ui/button';
 
 const Products = () => {
   const { products: allProducts } = useProducts();
@@ -94,20 +93,16 @@ const Products = () => {
               expiresAt: Date.now() + 48 * 60 * 60 * 1000
             };
           } else if (typeof value === 'object' && value !== null && 'value' in value && 'expiresAt' in value) {
-            const typedValue = value as {
+            formattedDiscounts[brand] = value as {
               value: number;
               expiresAt: number;
             };
-            // Only add discounts that have a valid value and haven't expired
-            if (typedValue.value > 0 && typedValue.expiresAt > Date.now()) {
-              formattedDiscounts[brand] = typedValue;
-            }
           }
         });
         
         const currentTime = Date.now();
         Object.keys(formattedDiscounts).forEach(brand => {
-          if (formattedDiscounts[brand].expiresAt < currentTime || formattedDiscounts[brand].value <= 0) {
+          if (formattedDiscounts[brand].expiresAt < currentTime || formattedDiscounts[brand].value === 0) {
             delete formattedDiscounts[brand];
           }
         });
@@ -236,8 +231,8 @@ const Products = () => {
     localStorage.setItem('discounts', JSON.stringify(newDiscounts));
     
     toast({
-      title: translateText("Discount Applied!", currentLanguage),
-      description: translateText(`You've won a ${discount}% discount on all ${brand} products.`, currentLanguage),
+      title: "Discount Applied!",
+      description: `You've won a ${discount}% discount on all ${brand} products.`,
     });
   };
 
@@ -291,15 +286,9 @@ const Products = () => {
       </h1>
       
       <div className="mb-6 flex justify-center">
-        <Button 
-          onClick={() => setShowSpinWheel(!showSpinWheel)} 
-          className="px-4 py-2 bg-card text-foreground rounded-md border border-border hover:bg-accent transition-colors"
-        >
-          {showSpinWheel ? 
-            translateText("Hide Spin", currentLanguage) : 
-            translateText("Try Your Luck With A Daily Spin!", currentLanguage)
-          }
-        </Button>
+        <button onClick={() => setShowSpinWheel(!showSpinWheel)} className="px-4 py-2 bg-card text-foreground rounded-md border border-border hover:bg-accent transition-colors">
+          {showSpinWheel ? translateText("Hide Spin", currentLanguage) : translateText("Try Your Luck", currentLanguage)}
+        </button>
       </div>
       
       {showSpinWheel && (
@@ -308,23 +297,25 @@ const Products = () => {
         </div>
       )}
       
-      {activeDiscounts.length > 0 && (
-        <div className="mb-6 p-4 bg-card rounded-lg border border-border">
-          <h2 className="text-lg font-semibold mb-2 text-center">{translateText("Active Discounts", currentLanguage)}</h2>
-          <div className="flex flex-wrap gap-2 justify-center">
-            {activeDiscounts.map(([brand, discount]) => {
+      <div className="mb-6 p-4 bg-card rounded-lg border border-border">
+        <h2 className="text-lg font-semibold mb-2 text-center">{translateText("Active Discounts", currentLanguage)}</h2>
+        <div className="flex flex-wrap gap-2 justify-center">
+          {activeDiscounts.length > 0 ? (
+            activeDiscounts.map(([brand, discount]) => {
               const now = Date.now();
               const timeRemaining = discount.expiresAt - now;
               const hoursRemaining = Math.floor(timeRemaining / (1000 * 60 * 60));
               return (
                 <span key={brand} className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-destructive text-white">
-                  {brand}: {discount.value}% {translateText("Off", currentLanguage)} ({hoursRemaining}h {translateText("Left", currentLanguage)})
+                  {brand}: {discount.value}% {translateText("off", currentLanguage)} ({hoursRemaining}h {translateText("left", currentLanguage)})
                 </span>
               );
-            })}
-          </div>
+            })
+          ) : (
+            <p className="text-muted-foreground">{translateText("No active discounts", currentLanguage)}</p>
+          )}
         </div>
-      )}
+      </div>
       
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="lg:w-1/4">

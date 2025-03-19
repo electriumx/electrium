@@ -20,7 +20,7 @@ const ProductGrid = ({
   products, 
   onQuantityChange, 
   discounts,
-  showWishlistButton = true,
+  showWishlistButton = true,  
   productStocks = {}, 
   updateStock
 }: ProductGridProps) => {
@@ -73,7 +73,6 @@ const ProductGrid = ({
     
     return () => {
       window.removeEventListener('languageChange', handleLanguageChange as EventListener);
-      window.removeEventListener('storage', updateWishlistCount);
     };
   }, [products]);
 
@@ -132,9 +131,6 @@ const ProductGrid = ({
         description: translateText(`${product.name} added to wishlist`, currentLanguage),
       });
     }
-    
-    // Dispatch storage event to update wishlist count in FloatingActions
-    window.dispatchEvent(new Event('storage'));
   };
 
   const getProductPrice = (product: Product) => {
@@ -226,11 +222,6 @@ const ProductGrid = ({
     });
     
     setIsReviewModalOpen(false);
-  };
-
-  const updateWishlistCount = () => {
-    // This function is used in the useEffect cleanup
-    // It was referenced but not defined in the original code
   };
 
   return (

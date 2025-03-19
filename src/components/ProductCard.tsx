@@ -1,11 +1,9 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, Heart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from 'react-router-dom';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction } from "@/components/ui/alert-dialog";
-import { translateText } from '@/utils/translation';
 
 interface ProductCardProps {
   id: number;
@@ -38,7 +36,6 @@ const ProductCard = ({
   const [wishlist, setWishlist] = useState(false);
   const [currentStock, setCurrentStock] = useState(stock);
   const [showOutOfStockAlert, setShowOutOfStockAlert] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState('english');
   const { toast } = useToast();
   const navigate = useNavigate();
   
@@ -50,22 +47,6 @@ const ProductCard = ({
     
     // Update local stock if prop changes
     setCurrentStock(stock);
-    
-    // Get current language
-    const savedLanguage = localStorage.getItem('preferredLanguage');
-    if (savedLanguage) {
-      setCurrentLanguage(savedLanguage);
-    }
-    
-    const handleLanguageChange = (e: CustomEvent) => {
-      setCurrentLanguage(e.detail);
-    };
-    
-    window.addEventListener('languageChange', handleLanguageChange as EventListener);
-    
-    return () => {
-      window.removeEventListener('languageChange', handleLanguageChange as EventListener);
-    };
   }, [id, stock]);
   
   const handleAddToCart = () => {
@@ -120,44 +101,6 @@ const ProductCard = ({
     }
   };
   
-  const toggleWishlist = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    
-    const existingWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
-    
-    if (wishlist) {
-      // Remove from wishlist
-      const updatedWishlist = existingWishlist.filter((item: any) => item.id !== id);
-      localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
-      setWishlist(false);
-      
-      toast({
-        description: translateText(`${name} removed from wishlist`, currentLanguage),
-      });
-    } else {
-      // Add to wishlist
-      const productToAdd = {
-        id,
-        name,
-        price,
-        imageUrl: image,
-        brand,
-        discount: discount || 0
-      };
-      
-      const updatedWishlist = [...existingWishlist, productToAdd];
-      localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
-      setWishlist(true);
-      
-      toast({
-        description: translateText(`${name} added to wishlist`, currentLanguage),
-      });
-    }
-    
-    // Dispatch storage event to update wishlist count in FloatingActions
-    window.dispatchEvent(new Event('storage'));
-  };
-  
   return (
     <>
       <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
@@ -174,14 +117,6 @@ const ProductCard = ({
               {discount}% OFF
             </div>
           )}
-          
-          <button 
-            onClick={toggleWishlist}
-            className="absolute top-2 right-2 p-1.5 bg-white/80 dark:bg-card/80 rounded-full text-muted-foreground hover:text-destructive z-10"
-            aria-label={wishlist ? translateText("Remove from wishlist", currentLanguage) : translateText("Add to wishlist", currentLanguage)}
-          >
-            <Heart className={wishlist ? "fill-destructive text-destructive" : ""} size={18} />
-          </button>
         </div>
         
         <div className="p-4">
@@ -215,7 +150,7 @@ const ProductCard = ({
                 size="sm"
                 disabled={currentStock <= 0}
               >
-                {currentStock > 0 ? translateText('Add To Cart', currentLanguage) : translateText('Out Of Stock', currentLanguage)}
+                {currentStock > 0 ? 'Add to Cart' : 'Out of Stock'}
               </Button>
             ) : (
               <div className="flex items-center border border-input rounded-md">
@@ -242,14 +177,14 @@ const ProductCard = ({
       <AlertDialog open={showOutOfStockAlert} onOpenChange={setShowOutOfStockAlert}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{translateText("Out Of Stock", currentLanguage)}</AlertDialogTitle>
+            <AlertDialogTitle>Out of Stock</AlertDialogTitle>
             <AlertDialogDescription>
-              {translateText("The desired item is currently not in stock.", currentLanguage)}
+              The desired item is currently not in stock.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogAction onClick={() => setShowOutOfStockAlert(false)}>
-              {translateText("OK", currentLanguage)}
+              OK
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

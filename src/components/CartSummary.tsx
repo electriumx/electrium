@@ -16,9 +16,7 @@ const CartSummary = ({
 }: CartSummaryProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState('english');
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,10 +24,13 @@ const CartSummary = ({
     if (savedLanguage) {
       setCurrentLanguage(savedLanguage);
     }
+    
     const handleLanguageChange = (e: CustomEvent) => {
       setCurrentLanguage(e.detail);
     };
+    
     window.addEventListener('languageChange', handleLanguageChange as EventListener);
+    
     return () => window.removeEventListener('languageChange', handleLanguageChange as EventListener);
   }, []);
 
@@ -54,6 +55,7 @@ const CartSummary = ({
     if (product.accessories) {
       price += product.accessories.filter(acc => acc.selected).reduce((sum, acc) => sum + acc.price, 0);
     }
+    
     return price;
   };
 
@@ -81,9 +83,10 @@ const CartSummary = ({
       detail: []
     });
     window.dispatchEvent(event);
+
     toast({
-      title: translateText("Cart Cleared", currentLanguage) || "Cart Cleared",
-      description: translateText("All Items Removed", currentLanguage) || "All items have been removed from your cart."
+      title: translateText("cart_cleared", currentLanguage) || "Cart cleared",
+      description: translateText("all_items_removed", currentLanguage) || "All items have been removed from your cart."
     });
   };
 
@@ -93,14 +96,22 @@ const CartSummary = ({
 
   if (cart.length === 0) return null;
 
-  return <div className={`fixed bottom-0 right-0 z-40 transition-transform duration-300 transform ${isOpen ? 'translate-y-0' : 'translate-y-[calc(100%-3.5rem)]'}`}>
+  return (
+    <div className={`fixed bottom-0 right-0 z-40 transition-transform duration-300 transform ${isOpen ? 'translate-y-0' : 'translate-y-[calc(100%-3.5rem)]'}`}>
       <div className="bg-card rounded-tl-lg shadow-lg border border-border max-w-md w-full">
-        
+        <button 
+          onClick={toggleCart} 
+          className="w-full p-3 font-medium flex justify-between items-center border-b border-border"
+        >
+          <span>{translateText("cart", currentLanguage) || "Cart"} ({cart.length})</span>
+          <span className="text-muted-foreground text-sm">${calculateTotal().toFixed(2)}</span>
+        </button>
         
         <div className={`max-h-96 overflow-y-auto ${isOpen ? 'block' : 'hidden'}`}>
           <div className="p-4 space-y-4">
             <div className="space-y-2">
-              {cart.map(item => <div key={item.id} className="flex justify-between items-center py-2 border-b border-border">
+              {cart.map(item => (
+                <div key={item.id} className="flex justify-between items-center py-2 border-b border-border">
                   <div className="flex gap-3 items-center">
                     <div className="flex-shrink-0 w-10 h-10 bg-muted rounded overflow-hidden">
                       <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
@@ -110,49 +121,55 @@ const CartSummary = ({
                         {translateText(item.name, currentLanguage) ? formatProductName(translateText(item.name, currentLanguage)) : formatProductName(item.name)}
                       </h4>
                       <div className="text-xs text-muted-foreground">
-                        {translateText("Quantity", currentLanguage)}: {item.quantity} × ${getItemPrice(item).toFixed(2)}
-                        {item.discount && item.discount > 0 && <span className="ml-1 text-destructive">
-                            (-{item.discount}% {translateText("Off", currentLanguage)})
-                          </span>}
+                        {translateText("quantity", currentLanguage)}: {item.quantity} × ${getItemPrice(item).toFixed(2)}
+                        {item.discount && item.discount > 0 && (
+                          <span className="ml-1 text-destructive">
+                            (-{item.discount}% {translateText("off", currentLanguage)})
+                          </span>
+                        )}
                       </div>
-                      {item.accessories && item.accessories.filter(acc => acc.selected).length > 0 && <div className="text-xs text-muted-foreground">
-                          {translateText("With", currentLanguage)}: {item.accessories.filter(acc => acc.selected).map(acc => translateText(acc.name, currentLanguage) ? formatProductName(translateText(acc.name, currentLanguage)) : formatProductName(acc.name)).join(', ')}
-                        </div>}
+                      {item.accessories && item.accessories.filter(acc => acc.selected).length > 0 && (
+                        <div className="text-xs text-muted-foreground">
+                          {translateText("with", currentLanguage)}: {item.accessories.filter(acc => acc.selected).map(acc => translateText(acc.name, currentLanguage) ? formatProductName(translateText(acc.name, currentLanguage)) : formatProductName(acc.name)).join(', ')}
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="text-sm font-semibold">
                     ${getItemTotal(item).toFixed(2)}
                   </div>
-                </div>)}
+                </div>
+              ))}
             </div>
             
             <div className="space-y-1 text-sm">
               <div className="flex justify-between">
-                <span>{translateText("Subtotal", currentLanguage)}</span>
+                <span>{translateText("subtotal", currentLanguage)}</span>
                 <span>${calculateSubtotal().toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span>{translateText("Tax", currentLanguage)} (8%)</span>
+                <span>{translateText("tax", currentLanguage)} (8%)</span>
                 <span>${calculateTax().toFixed(2)}</span>
               </div>
               <div className="flex justify-between font-bold pt-1 border-t border-border">
-                <span>{translateText("Total", currentLanguage)}</span>
+                <span>{translateText("total", currentLanguage)}</span>
                 <span>${calculateTotal().toFixed(2)}</span>
               </div>
             </div>
             
             <div className="flex space-x-2">
               <Button className="w-full" onClick={handleCheckout}>
-                {translateText("Proceed To Payment", currentLanguage)}
+                {translateText("proceed_to_payment", currentLanguage)}
               </Button>
               <Button variant="outline" className="w-full" onClick={clearCart}>
-                {translateText("Clear All Items", currentLanguage) || "Clear All Items"}
+                {translateText("clear_all", currentLanguage) || "Clear All Items"}
               </Button>
             </div>
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
 
 export default CartSummary;
