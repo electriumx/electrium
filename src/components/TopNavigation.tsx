@@ -1,7 +1,7 @@
 
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Heart, Settings } from 'lucide-react';
+import { Heart, Settings, Mail } from 'lucide-react';
 
 interface TopNavigationProps {
   toggleChat: () => void;
@@ -37,6 +37,7 @@ const TopNavigation = ({
         {isIndexPage && <div className="flex-1 flex justify-center gap-8">
             <Link to="/about" className="text-white hover:text-[#9eff00] transition-colors">About</Link>
             <Link to="/donation" className="text-white hover:text-[#9eff00] transition-colors">Donation</Link>
+            <a href="#" onClick={handleContactClick} className="text-white hover:text-[#9eff00] transition-colors">Contact</a>
           </div>}
         
         <div className="ml-auto flex items-center gap-4">
