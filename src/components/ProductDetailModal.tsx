@@ -1,3 +1,4 @@
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState, useEffect } from "react";
@@ -113,6 +114,7 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedAccessories, setSelectedAccessories] = useState<Accessory[]>([]);
   const [quantity, setQuantity] = useState(1);
+  const [totalPrice, setTotalPrice] = useState(discountedPrice);
   
   useEffect(() => {
     if (isOpen) {
@@ -136,6 +138,17 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
       }
     }
   }, [isOpen, product]);
+  
+  // Calculate total price whenever selected accessories change
+  useEffect(() => {
+    let total = discount > 0 ? discountedPrice : price;
+    
+    // Add price of all selected accessories
+    const accessoriesTotal = selectedAccessories.reduce((sum, acc) => sum + acc.price, 0);
+    total += accessoriesTotal;
+    
+    setTotalPrice(total);
+  }, [selectedAccessories, price, discountedPrice, discount]);
   
   const specs = getTechSpecs(id, brand);
   
@@ -195,8 +208,6 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
       }
     });
   };
-
-  const basePrice = discount > 0 ? discountedPrice : price;
 
   const handleAddToCart = () => {
     const productToAdd = {
@@ -260,6 +271,11 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
                   <span>${price.toFixed(2)}</span>
                 )}
               </p>
+              {selectedAccessories.length > 0 && (
+                <p className="text-sm mt-1">
+                  With accessories: <span className="font-semibold">${totalPrice.toFixed(2)}</span>
+                </p>
+              )}
               <p className="text-muted-foreground">Brand: {brand}</p>
               <p className="mt-4">
                 {name} is a premium device from {brand}, designed for optimal performance and user experience.
@@ -351,10 +367,11 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
                 {selectedAccessories.length > 0 && (
                   <div className="bg-card rounded-lg p-4 mt-4 border border-border">
                     <h4 className="font-medium mb-2">Selected Accessories</h4>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      These accessories will be added to your cart separately without affecting the product price.
-                    </p>
-                    <ul className="space-y-2 mb-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <p className="text-sm">Base price:</p>
+                      <p className="text-sm">${(discount > 0 ? discountedPrice : price).toFixed(2)}</p>
+                    </div>
+                    <ul className="space-y-2 mb-2">
                       {selectedAccessories.map(accessory => (
                         <li key={accessory.id} className="flex justify-between text-sm">
                           <span>{accessory.name}</span>
@@ -362,6 +379,10 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
                         </li>
                       ))}
                     </ul>
+                    <div className="flex justify-between items-center pt-2 border-t">
+                      <p className="font-medium">Total price:</p>
+                      <p className="font-medium">${totalPrice.toFixed(2)}</p>
+                    </div>
                   </div>
                 )}
               </div>

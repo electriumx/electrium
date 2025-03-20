@@ -135,9 +135,11 @@ const ProductCard = ({
     }
   };
   
-  // Function to capitalize first letter of each word
+  // Function to capitalize first letter of each word and remove underscores
   const capitalizeWords = (text: string) => {
-    return text.replace(/\b\w/g, char => char.toUpperCase()).replace(/_/g, ' ');
+    return text
+      .replace(/_/g, ' ')
+      .replace(/\b\w/g, char => char.toUpperCase());
   };
   
   return (
@@ -161,7 +163,7 @@ const ProductCard = ({
           <button
             onClick={toggleWishlist}
             className="absolute top-2 right-2 p-1.5 bg-white/80 dark:bg-card/80 rounded-full text-muted-foreground hover:text-destructive"
-            aria-label={wishlist ? "Remove from wishlist" : "Add to wishlist"}
+            aria-label={wishlist ? "Remove From Wishlist" : "Add To Wishlist"}
           >
             <Heart className={wishlist ? "fill-destructive text-destructive" : ""} size={18} />
           </button>

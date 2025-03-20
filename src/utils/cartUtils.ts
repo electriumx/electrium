@@ -51,19 +51,24 @@ export const addProductToCart = (product: Product, quantity: number, accessories
 
 // Calculate total price of a product including accessories
 export const calculateProductTotal = (product: Product, discounts: Record<string, { value: number; expiresAt: number; }>) => {
-  let price = product.price;
+  let basePrice = product.price;
   
   // Apply discount if available
   if (product.brand && discounts[product.brand] && discounts[product.brand].expiresAt > Date.now()) {
-    price = price * (1 - discounts[product.brand].value / 100);
+    basePrice = basePrice * (1 - discounts[product.brand].value / 100);
   }
   
-  // Add accessory prices
+  // Calculate price with accessories
+  let totalPrice = basePrice;
+  
+  // Add accessory prices if selected
   if (product.accessories) {
-    price += product.accessories
+    const accessoriesPrice = product.accessories
       .filter(acc => acc.selected)
       .reduce((sum, acc) => sum + acc.price, 0);
+    
+    totalPrice += accessoriesPrice;
   }
   
-  return price * (product.quantity || 1);
+  return totalPrice * (product.quantity || 1);
 };

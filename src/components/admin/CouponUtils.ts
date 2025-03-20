@@ -1,5 +1,4 @@
 
-
 interface Coupon {
   id: string;
   code: string;
@@ -56,14 +55,9 @@ export const saveCouponUsage = (code: string, userId: string) => {
 
 export const applyCoupon = (code: string, userId: string, productCategory?: string): { valid: boolean; discount: number } => {
   const coupons = getCoupons();
-  const usedCoupons = getUsedCoupons();
   
-  // Check if coupon has already been used by this user
-  const isUsed = usedCoupons.some(uc => uc.code === code && uc.usedBy === userId);
-  
-  if (isUsed) {
-    return { valid: false, discount: 0 };
-  }
+  // We're removing the check for previously used coupons to allow reuse across accounts
+  // Instead we'll just validate that the coupon exists and is valid
   
   const coupon = coupons.find(
     c => c.code === code && c.isActive && (!c.expiresAt || c.expiresAt > Date.now())
@@ -78,9 +72,8 @@ export const applyCoupon = (code: string, userId: string, productCategory?: stri
     return { valid: false, discount: 0 };
   }
   
-  // Mark the coupon as used by this user
+  // Still record usage for analytics purposes
   saveCouponUsage(code, userId);
   
   return { valid: true, discount: coupon.discount };
 };
-

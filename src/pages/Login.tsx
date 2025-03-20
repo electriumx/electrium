@@ -49,15 +49,14 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-    // In a real implementation, this would be integrated with Google OAuth
-    // For now, we'll simulate the popup behavior
+    // Improved Google OAuth simulation
     const width = 500;
     const height = 600;
     const left = window.screenX + (window.outerWidth - width) / 2;
     const top = window.screenY + (window.outerHeight - height) / 2.5;
     
     const googleWindow = window.open(
-      'about:blank',
+      'https://accounts.google.com/o/oauth2/auth',
       'Google Sign In',
       `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes,status=yes`
     );
@@ -74,40 +73,208 @@ const Login = () => {
               p { color: #5f6368; }
               .spinner { border: 4px solid #f3f3f3; border-radius: 50%; border-top: 4px solid #4285f4; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px 0; }
               @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+              .button { background-color: #4285f4; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; margin-top: 20px; }
+              .input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 4px; }
+              .form { width: 80%; max-width: 300px; }
             </style>
           </head>
           <body>
             <img class="google-logo" src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google">
-            <h1>Signing in...</h1>
-            <div class="spinner"></div>
-            <p>Please wait while we connect you to your Google account.</p>
+            <h1>Sign in with Google</h1>
+            <div class="form">
+              <p>Enter your Google account email</p>
+              <input type="email" placeholder="Email" class="input">
+              <p>Password</p>
+              <input type="password" placeholder="Password" class="input">
+              <button class="button" onclick="completeAuth()">Sign in</button>
+            </div>
+            <script>
+              function completeAuth() {
+                const spinner = document.createElement('div');
+                spinner.className = 'spinner';
+                document.querySelector('.form').innerHTML = '';
+                document.querySelector('.form').appendChild(spinner);
+                document.querySelector('h1').textContent = 'Authenticating...';
+                setTimeout(() => window.close(), 2000);
+              }
+            </script>
           </body>
         </html>
       `);
       
-      // Simulate auth flow completing after 2 seconds
-      setTimeout(() => {
-        googleWindow.close();
-        
-        // Log the user in with demo credentials
-        if (login('demo', 'demo123')) {
-          const from = location.state?.from?.pathname || '/';
-          navigate(from);
+      // Set up message listener to handle when the user completes auth
+      const messageListener = (event: MessageEvent) => {
+        if (event.data === 'googleAuthComplete') {
+          window.removeEventListener('message', messageListener);
+          
+          // Log the user in with demo credentials
+          if (login('demo', 'demo123')) {
+            const from = location.state?.from?.pathname || '/';
+            navigate(from);
+          }
         }
-      }, 2000);
+      };
+      
+      window.addEventListener('message', messageListener);
+      
+      // Fallback: If the user closes the window manually, we'll check every 500ms
+      const checkInterval = setInterval(() => {
+        if (googleWindow.closed) {
+          clearInterval(checkInterval);
+          window.removeEventListener('message', messageListener);
+          
+          // Log the user in with demo credentials
+          if (login('demo', 'demo123')) {
+            const from = location.state?.from?.pathname || '/';
+            navigate(from);
+          }
+        }
+      }, 500);
+    }
+  };
+
+  const handleFacebookLogin = () => {
+    const width = 500;
+    const height = 600;
+    const left = window.screenX + (window.outerWidth - width) / 2;
+    const top = window.screenY + (window.outerHeight - height) / 2.5;
+    
+    const facebookWindow = window.open(
+      'https://www.facebook.com/login.php',
+      'Facebook Login',
+      `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes,status=yes`
+    );
+    
+    if (facebookWindow) {
+      facebookWindow.document.write(`
+        <html>
+          <head>
+            <title>Facebook Login</title>
+            <style>
+              body { font-family: Helvetica, Arial, sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background-color: #f0f2f5; }
+              .facebook-logo { width: 240px; margin-bottom: 20px; }
+              h1 { color: #1877f2; font-size: 24px; }
+              p { color: #606770; }
+              .spinner { border: 4px solid #f3f3f3; border-radius: 50%; border-top: 4px solid #1877f2; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px 0; }
+              @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+              .button { background-color: #1877f2; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 16px; margin-top: 20px; width: 100%; font-weight: bold; }
+              .input { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; font-size: 16px; }
+              .form { width: 80%; max-width: 300px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
+            </style>
+          </head>
+          <body>
+            <img class="facebook-logo" src="https://static.xx.fbcdn.net/rsrc.php/y8/r/dF5SId3UHWd.svg" alt="Facebook">
+            <div class="form">
+              <p>Log in to Facebook</p>
+              <input type="text" placeholder="Email or phone number" class="input">
+              <input type="password" placeholder="Password" class="input">
+              <button class="button" onclick="completeAuth()">Log In</button>
+            </div>
+            <script>
+              function completeAuth() {
+                const spinner = document.createElement('div');
+                spinner.className = 'spinner';
+                document.querySelector('.form').innerHTML = '';
+                document.querySelector('.form').appendChild(spinner);
+                setTimeout(() => window.close(), 2000);
+              }
+            </script>
+          </body>
+        </html>
+      `);
+      
+      // Check if the window is closed
+      const checkInterval = setInterval(() => {
+        if (facebookWindow.closed) {
+          clearInterval(checkInterval);
+          
+          // Log the user in with demo credentials
+          if (login('demo', 'demo123')) {
+            const from = location.state?.from?.pathname || '/';
+            navigate(from);
+          }
+        }
+      }, 500);
+    }
+  };
+
+  const handleAppleLogin = () => {
+    const width = 500;
+    const height = 600;
+    const left = window.screenX + (window.outerWidth - width) / 2;
+    const top = window.screenY + (window.outerHeight - height) / 2.5;
+    
+    const appleWindow = window.open(
+      'https://appleid.apple.com/auth/authorize',
+      'Apple Sign In',
+      `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes,status=yes`
+    );
+    
+    if (appleWindow) {
+      appleWindow.document.write(`
+        <html>
+          <head>
+            <title>Sign in with Apple</title>
+            <style>
+              body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background-color: #fff; }
+              .apple-logo { width: 50px; margin-bottom: 20px; }
+              h1 { color: #000; font-size: 24px; font-weight: 500; margin-bottom: 30px; }
+              p { color: #86868b; }
+              .spinner { border: 4px solid #f3f3f3; border-radius: 50%; border-top: 4px solid #000; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px 0; }
+              @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+              .button { background-color: #000; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-size: 16px; margin-top: 20px; width: 100%; font-weight: 500; }
+              .input { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #d2d2d7; border-radius: 6px; font-size: 16px; }
+              .form { width: 80%; max-width: 300px; }
+            </style>
+          </head>
+          <body>
+            <svg class="apple-logo" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+              <path d="M747.4 535.7c-.4-68.2 30.5-119.6 92.9-157.5-34.9-50-87.7-77.5-157.3-82.8-65.9-5.2-138 38.4-164.4 38.4-27.9 0-91.7-36.2-150.8-35.2-71.2 1.1-137.3 41.2-174.6 104.5-75.6 129-19.1 317.8 53.7 422 36.1 52.4 78.3 111 133.9 109.2 54.2-1.8 74.4-34.2 139.4-34.2 64.9 0 83.8 34.2 140.8 33 58.4-1.2 95.3-52 130.9-104.6 40.8-59.6 57.7-117.3 58.1-120.1-1.1-.4-111-42.7-112.1-168.9zM663 288.8c50.4-60.8 42.5-146.2 41.4-152.1-39.7 1.9-87.2 27.2-114 59.7-25 28.8-47.2 75.2-41.4 119.8 44.1 3.2 85.3-19.7 114-27.4z"/>
+            </svg>
+            <h1>Sign in with Apple</h1>
+            <div class="form">
+              <p>Apple ID</p>
+              <input type="email" placeholder="Apple ID" class="input">
+              <p>Password</p>
+              <input type="password" placeholder="Password" class="input">
+              <button class="button" onclick="completeAuth()">Continue</button>
+            </div>
+            <script>
+              function completeAuth() {
+                const spinner = document.createElement('div');
+                spinner.className = 'spinner';
+                document.querySelector('.form').innerHTML = '';
+                document.querySelector('.form').appendChild(spinner);
+                document.querySelector('h1').textContent = 'Authenticating...';
+                setTimeout(() => window.close(), 2000);
+              }
+            </script>
+          </body>
+        </html>
+      `);
+      
+      // Check if the window is closed
+      const checkInterval = setInterval(() => {
+        if (appleWindow.closed) {
+          clearInterval(checkInterval);
+          
+          // Log the user in with demo credentials
+          if (login('demo', 'demo123')) {
+            const from = location.state?.from?.pathname || '/';
+            navigate(from);
+          }
+        }
+      }, 500);
     }
   };
 
   const handleSocialLogin = (provider: string) => {
     if (provider === 'google') {
       handleGoogleLogin();
-      return;
-    }
-    
-    // For other providers, use demo login for now
-    if (login('demo', 'demo123')) {
-      const from = location.state?.from?.pathname || '/';
-      navigate(from);
+    } else if (provider === 'facebook') {
+      handleFacebookLogin();
+    } else if (provider === 'apple') {
+      handleAppleLogin();
     }
   };
 
@@ -119,7 +286,7 @@ const Login = () => {
         className="max-w-md w-full space-y-8 bg-card p-8 rounded-xl shadow-lg"
       >
         <div>
-          <h2 className="text-center text-3xl font-bold">Log in to your account</h2>
+          <h2 className="text-center text-3xl font-bold">Log In To Your Account</h2>
         </div>
         
         <div className="grid grid-cols-3 gap-3">
@@ -213,14 +380,14 @@ const Login = () => {
               type="submit"
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
             >
-              Log in
+              Log In
             </button>
           </div>
         </form>
         
         <div className="text-center text-sm">
           <Link to="/register" className="font-medium text-primary hover:text-primary/90">
-            Don't have an account? Register
+            Don't Have An Account? Register
           </Link>
         </div>
       </motion.div>

@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Product, products as initialProducts } from '../data/productData';
+import { generateAdditionalProducts } from '../data/additionalProducts';
 
 // Add new iPhone models
 const additionalIPhones: Product[] = [
@@ -131,8 +132,11 @@ export const useProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
   
   useEffect(() => {
-    // Combine initial products with additional iPhones
-    const allProducts = [...initialProducts, ...additionalIPhones];
+    // Generate the additional 100+ products per category
+    const generatedProducts = generateAdditionalProducts();
+    
+    // Combine initial products with additional iPhones and generated products
+    const allProducts = [...initialProducts, ...additionalIPhones, ...generatedProducts];
     
     // Remove duplicates (in case they already exist)
     const uniqueProducts = allProducts.filter((product, index, self) => 
