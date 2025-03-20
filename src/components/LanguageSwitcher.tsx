@@ -15,26 +15,46 @@ const LanguageSwitcher = ({ variant = "dropdown", size = "md" }: LanguageSwitche
   const [showDialog, setShowDialog] = useState(false);
 
   useEffect(() => {
+    // Initialize language from localStorage on component mount
     const savedLanguage = localStorage.getItem('preferredLanguage');
     if (savedLanguage) {
       setSelectedLanguage(savedLanguage);
-      document.documentElement.lang = savedLanguage === "arabic" ? "ar" : savedLanguage === "french" ? "fr" : "en";
-      document.documentElement.dir = savedLanguage === "arabic" ? "rtl" : "ltr";
+      applyLanguageSettings(savedLanguage);
     }
+    
+    // Listen for language changes from other components
+    const handleLanguageChange = (e: CustomEvent) => {
+      setSelectedLanguage(e.detail);
+    };
+    
+    window.addEventListener('languageChange', handleLanguageChange as EventListener);
+    return () => window.removeEventListener('languageChange', handleLanguageChange as EventListener);
   }, []);
+
+  // Function to apply language settings across the site
+  const applyLanguageSettings = (language: string) => {
+    // Set language in HTML attributes
+    document.documentElement.lang = language === "arabic" ? "ar" : language === "french" ? "fr" : "en";
+    document.documentElement.dir = language === "arabic" ? "rtl" : "ltr";
+    
+    // Apply RTL-specific styles for Arabic
+    if (language === "arabic") {
+      document.body.classList.add('rtl-language');
+    } else {
+      document.body.classList.remove('rtl-language');
+    }
+    
+    // Apply responsive font sizes for different languages
+    document.body.classList.remove('lang-english', 'lang-french', 'lang-arabic');
+    document.body.classList.add(`lang-${language}`);
+  };
 
   const handleLanguageChange = (value: string) => {
     setSelectedLanguage(value);
     localStorage.setItem('preferredLanguage', value);
     
-    // Set HTML direction for RTL languages
-    if (value === "arabic") {
-      document.documentElement.dir = "rtl";
-      document.documentElement.lang = "ar";
-    } else {
-      document.documentElement.dir = "ltr";
-      document.documentElement.lang = value === "french" ? "fr" : "en";
-    }
+    // Apply language settings
+    applyLanguageSettings(value);
     
     // Dispatch a custom event so other components can react to language changes
     window.dispatchEvent(new CustomEvent('languageChange', { detail: value }));
@@ -45,7 +65,7 @@ const LanguageSwitcher = ({ variant = "dropdown", size = "md" }: LanguageSwitche
   if (variant === "buttons") {
     return (
       <>
-        <div className="flex space-x-2">
+        <div className="flex flex-wrap gap-2">
           <Button 
             variant={selectedLanguage === "english" ? "default" : "outline"} 
             size={size === "sm" ? "sm" : size === "lg" ? "lg" : "default"}

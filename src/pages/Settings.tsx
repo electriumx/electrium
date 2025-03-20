@@ -46,7 +46,7 @@ const Settings = () => {
     if (!user || user.password !== currentPassword) {
       toast({
         variant: "destructive",
-        title: "Error",
+        title: translateText("error", currentLanguage) || "Error",
         description: translateText("incorrect_password", currentLanguage) || "Current password is incorrect",
       });
       return;
@@ -56,7 +56,7 @@ const Settings = () => {
     if (newPassword !== confirmPassword) {
       toast({
         variant: "destructive",
-        title: "Error",
+        title: translateText("error", currentLanguage) || "Error",
         description: translateText("passwords_mismatch", currentLanguage) || "New passwords do not match",
       });
       return;
@@ -65,7 +65,7 @@ const Settings = () => {
     if (newPassword.length < 6) {
       toast({
         variant: "destructive",
-        title: "Error",
+        title: translateText("error", currentLanguage) || "Error",
         description: translateText("password_short", currentLanguage) || "New password must be at least 6 characters long",
       });
       return;

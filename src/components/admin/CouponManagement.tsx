@@ -1,13 +1,15 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Trash2, Edit, Plus, Tag } from 'lucide-react';
+import { Trash2, Edit, Plus, Tag, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { format, addDays, addMonths } from 'date-fns';
 
 interface Coupon {
   id: string;
@@ -33,6 +35,9 @@ const CouponManagement = () => {
     category: 'all'
   });
   
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [expiryType, setExpiryType] = useState<string>("never");
+  
   const formRef = useRef<HTMLDivElement>(null);
 
   // Available categories
@@ -44,6 +49,15 @@ const CouponManagement = () => {
     { value: 'accessories', label: 'Accessories' },
     { value: 'audio', label: 'Audio' },
     { value: 'wearables', label: 'Wearables' }
+  ];
+
+  // Expiration options
+  const expirationOptions = [
+    { value: 'never', label: 'Never Expires' },
+    { value: '7days', label: '7 Days' },
+    { value: '30days', label: '30 Days' },
+    { value: '90days', label: '90 Days' },
+    { value: 'custom', label: 'Custom Date' }
   ];
 
   // Load coupons from localStorage
@@ -63,6 +77,17 @@ const CouponManagement = () => {
       initializeDefaultCoupons();
     }
   }, []);
+
+  // Update expiry date when editing a coupon
+  useEffect(() => {
+    if (isEditing && currentCoupon.expiresAt) {
+      setSelectedDate(new Date(currentCoupon.expiresAt));
+      setExpiryType('custom');
+    } else if (isEditing && !currentCoupon.expiresAt) {
+      setSelectedDate(null);
+      setExpiryType('never');
+    }
+  }, [isEditing, currentCoupon.expiresAt]);
 
   const initializeDefaultCoupons = () => {
     const defaultCoupons: Coupon[] = [
@@ -276,6 +301,56 @@ const CouponManagement = () => {
     }));
   };
 
+  const handleExpiryTypeChange = (value: string) => {
+    setExpiryType(value);
+    
+    let newExpiryDate: number | null = null;
+    
+    switch (value) {
+      case 'never':
+        newExpiryDate = null;
+        setSelectedDate(null);
+        break;
+      case '7days':
+        newExpiryDate = addDays(new Date(), 7).getTime();
+        setSelectedDate(new Date(newExpiryDate));
+        break;
+      case '30days':
+        newExpiryDate = addDays(new Date(), 30).getTime();
+        setSelectedDate(new Date(newExpiryDate));
+        break;
+      case '90days':
+        newExpiryDate = addDays(new Date(), 90).getTime();
+        setSelectedDate(new Date(newExpiryDate));
+        break;
+      case 'custom':
+        // Keep the current selected date if it exists
+        if (!selectedDate) {
+          const defaultDate = addDays(new Date(), 14);
+          setSelectedDate(defaultDate);
+          newExpiryDate = defaultDate.getTime();
+        } else {
+          newExpiryDate = selectedDate.getTime();
+        }
+        break;
+    }
+    
+    setCurrentCoupon(prev => ({
+      ...prev,
+      expiresAt: newExpiryDate
+    }));
+  };
+
+  const handleDateSelect = (date: Date | undefined) => {
+    if (date) {
+      setSelectedDate(date);
+      setCurrentCoupon(prev => ({
+        ...prev,
+        expiresAt: date.getTime()
+      }));
+    }
+  };
+
   const handleAddCoupon = () => {
     setIsEditing(false);
     setCurrentCoupon({
@@ -287,6 +362,8 @@ const CouponManagement = () => {
       isActive: true,
       category: 'all'
     });
+    setSelectedDate(null);
+    setExpiryType('never');
     
     // Scroll to form
     if (formRef.current) {
@@ -297,6 +374,14 @@ const CouponManagement = () => {
   const handleEditCoupon = (coupon: Coupon) => {
     setIsEditing(true);
     setCurrentCoupon(coupon);
+    
+    if (coupon.expiresAt) {
+      setSelectedDate(new Date(coupon.expiresAt));
+      setExpiryType('custom');
+    } else {
+      setSelectedDate(null);
+      setExpiryType('never');
+    }
     
     // Scroll to form
     if (formRef.current) {
@@ -372,6 +457,8 @@ const CouponManagement = () => {
       category: 'all'
     });
     setIsEditing(false);
+    setSelectedDate(null);
+    setExpiryType('never');
   };
 
   // Format expiration date
@@ -379,7 +466,7 @@ const CouponManagement = () => {
     if (!timestamp) return 'Never expires';
     
     const expirationDate = new Date(timestamp);
-    return expirationDate.toLocaleDateString();
+    return format(expirationDate, 'MMM dd, yyyy');
   };
 
   // Get category label
@@ -426,24 +513,71 @@ const CouponManagement = () => {
                 </div>
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
-                <Select 
-                  value={currentCoupon.category} 
-                  onValueChange={handleSelectChange}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map(category => (
-                      <SelectItem key={category.value} value={category.value}>
-                        {category.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="category">Category</Label>
+                  <Select 
+                    value={currentCoupon.category} 
+                    onValueChange={handleSelectChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map(category => (
+                        <SelectItem key={category.value} value={category.value}>
+                          {category.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              
+                <div className="space-y-2">
+                  <Label htmlFor="expiresAt">Expiration</Label>
+                  <Select 
+                    value={expiryType} 
+                    onValueChange={handleExpiryTypeChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select expiration" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {expirationOptions.map(option => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
+              
+              {expiryType === 'custom' && (
+                <div className="space-y-2">
+                  <Label>Custom Expiration Date</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        className="w-full justify-start text-left flex items-center"
+                      >
+                        <Calendar className="mr-2 h-4 w-4" />
+                        {selectedDate ? format(selectedDate, 'PPP') : 'Select a date'}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <CalendarComponent
+                        mode="single"
+                        selected={selectedDate || undefined}
+                        onSelect={handleDateSelect}
+                        initialFocus
+                        disabled={(date) => date < new Date()} // Disable past dates
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              )}
               
               <div className="space-y-2">
                 <Label htmlFor="description">Description</Label>
@@ -469,7 +603,7 @@ const CouponManagement = () => {
               </div>
             </form>
           </CardContent>
-          <CardFooter className="flex justify-between">
+          <CardFooter className="flex flex-wrap justify-between gap-2">
             <Button 
               variant="outline" 
               onClick={() => {
@@ -483,6 +617,8 @@ const CouponManagement = () => {
                   isActive: true,
                   category: 'all'
                 });
+                setSelectedDate(null);
+                setExpiryType('never');
               }}
             >
               Cancel
@@ -495,7 +631,7 @@ const CouponManagement = () => {
       </div>
       
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-4">
           <div>
             <CardTitle>Active Coupons</CardTitle>
             <CardDescription>Manage your discount coupons</CardDescription>
@@ -509,77 +645,79 @@ const CouponManagement = () => {
           </Button>
         </CardHeader>
         <CardContent>
-          {coupons.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Code</TableHead>
-                  <TableHead>Discount</TableHead>
-                  <TableHead className="hidden md:table-cell">Category</TableHead>
-                  <TableHead className="hidden md:table-cell">Description</TableHead>
-                  <TableHead className="hidden md:table-cell">Expires</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {coupons.map((coupon) => (
-                  <TableRow key={coupon.id}>
-                    <TableCell className="font-medium">{coupon.code}</TableCell>
-                    <TableCell>{coupon.discount}%</TableCell>
-                    <TableCell className="hidden md:table-cell">
-                      {getCategoryLabel(coupon.category)}
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell max-w-[200px] truncate">
-                      {coupon.description}
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">
-                      {formatExpirationDate(coupon.expiresAt)}
-                    </TableCell>
-                    <TableCell>
-                      <span className={`px-2 py-1 rounded-full text-xs ${coupon.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                        {coupon.isActive ? 'Active' : 'Inactive'}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex space-x-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => handleEditCoupon(coupon)}
-                          className="h-8 w-8 p-0"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="destructive" 
-                          size="sm" 
-                          onClick={() => handleDeleteCoupon(coupon.id)}
-                          className="h-8 w-8 p-0"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
+          <div className="overflow-x-auto">
+            {coupons.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Code</TableHead>
+                    <TableHead>Discount</TableHead>
+                    <TableHead className="hidden md:table-cell">Category</TableHead>
+                    <TableHead className="hidden md:table-cell">Description</TableHead>
+                    <TableHead>Expires</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          ) : (
-            <div className="text-center py-4">
-              <Tag className="h-12 w-12 mx-auto text-gray-400 mb-2" />
-              <h3 className="text-lg font-medium">No coupons found</h3>
-              <p className="text-muted-foreground">Start creating discount coupons for your customers.</p>
-              <Button 
-                variant="outline" 
-                className="mt-4"
-                onClick={handleAddCoupon}
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Create your first coupon
-              </Button>
-            </div>
-          )}
+                </TableHeader>
+                <TableBody>
+                  {coupons.map((coupon) => (
+                    <TableRow key={coupon.id}>
+                      <TableCell className="font-medium">{coupon.code}</TableCell>
+                      <TableCell>{coupon.discount}%</TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {getCategoryLabel(coupon.category)}
+                      </TableCell>
+                      <TableCell className="hidden md:table-cell max-w-[200px] truncate">
+                        {coupon.description}
+                      </TableCell>
+                      <TableCell>
+                        {formatExpirationDate(coupon.expiresAt)}
+                      </TableCell>
+                      <TableCell>
+                        <span className={`px-2 py-1 rounded-full text-xs ${coupon.isActive ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'}`}>
+                          {coupon.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex space-x-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => handleEditCoupon(coupon)}
+                            className="h-8 w-8 p-0"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="destructive" 
+                            size="sm" 
+                            onClick={() => handleDeleteCoupon(coupon.id)}
+                            className="h-8 w-8 p-0"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <div className="text-center py-4">
+                <Tag className="h-12 w-12 mx-auto text-gray-400 mb-2" />
+                <h3 className="text-lg font-medium">No coupons found</h3>
+                <p className="text-muted-foreground">Start creating discount coupons for your customers.</p>
+                <Button 
+                  variant="outline" 
+                  className="mt-4"
+                  onClick={handleAddCoupon}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create your first coupon
+                </Button>
+              </div>
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>
