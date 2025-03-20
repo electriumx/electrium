@@ -1,9 +1,8 @@
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { addUser } from '../data/users';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Apple, Facebook, Eye, EyeOff } from 'lucide-react';
@@ -42,28 +41,27 @@ const Register = () => {
       isValid = false;
     }
 
-    // Validate password
-    if (!password) {
-      newErrors.password = 'Password is required';
-      isValid = false;
-    } else if (password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
-      isValid = false;
-    } else if (!/(?=.*[A-Z])/.test(password)) {
-      newErrors.password = 'Password must include at least one uppercase letter';
-      isValid = false;
-    } else if (!/(?=.*[0-9])/.test(password)) {
-      newErrors.password = 'Password must include at least one number';
-      isValid = false;
-    } else if (!/(?=.*[!@#$%^&*])/.test(password)) {
-      newErrors.password = 'Password must include at least one special character (!@#$%^&*)';
-      isValid = false;
-    }
+    // Validate password (only if it's provided for social login)
+    if (password) {
+      if (password.length < 8) {
+        newErrors.password = 'Password must be at least 8 characters';
+        isValid = false;
+      } else if (!/(?=.*[A-Z])/.test(password)) {
+        newErrors.password = 'Password must include at least one uppercase letter';
+        isValid = false;
+      } else if (!/(?=.*[0-9])/.test(password)) {
+        newErrors.password = 'Password must include at least one number';
+        isValid = false;
+      } else if (!/(?=.*[!@#$%^&*])/.test(password)) {
+        newErrors.password = 'Password must include at least one special character (!@#$%^&*)';
+        isValid = false;
+      }
 
-    // Validate password confirmation
-    if (password !== confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-      isValid = false;
+      // Validate password confirmation
+      if (password !== confirmPassword) {
+        newErrors.confirmPassword = 'Passwords do not match';
+        isValid = false;
+      }
     }
 
     setErrors(newErrors);
@@ -111,8 +109,7 @@ const Register = () => {
   };
 
   const handleSocialRegister = (provider: string) => {
-    // In a real app, we would implement OAuth registration here
-    // For now, just create a demo user with validation
+    // Fix: Now uses the email as username for social logins and generates a secure password
     if (!name.trim()) {
       setErrors(prev => ({ ...prev, name: 'Name is required, even for social login' }));
       toast({
@@ -123,18 +120,31 @@ const Register = () => {
       return;
     }
     
-    const demoUser = {
-      username: `demo_${Date.now()}`,
-      password: 'Demo123!@#',
-      displayName: name || `Demo User (${provider})`
+    if (!email.trim()) {
+      setErrors(prev => ({ ...prev, email: 'Email is required, even for social login' }));
+      toast({
+        variant: "destructive",
+        title: "Validation failed",
+        description: "Please enter your email before continuing with social login",
+      });
+      return;
+    }
+    
+    // Use user's provided password if available, or generate a secure one
+    const userPassword = password || `${provider}${Date.now()}!A1`;
+    
+    const socialUser = {
+      username: email.toLowerCase(),
+      password: userPassword,
+      displayName: name
     };
     
     try {
-      addUser(demoUser);
-      if (login(demoUser.username, demoUser.password)) {
+      addUser(socialUser);
+      if (login(socialUser.username, socialUser.password)) {
         toast({
           title: "Welcome!",
-          description: "Your account has been created with " + provider,
+          description: `Your account has been created with ${provider}`,
         });
         navigate('/');
       }
@@ -142,7 +152,7 @@ const Register = () => {
       toast({
         variant: "destructive",
         title: "Registration failed",
-        description: "Please try again later.",
+        description: "This email might already be registered. Please try logging in instead.",
       });
     }
   };

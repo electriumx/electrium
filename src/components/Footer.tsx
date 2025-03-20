@@ -1,8 +1,11 @@
+
 import { useState, useEffect } from 'react';
 import { Globe, Mail, Phone, Instagram, Linkedin } from 'lucide-react';
+
 const Footer = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [currentTimeUTC, setCurrentTimeUTC] = useState('');
+  
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
@@ -11,17 +14,21 @@ const Footer = () => {
       const utcMinutes = now.getUTCMinutes().toString().padStart(2, '0');
       setCurrentTimeUTC(`${utcHours}:${utcMinutes} UTC`);
     }, 60000);
+    
     const now = new Date();
     const utcHours = now.getUTCHours().toString().padStart(2, '0');
     const utcMinutes = now.getUTCMinutes().toString().padStart(2, '0');
     setCurrentTimeUTC(`${utcHours}:${utcMinutes} UTC`);
+    
     return () => clearInterval(interval);
   }, []);
+  
   const formattedTime = currentTime.toLocaleTimeString(undefined, {
     hour: '2-digit',
     minute: '2-digit',
     hour12: true
   });
+  
   return <footer id="footer" className="bg-black text-white py-8 mt-16">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -39,7 +46,6 @@ const Footer = () => {
               <li><a href="/" className="text-gray-300 hover:text-[#9eff00]">Home</a></li>
               <li><a href="/about" className="text-gray-300 hover:text-[#9eff00]">About</a></li>
               <li><a href="/products" className="text-gray-300 hover:text-[#9eff00]">Products</a></li>
-              <li><a href="/contact" className="text-gray-300 hover:text-[#9eff00]">Contact</a></li>
             </ul>
           </div>
           <div>
@@ -87,4 +93,5 @@ const Footer = () => {
       </div>
     </footer>;
 };
+
 export default Footer;

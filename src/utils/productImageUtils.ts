@@ -80,3 +80,34 @@ export const getGameImage = (title: string): string => {
     return '/lovable-uploads/elden-ring.jpg';
   }
 };
+
+// Maps iPhone models to appropriate prices
+export const getIPhonePrice = (model: string): number => {
+  const lowerModel = model.toLowerCase();
+  
+  if (lowerModel.includes('17') || lowerModel.includes('17 pro max') || lowerModel.includes('17 ultra')) {
+    return 1599;
+  } else if (lowerModel.includes('17 pro') || lowerModel.includes('16 pro max')) {
+    return 1399;
+  } else if (lowerModel.includes('16 pro')) {
+    return 1199;
+  } else if (lowerModel.includes('16') || lowerModel.includes('15 pro')) {
+    return 999;
+  } else if (lowerModel.includes('15')) {
+    return 899;
+  } else if (lowerModel.includes('14 pro') || lowerModel.includes('14 pro max')) {
+    return 799;
+  } else if (lowerModel.includes('14')) {
+    return 699;
+  } else if (lowerModel.includes('13')) {
+    return 599;
+  } else if (lowerModel.includes('12')) {
+    return 499;
+  } else if (lowerModel.includes('11')) {
+    return 399;
+  } else if (lowerModel.includes('se') || lowerModel.includes('mini')) {
+    return 429;
+  } else {
+    return 349; // Older models
+  }
+};
