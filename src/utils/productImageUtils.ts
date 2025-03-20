@@ -1,4 +1,3 @@
-
 // Maps product categories to appropriate image URLs from Amazon
 export const getCategoryImage = (category: string, brand?: string): string => {
   // These URLs point to Amazon-like product images
@@ -389,9 +388,9 @@ export const getProductPrice = (name: string, category: string, brand: string): 
     } else if (lowerName.includes('keyboard')) {
       if (lowerBrand === 'logitech') {
         return 129;
-      } else if (lowerBrand === 'razer')) {
+      } else if (lowerBrand === 'razer') {
         return 149;
-      } else if (lowerBrand === 'corsair')) {
+      } else if (lowerBrand === 'corsair') {
         return 169;
       }
       return 99; // Default keyboard price
