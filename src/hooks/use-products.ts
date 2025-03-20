@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Product, products as initialProducts } from '../data/productData';
 import { generateAdditionalProducts } from '../data/additionalProducts';
+import { getCategoryImage } from '../utils/productImageUtils';
 
 // Add new iPhone models
 const additionalIPhones: Product[] = [
@@ -12,7 +13,7 @@ const additionalIPhones: Product[] = [
     category: "Phone",
     brand: "Apple",
     description: "iPhone 7 with A10 Fusion chip, 12MP camera, and water resistance.",
-    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
+    imageUrl: "/lovable-uploads/iphone-13-pro-max.jpg",
     quantity: 0,
     rating: 4.3,
     reviews: 142
@@ -24,7 +25,7 @@ const additionalIPhones: Product[] = [
     category: "Phone",
     brand: "Apple",
     description: "iPhone 8 with A11 Bionic chip, wireless charging, and glass design.",
-    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
+    imageUrl: "/lovable-uploads/iphone-13-pro-max.jpg",
     quantity: 0,
     rating: 4.4,
     reviews: 156
@@ -36,7 +37,7 @@ const additionalIPhones: Product[] = [
     category: "Phone",
     brand: "Apple",
     description: "iPhone X with edge-to-edge Super Retina display, Face ID, and A11 Bionic chip.",
-    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
+    imageUrl: "/lovable-uploads/iphone-13-pro-max.jpg",
     quantity: 0,
     rating: 4.5,
     reviews: 178
@@ -48,7 +49,7 @@ const additionalIPhones: Product[] = [
     category: "Phone",
     brand: "Apple",
     description: "iPhone XS with Super Retina display, A12 Bionic chip, and improved cameras.",
-    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
+    imageUrl: "/lovable-uploads/iphone-13-pro-max.jpg",
     quantity: 0,
     rating: 4.5,
     reviews: 192
@@ -60,7 +61,7 @@ const additionalIPhones: Product[] = [
     category: "Phone",
     brand: "Apple",
     description: "iPhone 11 with A13 Bionic chip, dual-camera system, and all-day battery life.",
-    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
+    imageUrl: "/lovable-uploads/iphone-13-pro-max.jpg",
     quantity: 0,
     rating: 4.6,
     reviews: 215
@@ -72,7 +73,7 @@ const additionalIPhones: Product[] = [
     category: "Phone",
     brand: "Apple",
     description: "iPhone 12 with A14 Bionic chip, Super Retina XDR display, and 5G capability.",
-    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
+    imageUrl: "/lovable-uploads/iphone-13-pro-max.jpg",
     quantity: 0,
     rating: 4.7,
     reviews: 235
@@ -84,7 +85,7 @@ const additionalIPhones: Product[] = [
     category: "Phone",
     brand: "Apple",
     description: "iPhone 13 with A15 Bionic chip, advanced dual-camera system, and improved battery life.",
-    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
+    imageUrl: "/lovable-uploads/iphone-13-pro-max.jpg",
     quantity: 0,
     rating: 4.8,
     reviews: 248
@@ -96,7 +97,7 @@ const additionalIPhones: Product[] = [
     category: "Phone",
     brand: "Apple",
     description: "iPhone 14 with A16 Bionic chip, ProMotion technology, and outstanding camera system.",
-    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
+    imageUrl: "/lovable-uploads/iphone-13-pro-max.jpg",
     quantity: 0,
     rating: 4.9,
     reviews: 256
@@ -108,7 +109,7 @@ const additionalIPhones: Product[] = [
     category: "Phone",
     brand: "Apple",
     description: "iPhone 15 with A17 Pro chip, titanium design, and professional camera features.",
-    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
+    imageUrl: "/lovable-uploads/iphone-13-pro-max.jpg",
     quantity: 0,
     rating: 4.9,
     reviews: 243
@@ -120,7 +121,7 @@ const additionalIPhones: Product[] = [
     category: "Phone",
     brand: "Apple",
     description: "iPhone 16 with the latest A18 chip, improved AI capabilities, and advanced camera system.",
-    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
+    imageUrl: "/lovable-uploads/iphone-13-pro-max.jpg",
     quantity: 0,
     discount: 5,
     rating: 5.0,

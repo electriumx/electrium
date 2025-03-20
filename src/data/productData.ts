@@ -52,7 +52,7 @@ export const products: Product[] = [
     rating: 4.8,
     reviews: 235,
     accessories: [
-      { id: '1', name: 'AirPods Pro', price: 249, category: 'Headphones', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
+      { id: '1', name: 'AirPods Pro', price: 249, category: 'Headphones', image: '/lovable-uploads/bose-quietcomfort-45-headphones.jpg' },
       { id: '2', name: 'Leather Case', price: 59, category: 'Cases', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
       { id: '3', name: '20W USB-C Power Adapter', price: 19, category: 'Chargers', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
     ]
@@ -805,3 +805,4 @@ products.sort((a, b) => {
   }
   return a.category.localeCompare(b.category);
 });
+

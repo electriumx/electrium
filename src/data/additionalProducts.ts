@@ -1,5 +1,6 @@
 
 import { Product } from './productData';
+import { getCategoryImage, getGameImage } from '../utils/productImageUtils';
 
 // Generate a random price between min and max
 const randomPrice = (min: number, max: number): number => {
@@ -26,18 +27,30 @@ const generateProducts = (
   descriptionFormat: string,
   priceRange: [number, number]
 ): Product[] => {
-  return Array.from({ length: count }, (_, i) => ({
-    id: baseId + i,
-    name: `${namePrefix} ${i + 1}`,
-    price: randomPrice(priceRange[0], priceRange[1]),
-    category,
-    brand,
-    description: descriptionFormat.replace('{i}', (i + 1).toString()),
-    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
-    quantity: 0,
-    rating: randomRating(),
-    reviews: randomReviews()
-  }));
+  return Array.from({ length: count }, (_, i) => {
+    const productName = `${namePrefix} ${i + 1}`;
+    
+    // Choose appropriate image based on category and name
+    let imageUrl = getCategoryImage(category, brand);
+    
+    // Special case for games
+    if (category.toLowerCase() === 'games') {
+      imageUrl = getGameImage(productName);
+    }
+    
+    return {
+      id: baseId + i,
+      name: productName,
+      price: randomPrice(priceRange[0], priceRange[1]),
+      category,
+      brand,
+      description: descriptionFormat.replace('{i}', (i + 1).toString()),
+      imageUrl: imageUrl,
+      quantity: 0,
+      rating: randomRating(),
+      reviews: randomReviews()
+    };
+  });
 };
 
 // Generate additional products for various categories
