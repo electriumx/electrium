@@ -2,21 +2,17 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Heart, Settings } from 'lucide-react';
-
 interface TopNavigationProps {
   toggleChat: () => void;
 }
-
 const TopNavigation = ({
   toggleChat
 }: TopNavigationProps) => {
   const location = useLocation();
   const isIndexPage = location.pathname === '/';
   const {
-    isAuthenticated,
-    currentUser
+    isAuthenticated
   } = useAuth();
-
   const handleContactClick = (e: React.MouseEvent) => {
     e.preventDefault();
     const footer = document.querySelector('footer');
@@ -26,7 +22,6 @@ const TopNavigation = ({
       });
     }
   };
-
   return <nav className="fixed w-full top-0 z-40">
       <div className="container mx-auto flex items-center py-4 px-6">
         <Link to="/" className="text-2xl font-bold text-[#18a66e] flex items-center gap-2">
@@ -41,13 +36,6 @@ const TopNavigation = ({
           </div>}
         
         <div className="ml-auto flex items-center gap-4">
-          {/* Welcome Message for logged in users */}
-          {isAuthenticated && currentUser && (
-            <div className="text-white mr-2 hidden sm:block">
-              Welcome, {currentUser.displayName || currentUser.username}
-            </div>
-          )}
-          
           {/* Settings Button */}
           <div className="flex items-center gap-2">
             <Link to="/settings" className="flex items-center justify-center w-8 h-8 rounded-full hover:opacity-80 transition-opacity" aria-label="Settings">
@@ -67,5 +55,4 @@ const TopNavigation = ({
       </div>
     </nav>;
 };
-
 export default TopNavigation;

@@ -1,13 +1,10 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-
 interface SpinWheelProps {
   onWin: (brand: string, discount: number, expiresAt: number) => void;
 }
-
 const SpinWheel = ({
   onWin
 }: SpinWheelProps) => {
@@ -24,39 +21,57 @@ const SpinWheel = ({
     isAuthenticated
   } = useAuth();
   const navigate = useNavigate();
-
-  // 25 segments with brands and discounts
-  const segments = [
-    { brand: "Apple", discount: 5, color: "#9b87f5" },
-    { brand: "Samsung", discount: 10, color: "#7E69AB" },
-    { brand: "All", discount: 15, color: "#6E59A5" },
-    { brand: "Sony", discount: 7, color: "#8B5CF6" },
-    { brand: "Google", discount: 12, color: "#D946EF" },
-    { brand: "Microsoft", discount: 8, color: "#F97316" },
-    { brand: "Xiaomi", discount: 20, color: "#0EA5E9" },
-    { brand: "Accessories", discount: 25, color: "#9b87f5" },
-    { brand: "Audio", discount: 18, color: "#7E69AB" },
-    { brand: "Games", discount: 30, color: "#6E59A5" },
-    { brand: "PlayStation", discount: 15, color: "#8B5CF6" },
-    { brand: "PC Games", discount: 22, color: "#D946EF" },
-    { brand: "Headphones", discount: 12, color: "#F97316" },
-    { brand: "Laptops", discount: 8, color: "#0EA5E9" },
-    { brand: "Tablets", discount: 10, color: "#9b87f5" },
-    { brand: "TVs", discount: 15, color: "#7E69AB" },
-    { brand: "LG", discount: 7, color: "#6E59A5" },
-    { brand: "Nintendo", discount: 20, color: "#8B5CF6" },
-    { brand: "Dell", discount: 6, color: "#D946EF" },
-    { brand: "HP", discount: 9, color: "#F97316" },
-    { brand: "Asus", discount: 11, color: "#0EA5E9" },
-    { brand: "Lenovo", discount: 13, color: "#9b87f5" },
-    { brand: "Bose", discount: 17, color: "#7E69AB" },
-    { brand: "Cameras", discount: 14, color: "#6E59A5" },
-    { brand: "Smartwatches", discount: 16, color: "#8B5CF6" }
-  ];
-
+  const segments = [{
+    brand: "Apple",
+    discount: 5,
+    color: "#4a5568"
+  }, {
+    brand: "Samsung",
+    discount: 10,
+    color: "#1a202c"
+  }, {
+    brand: "All",
+    discount: 15,
+    color: "#2d3748"
+  }, {
+    brand: "Sony",
+    discount: 7,
+    color: "#4a5568"
+  }, {
+    brand: "Google",
+    discount: 12,
+    color: "#1a202c"
+  }, {
+    brand: "Microsoft",
+    discount: 8,
+    color: "#2d3748"
+  }, {
+    brand: "Xiaomi",
+    discount: 20,
+    color: "#4a5568"
+  }, {
+    brand: "Accessories",
+    discount: 25,
+    color: "#1a202c"
+  }, {
+    brand: "Audio",
+    discount: 18,
+    color: "#4a5568"
+  }, {
+    brand: "Games",
+    discount: 30,
+    color: "#1a202c"
+  }, {
+    brand: "PlayStation",
+    discount: 15,
+    color: "#2d3748"
+  }, {
+    brand: "PC Games",
+    discount: 22,
+    color: "#4a5568"
+  }];
   const numSegments = segments.length;
   const segmentAngle = 360 / numSegments;
-
   useEffect(() => {
     const lastSpinTime = localStorage.getItem('lastSpinTime');
     if (lastSpinTime) {
@@ -72,7 +87,6 @@ const SpinWheel = ({
       }
     }
   }, []);
-
   useEffect(() => {
     if (!cooldownActive || timeLeft === null) return;
     const timer = setInterval(() => {
@@ -87,7 +101,6 @@ const SpinWheel = ({
     }, 1000);
     return () => clearInterval(timer);
   }, [cooldownActive, timeLeft]);
-
   const formatTimeLeft = () => {
     if (timeLeft === null) return '';
     const hours = Math.floor(timeLeft / 3600);
@@ -95,92 +108,66 @@ const SpinWheel = ({
     const seconds = timeLeft % 60;
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
-
-  // Drawing the octogram (8-pointed star) shaped wheel
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
-    const outerRadius = Math.min(centerX, centerY) - 10;
-    const innerRadius = outerRadius * 0.4; // Inner radius for star shape
-
-    // Draw the wheel as an octogram (8-pointed star) shape with 25 segments
-    for (let i = 0; i < segments.length; i++) {
-      const segment = segments[i];
+    const radius = Math.min(centerX, centerY) - 10;
+    segments.forEach((segment, i) => {
       const startAngle = (i * segmentAngle - 90 + rotation) * Math.PI / 180;
       const endAngle = ((i + 1) * segmentAngle - 90 + rotation) * Math.PI / 180;
-      
-      // Calculate midpoint angle for the segment
-      const midAngle = (startAngle + endAngle) / 2;
-      
-      // Create octogram shape by alternating radius
-      const useOuterRadius = i % 2 === 0 ? outerRadius : outerRadius * 0.85;
-      
       ctx.beginPath();
       ctx.moveTo(centerX, centerY);
-      ctx.arc(centerX, centerY, useOuterRadius, startAngle, endAngle);
+      ctx.arc(centerX, centerY, radius, startAngle, endAngle);
       ctx.closePath();
-      
       ctx.fillStyle = segment.color;
       ctx.fill();
-      ctx.strokeStyle = '#ffffff';
+      ctx.strokeStyle = '#e2e8f0';
       ctx.lineWidth = 2;
       ctx.stroke();
-      
-      // Add text
       ctx.save();
       ctx.translate(centerX, centerY);
-      ctx.rotate(midAngle);
-      const textDistance = useOuterRadius * 0.65;
-      ctx.translate(textDistance, 0);
+      const textAngle = startAngle + (endAngle - startAngle) / 2;
+      ctx.rotate(textAngle);
+      ctx.translate(radius * 0.65, 0);
       ctx.rotate(Math.PI / 2);
-      
       ctx.fillStyle = '#ffffff';
-      ctx.font = '12px sans-serif';
+      ctx.font = '9px sans-serif';
       ctx.textAlign = 'center';
-      
-      // Handle long brand names
       if (segment.brand.length > 10) {
         const midpoint = Math.floor(segment.brand.length / 2);
         const firstHalf = segment.brand.substring(0, midpoint);
         const secondHalf = segment.brand.substring(midpoint);
         ctx.fillText(`${firstHalf}-`, 0, -5);
-        ctx.fillText(`${secondHalf}`, 0, 7);
+        ctx.fillText(`${secondHalf}`, 0, 5);
       } else {
         ctx.fillText(`${segment.brand}`, 0, 0);
       }
-      
-      ctx.fillText(`${segment.discount}%`, 0, 15);
+      ctx.fillText(`${segment.discount}%`, 0, 12);
       ctx.restore();
-    }
-
-    // Draw center circle
+    });
     ctx.beginPath();
-    ctx.arc(centerX, centerY, 20, 0, Math.PI * 2);
-    ctx.fillStyle = '#9b87f5';
+    ctx.arc(centerX, centerY, 15, 0, Math.PI * 2);
+    ctx.fillStyle = '#4a5568';
     ctx.fill();
-    ctx.strokeStyle = '#ffffff';
+    ctx.strokeStyle = '#e2e8f0';
     ctx.lineWidth = 2;
     ctx.stroke();
-
-    // Draw pointer
     ctx.beginPath();
-    ctx.moveTo(centerX, centerY - outerRadius - 5);
-    ctx.lineTo(centerX - 15, centerY - outerRadius - 25);
-    ctx.lineTo(centerX + 15, centerY - outerRadius - 25);
+    ctx.moveTo(centerX, centerY - radius - 5);
+    ctx.lineTo(centerX - 10, centerY - radius - 20);
+    ctx.lineTo(centerX + 10, centerY - radius - 20);
     ctx.closePath();
-    ctx.fillStyle = '#9b87f5';
+    ctx.fillStyle = '#4a5568';
     ctx.fill();
-    ctx.strokeStyle = '#ffffff';
+    ctx.strokeStyle = '#e2e8f0';
     ctx.lineWidth = 2;
     ctx.stroke();
   }, [rotation, segments, numSegments, segmentAngle]);
-
   const spinWheel = () => {
     if (isSpinning || cooldownActive) return;
     if (!isAuthenticated) {
@@ -230,11 +217,10 @@ const SpinWheel = ({
     };
     animate();
   };
-
   return <div className="flex flex-col items-center p-4">
       <h2 className="text-xl font-bold mb-4">Spin to Win a Discount!</h2>
       <div className="relative">
-        <canvas ref={canvasRef} width={320} height={320} className="border rounded-full" />
+        <canvas ref={canvasRef} width={300} height={300} className="border rounded-full" />
       </div>
       {cooldownActive ? <div className="mt-4 text-center">
           <div className="font-mono text-lg">{formatTimeLeft()}</div>
@@ -247,5 +233,4 @@ const SpinWheel = ({
         </div>}
     </div>;
 };
-
 export default SpinWheel;
