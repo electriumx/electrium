@@ -1,4 +1,3 @@
-
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -6,11 +5,12 @@ import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, A
 import { useToast } from "@/hooks/use-toast";
 import { translateText } from '@/utils/translation';
 import { Product } from '../data/productData';
+import { calculateProductTotal } from '@/utils/cartUtils';
 
 const Checkout = () => {
   const navigate = useNavigate();
   const [cartData, setCartData] = useState<Product[]>([]);
-  const [discounts, setDiscounts] = useState<Record<string, any>>({});
+  const [discounts, setDiscounts] = useState<Record<string, { value: number; expiresAt: number; }>>({});
   const [showOutOfStockAlert, setShowOutOfStockAlert] = useState(false);
   const [outOfStockItem, setOutOfStockItem] = useState<string>("");
   const [currentLanguage, setCurrentLanguage] = useState("english");
@@ -39,18 +39,25 @@ const Checkout = () => {
     // Load discounts
     const savedDiscounts = localStorage.getItem('discounts');
     if (savedDiscounts) {
-      const parsedDiscounts = JSON.parse(savedDiscounts);
-      const formattedDiscounts: Record<string, any> = {};
-      
-      Object.entries(parsedDiscounts).forEach(([brand, value]) => {
-        if (typeof value === 'object' && value !== null && 'value' in value) {
-          formattedDiscounts[brand] = value;
-        } else {
-          formattedDiscounts[brand] = { value };
-        }
-      });
-      
-      setDiscounts(formattedDiscounts);
+      try {
+        const parsedDiscounts = JSON.parse(savedDiscounts);
+        const currentTime = Date.now();
+        
+        // Keep only valid discounts
+        const validDiscounts: Record<string, { value: number; expiresAt: number; }> = {};
+        Object.entries(parsedDiscounts).forEach(([brand, value]) => {
+          if (typeof value === 'object' && value !== null && 'value' in value && 'expiresAt' in value) {
+            const typedValue = value as { value: number; expiresAt: number; };
+            if (typedValue.expiresAt > currentTime) {
+              validDiscounts[brand] = typedValue;
+            }
+          }
+        });
+        
+        setDiscounts(validDiscounts);
+      } catch (error) {
+        console.error('Error parsing discounts:', error);
+      }
     }
     
     // Add auto-scroll to top when page loads
@@ -70,31 +77,8 @@ const Checkout = () => {
       .join(' ');
   };
 
-  const getDiscountedPrice = (item: Product) => {
-    if (!item.brand) return item.price;
-    
-    const discount = discounts[item.brand]?.value || discounts['All']?.value || 0;
-    if (discount === 0) return item.price;
-    
-    return item.price * (1 - discount / 100);
-  };
-
-  const getAccessoriesPrice = (item: Product) => {
-    if (!item.accessories) return 0;
-    
-    return item.accessories
-      .filter(acc => acc.selected)
-      .reduce((sum, acc) => sum + acc.price, 0);
-  };
-
-  const calculateItemTotal = (item: Product) => {
-    const discountedPrice = getDiscountedPrice(item);
-    const accessoriesPrice = getAccessoriesPrice(item);
-    return (discountedPrice + accessoriesPrice) * item.quantity;
-  };
-
   const purchasedItems = cartData.filter(item => item.quantity > 0);
-  const total = purchasedItems.reduce((sum, item) => sum + calculateItemTotal(item), 0);
+  const total = purchasedItems.reduce((sum, item) => sum + calculateProductTotal(item, discounts), 0);
   
   const purchaseDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',
@@ -176,10 +160,7 @@ const Checkout = () => {
             <>
               <div className="space-y-6">
                 {purchasedItems.map((item: Product) => {
-                  const hasDiscount = item.brand && (discounts[item.brand]?.value || discounts['All']?.value);
-                  const discount = item.brand ? (discounts[item.brand]?.value || discounts['All']?.value || 0) : 0;
-                  const discountedPrice = getDiscountedPrice(item);
-                  const accessoriesPrice = getAccessoriesPrice(item);
+                  const itemTotal = calculateProductTotal(item, discounts);
                   const selectedAccessories = item.accessories?.filter(acc => acc.selected) || [];
                   
                   return (
@@ -190,13 +171,16 @@ const Checkout = () => {
                         className="w-20 h-20 object-cover rounded-lg"
                       />
                       <div className="flex-1">
-                        <h3 className={`font-medium text-foreground ${hasDiscount ? 'pl-2' : ''}`}>
+                        <h3 className="font-medium text-foreground">
                           {translateText(item.name, currentLanguage) ? 
                             formatProductName(translateText(item.name, currentLanguage)) : 
                             formatProductName(item.name)}
+                          {item.selectedColor && (
+                            <span className="ml-2 text-sm text-muted-foreground">({item.selectedColor})</span>
+                          )}
                         </h3>
                         <p className="text-muted-foreground">
-                          {translateText("quantity", currentLanguage)}: {item.quantity}
+                          {translateText("quantity", currentLanguage) || "Quantity"}: {item.quantity}
                         </p>
                         <p className="text-muted-foreground text-sm">
                           {translateText("purchase_date", currentLanguage) || "Purchase Date"}: {purchaseDate}
@@ -205,7 +189,7 @@ const Checkout = () => {
                         {selectedAccessories.length > 0 && (
                           <div className="mt-2">
                             <p className="text-sm text-muted-foreground">
-                              {translateText("with", currentLanguage)}:
+                              {translateText("with", currentLanguage) || "With"}:
                             </p>
                             <ul className="text-sm text-muted-foreground list-disc ml-5">
                               {selectedAccessories.map((acc, index) => (
@@ -221,23 +205,19 @@ const Checkout = () => {
                       </div>
                       <div className="text-right">
                         <p className="font-medium text-sage-600 dark:text-sage-400">
-                          {translateText("item_total", currentLanguage) || "Item Total"}: ${calculateItemTotal(item).toFixed(2)}
+                          {translateText("item_total", currentLanguage) || "Item Total"}: ${itemTotal.toFixed(2)}
                         </p>
-                        {hasDiscount ? (
-                          <div>
-                            <p className="text-sm line-through text-muted-foreground">
-                              ${item.price.toFixed(2)} {translateText("each", currentLanguage) || "each"}
-                            </p>
-                            <p className="text-sm text-destructive font-medium">
-                              ${discountedPrice.toFixed(2)} {translateText("each", currentLanguage) || "each"} ({discount}% {translateText("off", currentLanguage) || "off"})
-                            </p>
-                          </div>
-                        ) : (
-                          <p className="text-sm text-muted-foreground">${item.price.toFixed(2)} {translateText("each", currentLanguage) || "each"}</p>
+                        <p className="text-sm text-muted-foreground">
+                          ${item.price.toFixed(2)} {translateText("each", currentLanguage) || "each"}
+                        </p>
+                        {item.brand && discounts[item.brand] && (
+                          <p className="text-sm text-destructive">
+                            -{discounts[item.brand].value}% {translateText("off", currentLanguage) || "off"}
+                          </p>
                         )}
-                        {accessoriesPrice > 0 && (
+                        {selectedAccessories.length > 0 && (
                           <p className="text-sm text-muted-foreground">
-                            +${accessoriesPrice.toFixed(2)} {translateText("accessories", currentLanguage) || "accessories"}
+                            +${selectedAccessories.reduce((sum, acc) => sum + acc.price, 0).toFixed(2)} {translateText("accessories", currentLanguage) || "accessories"}
                           </p>
                         )}
                       </div>
@@ -248,7 +228,7 @@ const Checkout = () => {
               
               <div className="mt-8 pt-6 border-t border-border">
                 <div className="flex justify-between items-center text-lg font-medium">
-                  <span className="text-foreground">{translateText("total", currentLanguage)}</span>
+                  <span className="text-foreground">{translateText("total", currentLanguage) || "Total"}</span>
                   <span className="text-sage-600 dark:text-sage-400">${total.toFixed(2)}</span>
                 </div>
               </div>
@@ -259,7 +239,7 @@ const Checkout = () => {
                   className="w-full bg-sage-500 text-white py-3 px-6 rounded-lg font-medium 
                            transition-all duration-200 hover:bg-sage-600"
                 >
-                  {translateText("proceed_to_payment", currentLanguage)}
+                  {translateText("proceed_to_payment", currentLanguage) || "Proceed to Payment"}
                 </button>
                 <button
                   onClick={() => navigate('/products')}
@@ -267,7 +247,7 @@ const Checkout = () => {
                            border border-sage-200 dark:border-sage-800
                            transition-all duration-200 hover:bg-sage-50 dark:hover:bg-sage-900/30"
                 >
-                  {translateText("continue_shopping", currentLanguage)}
+                  {translateText("continue_shopping", currentLanguage) || "Continue Shopping"}
                 </button>
                 <button
                   onClick={handleClearItems}
@@ -293,7 +273,7 @@ const Checkout = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogAction onClick={() => setShowOutOfStockAlert(false)}>
-              {translateText("ok", currentLanguage)}
+              {translateText("ok", currentLanguage) || "OK"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

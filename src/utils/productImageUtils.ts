@@ -1,99 +1,76 @@
-
 // Maps product categories to appropriate image URLs from Google
 export const getCategoryImage = (category: string, brand?: string): string => {
-  // These URLs point to Google-like product images
+  // These URLs point to standardized Google-like product images by category
   switch (category.toLowerCase()) {
     case 'smartphones':
     case 'phone':
       return brand?.toLowerCase() === 'apple' 
         ? 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-7inch_GEO_US?wid=5120&hei=2880&fmt=p-jpg&qlt=80&.v=1693009284541'  // iPhone 15 Pro
-        : 'https://lh3.googleusercontent.com/spp/AE_ITi1D72-F7PydJdVTGgKbTrpvrZEzZC7L0a3Wv_QQMF3M4FUGhdJBrPjQlJnVoK65QbPLm0CjOZ_lR3m1Ws5xKT5-Y2JzDQcjAUcoGkALIxRQYMC67lnGFOUQUOUw2TIAuFEHKvCN8oUTqEkQ5C3R7wKNvWkTGJSQ_k_8=s512-rw-pd-pc0x0'; // Google Pixel
-
+        : 'https://lh3.googleusercontent.com/spp/AE_ITi1D72-F7PydJdVTGgKbTrpvrZEzZC7L0a3Wv_QQMF3M4FUGhdJBrPjQlJnVoK65QbPLm0CjOZ_lR3m1Ws5xKT5-Y2JzDQcjAUcoGkALIxRQYMC67lnGFOUQUOUw2TIAuFEHKvCN8oUTqEkQ5C3R7wKNvWkTGJSQ_k_8=s512-rw-pd-pc0x0'; // Generic Smartphone
+    
     case 'laptops':
-      return brand?.toLowerCase() === 'apple'
-        ? 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/mbp14-spacegray-select-202301?wid=904&hei=840&fmt=jpeg&qlt=90&.v=1671304673229'  // MacBook Pro
-        : 'https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/xps-notebooks/xps-13-9315/media-gallery/notebook-xps-9315-nt-blue-gallery-1.psd?fmt=png-alpha&pscan=auto&scl=1&hei=402&wid=643&qlt=100,1&resMode=sharp2&size=643,402&chrss=full'; // Dell XPS
+      return 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/mbp14-spacegray-select-202301?wid=904&hei=840&fmt=jpeg&qlt=90&.v=1671304673229';  // Generic Laptop
     
     case 'gaming consoles':
-      return brand?.toLowerCase() === 'playstation' 
-        ? 'https://gmedia.playstation.com/is/image/SIEPDC/ps5-product-thumbnail-01-en-14sep21?$facebook$'     // PlayStation 5
-        : 'https://assets.xboxservices.com/assets/a3/a2/a3a2a302-214c-4a88-a001-b19ae3e76983.jpg?n=204202N_Gallery-0_11_1350x759.jpg';    // Xbox Series X
+      return 'https://gmedia.playstation.com/is/image/SIEPDC/ps5-product-thumbnail-01-en-14sep21?$facebook$';  // Generic Gaming Console
     
     case 'tvs':
-      return brand?.toLowerCase() === 'samsung'
-        ? 'https://image-us.samsung.com/SamsungUS/home/television-home-theater/tvs/tvs/01192022/NeoQLED-S95C-2023/NQ9C_75-55_FrontV_Black.jpg'  // Samsung QLED
-        : 'https://www.lg.com/us/images/tvs/md08003300/gallery/D-01.jpg'; // LG OLED
+      return 'https://image-us.samsung.com/SamsungUS/home/television-home-theater/tvs/tvs/01192022/NeoQLED-S95C-2023/NQ9C_75-55_FrontV_Black.jpg';  // Generic TV
     
     case 'headphones':
-      return brand?.toLowerCase() === 'sony' 
-        ? 'https://electronics.sony.com/image/c13c1c7f0cbfcfc5ff488e5fb0ad1c98?fmt=png-alpha&wid=600&hei=600'  // Sony WH-1000XM5
-        : 'https://assets.bose.com/content/dam/Bose_DAM/Web/consumer_electronics/global/products/headphones/qc_45/product_silo_images/QC45_LEFT_MIDNIGHTBLUE.png/jcr:content/renditions/cq5dam.web.1280.1280.png'; // Bose QuietComfort
+      return 'https://electronics.sony.com/image/c13c1c7f0cbfcfc5ff488e5fb0ad1c98?fmt=png-alpha&wid=600&hei=600';  // Generic Headphones
     
     case 'tablets':
-      return brand?.toLowerCase() === 'apple'
-        ? 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-pro-finish-select-202210-11inch-space-gray-wifi?wid=2560&hei=1440&fmt=p-jpg&qlt=95&.v=1664411207213'  // iPad Pro
-        : 'https://image-us.samsung.com/us/smartphones/galaxy-tab-s8-ultra/gallery/1-14-22/Gallery-Q8-Ultra-Graphite-1600x1200.jpg'; // Samsung Galaxy Tab
+      return 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-pro-finish-select-202210-11inch-space-gray-wifi?wid=2560&hei=1440&fmt=p-jpg&qlt=95&.v=1664411207213';  // Generic Tablet
     
     case 'pc accessories':
-      return brand?.toLowerCase() === 'logitech'
-        ? 'https://resource.logitech.com/content/dam/logitech/en/products/mice/mx-master-3s/gallery/mx-master-3s-mouse-pale-gray-top-view.png'  // Logitech MX Master
-        : 'https://assets3.razerzone.com/k3HtgfS-H8BgU1v9_mICDRwJSrM=/1500x1000/https%3A%2F%2Fhybrismediaprod.blob.core.windows.net%2Fsys-master-phoenix-images-container%2Fh36%2Fh45%2F9392221806622%2F211026-blackwidow-v3-black-1500x1000-1.jpg'; // Razer BlackWidow
+      return 'https://resource.logitech.com/content/dam/logitech/en/products/mice/mx-master-3s/gallery/mx-master-3s-mouse-pale-gray-top-view.png';  // Generic PC Accessory
     
     case 'games':
+      // Use a standardized game image for all games
       if (brand?.toLowerCase().includes('playstation')) {
-        return 'https://image.api.playstation.com/vulcan/ap/rnd/202007/0217/kF7P6BZJi80JywPqCe2NB2rD.jpg'; // Ghost of Tsushima
-      } else if (brand?.toLowerCase().includes('pc')) {
-        return 'https://image.api.playstation.com/vulcan/ap/rnd/202111/3013/cKH3DJ2viC0iGvV2ka1sOqUN.jpg'; // Cyberpunk 2077
+        return 'https://image.api.playstation.com/vulcan/ap/rnd/202108/0410/8ifJ8dxNOAMWHJi1vHLtUUZK.jpg';  // Generic PlayStation Game
+      } else if (brand?.toLowerCase().includes('xbox')) {
+        return 'https://assets.xboxservices.com/assets/a3/a2/a3a2a302-214c-4a88-a001-b19ae3e76983.jpg?n=204202N_Gallery-0_11_1350x759.jpg';  // Generic Xbox Game
+      } else if (brand?.toLowerCase().includes('nintendo')) {
+        return 'https://assets.nintendo.com/image/upload/c_fill,w_1200/q_auto:best/f_auto/dpr_2.0/ncom/en_US/games/switch/m/mario-kart-8-deluxe-switch/hero';  // Generic Nintendo Game
       } else {
-        return 'https://image.api.playstation.com/vulcan/ap/rnd/202108/0410/8ifJ8dxNOAMWHJi1vHLtUUZK.jpg'; // Elden Ring
+        return 'https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg';  // Generic PC Game (Elden Ring)
       }
     
     // Appliance categories
     case 'microwaves':
-      return 'https://images.thdstatic.com/productImages/c06dbb85-e7d5-47f5-898a-c26e5a43ef2e/svn/toshiba-countertop-microwaves-ml2-ec10sa-bs-64_600.jpg'; // Toshiba Microwave
+      return 'https://images.thdstatic.com/productImages/c06dbb85-e7d5-47f5-898a-c26e5a43ef2e/svn/toshiba-countertop-microwaves-ml2-ec10sa-bs-64_600.jpg'; // Generic Microwave
     
     case 'washing machines':
-      return 'https://pisces.bbystatic.com/image2/BestBuy_US/images/products/6462/6462171_sd.jpg'; // Samsung Washer
+      return 'https://pisces.bbystatic.com/image2/BestBuy_US/images/products/6462/6462171_sd.jpg'; // Generic Washer
     
     case 'refrigerators':
-      return 'https://www.lg.com/us/images/refrigerators/md07000130/gallery/desktop-01.jpg'; // LG Refrigerator
+      return 'https://www.lg.com/us/images/refrigerators/md07000130/gallery/desktop-01.jpg'; // Generic Refrigerator
     
     case 'air conditioners':
-      return 'https://images.thdstatic.com/productImages/a6d87c32-c1c7-405d-9ab9-38c10ec9f34c/svn/white-midea-portable-air-conditioners-map08r1cwtc-64_600.jpg'; // Midea Air Conditioner
+      return 'https://images.thdstatic.com/productImages/a6d87c32-c1c7-405d-9ab9-38c10ec9f34c/svn/white-midea-portable-air-conditioners-map08r1cwtc-64_600.jpg'; // Generic Air Conditioner
     
     case 'vacuum cleaners':
-      return 'https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/global/products/vacuum-cleaners/v15-detect/pdp/primary/fullwidth/V15-Detect-Fluffy-PDP-Floor-dock-Fullwidth-1536x864.jpg'; // Dyson Vacuum
+      return 'https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/global/products/vacuum-cleaners/v15-detect/pdp/primary/fullwidth/V15-Detect-Fluffy-PDP-Floor-dock-Fullwidth-1536x864.jpg'; // Generic Vacuum
     
     case 'smart screens':
-      return 'https://m.media-amazon.com/images/I/71yKr-O4iUL._AC_UF1000,1000_QL80_.jpg'; // Echo Show
+      return 'm.media-amazon.com/images/I/71yKr-O4iUL._AC_UF1000,1000_QL80_.jpg'; // Generic Smart Screen
       
     default:
       return 'https://m.media-amazon.com/images/I/71xMxbdxrsL._AC_SL1500_.jpg'; // Default product
   }
 };
 
-// Maps game titles to appropriate image URLs based on keywords
+// For Elden Ring specifically, use the requested image
 export const getGameImage = (title: string): string => {
   const lowerTitle = title.toLowerCase();
   
   if (lowerTitle.includes('elden ring')) {
     return 'https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg';
-  } else if (lowerTitle.includes('souls') || lowerTitle.includes('legend') || lowerTitle.includes('ring')) {
-    return 'https://image.api.playstation.com/vulcan/ap/rnd/202108/0410/8ifJ8dxNOAMWHJi1vHLtUUZK.jpg'; // Elden Ring
-  } else if (lowerTitle.includes('horizon') || lowerTitle.includes('west') || lowerTitle.includes('quest')) {
-    return 'https://image.api.playstation.com/vulcan/ap/rnd/202107/3100/HO8vkMEFzpv5NVPjoWXhfnx9.png'; // Horizon Forbidden West
-  } else if (lowerTitle.includes('last') || lowerTitle.includes('us') || lowerTitle.includes('survival')) {
-    return 'https://image.api.playstation.com/vulcan/ap/rnd/202206/0720/eEczyEMDd2BLa3dtkGJVE9Id.png'; // The Last of Us Part II
-  } else if (lowerTitle.includes('cyber') || lowerTitle.includes('punk') || lowerTitle.includes('future')) {
-    return 'https://image.api.playstation.com/vulcan/ap/rnd/202111/3013/cKH3DJ2viC0iGvV2ka1sOqUN.jpg'; // Cyberpunk 2077
-  } else if (lowerTitle.includes('ghost') || lowerTitle.includes('tsushima') || lowerTitle.includes('samurai')) {
-    return 'https://image.api.playstation.com/vulcan/ap/rnd/202007/0217/kF7P6BZJi80JywPqCe2NB2rD.jpg'; // Ghost of Tsushima
-  } else if (lowerTitle.includes('death') || lowerTitle.includes('strand')) {
-    return 'https://upload.wikimedia.org/wikipedia/en/2/22/Death_Stranding.jpg'; // Death Stranding
-  } else {
-    // Default game image
-    return 'https://image.api.playstation.com/vulcan/ap/rnd/202108/0410/8ifJ8dxNOAMWHJi1vHLtUUZK.jpg'; // Elden Ring
   }
+  
+  return getCategoryImage('games');
 };
 
 // Maps iPhone models to appropriate prices based on pricing

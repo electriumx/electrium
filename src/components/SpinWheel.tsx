@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from '../contexts/AuthContext';
@@ -21,33 +20,32 @@ const SpinWheel = ({
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  // Updated to 25 segments
   const segments = [
-    { brand: "Apple", discount: 5, color: "#E74C3C" },
-    { brand: "Samsung", discount: 10, color: "#3498DB" },
-    { brand: "All", discount: 15, color: "#2ECC71" },
-    { brand: "Sony", discount: 7, color: "#9B59B6" },
-    { brand: "Google", discount: 12, color: "#F1C40F" },
-    { brand: "Microsoft", discount: 8, color: "#1ABC9C" },
-    { brand: "Xiaomi", discount: 20, color: "#E67E22" },
-    { brand: "Accessories", discount: 25, color: "#34495E" },
-    { brand: "Audio", discount: 18, color: "#D35400" },
-    { brand: "Games", discount: 30, color: "#8E44AD" },
-    { brand: "PlayStation", discount: 15, color: "#2980B9" },
-    { brand: "PC Games", discount: 22, color: "#27AE60" },
-    { brand: "Speakers", discount: 17, color: "#C0392B" },
-    { brand: "Laptops", discount: 8, color: "#F39C12" },
-    { brand: "Tablets", discount: 12, color: "#16A085" },
-    { brand: "Gaming Gear", discount: 20, color: "#7F8C8D" },
-    { brand: "TVs", discount: 15, color: "#3498DB" },
-    { brand: "Cameras", discount: 10, color: "#2ECC71" },
-    { brand: "Smartwatches", discount: 22, color: "#E74C3C" },
-    { brand: "Home Tech", discount: 18, color: "#9B59B6" },
-    { brand: "Nintendo", discount: 14, color: "#F1C40F" },
-    { brand: "Dell", discount: 9, color: "#1ABC9C" },
-    { brand: "HP", discount: 11, color: "#E67E22" },
-    { brand: "LG", discount: 13, color: "#34495E" },
-    { brand: "Monitors", discount: 16, color: "#D35400" },
+    { brand: "Apple", discount: 5, color: "#1A1C29" },
+    { brand: "Samsung", discount: 10, color: "#243949" },
+    { brand: "All", discount: 15, color: "#0F4C81" },
+    { brand: "Sony", discount: 7, color: "#2C3E50" },
+    { brand: "Google", discount: 12, color: "#18304C" },
+    { brand: "Microsoft", discount: 8, color: "#143A5C" },
+    { brand: "Xiaomi", discount: 20, color: "#1E293B" },
+    { brand: "Accessories", discount: 25, color: "#0A4D68" },
+    { brand: "Audio", discount: 18, color: "#222831" },
+    { brand: "Games", discount: 30, color: "#1A1C24" },
+    { brand: "PlayStation", discount: 15, color: "#0D2B44" },
+    { brand: "PC Games", discount: 22, color: "#1F3A5F" },
+    { brand: "Speakers", discount: 17, color: "#2A3147" },
+    { brand: "Laptops", discount: 8, color: "#203654" },
+    { brand: "Tablets", discount: 12, color: "#30445C" },
+    { brand: "Gaming Gear", discount: 20, color: "#0E2A47" },
+    { brand: "TVs", discount: 15, color: "#1C3D5B" },
+    { brand: "Cameras", discount: 10, color: "#263859" },
+    { brand: "Smartwatches", discount: 22, color: "#0D293E" },
+    { brand: "Home Tech", discount: 18, color: "#18445C" },
+    { brand: "Nintendo", discount: 14, color: "#2A3F65" },
+    { brand: "Dell", discount: 9, color: "#0D2438" },
+    { brand: "HP", discount: 11, color: "#243752" },
+    { brand: "LG", discount: 13, color: "#162839" },
+    { brand: "Monitors", discount: 16, color: "#213449" },
   ];
 
   const numSegments = segments.length;
@@ -103,17 +101,13 @@ const SpinWheel = ({
     const centerY = canvas.height / 2;
     const radius = Math.min(centerX, centerY) - 20;
     
-    // Draw the octagram shape wheel with 25 segments
     const drawOctagramWheel = () => {
-      const pointCount = numSegments;
-      const outerRadius = radius;
-      const innerRadius = radius * 0.4;
-      
       segments.forEach((segment, i) => {
         const startAngle = (i * segmentAngle - 90 + rotation) * Math.PI / 180;
         const endAngle = ((i + 1) * segmentAngle - 90 + rotation) * Math.PI / 180;
+        const outerRadius = radius;
+        const innerRadius = radius * 0.4;
         
-        // Calculate points of the segment
         const outerStart = {
           x: centerX + outerRadius * Math.cos(startAngle),
           y: centerY + outerRadius * Math.sin(startAngle)
@@ -122,21 +116,7 @@ const SpinWheel = ({
           x: centerX + outerRadius * Math.cos(endAngle),
           y: centerY + outerRadius * Math.sin(endAngle)
         };
-        const innerStart = {
-          x: centerX + innerRadius * Math.cos(startAngle),
-          y: centerY + innerRadius * Math.sin(startAngle)
-        };
-        const innerEnd = {
-          x: centerX + innerRadius * Math.cos(endAngle),
-          y: centerY + innerRadius * Math.sin(endAngle)
-        };
-        const midAngle = (startAngle + endAngle) / 2;
-        const midPoint = {
-          x: centerX + (outerRadius * 0.7) * Math.cos(midAngle),
-          y: centerY + (outerRadius * 0.7) * Math.sin(midAngle)
-        };
         
-        // Draw the segment
         ctx.beginPath();
         ctx.moveTo(centerX, centerY);
         ctx.lineTo(outerStart.x, outerStart.y);
@@ -144,59 +124,64 @@ const SpinWheel = ({
         ctx.lineTo(centerX, centerY);
         ctx.closePath();
         
-        // Fill and stroke the segment
         ctx.fillStyle = segment.color;
         ctx.fill();
-        ctx.strokeStyle = '#ffffff';
+        ctx.strokeStyle = '#4A5568';
         ctx.lineWidth = 1;
         ctx.stroke();
         
-        // Add text
+        const midAngle = (startAngle + endAngle) / 2;
+        const textRadius = outerRadius * 0.7;
+        const textX = centerX + textRadius * Math.cos(midAngle);
+        const textY = centerY + textRadius * Math.sin(midAngle);
+        
         ctx.save();
-        ctx.translate(midPoint.x, midPoint.y);
-        ctx.rotate(midAngle + Math.PI/2);
+        ctx.translate(textX, textY);
+        ctx.rotate(midAngle + Math.PI / 2);
         ctx.fillStyle = '#ffffff';
-        ctx.font = '9px Arial';
+        ctx.font = 'bold 9px Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         
-        if (segment.brand.length > 10) {
-          const words = segment.brand.split(' ');
+        const brandName = segment.brand;
+        const discount = `${segment.discount}%`;
+        
+        if (brandName.length > 8) {
+          const words = brandName.split(' ');
           if (words.length > 1) {
             ctx.fillText(words[0], 0, -6);
-            ctx.fillText(words.slice(1).join(' '), 0, 6);
+            ctx.fillText(words.slice(1).join(' '), 0, 2);
+            ctx.fillText(discount, 0, 10);
           } else {
-            const midpoint = Math.floor(segment.brand.length / 2);
-            ctx.fillText(segment.brand.substring(0, midpoint) + '-', 0, -6);
-            ctx.fillText(segment.brand.substring(midpoint), 0, 6);
+            const midpoint = Math.floor(brandName.length / 2);
+            ctx.fillText(brandName.substring(0, midpoint) + '-', 0, -6);
+            ctx.fillText(brandName.substring(midpoint), 0, 2);
+            ctx.fillText(discount, 0, 10);
           }
         } else {
-          ctx.fillText(segment.brand, 0, -6);
+          ctx.fillText(brandName, 0, -3);
+          ctx.fillText(discount, 0, 7);
         }
-        ctx.fillText(`${segment.discount}%`, 0, 6);
         ctx.restore();
       });
     };
     
-    // Draw the octagram wheel
     drawOctagramWheel();
     
-    // Draw center circle
     ctx.beginPath();
-    ctx.arc(centerX, centerY, 20, 0, Math.PI * 2);
-    ctx.fillStyle = '#333333';
+    ctx.arc(centerX, centerY, 30, 0, Math.PI * 2);
+    ctx.fillStyle = '#0A4D68';
     ctx.fill();
-    ctx.strokeStyle = '#ffffff';
+    ctx.strokeStyle = '#4A5568';
     ctx.lineWidth = 2;
     ctx.stroke();
     
-    // Draw pointer
     ctx.beginPath();
     ctx.moveTo(centerX, centerY - radius - 5);
-    ctx.lineTo(centerX - 10, centerY - radius - 20);
-    ctx.lineTo(centerX + 10, centerY - radius - 20);
+    ctx.lineTo(centerX - 15, centerY - radius - 25);
+    ctx.lineTo(centerX + 15, centerY - radius - 25);
     ctx.closePath();
-    ctx.fillStyle = '#ff5722';
+    ctx.fillStyle = '#0F4C81';
     ctx.fill();
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 2;
@@ -223,18 +208,16 @@ const SpinWheel = ({
     setIsSpinning(true);
     setResult(null);
     
-    // More rotations for a better spinning effect
     const rotations = 5 + Math.random() * 3;
     const landingAngle = Math.floor(Math.random() * 360);
     const totalRotation = rotations * 360 + landingAngle;
     let currentRotation = rotation;
     const startTime = Date.now();
-    const duration = 4000; // Longer spin for more drama
+    const duration = 4000;
     
     const animate = () => {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      // Cubic easing out for a more realistic spinning effect
       const easeOut = 1 - Math.pow(1 - progress, 3);
       currentRotation = rotation + totalRotation * easeOut;
       setRotation(currentRotation);
@@ -269,9 +252,9 @@ const SpinWheel = ({
       <div className="relative">
         <canvas 
           ref={canvasRef} 
-          width={320} 
-          height={320} 
-          className="border rounded-full shadow-lg"
+          width={340} 
+          height={340} 
+          className="border rounded-full shadow-lg border-border"
         />
       </div>
       
@@ -284,14 +267,14 @@ const SpinWheel = ({
         <button 
           onClick={spinWheel} 
           disabled={isSpinning} 
-          className="mt-4 px-6 py-2 bg-primary rounded-md hover:bg-primary/90 disabled:opacity-50 text-stone-950"
+          className="mt-4 px-6 py-2 spin-wheel-btn rounded-md hover:opacity-90 disabled:opacity-50"
         >
           {isSpinning ? 'Spinning...' : 'Spin'}
         </button>
       )}
       
       {result && (
-        <div className="mt-4 p-3 bg-green-100 text-green-700 rounded-md">
+        <div className="mt-4 p-3 bg-muted text-accent-foreground rounded-md">
           {result}
         </div>
       )}

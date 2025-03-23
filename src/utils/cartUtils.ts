@@ -15,7 +15,10 @@ export const saveCartToLocalStorage = (cart: Product[]) => {
 // Add product to cart with accessories
 export const addProductToCart = (product: Product, quantity: number, accessories?: { id: number | string, selected: boolean }[]) => {
   const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-  const existingProductIndex = cart.findIndex((item: Product) => item.id === product.id);
+  const existingProductIndex = cart.findIndex((item: Product) => 
+    item.id === product.id && 
+    item.selectedColor === product.selectedColor
+  );
   
   // If product has accessories and they're passed, update them on the product
   const productToAdd = { ...product };
@@ -56,6 +59,13 @@ export const calculateProductTotal = (product: Product, discounts: Record<string
   // Apply discount if available
   if (product.brand && discounts[product.brand] && discounts[product.brand].expiresAt > Date.now()) {
     basePrice = basePrice * (1 - discounts[product.brand].value / 100);
+  } else if (discounts['All'] && discounts['All'].expiresAt > Date.now()) {
+    basePrice = basePrice * (1 - discounts['All'].value / 100);
+  }
+  
+  // Apply product-specific discount if available (from admin)
+  if (product.discount && product.discount > 0) {
+    basePrice = basePrice * (1 - product.discount / 100);
   }
   
   // Calculate price with accessories
