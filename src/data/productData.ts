@@ -12,6 +12,7 @@ export interface Product {
   quantity?: number;
   discount?: number;
   accessories?: ProductAccessory[];
+  selectedColor?: string;
 }
 
 export interface ProductAccessory {
@@ -805,4 +806,3 @@ products.sort((a, b) => {
   }
   return a.category.localeCompare(b.category);
 });
-
