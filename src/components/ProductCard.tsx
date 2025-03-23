@@ -14,7 +14,7 @@ interface ProductCardProps {
   brand: string;
   discountedPrice?: number;
   discount?: number;
-  onQuantityChange: (id: number, quantity: number) => void;
+  onQuantityChange: (id: number, quantity: number, selectedColor?: string) => void;
   onProductClick?: () => void;
   stock?: number;
   updateStock?: (id: number, newStock: number) => void;
@@ -37,8 +37,12 @@ const ProductCard = ({
   const [wishlist, setWishlist] = useState(false);
   const [currentStock, setCurrentStock] = useState(stock);
   const [showOutOfStockAlert, setShowOutOfStockAlert] = useState(false);
+  const [selectedColor, setSelectedColor] = useState("Blue");
   const { toast } = useToast();
   const navigate = useNavigate();
+  
+  // Available product colors
+  const productColors = ["Blue", "White", "Titanium", "Black"];
   
   useEffect(() => {
     // Check if the product is already in the wishlist when the component mounts
@@ -58,7 +62,7 @@ const ProductCard = ({
     
     if (quantity === 0) {
       setQuantity(1);
-      onQuantityChange(id, 1);
+      onQuantityChange(id, 1, selectedColor);
       
       // Update stock
       const newStock = currentStock - 1;
@@ -66,7 +70,7 @@ const ProductCard = ({
       if (updateStock) updateStock(id, newStock);
       
       toast({
-        description: `${name} added to cart`,
+        description: `${name} (${selectedColor}) added to cart`,
       });
     }
   };
@@ -82,7 +86,7 @@ const ProductCard = ({
     }
     
     setQuantity(newQuantity);
-    onQuantityChange(id, newQuantity);
+    onQuantityChange(id, newQuantity, selectedColor);
     
     // Update stock
     const newStock = currentStock - diff;
@@ -141,6 +145,17 @@ const ProductCard = ({
       .replace(/_/g, ' ')
       .replace(/\b\w/g, char => char.toUpperCase());
   };
+
+  // Handle color selection
+  const handleColorSelect = (color: string) => {
+    setSelectedColor(color);
+    if (quantity > 0) {
+      onQuantityChange(id, quantity, color);
+      toast({
+        description: `Updated ${name} color to ${color}`,
+      });
+    }
+  };
   
   return (
     <>
@@ -178,6 +193,27 @@ const ProductCard = ({
               {capitalizeWords(name)}
             </h3>
             <p className="text-sm text-muted-foreground">{brand}</p>
+          </div>
+          
+          {/* Color selection buttons */}
+          <div className="flex justify-center gap-2 mb-3">
+            {productColors.map(color => (
+              <button
+                key={color}
+                onClick={() => handleColorSelect(color)}
+                className={`w-6 h-6 rounded-full border ${
+                  selectedColor === color ? 'border-primary ring-2 ring-primary/30' : 'border-gray-300'
+                }`}
+                style={{ 
+                  backgroundColor: color.toLowerCase() === 'blue' ? '#1e90ff' : 
+                                  color.toLowerCase() === 'white' ? '#ffffff' :
+                                  color.toLowerCase() === 'titanium' ? '#878681' : '#000000',
+                  cursor: 'pointer'
+                }}
+                aria-label={`Select ${color} color`}
+                title={color}
+              />
+            ))}
           </div>
           
           <div className="flex justify-between items-center mb-3">

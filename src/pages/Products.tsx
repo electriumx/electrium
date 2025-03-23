@@ -183,22 +183,28 @@ const Products = () => {
     setSearchQuery(query);
   };
 
-  const handleQuantityChange = (id: number, quantity: number) => {
+  const handleQuantityChange = (id: number, quantity: number, selectedColor?: string) => {
     const updatedCart = [...cart];
-    const existingItemIndex = updatedCart.findIndex(item => item.id === id);
+    const existingItemIndex = updatedCart.findIndex(item => 
+      item.id === id && (!selectedColor || item.selectedColor === selectedColor)
+    );
     
     if (existingItemIndex !== -1) {
       if (quantity === 0) {
         updatedCart.splice(existingItemIndex, 1);
       } else {
         updatedCart[existingItemIndex].quantity = quantity;
+        if (selectedColor) {
+          updatedCart[existingItemIndex].selectedColor = selectedColor;
+        }
       }
     } else if (quantity > 0) {
       const product = allProducts.find(p => p.id === id);
       if (product) {
         updatedCart.push({
           ...product,
-          quantity
+          quantity,
+          selectedColor: selectedColor || "Blue" // Default color if none selected
         });
       }
     }

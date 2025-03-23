@@ -8,7 +8,7 @@ import { Heart } from 'lucide-react';
 
 interface ProductGridProps {
   products: Product[];
-  onQuantityChange: (id: number, quantity: number) => void;
+  onQuantityChange: (id: number, quantity: number, selectedColor?: string) => void;
   discounts: Record<string, { value: number, expiresAt: number }>;
   showWishlistButton?: boolean;
   productStocks?: Record<number, number>;
@@ -148,8 +148,8 @@ const ProductGrid = ({
     return 0;
   };
 
-  const handleDetailQuantityChange = (id: number, quantity: number) => {
-    onQuantityChange(id, quantity);
+  const handleDetailQuantityChange = (id: number, quantity: number, selectedColor?: string) => {
+    onQuantityChange(id, quantity, selectedColor);
     
     // Update stock based on quantity change
     const product = products.find(p => p.id === id);
@@ -174,6 +174,11 @@ const ProductGrid = ({
         const stock = productStocks[product.id] || 0;
         const finalPrice = getProductPrice(product);
 
+        // Special case for Elden Ring - update image URL
+        const imageUrl = product.name.toLowerCase().includes('elden ring') 
+          ? 'https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg'
+          : product.imageUrl;
+
         return (
           <div 
             key={product.id}
@@ -182,7 +187,7 @@ const ProductGrid = ({
           >
             <div className="relative">
               <img 
-                src={product.imageUrl} 
+                src={imageUrl} 
                 alt={product.name} 
                 className="product-image w-full h-48 object-contain"
               />
