@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "next-themes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useNavigate, useLocation, Navigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Index from "./pages/Index";
 import Products from "./pages/Products";
 import About from "./pages/About";
@@ -26,7 +26,6 @@ import SocialButtons from "./components/SocialButtons";
 import PaymentSuccess from "./components/PaymentSuccess";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import CookieConsent from "./components/CookieConsent";
-import { useEffect } from "react";
 import AIChat from "./components/AIChat";
 import RouteTracker from "./components/RouteTracker";
 import BackButton from "./components/BackButton";
@@ -105,11 +104,21 @@ const PageWithBackButton = ({ children }: { children: React.ReactNode }) => {
 
 // Main app wrapper that uses the auth context
 const AppWithAuth = () => {
-  const [showCookieConsent, setShowCookieConsent] = useState(() => {
-    return localStorage.getItem('cookieConsent') !== 'accepted';
-  });
-  
+  const { isAuthenticated, currentUser } = useAuth();
+  const [showCookieConsent, setShowCookieConsent] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
+
+  useEffect(() => {
+    // Check if cookie consent has been shown to this account
+    if (isAuthenticated && currentUser) {
+      const cookieConsent = localStorage.getItem(`cookieConsent_${currentUser.username}`);
+      setShowCookieConsent(!cookieConsent);
+    } else if (!isAuthenticated) {
+      // For non-authenticated users, use a generic key
+      const cookieConsent = localStorage.getItem('cookieConsent_guest');
+      setShowCookieConsent(!cookieConsent);
+    }
+  }, [isAuthenticated, currentUser]);
 
   const toggleChat = () => {
     setIsChatOpen(!isChatOpen);
@@ -121,7 +130,11 @@ const AppWithAuth = () => {
   }, []);
 
   const handleCookieAccept = () => {
-    localStorage.setItem('cookieConsent', 'accepted');
+    if (isAuthenticated && currentUser) {
+      localStorage.setItem(`cookieConsent_${currentUser.username}`, 'accepted');
+    } else {
+      localStorage.setItem('cookieConsent_guest', 'accepted');
+    }
     setShowCookieConsent(false);
   };
 

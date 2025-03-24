@@ -26,7 +26,7 @@ const BackButton = () => {
     <Button 
       variant="ghost" 
       size="sm" 
-      className="absolute top-4 left-4 z-10" 
+      className="fixed top-4 left-4 z-50" 
       onClick={handleBack}
     >
       <ArrowLeft className="mr-1 h-4 w-4" />

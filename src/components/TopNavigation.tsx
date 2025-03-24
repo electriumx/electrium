@@ -1,7 +1,7 @@
 
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Heart, Settings, Mail } from 'lucide-react';
+import { Heart, Settings } from 'lucide-react';
 
 interface TopNavigationProps {
   toggleChat: () => void;
