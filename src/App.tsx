@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -27,6 +28,8 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import CookieConsent from "./components/CookieConsent";
 import { useEffect } from "react";
 import AIChat from "./components/AIChat";
+import RouteTracker from "./components/RouteTracker";
+import BackButton from "./components/BackButton";
 
 const queryClient = new QueryClient();
 
@@ -87,6 +90,19 @@ const AdminKeyHandler = () => {
   return null;
 };
 
+// Page wrapper component that includes BackButton for all pages except home
+const PageWithBackButton = ({ children }: { children: React.ReactNode }) => {
+  const location = useLocation();
+  const showBackButton = location.pathname !== '/';
+  
+  return (
+    <div className="relative">
+      {showBackButton && <BackButton />}
+      {children}
+    </div>
+  );
+};
+
 // Main app wrapper that uses the auth context
 const AppWithAuth = () => {
   const [showCookieConsent, setShowCookieConsent] = useState(() => {
@@ -112,25 +128,26 @@ const AppWithAuth = () => {
   return (
     <>
       <AdminKeyHandler />
+      <RouteTracker />
       <Toaster />
       <Sonner />
       <TopNavigation toggleChat={toggleChat} />
       <div className="pt-16">
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/payment" element={<ProtectedPaymentRoute />} />
-          <Route path="/payment-success" element={<PaymentSuccess />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/thank-you" element={<ThankYou />} />
-          <Route path="/donation" element={<Donation />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/wishlist" element={<Wishlist />} />
-          <Route path="/admin" element={<AdminRoute />} />
-          <Route path="*" element={<NotFound />} />
+          <Route path="/products" element={<PageWithBackButton><Products /></PageWithBackButton>} />
+          <Route path="/about" element={<PageWithBackButton><About /></PageWithBackButton>} />
+          <Route path="/checkout" element={<PageWithBackButton><Checkout /></PageWithBackButton>} />
+          <Route path="/payment" element={<PageWithBackButton><ProtectedPaymentRoute /></PageWithBackButton>} />
+          <Route path="/payment-success" element={<PageWithBackButton><PaymentSuccess /></PageWithBackButton>} />
+          <Route path="/login" element={<PageWithBackButton><Login /></PageWithBackButton>} />
+          <Route path="/register" element={<PageWithBackButton><Register /></PageWithBackButton>} />
+          <Route path="/thank-you" element={<PageWithBackButton><ThankYou /></PageWithBackButton>} />
+          <Route path="/donation" element={<PageWithBackButton><Donation /></PageWithBackButton>} />
+          <Route path="/settings" element={<PageWithBackButton><Settings /></PageWithBackButton>} />
+          <Route path="/wishlist" element={<PageWithBackButton><Wishlist /></PageWithBackButton>} />
+          <Route path="/admin" element={<PageWithBackButton><AdminRoute /></PageWithBackButton>} />
+          <Route path="*" element={<PageWithBackButton><NotFound /></PageWithBackButton>} />
         </Routes>
       </div>
       

@@ -15,8 +15,12 @@ interface UsedCoupon {
   usedAt: number;
 }
 
+// Global variable in localStorage to ensure consistent access across devices
+const COUPONS_STORAGE_KEY = 'globalAdminCoupons';
+const USED_COUPONS_STORAGE_KEY = 'globalUsedCoupons';
+
 export const getCoupons = (): Coupon[] => {
-  const savedCoupons = localStorage.getItem('adminCoupons');
+  const savedCoupons = localStorage.getItem(COUPONS_STORAGE_KEY);
   if (savedCoupons) {
     try {
       return JSON.parse(savedCoupons);
@@ -29,7 +33,7 @@ export const getCoupons = (): Coupon[] => {
 };
 
 export const getUsedCoupons = (): UsedCoupon[] => {
-  const savedUsedCoupons = localStorage.getItem('usedCoupons');
+  const savedUsedCoupons = localStorage.getItem(USED_COUPONS_STORAGE_KEY);
   if (savedUsedCoupons) {
     try {
       return JSON.parse(savedUsedCoupons);
@@ -50,7 +54,7 @@ export const saveCouponUsage = (code: string, userId: string) => {
     usedAt: Date.now()
   });
   
-  localStorage.setItem('usedCoupons', JSON.stringify(usedCoupons));
+  localStorage.setItem(USED_COUPONS_STORAGE_KEY, JSON.stringify(usedCoupons));
 };
 
 export const applyCoupon = (code: string, userId: string, productCategory?: string): { valid: boolean; discount: number } => {

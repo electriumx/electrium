@@ -1,301 +1,135 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { useAuth } from '../contexts/AuthContext';
+
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-
-const formatCardNumber = (value: string): string => {
-  const digits = value.replace(/\D/g, '');
-  const chunks = [];
-  
-  for (let i = 0; i < digits.length && i < 16; i += 4) {
-    chunks.push(digits.slice(i, i + 4));
-  }
-  
-  return chunks.join(' ');
-};
-
-const formatExpiryDate = (value: string): string => {
-  const digits = value.replace(/\D/g, '');
-  
-  if (digits.length <= 2) {
-    return digits;
-  }
-  
-  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}`;
-};
-
-const formatCVV = (value: string): string => {
-  return value.replace(/\D/g, '').slice(0, 4);
-};
-
-const validateCardNumber = (cardNumber: string): boolean => {
-  const digits = cardNumber.replace(/\D/g, '');
-  
-  if (digits.length < 13 || digits.length > 19) {
-    return false;
-  }
-  
-  let sum = 0;
-  let shouldDouble = false;
-  
-  for (let i = digits.length - 1; i >= 0; i--) {
-    let digit = parseInt(digits.charAt(i));
-    
-    if (shouldDouble) {
-      digit *= 2;
-      if (digit > 9) {
-        digit -= 9;
-      }
-    }
-    
-    sum += digit;
-    shouldDouble = !shouldDouble;
-  }
-  
-  return sum % 10 === 0;
-};
+import { Slider } from '@/components/ui/slider';
+import { Label } from '@/components/ui/label';
+import { ArrowLeft, Heart } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useGlobalDonation } from '@/hooks/use-global-donation';
 
 const Donation = () => {
-  const [amount, setAmount] = useState('');
-  const [cardNumber, setCardNumber] = useState('');
-  const [expiryDate, setExpiryDate] = useState('');
-  const [cvv, setCvv] = useState('');
-  const [isOnCooldown, setIsOnCooldown] = useState(false);
-  const [cooldownTime, setCooldownTime] = useState(0);
-  const [totalDonations, setTotalDonations] = useState(0);
-  const [donationCount, setDonationCount] = useState(0);
-  const [currentLanguage, setCurrentLanguage] = useState('english');
-  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  const MAX_DONATION = 1000000;
-
-  useEffect(() => {
-    const savedLanguage = localStorage.getItem('preferredLanguage');
-    if (savedLanguage) {
-      setCurrentLanguage(savedLanguage);
-    }
-    
-    const handleLanguageChange = (e: CustomEvent) => {
-      setCurrentLanguage(e.detail);
-    };
-    
-    window.addEventListener('languageChange', handleLanguageChange as EventListener);
-    
-    const savedTotal = localStorage.getItem('totalDonations');
-    if (savedTotal) {
-      setTotalDonations(parseFloat(savedTotal));
-    }
-    
-    const savedCount = localStorage.getItem('donationCount');
-    if (savedCount) {
-      setDonationCount(parseInt(savedCount, 10));
-    }
-
-    let intervalId: NodeJS.Timeout;
-    if (isOnCooldown && cooldownTime > 0) {
-      intervalId = setInterval(() => {
-        setCooldownTime((time) => time - 1);
-      }, 1000);
-    } else if (cooldownTime === 0) {
-      setIsOnCooldown(false);
-    }
-    
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-      window.removeEventListener('languageChange', handleLanguageChange as EventListener);
-    };
-  }, [isOnCooldown, cooldownTime]);
-
-  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatCardNumber(e.target.value);
-    setCardNumber(formatted);
+  const [amount, setAmount] = useState(10);
+  const { totalDonations, addDonation } = useGlobalDonation();
+  
+  const presetAmounts = [5, 10, 25, 50, 100];
+  
+  const handleAmountSelect = (value: number) => {
+    setAmount(value);
   };
-
-  const handleExpiryDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatExpiryDate(e.target.value);
-    setExpiryDate(formatted);
+  
+  const handleSliderChange = (values: number[]) => {
+    setAmount(values[0]);
   };
-
-  const handleCvvChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatCVV(e.target.value);
-    setCvv(formatted);
+  
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(e.target.value);
+    if (!isNaN(value) && value >= 0) {
+      setAmount(value);
+    }
   };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const donationAmount = Number(amount);
-
-    if (!isAuthenticated) {
-      toast({
-        variant: "destructive",
-        title: "Authentication Required",
-        description: "Please sign in to make a donation"
-      });
-      navigate('/login', { state: { from: '/donation' } });
-      return;
-    }
-
-    if (isOnCooldown) {
-      toast({
-        variant: "destructive",
-        title: "Donation Cooldown",
-        description: `Please wait ${cooldownTime} seconds before making another donation`
-      });
-      return;
-    }
-
-    if (isNaN(donationAmount) || donationAmount < 1 || donationAmount > MAX_DONATION) {
-      toast({
-        variant: "destructive",
-        title: "Invalid Amount",
-        description: `Please enter an amount between $1 and $${MAX_DONATION.toLocaleString()}`
-      });
-      return;
-    }
-
-    if (!cardNumber || !expiryDate || !cvv) {
-      toast({
-        variant: "destructive",
-        title: "Missing Card Details",
-        description: "Please fill in all card details"
-      });
-      return;
-    }
-
-    const newTotal = totalDonations + donationAmount;
-    setTotalDonations(newTotal);
-    localStorage.setItem('totalDonations', newTotal.toString());
+  
+  const handleDonate = () => {
+    const newTotal = addDonation(amount);
     
-    const newCount = donationCount + 1;
-    setDonationCount(newCount);
-    localStorage.setItem('donationCount', newCount.toString());
-
     toast({
-      title: "Thank you!",
-      description: `Your donation of $${donationAmount} has been received`
+      title: "Thank you for your donation!",
+      description: `Your donation of $${amount.toFixed(2)} has been received.`
     });
-
-    setIsOnCooldown(true);
-    setCooldownTime(15);
-    setAmount('');
-    setCardNumber('');
-    setExpiryDate('');
-    setCvv('');
+    
+    navigate('/thank-you');
   };
-
+  
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-card/60 backdrop-blur-sm p-8 rounded-xl shadow-lg relative">
-        <div>
-          <h2 className="text-center text-3xl font-bold mb-2">Make Donation</h2>
-          <div className="flex justify-center gap-6 mb-4">
-            <div className="text-center">
-              <p className="text-muted-foreground text-sm">Total Raised</p>
-              <p className="font-bold text-xl">${totalDonations.toFixed(2)}</p>
-            </div>
-            <div className="text-center">
-              <p className="text-muted-foreground text-sm">Donations</p>
-              <p className="font-bold text-xl">{donationCount}</p>
-            </div>
+    <div className="w-full max-w-3xl mx-auto p-4 pt-10">
+      <Card>
+        <CardHeader className="text-center">
+          <div className="mx-auto bg-primary-foreground p-4 rounded-full w-16 h-16 flex items-center justify-center mb-2">
+            <Heart className="h-8 w-8 text-destructive" />
           </div>
-          <p className="mt-2 text-center text-sm text-muted-foreground">
-            Support Mission with a donation between $1 and ${MAX_DONATION.toLocaleString()}
-          </p>
-          {isOnCooldown && (
-            <p className="mt-2 text-center text-sm text-yellow-400">
-              Cooldown: {cooldownTime} seconds
-            </p>
-          )}
-        </div>
-
-        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="amount" className="block text-sm font-medium text-gray-300">
-                Donation Amount ($)
-              </label>
-              <input
-                id="amount"
-                name="amount"
-                type="number"
-                min="1"
-                max={MAX_DONATION}
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-700 rounded-md shadow-sm bg-gray-900 text-white focus:outline-none focus:ring-sage-500 focus:border-sage-500"
-                placeholder="Enter amount"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-              />
-            </div>
-
-            <div>
-              <label htmlFor="cardNumber" className="block text-sm font-medium text-gray-300">
-                Card Number
-              </label>
-              <input
-                id="cardNumber"
-                name="cardNumber"
-                type="text"
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-700 rounded-md shadow-sm bg-gray-900 text-white focus:outline-none focus:ring-sage-500 focus:border-sage-500"
-                placeholder="1234 5678 9012 3456"
-                value={cardNumber}
-                onChange={handleCardNumberChange}
-                maxLength={19}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="expiryDate" className="block text-sm font-medium text-gray-300">
-                  Expiry Date
-                </label>
-                <input
-                  id="expiryDate"
-                  name="expiryDate"
-                  type="text"
-                  required
-                  className="mt-1 block w-full px-3 py-2 border border-gray-700 rounded-md shadow-sm bg-gray-900 text-white focus:outline-none focus:ring-sage-500 focus:border-sage-500"
-                  placeholder="MM/YY"
-                  value={expiryDate}
-                  onChange={handleExpiryDateChange}
-                  maxLength={5}
-                />
+          <CardTitle className="text-2xl">Make a Donation</CardTitle>
+          <CardDescription>Your contribution helps support our mission</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <h3 className="font-medium text-lg">Donation Amount</h3>
+              <div className="text-muted-foreground">
+                Total Raised: ${totalDonations.toFixed(2)}
               </div>
-
-              <div>
-                <label htmlFor="cvv" className="block text-sm font-medium text-gray-300">
-                  CVV
-                </label>
-                <input
-                  id="cvv"
-                  name="cvv"
-                  type="text"
-                  required
-                  className="mt-1 block w-full px-3 py-2 border border-gray-700 rounded-md shadow-sm bg-gray-900 text-white focus:outline-none focus:ring-sage-500 focus:border-sage-500"
-                  placeholder="123"
-                  value={cvv}
-                  onChange={handleCvvChange}
-                  maxLength={4}
+            </div>
+            
+            <div className="grid grid-cols-5 gap-2">
+              {presetAmounts.map((presetAmount) => (
+                <Button 
+                  key={presetAmount}
+                  variant={amount === presetAmount ? "default" : "outline"}
+                  onClick={() => handleAmountSelect(presetAmount)}
+                >
+                  ${presetAmount}
+                </Button>
+              ))}
+            </div>
+            
+            <div className="pt-6 pb-2">
+              <Slider
+                value={[amount]}
+                min={1}
+                max={250}
+                step={1}
+                onValueChange={handleSliderChange}
+              />
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Label htmlFor="customAmount">Custom Amount:</Label>
+              <div className="relative flex-1">
+                <span className="absolute left-3 top-2.5">$</span>
+                <Input
+                  id="customAmount"
+                  type="number"
+                  min="1"
+                  value={amount}
+                  onChange={handleInputChange}
+                  className="pl-7"
                 />
               </div>
             </div>
           </div>
-
-          <button
-            type="submit"
-            disabled={isOnCooldown}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-sage-500 hover:bg-sage-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sage-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          
+          <div className="space-y-2">
+            <Label htmlFor="message">Message (Optional)</Label>
+            <Input
+              id="message"
+              placeholder="Add a message with your donation"
+            />
+          </div>
+          
+          <div className="rounded-lg bg-muted p-4">
+            <h4 className="font-medium mb-2">How your donation helps:</h4>
+            <ul className="space-y-1 text-sm">
+              <li>• Supporting community initiatives</li>
+              <li>• Funding educational programs</li>
+              <li>• Providing resources to those in need</li>
+              <li>• Advancing our shared mission</li>
+            </ul>
+          </div>
+        </CardContent>
+        <CardFooter>
+          <Button 
+            className="w-full" 
+            size="lg" 
+            onClick={handleDonate}
+            disabled={amount <= 0}
           >
-            Donate
-          </button>
-        </form>
-      </div>
+            Donate ${amount.toFixed(2)}
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
   );
 };

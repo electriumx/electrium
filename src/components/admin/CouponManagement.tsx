@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,9 @@ interface Coupon {
   isActive: boolean;
   category?: string;
 }
+
+// Global storage key for coupons
+const COUPONS_STORAGE_KEY = 'globalAdminCoupons';
 
 const CouponManagement = () => {
   const { toast } = useToast();
@@ -62,7 +66,7 @@ const CouponManagement = () => {
 
   // Load coupons from localStorage
   useEffect(() => {
-    const savedCoupons = localStorage.getItem('adminCoupons');
+    const savedCoupons = localStorage.getItem(COUPONS_STORAGE_KEY);
     if (savedCoupons) {
       try {
         const parsedCoupons = JSON.parse(savedCoupons);
@@ -274,13 +278,13 @@ const CouponManagement = () => {
     ];
     
     setCoupons(defaultCoupons);
-    localStorage.setItem('adminCoupons', JSON.stringify(defaultCoupons));
+    localStorage.setItem(COUPONS_STORAGE_KEY, JSON.stringify(defaultCoupons));
   };
 
   // Save coupons to localStorage
   useEffect(() => {
     if (coupons.length > 0) {
-      localStorage.setItem('adminCoupons', JSON.stringify(coupons));
+      localStorage.setItem(COUPONS_STORAGE_KEY, JSON.stringify(coupons));
     }
   }, [coupons]);
 

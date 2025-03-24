@@ -1,3 +1,4 @@
+
 import { Product } from './productData';
 import { getCategoryImage, getGameImage } from '../utils/productImageUtils';
 
@@ -354,6 +355,26 @@ export const generateAdditionalProducts = (): Product[] => {
       }))
     );
   });
+  
+  // Add Call of Duty Black Ops games 1-6
+  nextId += 1000;
+  for (let i = 1; i <= 6; i++) {
+    products = products.concat([
+      {
+        id: nextId + i,
+        name: `Call of Duty: Black Ops ${i}`,
+        price: 59.99,
+        category: "Games",
+        brand: "PC Games",
+        description: `Call of Duty: Black Ops ${i} - intense first-person shooter with epic campaign and multiplayer modes`,
+        imageUrl: `/lovable-uploads/e697f6f9-1a87-4501-9265-09ba16f3af26.png`, // Will be overridden by productImageUtils
+        quantity: 0,
+        rating: randomRating(),
+        reviews: randomReviews(),
+        subcategory: "FPS Games"
+      }
+    ]);
+  }
   
   return products;
 };

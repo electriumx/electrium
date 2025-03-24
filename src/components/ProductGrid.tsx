@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { Product } from '../data/productData';
 import { useToast } from '@/hooks/use-toast';
-import { translateText } from '@/utils/translation';
 import ProductDetailModal from './ProductDetailModal';
 import { Heart } from 'lucide-react';
 
@@ -181,6 +180,8 @@ const ProductGrid = ({
           imageUrl = '/lovable-uploads/49cf3cc6-b591-4fe9-b0ca-7e21178098d2.png';
         } else if (product.category === 'Washing Machines') {
           imageUrl = '/lovable-uploads/2ae5236f-4492-452a-b393-492c225380c1.png';
+        } else if (product.name.toLowerCase().includes('rainbow six')) {
+          imageUrl = '/lovable-uploads/e697f6f9-1a87-4501-9265-09ba16f3af26.png';
         } else if (product.brand === 'Samsung') {
           if (product.name.toLowerCase().includes('interactive panel')) {
             imageUrl = '/lovable-uploads/83220acc-b41f-488f-996c-70c790349093.png';
