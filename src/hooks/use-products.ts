@@ -237,9 +237,51 @@ export const useProducts = () => {
           imageUrl: "/lovable-uploads/e4e5c805-99ee-44b2-bac6-a7549cd85562.png"
         };
       }
-      // Call of Duty Black Ops 6 for PC gets the new fourth image
+      // Call of Duty Black Ops 6 gets the new fourth image
       else if (product.name.toLowerCase().includes("call of duty black ops 6") || 
                product.name.toLowerCase().includes("call of duty: black ops 6")) {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png"
+        };
+      }
+      // Washing Machines get the newly uploaded image
+      else if (product.category === "Washing Machines") {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/2ae5236f-4492-452a-b393-492c225380c1.png"
+        };
+      }
+      // Horizon Kings - Simulation gets the newly uploaded image
+      else if (product.name.toLowerCase().includes("horizon kings") && product.name.toLowerCase().includes("simulation")) {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/f58b103e-1e2f-4e40-92bd-5ceee55670d4.png"
+        };
+      }
+      // World of Warriors - Racing gets the newly uploaded image
+      else if (product.name.toLowerCase().includes("world of warriors") && product.name.toLowerCase().includes("racing")) {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/cf30cef5-878e-4911-b265-6fadc46cd9b1.png"
+        };
+      }
+      // Ultimate Fantasy - Racing gets the newly uploaded image
+      else if (product.name.toLowerCase().includes("ultimate fantasy") && product.name.toLowerCase().includes("racing")) {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/49cf3cc6-b591-4fe9-b0ca-7e21178098d2.png"
+        };
+      }
+      // Cyberpunk 2077 gets the newly uploaded image
+      else if (product.name.toLowerCase().includes("cyberpunk 2077")) {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/d0b5f6e9-d8a7-4e6d-92d9-0981cb533be3.png"
+        };
+      }
+      // All Call of Duty games
+      else if (product.name.toLowerCase().includes("call of duty")) {
         return {
           ...product,
           imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png"

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Product } from '../data/productData';
 import { useToast } from '@/hooks/use-toast';
@@ -28,7 +27,6 @@ const ProductGrid = ({
   const [wishlist, setWishlist] = useState<{[key: number]: boolean}>({});
   const { toast } = useToast();
   
-  // Function to capitalize first letter of each word and remove underscores
   const formatText = (text: string) => {
     return text.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
   };
@@ -109,38 +107,29 @@ const ProductGrid = ({
   const getProductPrice = (product: Product) => {
     let price = product.price;
     
-    // Apply brand discount if available and valid
     const brandDiscount = discounts[product.brand];
     const allDiscount = discounts['All'];
     
-    // Only apply discounts if they're set by admin or wheel (valid discounts have expiresAt)
     if (brandDiscount && brandDiscount.expiresAt > Date.now() && brandDiscount.value > 0) {
       price = price * (1 - brandDiscount.value / 100);
     } else if (allDiscount && allDiscount.expiresAt > Date.now() && allDiscount.value > 0) {
       price = price * (1 - allDiscount.value / 100);
     } else if (product.discount && product.discount > 0) {
-      // Apply product-specific discount if no brand discount
       price = price * (1 - product.discount / 100);
     }
     
-    // Make sure discounted price is less than original price
     return price < product.price ? price : price;
   };
 
   const getDiscountPercentage = (product: Product) => {
-    // Only apply discounts if they're set by admin or wheel (valid discounts have expiresAt)
-    
-    // Product-specific discount
     if (product.discount && product.discount > 0) {
       return product.discount;
     }
     
-    // Brand-specific discount
     if (discounts[product.brand]?.expiresAt > Date.now() && discounts[product.brand]?.value > 0) {
       return discounts[product.brand].value;
     }
     
-    // Global discount
     if (discounts['All']?.expiresAt > Date.now() && discounts['All']?.value > 0) {
       return discounts['All'].value;
     }
@@ -151,7 +140,6 @@ const ProductGrid = ({
   const handleDetailQuantityChange = (id: number, quantity: number, selectedColor?: string) => {
     onQuantityChange(id, quantity, selectedColor);
     
-    // Update stock based on quantity change
     const product = products.find(p => p.id === id);
     if (product) {
       const oldQuantity = product.quantity || 0;
@@ -174,16 +162,24 @@ const ProductGrid = ({
         const stock = productStocks[product.id] || 0;
         const finalPrice = getProductPrice(product);
 
-        // Get the correct image URL based on product name/type
         let imageUrl = product.imageUrl;
         
-        // Special cases for specific products
         if (product.name.toLowerCase().includes('death stranding')) {
           imageUrl = '/lovable-uploads/e61d09d1-fb3f-4e38-aaca-2342513b89de.png';
         } else if (product.name.toLowerCase().includes('elden ring')) {
           imageUrl = 'https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg';
-        } else if (product.name.toLowerCase().includes('call of duty black ops 6')) {
+        } else if (product.name.toLowerCase().includes('call of duty')) {
           imageUrl = '/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png';
+        } else if (product.name.toLowerCase().includes('cyberpunk 2077')) {
+          imageUrl = '/lovable-uploads/d0b5f6e9-d8a7-4e6d-92d9-0981cb533be3.png';
+        } else if (product.name.toLowerCase().includes('horizon kings') && product.name.toLowerCase().includes('simulation')) {
+          imageUrl = '/lovable-uploads/f58b103e-1e2f-4e40-92bd-5ceee55670d4.png';
+        } else if (product.name.toLowerCase().includes('world of warriors') && product.name.toLowerCase().includes('racing')) {
+          imageUrl = '/lovable-uploads/cf30cef5-878e-4911-b265-6fadc46cd9b1.png';
+        } else if (product.name.toLowerCase().includes('ultimate fantasy') && product.name.toLowerCase().includes('racing')) {
+          imageUrl = '/lovable-uploads/49cf3cc6-b591-4fe9-b0ca-7e21178098d2.png';
+        } else if (product.category === 'Washing Machines') {
+          imageUrl = '/lovable-uploads/2ae5236f-4492-452a-b393-492c225380c1.png';
         } else if (product.brand === 'Samsung') {
           if (product.name.toLowerCase().includes('interactive panel')) {
             imageUrl = '/lovable-uploads/83220acc-b41f-488f-996c-70c790349093.png';

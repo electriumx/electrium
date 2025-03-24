@@ -70,8 +70,16 @@ export const getGameImage = (title: string): string => {
     return 'https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg';
   } else if (lowerTitle.includes('death stranding')) {
     return '/lovable-uploads/e61d09d1-fb3f-4e38-aaca-2342513b89de.png';
-  } else if (lowerTitle.includes('call of duty black ops 6')) {
+  } else if (lowerTitle.includes('call of duty')) {
     return '/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png';
+  } else if (lowerTitle.includes('cyberpunk 2077')) {
+    return '/lovable-uploads/d0b5f6e9-d8a7-4e6d-92d9-0981cb533be3.png';
+  } else if (lowerTitle.includes('horizon kings') && lowerTitle.includes('simulation')) {
+    return '/lovable-uploads/f58b103e-1e2f-4e40-92bd-5ceee55670d4.png';
+  } else if (lowerTitle.includes('world of warriors') && lowerTitle.includes('racing')) {
+    return '/lovable-uploads/cf30cef5-878e-4911-b265-6fadc46cd9b1.png';
+  } else if (lowerTitle.includes('ultimate fantasy') && lowerTitle.includes('racing')) {
+    return '/lovable-uploads/49cf3cc6-b591-4fe9-b0ca-7e21178098d2.png';
   }
   
   return getCategoryImage('games');
