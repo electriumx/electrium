@@ -1,4 +1,3 @@
-
 import { Product } from './productData';
 import { getCategoryImage, getGameImage } from '../utils/productImageUtils';
 
@@ -27,7 +26,10 @@ const generateProducts = (
   descriptionFormat: string,
   priceRange: [number, number]
 ): Product[] => {
-  return Array.from({ length: count }, (_, i) => {
+  // For microwaves, limit the count to 22 to avoid generating models numbered 23-100
+  const actualCount = category === "Microwaves" ? Math.min(count, 22) : count;
+  
+  return Array.from({ length: actualCount }, (_, i) => {
     const productName = `${namePrefix} ${i + 1}`;
     
     // Choose appropriate image based on category and name
@@ -227,7 +229,7 @@ export const generateAdditionalProducts = (): Product[] => {
   
   // Appliance categories - Ensure 100 products per brand
   
-  // Microwaves
+  // Microwaves - Modified to ensure numbering stops at 22
   nextId += 500;
   const microwaveBrands = ["Samsung", "LG", "Whirlpool", "Panasonic"];
   microwaveBrands.forEach((brand, index) => {
@@ -236,7 +238,7 @@ export const generateAdditionalProducts = (): Product[] => {
         "Microwaves",
         brand,
         nextId + (index * 100),
-        100,
+        22, // Generate max 22 products per brand to avoid having models 23-100
         `${brand} Microwave`,
         `${brand} microwave with multiple cooking modes and smart features, model {i}`,
         [89.99, 399.99]
@@ -326,6 +328,30 @@ export const generateAdditionalProducts = (): Product[] => {
         `${brand} smart display with voice assistant and video calling features, model {i}`,
         [99.99, 349.99]
       )
+    );
+  });
+  
+  // Add FPS games to the list
+  nextId += 500;
+  const fpsGameNames = [
+    "Counter-Strike", "Battlefield", "Rainbow Six", "Call of Duty: Modern Warfare", 
+    "Call of Duty: Vanguard", "Call of Duty: Black Ops", "Doom Eternal", "Halo Infinite"
+  ];
+  
+  fpsGameNames.forEach((gameName, index) => {
+    products = products.concat(
+      generateProducts(
+        "Games",
+        "PC Games",
+        nextId + (index * 20), // Smaller gap since we have fewer games per brand
+        5, // Generate 5 variants per game
+        gameName,
+        `${gameName} - action-packed first-person shooter with immersive gameplay, version {i}`,
+        [29.99, 69.99]
+      ).map(game => ({
+        ...game,
+        subcategory: "FPS Games"
+      }))
     );
   });
   

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Product } from '../data/productData';
 import { useToast } from '@/hooks/use-toast';
@@ -187,7 +188,17 @@ const ProductGrid = ({
             imageUrl = '/lovable-uploads/f4d18f61-e011-41e1-8945-0862b8e9cb22.png';
           } else if (product.name.toLowerCase().includes('digital signage')) {
             imageUrl = '/lovable-uploads/e4e5c805-99ee-44b2-bac6-a7549cd85562.png';
+          } else if (product.category === 'Microwaves') {
+            imageUrl = '/lovable-uploads/86bf4158-8228-4965-8b2d-1f5a3feed7e9.png';
           }
+        } else if (product.brand === 'LG' && product.category === 'Microwaves') {
+          imageUrl = '/lovable-uploads/67a3f208-e588-471a-88d1-c0db17913854.png';
+        } else if (product.brand === 'Whirlpool' && product.category === 'Microwaves') {
+          imageUrl = '/lovable-uploads/0140d4cf-1335-41c7-9dbd-d5c2fc67a2f8.png';
+        } else if (product.brand === 'Panasonic' && product.category === 'Microwaves') {
+          imageUrl = '/lovable-uploads/05649a66-79e2-4aa3-b369-2496bac58ad7.png';
+        } else if (product.category === 'Headphones' && product.subcategory && product.subcategory.toLowerCase().includes('sports')) {
+          imageUrl = '/lovable-uploads/bfd80abc-6761-4660-9b25-36864420ec27.png';
         }
 
         return (

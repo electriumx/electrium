@@ -464,7 +464,7 @@ const subcategories: Record<string, string[]> = {
   "Headphones": ["Over-ear", "In-ear", "Wireless", "Noise-cancelling", "Gaming", "Sports"],
   "PC Accessories": ["Keyboards", "Mice", "Monitors", "Webcams", "Microphones", "Speakers"],
   "Tablets": ["iOS", "Android", "Windows", "E-readers", "Budget", "Premium"],
-  "Games": ["Action", "RPG", "Strategy", "Sports", "Simulation", "Racing", "Puzzle"],
+  "Games": ["Action", "RPG", "Strategy", "Sports", "Simulation", "Racing", "Puzzle", "FPS Games"],
   "Microwaves": ["Countertop", "Built-in", "Convection", "Smart", "Compact"],
   "Washing Machines": ["Front Load", "Top Load", "Compact", "Smart", "Commercial"],
   "Refrigerators": ["French Door", "Side-by-Side", "Top Freezer", "Bottom Freezer", "Mini", "Smart"],
@@ -817,6 +817,206 @@ const applianceProducts: Product[] = [
 ];
 
 applianceProducts.forEach(product => products.push(product));
+
+const fpsGames: Product[] = [
+  {
+    id: 3001,
+    name: "Call of Duty: Black Ops 6",
+    description: "The latest installment in the Black Ops series with intense multiplayer action.",
+    price: 69.99,
+    imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
+    brand: "PC Games",
+    category: "Games",
+    subcategory: "FPS Games",
+    rating: 4.8,
+    reviews: 310,
+    accessories: [
+      { id: 'acc-fps-1', name: 'Season Pass', price: 39.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
+    ]
+  },
+  {
+    id: 3002,
+    name: "Call of Duty: Modern Warfare 3",
+    description: "Continue the gripping storyline in this action-packed first-person shooter.",
+    price: 59.99,
+    imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
+    brand: "PC Games",
+    category: "Games",
+    subcategory: "FPS Games",
+    rating: 4.7,
+    reviews: 285,
+    accessories: [
+      { id: 'acc-fps-2', name: 'Map Pack', price: 14.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
+    ]
+  },
+  {
+    id: 3003,
+    name: "Call of Duty: Warzone",
+    description: "Free-to-play battle royale game with massive 150-player battles.",
+    price: 0,
+    imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
+    brand: "PC Games",
+    category: "Games",
+    subcategory: "FPS Games",
+    rating: 4.6,
+    reviews: 420,
+    accessories: [
+      { id: 'acc-fps-3', name: 'Battle Pass', price: 9.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
+    ]
+  },
+  {
+    id: 3004,
+    name: "Counter-Strike 2",
+    description: "The iconic tactical shooter returns with enhanced graphics and gameplay.",
+    price: 49.99,
+    imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
+    brand: "PC Games",
+    category: "Games",
+    subcategory: "FPS Games",
+    rating: 4.9,
+    reviews: 550,
+    accessories: [
+      { id: 'acc-fps-4', name: 'Operation Pass', price: 14.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
+    ]
+  },
+  {
+    id: 3005,
+    name: "Counter-Strike: Global Offensive",
+    description: "Classic competitive FPS with multiple game modes and a thriving esports scene.",
+    price: 14.99,
+    imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
+    brand: "PC Games",
+    category: "Games",
+    subcategory: "FPS Games",
+    rating: 4.8,
+    reviews: 620,
+    accessories: [
+      { id: 'acc-fps-5', name: 'Operation Pass', price: 9.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
+    ]
+  },
+  {
+    id: 3006,
+    name: "Battlefield 2042",
+    description: "Large-scale warfare with destructible environments and dynamic weather.",
+    price: 39.99,
+    imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
+    brand: "PC Games",
+    category: "Games",
+    subcategory: "FPS Games",
+    rating: 4.2,
+    reviews: 380,
+    accessories: [
+      { id: 'acc-fps-6', name: 'Year 1 Pass', price: 39.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
+    ]
+  },
+  {
+    id: 3007,
+    name: "Battlefield V",
+    description: "WWII-themed shooter with immersive single-player stories and multiplayer modes.",
+    price: 29.99,
+    imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
+    brand: "PC Games",
+    category: "Games",
+    subcategory: "FPS Games",
+    rating: 4.5,
+    reviews: 410,
+    accessories: [
+      { id: 'acc-fps-7', name: 'Definitive Edition Upgrade', price: 24.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
+    ]
+  },
+  {
+    id: 3008,
+    name: "Rainbow Six Siege",
+    description: "Tactical team-based shooter focused on destructible environments and operator selection.",
+    price: 19.99,
+    imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
+    brand: "PC Games",
+    category: "Games",
+    subcategory: "FPS Games",
+    rating: 4.7,
+    reviews: 520,
+    accessories: [
+      { id: 'acc-fps-8', name: 'Year 8 Pass', price: 29.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
+    ]
+  },
+  {
+    id: 3009,
+    name: "Call of Duty: Black Ops 5",
+    description: "Cold War-era first-person shooter with cinematic campaign and competitive multiplayer.",
+    price: 49.99,
+    imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
+    brand: "PC Games",
+    category: "Games",
+    subcategory: "FPS Games",
+    rating: 4.6,
+    reviews: 375,
+    accessories: [
+      { id: 'acc-fps-9', name: 'Season Pass', price: 34.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
+    ]
+  },
+  {
+    id: 3010,
+    name: "Call of Duty: Black Ops 4",
+    description: "Multiplayer-focused FPS including the battle royale mode Blackout.",
+    price: 39.99,
+    imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
+    brand: "PC Games",
+    category: "Games",
+    subcategory: "FPS Games",
+    rating: 4.5,
+    reviews: 340,
+    accessories: [
+      { id: 'acc-fps-10', name: 'Black Ops Pass', price: 29.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
+    ]
+  },
+  {
+    id: 3011,
+    name: "Call of Duty: Black Ops 3",
+    description: "Futuristic warfare with cybernetics, robotics, and cutting-edge military technology.",
+    price: 29.99,
+    imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
+    brand: "PC Games",
+    category: "Games",
+    subcategory: "FPS Games",
+    rating: 4.4,
+    reviews: 320,
+    accessories: [
+      { id: 'acc-fps-11', name: 'Season Pass', price: 24.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
+    ]
+  },
+  {
+    id: 3012,
+    name: "Call of Duty: Black Ops 2",
+    description: "Near-future warfare with branching storylines and enhanced multiplayer experience.",
+    price: 19.99,
+    imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
+    brand: "PC Games",
+    category: "Games",
+    subcategory: "FPS Games",
+    rating: 4.7,
+    reviews: 360,
+    accessories: [
+      { id: 'acc-fps-12', name: 'Map Pack Bundle', price: 19.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
+    ]
+  },
+  {
+    id: 3013,
+    name: "Call of Duty: Black Ops",
+    description: "Cold War-era shooter with a thrilling campaign and iconic multiplayer maps.",
+    price: 14.99,
+    imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
+    brand: "PC Games",
+    category: "Games",
+    subcategory: "FPS Games",
+    rating: 4.6,
+    reviews: 330,
+    accessories: [
+      { id: 'acc-fps-13', name: 'Rezurrection Pack', price: 9.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
+    ]
+  }
+];
+
+fpsGames.forEach(game => products.push(game));
 
 products.sort((a, b) => {
   if (a.category === b.category) {

@@ -1,3 +1,4 @@
+
 // Maps product categories to appropriate image URLs from Google
 export const getCategoryImage = (category: string, brand?: string): string => {
   // These URLs point to standardized Google-like product images by category
@@ -18,6 +19,11 @@ export const getCategoryImage = (category: string, brand?: string): string => {
       return 'https://image-us.samsung.com/SamsungUS/home/television-home-theater/tvs/tvs/01192022/NeoQLED-S95C-2023/NQ9C_75-55_FrontV_Black.jpg';  // Generic TV
     
     case 'headphones':
+      if (brand?.toLowerCase() === 'apple') {
+        return '/lovable-uploads/d1307e35-8834-4230-b1d0-9aa18e7760f7.png';  // Apple Headphones
+      } else if (brand?.toLowerCase().includes('sports') || category.toLowerCase().includes('sports')) {
+        return '/lovable-uploads/bfd80abc-6761-4660-9b25-36864420ec27.png';  // Sports Headphones
+      }
       return 'https://electronics.sony.com/image/c13c1c7f0cbfcfc5ff488e5fb0ad1c98?fmt=png-alpha&wid=600&hei=600';  // Generic Headphones
     
     case 'tablets':
@@ -34,16 +40,27 @@ export const getCategoryImage = (category: string, brand?: string): string => {
         return 'https://assets.xboxservices.com/assets/a3/a2/a3a2a302-214c-4a88-a001-b19ae3e76983.jpg?n=204202N_Gallery-0_11_1350x759.jpg';  // Generic Xbox Game
       } else if (brand?.toLowerCase().includes('nintendo')) {
         return 'https://assets.nintendo.com/image/upload/c_fill,w_1200/q_auto:best/f_auto/dpr_2.0/ncom/en_US/games/switch/m/mario-kart-8-deluxe-switch/hero';  // Generic Nintendo Game
+      } else if (brand?.toLowerCase().includes('fps') || brand?.toLowerCase().includes('call of duty')) {
+        return '/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png';  // Call of Duty image for FPS games
       } else {
         return 'https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg';  // Generic PC Game (Elden Ring)
       }
     
     // Appliance categories
     case 'microwaves':
+      if (brand?.toLowerCase() === 'samsung') {
+        return '/lovable-uploads/86bf4158-8228-4965-8b2d-1f5a3feed7e9.png'; // Samsung Microwave
+      } else if (brand?.toLowerCase() === 'lg') {
+        return '/lovable-uploads/67a3f208-e588-471a-88d1-c0db17913854.png'; // LG Microwave
+      } else if (brand?.toLowerCase() === 'whirlpool') {
+        return '/lovable-uploads/0140d4cf-1335-41c7-9dbd-d5c2fc67a2f8.png'; // Whirlpool Microwave
+      } else if (brand?.toLowerCase() === 'panasonic') {
+        return '/lovable-uploads/05649a66-79e2-4aa3-b369-2496bac58ad7.png'; // Panasonic Microwave
+      }
       return 'https://images.thdstatic.com/productImages/c06dbb85-e7d5-47f5-898a-c26e5a43ef2e/svn/toshiba-countertop-microwaves-ml2-ec10sa-bs-64_600.jpg'; // Generic Microwave
     
     case 'washing machines':
-      return 'https://pisces.bbystatic.com/image2/BestBuy_US/images/products/6462/6462171_sd.jpg'; // Generic Washer
+      return '/lovable-uploads/2ae5236f-4492-452a-b393-492c225380c1.png'; // Generic Washer
     
     case 'refrigerators':
       return 'https://www.lg.com/us/images/refrigerators/md07000130/gallery/desktop-01.jpg'; // Generic Refrigerator
@@ -52,9 +69,21 @@ export const getCategoryImage = (category: string, brand?: string): string => {
       return 'https://images.thdstatic.com/productImages/a6d87c32-c1c7-405d-9ab9-38c10ec9f34c/svn/white-midea-portable-air-conditioners-map08r1cwtc-64_600.jpg'; // Generic Air Conditioner
     
     case 'vacuum cleaners':
-      return 'https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/global/products/vacuum-cleaners/v15-detect/pdp/primary/fullwidth/V15-Detect-Fluffy-PDP-Floor-dock-Fullwidth-1536x864.jpg'; // Generic Vacuum
+      if (brand?.toLowerCase() === 'irobot') {
+        return '/lovable-uploads/aefe184c-a90a-46d3-b244-124b1062a6f0.png'; // iRobot Vacuum
+      }
+      return '/lovable-uploads/99ac0da2-0189-48a9-8115-cbad8e1b079c.png'; // Generic Vacuum
     
     case 'smart screens':
+      if (brand?.toLowerCase() === 'samsung' && category.toLowerCase().includes('digital frame')) {
+        return '/lovable-uploads/15fa551c-cf90-4a18-b949-a21c2a6f44d4.png'; // Samsung Digital Frame
+      } else if (brand?.toLowerCase() === 'samsung' && category.toLowerCase().includes('smart digital display')) {
+        return '/lovable-uploads/f4d18f61-e011-41e1-8945-0862b8e9cb22.png'; // Samsung Smart Digital Display
+      } else if (brand?.toLowerCase() === 'samsung' && category.toLowerCase().includes('digital signage')) {
+        return '/lovable-uploads/e4e5c805-99ee-44b2-bac6-a7549cd85562.png'; // Samsung Digital Signage
+      } else if (brand?.toLowerCase() === 'samsung' && category.toLowerCase().includes('interactive panel')) {
+        return '/lovable-uploads/83220acc-b41f-488f-996c-70c790349093.png'; // Samsung Interactive Panel
+      }
       return 'm.media-amazon.com/images/I/71yKr-O4iUL._AC_UF1000,1000_QL80_.jpg'; // Generic Smart Screen
       
     default:
@@ -72,6 +101,12 @@ export const getGameImage = (title: string): string => {
     return '/lovable-uploads/e61d09d1-fb3f-4e38-aaca-2342513b89de.png';
   } else if (lowerTitle.includes('call of duty')) {
     return '/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png';
+  } else if (lowerTitle.includes('counter strike') || lowerTitle.includes('cs:go') || lowerTitle.includes('cs go')) {
+    return '/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png'; // Using Call of Duty image for now
+  } else if (lowerTitle.includes('battlefield')) {
+    return '/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png'; // Using Call of Duty image for now
+  } else if (lowerTitle.includes('rainbow six')) {
+    return '/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png'; // Using Call of Duty image for now
   } else if (lowerTitle.includes('cyberpunk 2077')) {
     return '/lovable-uploads/d0b5f6e9-d8a7-4e6d-92d9-0981cb533be3.png';
   } else if (lowerTitle.includes('horizon kings') && lowerTitle.includes('simulation')) {

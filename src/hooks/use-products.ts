@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Product, products as initialProducts } from '../data/productData';
 import { generateAdditionalProducts } from '../data/additionalProducts';
@@ -144,8 +143,20 @@ export const useProducts = () => {
       index === self.findIndex(p => p.id === product.id)
     );
 
+    // Remove microwaves numbered from 23 to 100
+    const filteredProducts = uniqueProducts.filter(product => {
+      if (product.category === "Microwaves") {
+        const match = product.name.match(/\d+$/);
+        if (match) {
+          const num = parseInt(match[0], 10);
+          return num < 23 || num > 100;
+        }
+      }
+      return true;
+    });
+
     // Update product images based on category and brand
-    const updatedProducts = uniqueProducts.map(product => {
+    const updatedProducts = filteredProducts.map(product => {
       // Samsung phones get the first image
       if (product.brand === "Samsung" && (product.category === "Smartphones" || product.category === "Phone")) {
         return {
@@ -285,6 +296,34 @@ export const useProducts = () => {
         return {
           ...product,
           imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png"
+        };
+      }
+      // Sports headphones get the newly uploaded image
+      else if (product.category === "Headphones" && product.subcategory && product.subcategory.toLowerCase().includes("sports")) {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/bfd80abc-6761-4660-9b25-36864420ec27.png"
+        };
+      }
+      // LG Microwaves get the newly uploaded image
+      else if (product.brand === "LG" && product.category === "Microwaves") {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/67a3f208-e588-471a-88d1-c0db17913854.png"
+        };
+      }
+      // Whirlpool Microwaves get the newly uploaded image
+      else if (product.brand === "Whirlpool" && product.category === "Microwaves") {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/0140d4cf-1335-41c7-9dbd-d5c2fc67a2f8.png"
+        };
+      }
+      // Panasonic Microwaves get the newly uploaded image
+      else if (product.brand === "Panasonic" && product.category === "Microwaves") {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/05649a66-79e2-4aa3-b369-2496bac58ad7.png"
         };
       }
       // All tablets get the second image
