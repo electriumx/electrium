@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Product } from '../data/productData';
 import { useToast } from '@/hooks/use-toast';
@@ -164,29 +165,7 @@ const ProductGrid = ({
 
         let imageUrl = product.imageUrl;
         
-        if (product.name.toLowerCase().includes('rainbow six')) {
-          imageUrl = '/lovable-uploads/cc6dd7c3-96a7-48d0-95cd-9e56d8b0b2be.png';
-        } else if (product.name.toLowerCase().includes('doom eternal')) {
-          imageUrl = '/lovable-uploads/fe932eb3-cb32-421d-a093-363b4eb1ec26.png';
-        } else if (product.name.toLowerCase().includes('halo infinite')) {
-          imageUrl = '/lovable-uploads/03e23074-05f0-4441-83d9-1098b7354f8a.png';
-        } 
-        else if (product.name.toLowerCase().includes('call of duty: black ops') || product.name.toLowerCase().includes('call of duty black ops')) {
-          if (product.name.toLowerCase().includes('6')) {
-            imageUrl = '/lovable-uploads/f2335078-f00a-4ba7-a710-813d902a43d6.png';
-          } else if (product.name.toLowerCase().includes('5')) {
-            imageUrl = '/lovable-uploads/dcbb96be-ee59-4c0c-8f16-c30e0519321a.png';
-          } else if (product.name.toLowerCase().includes('4')) {
-            imageUrl = '/lovable-uploads/cbf2b15d-37e8-4ae8-a8d8-88b6e3b44178.png';
-          } else if (product.name.toLowerCase().includes('3')) {
-            imageUrl = '/lovable-uploads/4e9b6c3d-fc58-4e33-982b-0e81c5017eff.png';
-          } else if (product.name.toLowerCase().includes('2')) {
-            imageUrl = '/lovable-uploads/44e6b722-2c55-4d97-9301-eb8828a7c62b.png';
-          } else if (product.name.toLowerCase().match(/black ops( 1)?$/)) {
-            imageUrl = '/lovable-uploads/24e770b0-cffa-4470-987e-58bd580424a3.png';
-          }
-        }
-        else if (product.name.toLowerCase().includes('death stranding')) {
+        if (product.name.toLowerCase().includes('death stranding')) {
           imageUrl = '/lovable-uploads/e61d09d1-fb3f-4e38-aaca-2342513b89de.png';
         } else if (product.name.toLowerCase().includes('elden ring')) {
           imageUrl = 'https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg';

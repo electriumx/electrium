@@ -335,9 +335,7 @@ export const generateAdditionalProducts = (): Product[] => {
   nextId += 500;
   const fpsGameNames = [
     "Counter-Strike", "Battlefield", "Rainbow Six", "Call of Duty: Modern Warfare", 
-    "Call of Duty: Vanguard", "Call of Duty: Black Ops", "Call of Duty: Black Ops 2",
-    "Call of Duty: Black Ops 3", "Call of Duty: Black Ops 4", "Call of Duty: Black Ops 5",
-    "Call of Duty: Black Ops 6", "Doom Eternal", "Halo Infinite"
+    "Call of Duty: Vanguard", "Call of Duty: Black Ops", "Doom Eternal", "Halo Infinite"
   ];
   
   fpsGameNames.forEach((gameName, index) => {
@@ -359,4 +357,3 @@ export const generateAdditionalProducts = (): Product[] => {
   
   return products;
 };
-
