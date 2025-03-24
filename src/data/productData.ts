@@ -1,5 +1,3 @@
-import { Product } from '../data/productData';
-
 export interface Product {
   id: number;
   name: string;
