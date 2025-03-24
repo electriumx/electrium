@@ -1,4 +1,3 @@
-
 // Maps product categories to appropriate image URLs from Google
 export const getCategoryImage = (category: string, brand?: string): string => {
   // These URLs point to standardized Google-like product images by category
@@ -95,17 +94,41 @@ export const getCategoryImage = (category: string, brand?: string): string => {
 export const getGameImage = (title: string): string => {
   const lowerTitle = title.toLowerCase();
   
-  if (lowerTitle.includes('elden ring')) {
+  // FPS Games - New images
+  if (lowerTitle.includes('rainbow six')) {
+    return '/lovable-uploads/cc6dd7c3-96a7-48d0-95cd-9e56d8b0b2be.png'; // Rainbow Six Siege/Extraction
+  } else if (lowerTitle.includes('doom eternal')) {
+    return '/lovable-uploads/fe932eb3-cb32-421d-a093-363b4eb1ec26.png'; // Doom Eternal
+  } else if (lowerTitle.includes('halo infinite')) {
+    return '/lovable-uploads/03e23074-05f0-4441-83d9-1098b7354f8a.png'; // Halo Infinite
+  } 
+  // Call of Duty Black Ops Series
+  else if (lowerTitle.includes('call of duty: black ops') || lowerTitle.includes('call of duty black ops')) {
+    if (lowerTitle.includes('6')) {
+      return '/lovable-uploads/f2335078-f00a-4ba7-a710-813d902a43d6.png'; // Black Ops 6
+    } else if (lowerTitle.includes('5')) {
+      return '/lovable-uploads/dcbb96be-ee59-4c0c-8f16-c30e0519321a.png'; // Black Ops 5
+    } else if (lowerTitle.includes('4')) {
+      return '/lovable-uploads/cbf2b15d-37e8-4ae8-a8d8-88b6e3b44178.png'; // Black Ops 4
+    } else if (lowerTitle.includes('3')) {
+      return '/lovable-uploads/4e9b6c3d-fc58-4e33-982b-0e81c5017eff.png'; // Black Ops 3
+    } else if (lowerTitle.includes('2')) {
+      return '/lovable-uploads/44e6b722-2c55-4d97-9301-eb8828a7c62b.png'; // Black Ops 2
+    } else if (lowerTitle.includes('1') || lowerTitle.match(/black ops$/)) {
+      return '/lovable-uploads/24e770b0-cffa-4470-987e-58bd580424a3.png'; // Black Ops 1
+    }
+  }
+  // Other games with existing images
+  else if (lowerTitle.includes('elden ring')) {
     return 'https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg';
   } else if (lowerTitle.includes('death stranding')) {
     return '/lovable-uploads/e61d09d1-fb3f-4e38-aaca-2342513b89de.png';
   } else if (lowerTitle.includes('call of duty')) {
+    // Generic Call of Duty image for other COD games
     return '/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png';
   } else if (lowerTitle.includes('counter strike') || lowerTitle.includes('cs:go') || lowerTitle.includes('cs go')) {
     return '/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png'; // Using Call of Duty image for now
   } else if (lowerTitle.includes('battlefield')) {
-    return '/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png'; // Using Call of Duty image for now
-  } else if (lowerTitle.includes('rainbow six')) {
     return '/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png'; // Using Call of Duty image for now
   } else if (lowerTitle.includes('cyberpunk 2077')) {
     return '/lovable-uploads/d0b5f6e9-d8a7-4e6d-92d9-0981cb533be3.png';
