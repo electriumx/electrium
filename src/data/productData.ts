@@ -1,3 +1,5 @@
+import { Product } from '../data/productData';
+
 export interface Product {
   id: number;
   name: string;
@@ -430,6 +432,24 @@ export const products: Product[] = [
     ]
   }
 ];
+
+// Find specific products and update their images
+for (let i = 0; i < products.length; i++) {
+  // Update Daikin Portable Air Conditioner 974
+  if (products[i].name === "Daikin Portable Air Conditioner 974") {
+    products[i].imageUrl = "https://5.imimg.com/data5/SELLER/Default/2023/7/337683112/EE/CV/NC/22007239791/daikin-portable-tower-air-conditioners.jpg";
+  }
+  
+  // Update LG Portable Air Conditioner 595
+  if (products[i].name === "LG Portable Air Conditioner 595") {
+    products[i].imageUrl = "https://www.lg.com/us/images/air-conditioners/md08002082/gallery/desktop-01.jpg";
+  }
+  
+  // Update Frigidaire Portable Air Conditioner 319
+  if (products[i].name === "Frigidaire Portable Air Conditioner 319") {
+    products[i].imageUrl = "https://i5.walmartimages.com/asr/9387578d-7943-48a3-a868-bde54f30ea2a.bfe92d74ca7cf89a87ef62be1b0f9ba7.jpeg";
+  }
+}
 
 const categories = [
   'Smartphones', 'Laptops', 'Gaming Consoles', 'TVs', 
