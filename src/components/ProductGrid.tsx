@@ -174,10 +174,15 @@ const ProductGrid = ({
         const stock = productStocks[product.id] || 0;
         const finalPrice = getProductPrice(product);
 
-        // Special case for Elden Ring - update image URL
-        const imageUrl = product.name.toLowerCase().includes('elden ring') 
-          ? 'https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg'
-          : product.imageUrl;
+        // Get the correct image URL based on product name/type
+        let imageUrl = product.imageUrl;
+        
+        // Special cases for specific products
+        if (product.name.toLowerCase().includes('death stranding')) {
+          imageUrl = '/lovable-uploads/e61d09d1-fb3f-4e38-aaca-2342513b89de.png';
+        } else if (product.name.toLowerCase().includes('elden ring')) {
+          imageUrl = 'https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg';
+        }
 
         return (
           <div 

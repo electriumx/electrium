@@ -152,6 +152,69 @@ export const useProducts = () => {
           imageUrl: "/lovable-uploads/ec449e2d-bb1c-4e51-9af8-cb2419b6785f.png"
         };
       }
+      // Pixel phones get the first new image
+      else if (product.brand === "Google" && (product.name.toLowerCase().includes("pixel") || (product.category === "Smartphones" || product.category === "Phone"))) {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/f97dcb3d-1a62-49e1-ba15-0f5d5f80099d.png"
+        };
+      }
+      // iRobot vacuum cleaners get the second new image
+      else if (product.brand === "iRobot" && product.category === "Vacuum Cleaners") {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/aefe184c-a90a-46d3-b244-124b1062a6f0.png"
+        };
+      }
+      // Other vacuum cleaners get the third new image
+      else if (product.category === "Vacuum Cleaners" && product.brand !== "iRobot") {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/99ac0da2-0189-48a9-8115-cbad8e1b079c.png"
+        };
+      }
+      // Death Stranding gets the fourth new image
+      else if (product.name.toLowerCase().includes("death stranding")) {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/e61d09d1-fb3f-4e38-aaca-2342513b89de.png"
+        };
+      }
+      // Apple headphones get the fifth new image
+      else if (product.brand === "Apple" && product.category === "Headphones") {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/d1307e35-8834-4230-b1d0-9aa18e7760f7.png"
+        };
+      }
+      // Apple AirPods get the sixth new image
+      else if (product.brand === "Apple" && product.name.toLowerCase().includes("airpod")) {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/b716e87d-a752-4422-aafa-94b38c1dbff3.png"
+        };
+      }
+      // Samsung microwaves get the seventh new image
+      else if (product.brand === "Samsung" && product.category === "Microwaves") {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/86bf4158-8228-4965-8b2d-1f5a3feed7e9.png"
+        };
+      }
+      // Samsung digital frame get the eighth new image
+      else if (product.brand === "Samsung" && product.name.toLowerCase().includes("digital frame")) {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/15fa551c-cf90-4a18-b949-a21c2a6f44d4.png"
+        };
+      }
+      // Samsung OLED TVs get the ninth new image
+      else if (product.brand === "Samsung" && product.category === "TVs" && product.name.toLowerCase().includes("oled")) {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/2f84a28b-83f8-4c69-96f8-ed61e49e631b.png"
+        };
+      }
       // All tablets get the second image
       else if (product.category === "Tablets") {
         return {
