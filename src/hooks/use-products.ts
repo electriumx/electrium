@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Product, products as initialProducts } from '../data/productData';
 import { generateAdditionalProducts } from '../data/additionalProducts';
@@ -213,6 +214,35 @@ export const useProducts = () => {
         return {
           ...product,
           imageUrl: "/lovable-uploads/2f84a28b-83f8-4c69-96f8-ed61e49e631b.png"
+        };
+      }
+      // Samsung interactive panels get the new first image
+      else if (product.brand === "Samsung" && product.name.toLowerCase().includes("interactive panel")) {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/83220acc-b41f-488f-996c-70c790349093.png"
+        };
+      }
+      // Samsung smart digital displays get the new second image
+      else if (product.brand === "Samsung" && product.name.toLowerCase().includes("smart digital display")) {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/f4d18f61-e011-41e1-8945-0862b8e9cb22.png"
+        };
+      }
+      // Samsung digital signage monitors get the new third image
+      else if (product.brand === "Samsung" && product.name.toLowerCase().includes("digital signage")) {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/e4e5c805-99ee-44b2-bac6-a7549cd85562.png"
+        };
+      }
+      // Call of Duty Black Ops 6 for PC gets the new fourth image
+      else if (product.name.toLowerCase().includes("call of duty black ops 6") || 
+               product.name.toLowerCase().includes("call of duty: black ops 6")) {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png"
         };
       }
       // All tablets get the second image

@@ -182,6 +182,16 @@ const ProductGrid = ({
           imageUrl = '/lovable-uploads/e61d09d1-fb3f-4e38-aaca-2342513b89de.png';
         } else if (product.name.toLowerCase().includes('elden ring')) {
           imageUrl = 'https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg';
+        } else if (product.name.toLowerCase().includes('call of duty black ops 6')) {
+          imageUrl = '/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png';
+        } else if (product.brand === 'Samsung') {
+          if (product.name.toLowerCase().includes('interactive panel')) {
+            imageUrl = '/lovable-uploads/83220acc-b41f-488f-996c-70c790349093.png';
+          } else if (product.name.toLowerCase().includes('smart digital display')) {
+            imageUrl = '/lovable-uploads/f4d18f61-e011-41e1-8945-0862b8e9cb22.png';
+          } else if (product.name.toLowerCase().includes('digital signage')) {
+            imageUrl = '/lovable-uploads/e4e5c805-99ee-44b2-bac6-a7549cd85562.png';
+          }
         }
 
         return (

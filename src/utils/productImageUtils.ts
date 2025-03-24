@@ -62,12 +62,16 @@ export const getCategoryImage = (category: string, brand?: string): string => {
   }
 };
 
-// For Elden Ring specifically, use the requested image
+// For specific game titles, use the requested images
 export const getGameImage = (title: string): string => {
   const lowerTitle = title.toLowerCase();
   
   if (lowerTitle.includes('elden ring')) {
     return 'https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg';
+  } else if (lowerTitle.includes('death stranding')) {
+    return '/lovable-uploads/e61d09d1-fb3f-4e38-aaca-2342513b89de.png';
+  } else if (lowerTitle.includes('call of duty black ops 6')) {
+    return '/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png';
   }
   
   return getCategoryImage('games');
