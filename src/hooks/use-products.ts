@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Product, products as initialProducts } from '../data/productData';
 import { generateAdditionalProducts } from '../data/additionalProducts';
@@ -144,9 +143,38 @@ export const useProducts = () => {
       index === self.findIndex(p => p.id === product.id)
     );
 
-    // Update all smartphone images to use the new iPhone image
+    // Update product images based on category and brand
     const updatedProducts = uniqueProducts.map(product => {
-      if (product.category === "Smartphones" || product.category === "Phone") {
+      // Samsung phones get the first image
+      if (product.brand === "Samsung" && (product.category === "Smartphones" || product.category === "Phone")) {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/ec449e2d-bb1c-4e51-9af8-cb2419b6785f.png"
+        };
+      }
+      // All tablets get the second image
+      else if (product.category === "Tablets") {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/ce523ec7-d793-4a5d-b548-b1f7a0193bf1.png"
+        };
+      }
+      // All refrigerators get the third image
+      else if (product.category === "Refrigerators") {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/b43ca66e-4dd7-4f6f-9b2d-f2af3a926756.png"
+        };
+      }
+      // All air conditioners get the fourth image
+      else if (product.category === "Air Conditioners") {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/a964141c-5fe9-49ec-9aa0-6b0bd558181c.png"
+        };
+      }
+      // Keep other products with existing images (including iPhones with the previously set image)
+      else if (product.category === "Phone" || product.category === "Smartphones") {
         return {
           ...product,
           imageUrl: "/lovable-uploads/27df906c-346c-4282-ba2b-a0b7e8fab3b8.png"
