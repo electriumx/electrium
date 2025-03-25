@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 
 // Global storage key for donations
 const DONATIONS_STORAGE_KEY = 'globalDonations';
-const DONATION_LIMIT = 1000000;
+const DONATION_LIMIT = 1000000; // This is now the per-transaction limit, not total donations
 
 export const useGlobalDonation = () => {
   const [totalDonations, setTotalDonations] = useState(0);
@@ -16,9 +16,14 @@ export const useGlobalDonation = () => {
     }
   }, []);
   
-  // Function to add a new donation
+  // Function to add a new donation (now with no total limit)
   const addDonation = (amount: number) => {
-    const newTotal = Math.min(totalDonations + amount, DONATION_LIMIT);
+    // Only limit per transaction, not total
+    if (amount > DONATION_LIMIT) {
+      amount = DONATION_LIMIT;
+    }
+    
+    const newTotal = totalDonations + amount;
     setTotalDonations(newTotal);
     localStorage.setItem(DONATIONS_STORAGE_KEY, newTotal.toString());
     return newTotal;

@@ -27,8 +27,9 @@ const generateProducts = (
   descriptionFormat: string,
   priceRange: [number, number]
 ): Product[] => {
-  // For microwaves, limit the count to 22 to avoid generating models numbered 23-100
-  const actualCount = category === "Microwaves" ? Math.min(count, 22) : count;
+  // For microwaves, limit the count to avoid generating models numbered 20-100
+  // For other categories, we'll limit the count to avoid too many products
+  const actualCount = category === "Microwaves" ? Math.min(count, 19) : Math.min(count, 19);
   
   return Array.from({ length: actualCount }, (_, i) => {
     const productName = `${namePrefix} ${i + 1}`;
@@ -41,6 +42,22 @@ const generateProducts = (
       imageUrl = getGameImage(productName);
     }
     
+    // Add FPS subcategory to appropriate games
+    let subcategory = undefined;
+    if (category === "Games") {
+      if (productName.toLowerCase().includes("call of duty") || 
+          productName.toLowerCase().includes("rainbow six") ||
+          productName.toLowerCase().includes("battlefield") ||
+          productName.toLowerCase().includes("counter-strike")) {
+        subcategory = "FPS Games";
+      }
+    }
+    
+    // Skip numbers 20-100
+    if (i + 1 >= 20) {
+      return null;
+    }
+    
     return {
       id: baseId + i,
       name: productName,
@@ -51,9 +68,10 @@ const generateProducts = (
       imageUrl: imageUrl,
       quantity: 0,
       rating: randomRating(),
-      reviews: randomReviews()
+      reviews: randomReviews(),
+      subcategory
     };
-  });
+  }).filter(Boolean) as Product[]; // Filter out null products (the ones we skipped)
 };
 
 // Generate additional products for various categories
@@ -61,7 +79,7 @@ export const generateAdditionalProducts = (): Product[] => {
   let products: Product[] = [];
   let nextId = 5000;
   
-  // Smartphones - Ensure 100 products per brand
+  // Smartphones - Limit products per brand
   const smartphoneBrands = ["Apple", "Samsung", "Google", "Xiaomi"];
   smartphoneBrands.forEach((brand, index) => {
     const brandPrefix = brand === "Apple" ? "iPhone" : 
@@ -73,7 +91,7 @@ export const generateAdditionalProducts = (): Product[] => {
         "Phone",
         brand,
         nextId + (index * 100), // Increase the space between brand IDs
-        100, // Generate 100 products per brand
+        19, // Limit products per brand to 19 (excludes 20-100)
         brandPrefix,
         `${brand} flagship smartphone with advanced camera system, version {i}`,
         [399, 1299]
@@ -83,7 +101,7 @@ export const generateAdditionalProducts = (): Product[] => {
   
   nextId += 500; // Increase ID gap between categories
   
-  // Laptops - Ensure 100 products per brand
+  // Laptops - Limit products per brand
   const laptopBrands = ["Apple", "Microsoft", "Sony", "LG"];
   laptopBrands.forEach((brand, index) => {
     const brandPrefix = brand === "Apple" ? "MacBook Pro" : 
@@ -95,7 +113,7 @@ export const generateAdditionalProducts = (): Product[] => {
         "Laptop",
         brand,
         nextId + (index * 100),
-        100, // Generate 100 products per brand
+        19, // Limit products per brand to 19 (excludes 20-100)
         brandPrefix,
         `${brand} premium laptop with high-performance processor, model {i}`,
         [699, 2499]
@@ -105,7 +123,7 @@ export const generateAdditionalProducts = (): Product[] => {
   
   nextId += 500;
   
-  // Gaming consoles - Ensure 100 products per brand
+  // Gaming consoles - Limit products per brand
   const consoleBrands = ["Sony", "Microsoft", "Nintendo"];
   consoleBrands.forEach((brand, index) => {
     const brandPrefix = brand === "Sony" ? "PlayStation" : 
@@ -116,7 +134,7 @@ export const generateAdditionalProducts = (): Product[] => {
         "Gaming Consoles",
         brand,
         nextId + (index * 100),
-        100, // Generate 100 products per brand
+        19, // Limit products per brand to 19 (excludes 20-100)
         brandPrefix,
         `${brand} gaming console with immersive gameplay experience, generation {i}`,
         [249, 599]
@@ -335,7 +353,7 @@ export const generateAdditionalProducts = (): Product[] => {
   // Add FPS games to the list
   nextId += 500;
   const fpsGameNames = [
-    "Counter-Strike", "Battlefield", "Rainbow Six", "Call of Duty: Modern Warfare", 
+    "Counter-Strike", "Battlefield", "Rainbow Six Siege", "Call of Duty: Modern Warfare", 
     "Call of Duty: Vanguard", "Call of Duty: Black Ops", "Doom Eternal", "Halo Infinite"
   ];
   
@@ -351,10 +369,58 @@ export const generateAdditionalProducts = (): Product[] => {
         [29.99, 69.99]
       ).map(game => ({
         ...game,
-        subcategory: "FPS Games"
+        subcategory: "FPS Games",
+        // Use Rainbow Six image for Rainbow Six games
+        imageUrl: game.name.toLowerCase().includes("rainbow six") 
+          ? "/lovable-uploads/e697f6f9-1a87-4501-9265-09ba16f3af26.png" 
+          : game.imageUrl
       }))
     );
   });
+  
+  // Add specific Rainbow Six Siege games with the uploaded image
+  nextId += 1000;
+  products = products.concat([
+    {
+      id: nextId + 1,
+      name: "Rainbow Six Siege Standard Edition",
+      price: 29.99,
+      category: "Games",
+      brand: "PC Games",
+      description: "Tom Clancy's Rainbow Six Siege Standard Edition - tactical first-person shooter with destructible environments and team-based gameplay",
+      imageUrl: "/lovable-uploads/2b732385-bcb9-459e-981e-bb57c1860769.png", // New Rainbow Six image
+      quantity: 0,
+      rating: randomRating(),
+      reviews: randomReviews(),
+      subcategory: "FPS Games"
+    },
+    {
+      id: nextId + 2,
+      name: "Rainbow Six Siege Deluxe Edition",
+      price: 39.99,
+      category: "Games",
+      brand: "PC Games",
+      description: "Tom Clancy's Rainbow Six Siege Deluxe Edition - includes the base game and Year 1 operators for intense tactical shooter experience",
+      imageUrl: "/lovable-uploads/2b732385-bcb9-459e-981e-bb57c1860769.png", // New Rainbow Six image
+      quantity: 0,
+      rating: randomRating(),
+      reviews: randomReviews(),
+      subcategory: "FPS Games"
+    },
+    {
+      id: nextId + 3,
+      name: "Rainbow Six Siege Gold Edition",
+      price: 49.99,
+      category: "Games",
+      brand: "PC Games",
+      description: "Tom Clancy's Rainbow Six Siege Gold Edition - includes the base game, Year 1 operators, and latest season pass",
+      imageUrl: "/lovable-uploads/2b732385-bcb9-459e-981e-bb57c1860769.png", // New Rainbow Six image
+      quantity: 0,
+      rating: randomRating(),
+      reviews: randomReviews(),
+      subcategory: "FPS Games"
+    }
+  ]);
   
   // Add Call of Duty Black Ops games 1-6
   nextId += 1000;
@@ -367,7 +433,7 @@ export const generateAdditionalProducts = (): Product[] => {
         category: "Games",
         brand: "PC Games",
         description: `Call of Duty: Black Ops ${i} - intense first-person shooter with epic campaign and multiplayer modes`,
-        imageUrl: `/lovable-uploads/e697f6f9-1a87-4501-9265-09ba16f3af26.png`, // Will be overridden by productImageUtils
+        imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png", // Keep COD image
         quantity: 0,
         rating: randomRating(),
         reviews: randomReviews(),

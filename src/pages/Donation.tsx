@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,7 +13,6 @@ const Donation = () => {
   const { toast } = useToast();
   const [amount, setAmount] = useState(10);
   const { totalDonations, addDonation, DONATION_LIMIT } = useGlobalDonation();
-  const [remainingLimit, setRemainingLimit] = useState(DONATION_LIMIT);
   const [cooldown, setCooldown] = useState(0);
   const [cardName, setCardName] = useState('');
   const [cardNumber, setCardNumber] = useState('');
@@ -23,12 +23,6 @@ const Donation = () => {
   const presetAmounts = [5, 10, 25, 50, 100];
   
   useEffect(() => {
-    // Calculate remaining donation limit
-    const remaining = Math.max(0, DONATION_LIMIT - totalDonations);
-    setRemainingLimit(remaining);
-  }, [totalDonations, DONATION_LIMIT]);
-
-  useEffect(() => {
     // Handle cooldown timer
     if (cooldown > 0) {
       const timer = setTimeout(() => setCooldown(cooldown - 1), 1000);
@@ -37,28 +31,28 @@ const Donation = () => {
   }, [cooldown]);
 
   const handleAmountSelect = (value: number) => {
-    // Ensure amount doesn't exceed remaining limit
-    setAmount(Math.min(value, remainingLimit));
+    // Ensure amount doesn't exceed the per-transaction limit
+    setAmount(Math.min(value, DONATION_LIMIT));
   };
   
   const handleSliderChange = (values: number[]) => {
-    // Ensure amount doesn't exceed remaining limit
-    setAmount(Math.min(values[0], remainingLimit));
+    // Ensure amount doesn't exceed the per-transaction limit
+    setAmount(Math.min(values[0], DONATION_LIMIT));
   };
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseFloat(e.target.value);
     if (!isNaN(value) && value >= 0) {
-      // Ensure amount doesn't exceed remaining limit
-      setAmount(Math.min(value, remainingLimit));
+      // Ensure amount doesn't exceed the per-transaction limit
+      setAmount(Math.min(value, DONATION_LIMIT));
     }
   };
   
   const handleDonate = () => {
-    if (amount <= 0 || amount > remainingLimit) {
+    if (amount <= 0 || amount > DONATION_LIMIT) {
       toast({
         title: "Invalid donation amount",
-        description: `Please enter an amount between $1 and $${remainingLimit.toFixed(2)}.`
+        description: `Please enter an amount between $1 and $${DONATION_LIMIT.toFixed(2)}.`
       });
       return;
     }
@@ -122,11 +116,9 @@ const Donation = () => {
                 <span className="text-muted-foreground">
                   Total Raised: ${totalDonations.toFixed(2)}
                 </span>
-                {remainingLimit < DONATION_LIMIT && (
-                  <span className="ml-2 text-muted-foreground">
-                    (Limit: ${remainingLimit.toFixed(2)} remaining)
-                  </span>
-                )}
+                <span className="ml-2 text-muted-foreground">
+                  (Max per donation: ${DONATION_LIMIT.toFixed(2)})
+                </span>
               </div>
             </div>
             
@@ -136,7 +128,6 @@ const Donation = () => {
                   key={presetAmount}
                   variant={amount === presetAmount ? "default" : "outline"}
                   onClick={() => handleAmountSelect(presetAmount)}
-                  disabled={presetAmount > remainingLimit}
                 >
                   ${presetAmount}
                 </Button>
@@ -147,10 +138,9 @@ const Donation = () => {
               <Slider
                 value={[amount]}
                 min={1}
-                max={Math.min(DONATION_LIMIT, remainingLimit)}
+                max={DONATION_LIMIT}
                 step={1}
                 onValueChange={handleSliderChange}
-                disabled={remainingLimit <= 0}
               />
             </div>
             
@@ -162,20 +152,13 @@ const Donation = () => {
                   id="customAmount"
                   type="number"
                   min="1"
-                  max={remainingLimit}
+                  max={DONATION_LIMIT}
                   value={amount}
                   onChange={handleInputChange}
                   className="pl-7"
-                  disabled={remainingLimit <= 0}
                 />
               </div>
             </div>
-            
-            {remainingLimit <= 0 && (
-              <div className="bg-muted p-3 rounded-lg text-center">
-                <p className="text-sm font-medium">Donation limit reached! Thank you for your support.</p>
-              </div>
-            )}
           </div>
           
           <div className="space-y-2">
@@ -261,7 +244,7 @@ const Donation = () => {
             className="w-full" 
             size="lg" 
             onClick={handleDonate}
-            disabled={amount <= 0 || remainingLimit <= 0 || cooldown > 0}
+            disabled={amount <= 0 || cooldown > 0}
           >
             {cooldown > 0 
               ? `Donate (${cooldown}s)` 
