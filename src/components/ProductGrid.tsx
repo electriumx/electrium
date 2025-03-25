@@ -177,7 +177,7 @@ const ProductGrid = ({
         } else if (product.name.toLowerCase().includes('call of duty')) {
           imageUrl = '/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png';
         } else if (product.name.toLowerCase().includes('rainbow six')) {
-          imageUrl = '/lovable-uploads/e697f6f9-1a87-4501-9265-09ba16f3af26.png';
+          imageUrl = '/lovable-uploads/2b732385-bcb9-459e-981e-bb57c1860769.png';
         } else if (product.name.toLowerCase().includes('cyberpunk 2077')) {
           imageUrl = '/lovable-uploads/d0b5f6e9-d8a7-4e6d-92d9-0981cb533be3.png';
         } else if (product.name.toLowerCase().includes('horizon kings') && product.name.toLowerCase().includes('simulation')) {

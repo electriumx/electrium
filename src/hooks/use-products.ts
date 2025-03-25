@@ -195,7 +195,7 @@ export const useProducts = () => {
       else if (product.name.toLowerCase().includes("rainbow six")) {
         return {
           ...product,
-          imageUrl: "/lovable-uploads/e697f6f9-1a87-4501-9265-09ba16f3af26.png"
+          imageUrl: "/lovable-uploads/2b732385-bcb9-459e-981e-bb57c1860769.png"
         };
       }
       // Other vacuum cleaners get the third new image
