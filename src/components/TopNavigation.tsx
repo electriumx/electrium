@@ -2,6 +2,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Heart, Settings } from 'lucide-react';
+import BackButton from './BackButton';
 
 interface TopNavigationProps {
   toggleChat: () => void;
@@ -13,6 +14,7 @@ const TopNavigation = ({
   const location = useLocation();
   const isIndexPage = location.pathname === '/';
   const { isAuthenticated, currentUser } = useAuth();
+  const showBackButton = location.pathname !== '/';
   
   const handleContactClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -27,10 +29,13 @@ const TopNavigation = ({
   return (
     <nav className="fixed w-full top-0 z-40">
       <div className="container mx-auto flex flex-wrap items-center py-4 px-6">
-        <Link to="/" className="text-2xl font-bold text-[#18a66e] flex items-center gap-2">
-          <img src="/lovable-uploads/332dd32d-b893-48bd-8da7-73aa4bc107bb.png" alt="Electrium Logo" className="w-8 h-8" />
-          Electrium
-        </Link>
+        <div className="flex flex-col items-start">
+          <Link to="/" className="text-2xl font-bold text-[#18a66e] flex items-center gap-2">
+            <img src="/lovable-uploads/332dd32d-b893-48bd-8da7-73aa4bc107bb.png" alt="Electrium Logo" className="w-8 h-8" />
+            Electrium
+          </Link>
+          {showBackButton && <BackButton />}
+        </div>
         
         {isIndexPage && (
           <div className="flex-1 flex justify-center gap-4 md:gap-8 mt-2 md:mt-0">

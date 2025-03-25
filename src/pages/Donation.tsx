@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,17 +6,19 @@ import { useToast } from '@/hooks/use-toast';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Heart } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { useGlobalDonation } from '@/hooks/use-global-donation';
 
-const DONATION_LIMIT = 1000000;
-
 const Donation = () => {
-  const navigate = useNavigate();
   const { toast } = useToast();
   const [amount, setAmount] = useState(10);
-  const { totalDonations, addDonation } = useGlobalDonation();
+  const { totalDonations, addDonation, DONATION_LIMIT } = useGlobalDonation();
   const [remainingLimit, setRemainingLimit] = useState(DONATION_LIMIT);
+  const [cooldown, setCooldown] = useState(0);
+  const [cardName, setCardName] = useState('');
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardExpiry, setCardExpiry] = useState('');
+  const [cardCvv, setCvv] = useState('');
+  const [showCardForm, setShowCardForm] = useState(false);
   
   const presetAmounts = [5, 10, 25, 50, 100];
   
@@ -25,7 +26,15 @@ const Donation = () => {
     // Calculate remaining donation limit
     const remaining = Math.max(0, DONATION_LIMIT - totalDonations);
     setRemainingLimit(remaining);
-  }, [totalDonations]);
+  }, [totalDonations, DONATION_LIMIT]);
+
+  useEffect(() => {
+    // Handle cooldown timer
+    if (cooldown > 0) {
+      const timer = setTimeout(() => setCooldown(cooldown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [cooldown]);
 
   const handleAmountSelect = (value: number) => {
     // Ensure amount doesn't exceed remaining limit
@@ -53,6 +62,27 @@ const Donation = () => {
       });
       return;
     }
+
+    // Check if card details are required for large donations
+    if (amount > 100 && !cardName && !showCardForm) {
+      setShowCardForm(true);
+      toast({
+        title: "Card details required",
+        description: "Please enter your card details for donations over $100."
+      });
+      return;
+    }
+
+    // If card form is shown, validate card details
+    if (showCardForm) {
+      if (!cardName || !cardNumber || !cardExpiry || !cardCvv) {
+        toast({
+          title: "Missing card information",
+          description: "Please fill in all card details to complete your donation."
+        });
+        return;
+      }
+    }
     
     const newTotal = addDonation(amount);
     
@@ -61,7 +91,17 @@ const Donation = () => {
       description: `Your donation of $${amount.toFixed(2)} has been received.`
     });
     
-    navigate('/thank-you');
+    // Set the cooldown
+    setCooldown(10);
+    
+    // Reset form after donation
+    if (showCardForm) {
+      setCardName('');
+      setCardNumber('');
+      setCardExpiry('');
+      setCvv('');
+      setShowCardForm(false);
+    }
   };
   
   return (
@@ -107,7 +147,7 @@ const Donation = () => {
               <Slider
                 value={[amount]}
                 min={1}
-                max={Math.min(250, remainingLimit)}
+                max={Math.min(DONATION_LIMIT, remainingLimit)}
                 step={1}
                 onValueChange={handleSliderChange}
                 disabled={remainingLimit <= 0}
@@ -145,6 +185,66 @@ const Donation = () => {
               placeholder="Add a message with your donation"
             />
           </div>
+
+          {showCardForm && (
+            <div className="space-y-4 border border-border rounded-lg p-4">
+              <h3 className="text-lg font-medium">Card Details</h3>
+              
+              <div className="space-y-2">
+                <Label htmlFor="cardName">Cardholder Name</Label>
+                <Input
+                  id="cardName"
+                  value={cardName}
+                  onChange={(e) => setCardName(e.target.value)}
+                  placeholder="Name on card"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="cardNumber">Card Number</Label>
+                <Input
+                  id="cardNumber"
+                  value={cardNumber}
+                  onChange={(e) => setCardNumber(e.target.value.replace(/\D/g, '').substring(0, 16))}
+                  placeholder="1234 5678 9012 3456"
+                  maxLength={16}
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="cardExpiry">Expiry Date</Label>
+                  <Input
+                    id="cardExpiry"
+                    value={cardExpiry}
+                    onChange={(e) => {
+                      const input = e.target.value.replace(/\D/g, '');
+                      if (input.length <= 4) {
+                        let formatted = input;
+                        if (input.length > 2) {
+                          formatted = input.substring(0, 2) + '/' + input.substring(2);
+                        }
+                        setCardExpiry(formatted);
+                      }
+                    }}
+                    placeholder="MM/YY"
+                    maxLength={5}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="cardCvv">CVV</Label>
+                  <Input
+                    id="cardCvv"
+                    value={cardCvv}
+                    onChange={(e) => setCvv(e.target.value.replace(/\D/g, '').substring(0, 3))}
+                    placeholder="123"
+                    maxLength={3}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
           
           <div className="rounded-lg bg-muted p-4">
             <h4 className="font-medium mb-2">How your donation helps:</h4>
@@ -161,9 +261,11 @@ const Donation = () => {
             className="w-full" 
             size="lg" 
             onClick={handleDonate}
-            disabled={amount <= 0 || remainingLimit <= 0}
+            disabled={amount <= 0 || remainingLimit <= 0 || cooldown > 0}
           >
-            Donate ${amount.toFixed(2)}
+            {cooldown > 0 
+              ? `Donate (${cooldown}s)` 
+              : `Donate $${amount.toFixed(2)}`}
           </Button>
         </CardFooter>
       </Card>

@@ -4,6 +4,7 @@ import { Product } from '../data/productData';
 import { useToast } from '@/hooks/use-toast';
 import ProductDetailModal from './ProductDetailModal';
 import { Heart } from 'lucide-react';
+import { getHeadphoneImage } from '@/utils/productImageUtils';
 
 interface ProductGridProps {
   products: Product[];
@@ -164,12 +165,19 @@ const ProductGrid = ({
 
         let imageUrl = product.imageUrl;
         
-        if (product.name.toLowerCase().includes('death stranding')) {
+        // Check for QuietComfort products
+        if (product.name.toLowerCase().includes('quietcomfort') && product.brand.toLowerCase() === 'bose') {
+          imageUrl = '/lovable-uploads/7be48add-b36a-4617-8856-47352e844bae.png';
+        } 
+        // Handle other product images
+        else if (product.name.toLowerCase().includes('death stranding')) {
           imageUrl = '/lovable-uploads/e61d09d1-fb3f-4e38-aaca-2342513b89de.png';
         } else if (product.name.toLowerCase().includes('elden ring')) {
           imageUrl = 'https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg';
         } else if (product.name.toLowerCase().includes('call of duty')) {
           imageUrl = '/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png';
+        } else if (product.name.toLowerCase().includes('rainbow six')) {
+          imageUrl = '/lovable-uploads/e697f6f9-1a87-4501-9265-09ba16f3af26.png';
         } else if (product.name.toLowerCase().includes('cyberpunk 2077')) {
           imageUrl = '/lovable-uploads/d0b5f6e9-d8a7-4e6d-92d9-0981cb533be3.png';
         } else if (product.name.toLowerCase().includes('horizon kings') && product.name.toLowerCase().includes('simulation')) {
@@ -180,8 +188,8 @@ const ProductGrid = ({
           imageUrl = '/lovable-uploads/49cf3cc6-b591-4fe9-b0ca-7e21178098d2.png';
         } else if (product.category === 'Washing Machines') {
           imageUrl = '/lovable-uploads/2ae5236f-4492-452a-b393-492c225380c1.png';
-        } else if (product.name.toLowerCase().includes('rainbow six')) {
-          imageUrl = '/lovable-uploads/e697f6f9-1a87-4501-9265-09ba16f3af26.png';
+        } else if (product.category === 'Headphones') {
+          imageUrl = getHeadphoneImage(product.name, product.brand);
         } else if (product.brand === 'Samsung') {
           if (product.name.toLowerCase().includes('interactive panel')) {
             imageUrl = '/lovable-uploads/83220acc-b41f-488f-996c-70c790349093.png';
@@ -198,8 +206,6 @@ const ProductGrid = ({
           imageUrl = '/lovable-uploads/0140d4cf-1335-41c7-9dbd-d5c2fc67a2f8.png';
         } else if (product.brand === 'Panasonic' && product.category === 'Microwaves') {
           imageUrl = '/lovable-uploads/05649a66-79e2-4aa3-b369-2496bac58ad7.png';
-        } else if (product.category === 'Headphones' && product.subcategory && product.subcategory.toLowerCase().includes('sports')) {
-          imageUrl = '/lovable-uploads/bfd80abc-6761-4660-9b25-36864420ec27.png';
         }
 
         return (

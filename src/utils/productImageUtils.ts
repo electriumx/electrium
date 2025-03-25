@@ -1,4 +1,3 @@
-
 // Maps product categories to appropriate image URLs from Google
 export const getCategoryImage = (category: string, brand?: string): string => {
   // These URLs point to standardized Google-like product images by category
@@ -21,6 +20,8 @@ export const getCategoryImage = (category: string, brand?: string): string => {
     case 'headphones':
       if (brand?.toLowerCase() === 'apple') {
         return '/lovable-uploads/d1307e35-8834-4230-b1d0-9aa18e7760f7.png';  // Apple Headphones
+      } else if (brand?.toLowerCase() === 'bose' && category.toLowerCase().includes('quietcomfort')) {
+        return '/lovable-uploads/7be48add-b36a-4617-8856-47352e844bae.png';  // Bose QuietComfort
       } else if (brand?.toLowerCase().includes('sports') || category.toLowerCase().includes('sports')) {
         return '/lovable-uploads/bfd80abc-6761-4660-9b25-36864420ec27.png';  // Sports Headphones
       }
@@ -42,6 +43,8 @@ export const getCategoryImage = (category: string, brand?: string): string => {
         return 'https://assets.nintendo.com/image/upload/c_fill,w_1200/q_auto:best/f_auto/dpr_2.0/ncom/en_US/games/switch/m/mario-kart-8-deluxe-switch/hero';  // Generic Nintendo Game
       } else if (brand?.toLowerCase().includes('fps') || brand?.toLowerCase().includes('call of duty')) {
         return '/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png';  // Call of Duty image for FPS games
+      } else if (brand?.toLowerCase().includes('rainbow six')) {
+        return '/lovable-uploads/e697f6f9-1a87-4501-9265-09ba16f3af26.png';  // Rainbow Six games
       } else {
         return 'https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg';  // Generic PC Game (Elden Ring)
       }
@@ -106,7 +109,7 @@ export const getGameImage = (title: string): string => {
   } else if (lowerTitle.includes('battlefield')) {
     return '/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png'; // Using Call of Duty image for now
   } else if (lowerTitle.includes('rainbow six')) {
-    return '/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png'; // Using Call of Duty image for now
+    return '/lovable-uploads/e697f6f9-1a87-4501-9265-09ba16f3af26.png'; // Rainbow Six games
   } else if (lowerTitle.includes('cyberpunk 2077')) {
     return '/lovable-uploads/d0b5f6e9-d8a7-4e6d-92d9-0981cb533be3.png';
   } else if (lowerTitle.includes('horizon kings') && lowerTitle.includes('simulation')) {
@@ -118,6 +121,22 @@ export const getGameImage = (title: string): string => {
   }
   
   return getCategoryImage('games');
+};
+
+// Add a specific image getter for headphones that checks for QuietComfort
+export const getHeadphoneImage = (name: string, brand: string): string => {
+  const lowerName = name.toLowerCase();
+  const lowerBrand = brand.toLowerCase();
+  
+  if (lowerBrand === 'bose' && lowerName.includes('quietcomfort')) {
+    return '/lovable-uploads/7be48add-b36a-4617-8856-47352e844bae.png'; // Bose QuietComfort
+  } else if (lowerBrand === 'apple') {
+    return '/lovable-uploads/d1307e35-8834-4230-b1d0-9aa18e7760f7.png'; // Apple Headphones
+  } else if (lowerName.includes('sports')) {
+    return '/lovable-uploads/bfd80abc-6761-4660-9b25-36864420ec27.png'; // Sports Headphones
+  }
+  
+  return 'https://electronics.sony.com/image/c13c1c7f0cbfcfc5ff488e5fb0ad1c98?fmt=png-alpha&wid=600&hei=600'; // Default
 };
 
 // Maps iPhone models to appropriate prices based on pricing

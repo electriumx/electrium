@@ -26,6 +26,7 @@ export const useGlobalDonation = () => {
   
   return {
     totalDonations,
-    addDonation
+    addDonation,
+    DONATION_LIMIT
   };
 };
