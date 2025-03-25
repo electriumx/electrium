@@ -155,8 +155,21 @@ export const useProducts = () => {
       return true;
     });
 
+    // Add FPS subcategory to games
+    const productsWithFPSSubcategory = filteredProducts.map(product => {
+      if (product.category === "Games" || 
+          product.name.toLowerCase().includes("call of duty") || 
+          product.name.toLowerCase().includes("rainbow six")) {
+        return {
+          ...product,
+          subcategory: "FPS"
+        };
+      }
+      return product;
+    });
+
     // Update product images based on category and brand
-    const updatedProducts = filteredProducts.map(product => {
+    const updatedProducts = productsWithFPSSubcategory.map(product => {
       // Samsung phones get the first image
       if (product.brand === "Samsung" && (product.category === "Smartphones" || product.category === "Phone")) {
         return {
@@ -176,6 +189,13 @@ export const useProducts = () => {
         return {
           ...product,
           imageUrl: "/lovable-uploads/aefe184c-a90a-46d3-b244-124b1062a6f0.png"
+        };
+      }
+      // Rainbow Six games get the user-provided image
+      else if (product.name.toLowerCase().includes("rainbow six")) {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/e697f6f9-1a87-4501-9265-09ba16f3af26.png"
         };
       }
       // Other vacuum cleaners get the third new image
@@ -254,6 +274,13 @@ export const useProducts = () => {
         return {
           ...product,
           imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png"
+        };
+      }
+      // QuietComfort products get the user-provided image
+      else if (product.name.toLowerCase().includes("quietcomfort") && product.brand.toLowerCase() === "bose") {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/7be48add-b36a-4617-8856-47352e844bae.png"
         };
       }
       // Washing Machines get the newly uploaded image
