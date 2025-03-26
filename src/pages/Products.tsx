@@ -281,6 +281,8 @@ const Products = () => {
           onClose={handleCloseDetailModal}
           onQuantityChange={handleQuantityChange}
           reviews={reviews}
+          discount={0}
+          stock={10}
         />
       </div>
     </div>
