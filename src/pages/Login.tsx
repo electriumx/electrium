@@ -1,10 +1,9 @@
-
 import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { users } from "@/data/users";
 import { useAuth } from "@/contexts/AuthContext";
 import { Eye, EyeOff } from "lucide-react";
@@ -16,7 +15,6 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [showGoogleAccounts, setShowGoogleAccounts] = useState(false);
-  const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
@@ -49,14 +47,15 @@ const Login = () => {
     }
 
     // Login successful
-    login(user);
+    const success = login(username, password);
     
-    toast({
-      title: "Login Successful",
-      description: `Welcome back, ${user.displayName}!`,
-    });
-
-    navigate(from, { replace: true });
+    if (success) {
+      toast({
+        title: "Login Successful",
+        description: `Welcome back, ${user.displayName}!`,
+      });
+      navigate(from, { replace: true });
+    }
   };
 
   const handleSocialLogin = (provider: string, email?: string) => {
@@ -75,14 +74,19 @@ const Login = () => {
       isAdmin: false
     };
     
-    login(socialUser);
+    // We need to create a dummy password for the login function
+    const dummyPassword = "social_auth_" + Date.now();
+    socialUser.password = dummyPassword;
     
-    toast({
-      title: "Login Successful",
-      description: `Welcome, ${socialUser.displayName}!`,
-    });
+    const success = login(socialUser.username, dummyPassword);
     
-    navigate(from, { replace: true });
+    if (success) {
+      toast({
+        title: "Login Successful",
+        description: `Welcome, ${socialUser.displayName}!`,
+      });
+      navigate(from, { replace: true });
+    }
   };
 
   const togglePasswordVisibility = () => {
