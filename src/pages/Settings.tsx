@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -7,7 +6,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { users } from "@/data/users";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { translateText } from "@/utils/translation";
-
 const Settings = () => {
   const {
     toast
@@ -21,7 +19,6 @@ const Settings = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [currentLanguage, setCurrentLanguage] = useState("english");
-  
   useEffect(() => {
     const savedLanguage = localStorage.getItem('preferredLanguage');
     if (savedLanguage) {
@@ -33,7 +30,6 @@ const Settings = () => {
     window.addEventListener('languageChange', handleLanguageChange as EventListener);
     return () => window.removeEventListener('languageChange', handleLanguageChange as EventListener);
   }, []);
-  
   if (!isAuthenticated) {
     return <div className="container mx-auto px-4 py-8 min-h-screen">
         <h1 className="text-4xl font-bold mb-8 text-center">
@@ -41,7 +37,6 @@ const Settings = () => {
         </h1>
       </div>;
   }
-  
   const handlePasswordChange = () => {
     // Verify current password
     const user = users.find(u => u.username === currentUser?.username);
@@ -84,7 +79,6 @@ const Settings = () => {
     setNewPassword("");
     setConfirmPassword("");
   };
-  
   return <div className="container mx-auto px-4 py-8 min-h-screen transition-colors duration-300">
       <h1 className="text-4xl font-bold mb-8">{translateText("settings_title", currentLanguage)}</h1>
       
@@ -105,17 +99,7 @@ const Settings = () => {
         </div>
 
         {/* Language Selection */}
-        <div className="bg-card p-6 rounded-lg shadow-lg">
-          <h2 className="text-xl font-semibold mb-4">{translateText("language_selection", currentLanguage) || "Language Selection"}</h2>
-          <LanguageSwitcher 
-            currentLanguage={currentLanguage} 
-            onChange={(language) => {
-              setCurrentLanguage(language);
-              localStorage.setItem('preferredLanguage', language);
-              window.dispatchEvent(new CustomEvent('languageChange', { detail: language }));
-            }} 
-          />
-        </div>
+        
 
         {/* Password Change */}
         <div className="bg-card p-6 rounded-lg shadow-lg">
@@ -148,5 +132,4 @@ const Settings = () => {
       </div>
     </div>;
 };
-
 export default Settings;
