@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -7,7 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
+import { Star } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
 
 interface ProductReviewModalProps {
   productId: number;
@@ -33,11 +35,11 @@ const ProductReviewModal = ({
   const { toast } = useToast();
 
   // Pre-fill name if user is authenticated
-  useState(() => {
+  useEffect(() => {
     if (currentUser?.displayName) {
       setName(currentUser.displayName);
     }
-  });
+  }, [currentUser, isOpen]);
 
   const handleSubmit = () => {
     // Check if user is authenticated
@@ -68,9 +70,13 @@ const ProductReviewModal = ({
     }
   };
 
+  const handleRatingChange = (values: number[]) => {
+    setRating(values[0]);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md" data-product-id={productId}>
         <DialogHeader>
           <DialogTitle>Write a Review for {productName}</DialogTitle>
         </DialogHeader>
@@ -88,30 +94,26 @@ const ProductReviewModal = ({
           </div>
           
           <div className="space-y-2">
-            <Label>Rating</Label>
-            <div className="flex gap-1">
+            <Label>Rating ({rating.toFixed(1)} out of 5 stars)</Label>
+            <div className="py-4 px-1">
+              <Slider 
+                defaultValue={[5]} 
+                value={[rating]}
+                min={0.5}
+                max={5} 
+                step={0.1} 
+                onValueChange={handleRatingChange}
+              />
+            </div>
+            <div className="flex justify-between">
               {[1, 2, 3, 4, 5].map((star) => (
-                <button
+                <Star 
                   key={star}
-                  type="button"
+                  className={`h-6 w-6 cursor-pointer transition-colors ${
+                    star <= Math.round(rating) ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"
+                  }`}
                   onClick={() => setRating(star)}
-                  className="focus:outline-none"
-                >
-                  <svg 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    width="24" 
-                    height="24" 
-                    viewBox="0 0 24 24" 
-                    fill={star <= rating ? "gold" : "none"} 
-                    stroke="currentColor" 
-                    strokeWidth="2" 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round"
-                    className="text-yellow-500 hover:scale-110 transition-transform"
-                  >
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                  </svg>
-                </button>
+                />
               ))}
             </div>
           </div>
