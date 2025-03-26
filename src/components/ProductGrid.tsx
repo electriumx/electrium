@@ -165,8 +165,21 @@ const ProductGrid = ({
 
         let imageUrl = product.imageUrl;
         
+        // Use the provided images for specific product types
+        // Battlefield games
+        if (product.name.toLowerCase().includes('battlefield')) {
+          imageUrl = '/lovable-uploads/d496c5e1-cf2a-4e3a-ad70-e121a939a763.png';
+        } 
+        // Chromebooks
+        else if (product.brand.toLowerCase() === 'google' && product.name.toLowerCase().includes('chromebook')) {
+          imageUrl = '/lovable-uploads/f36c4267-74e8-4514-8f6d-ba947eea3a13.png';
+        }
+        // Nintendo products
+        else if (product.brand.toLowerCase() === 'nintendo' || product.name.toLowerCase().includes('nintendo') || product.name.toLowerCase().includes('switch')) {
+          imageUrl = '/lovable-uploads/54b67814-dd27-4a46-ac69-4beaf7bd7851.png';
+        }
         // Check for QuietComfort products
-        if (product.name.toLowerCase().includes('quietcomfort') && product.brand.toLowerCase() === 'bose') {
+        else if (product.name.toLowerCase().includes('quietcomfort') && product.brand.toLowerCase() === 'bose') {
           imageUrl = '/lovable-uploads/7be48add-b36a-4617-8856-47352e844bae.png';
         } 
         // Handle other product images
@@ -234,6 +247,12 @@ const ProductGrid = ({
               {hasDiscount && (
                 <div className="absolute top-2 left-2 bg-destructive text-white text-xs font-bold px-2 py-1 rounded">
                   {discountPercentage}% OFF
+                </div>
+              )}
+              
+              {product.subcategory && (
+                <div className="absolute bottom-2 left-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded">
+                  {product.subcategory}
                 </div>
               )}
             </div>

@@ -1,7 +1,6 @@
 
-// Maps product categories to appropriate image URLs from Google
+// Maps product categories to appropriate image URLs
 export const getCategoryImage = (category: string, brand?: string): string => {
-  // These URLs point to standardized Google-like product images by category
   switch (category.toLowerCase()) {
     case 'smartphones':
     case 'phone':
@@ -10,9 +9,16 @@ export const getCategoryImage = (category: string, brand?: string): string => {
         : 'https://lh3.googleusercontent.com/spp/AE_ITi1D72-F7PydJdVTGgKbTrpvrZEzZC7L0a3Wv_QQMF3M4FUGhdJBrPjQlJnVoK65QbPLm0CjOZ_lR3m1Ws5xKT5-Y2JzDQcjAUcoGkALIxRQYMC67lnGFOUQUOUw2TIAuFEHKvCN8oUTqEkQ5C3R7wKNvWkTGJSQ_k_8=s512-rw-pd-pc0x0'; // Generic Smartphone
     
     case 'laptops':
+    case 'laptop':
+      if (brand?.toLowerCase() === 'google' && category.toLowerCase().includes('chromebook')) {
+        return '/lovable-uploads/f36c4267-74e8-4514-8f6d-ba947eea3a13.png';  // Chromebook image
+      }
       return 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/mbp14-spacegray-select-202301?wid=904&hei=840&fmt=jpeg&qlt=90&.v=1671304673229';  // Generic Laptop
     
     case 'gaming consoles':
+      if (brand?.toLowerCase() === 'nintendo' || category.toLowerCase().includes('nintendo') || category.toLowerCase().includes('switch')) {
+        return '/lovable-uploads/54b67814-dd27-4a46-ac69-4beaf7bd7851.png';  // Nintendo image
+      }
       return 'https://gmedia.playstation.com/is/image/SIEPDC/ps5-product-thumbnail-01-en-14sep21?$facebook$';  // Generic Gaming Console
     
     case 'tvs':
@@ -35,17 +41,25 @@ export const getCategoryImage = (category: string, brand?: string): string => {
       return 'https://resource.logitech.com/content/dam/logitech/en/products/mice/mx-master-3s/gallery/mx-master-3s-mouse-pale-gray-top-view.png';  // Generic PC Accessory
     
     case 'games':
-      // Use a standardized game image for all games
-      if (brand?.toLowerCase().includes('playstation')) {
+      // Battlefield games get the specific image
+      if (category.toLowerCase().includes('battlefield') || brand?.toLowerCase()?.includes('battlefield')) {
+        return '/lovable-uploads/d496c5e1-cf2a-4e3a-ad70-e121a939a763.png';  // Battlefield image
+      } 
+      // Rainbow Six games get the specific image
+      else if (category.toLowerCase().includes('rainbow six') || brand?.toLowerCase()?.includes('rainbow six')) {
+        return '/lovable-uploads/2b732385-bcb9-459e-981e-bb57c1860769.png';  // Rainbow Six image
+      } 
+      // Call of Duty games get the specific image
+      else if (category.toLowerCase().includes('call of duty') || brand?.toLowerCase()?.includes('call of duty')) {
+        return '/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png';  // Call of Duty image
+      }
+      // Use other game-specific images
+      else if (brand?.toLowerCase().includes('playstation')) {
         return 'https://image.api.playstation.com/vulcan/ap/rnd/202108/0410/8ifJ8dxNOAMWHJi1vHLtUUZK.jpg';  // Generic PlayStation Game
       } else if (brand?.toLowerCase().includes('xbox')) {
         return 'https://assets.xboxservices.com/assets/a3/a2/a3a2a302-214c-4a88-a001-b19ae3e76983.jpg?n=204202N_Gallery-0_11_1350x759.jpg';  // Generic Xbox Game
       } else if (brand?.toLowerCase().includes('nintendo')) {
-        return 'https://assets.nintendo.com/image/upload/c_fill,w_1200/q_auto:best/f_auto/dpr_2.0/ncom/en_US/games/switch/m/mario-kart-8-deluxe-switch/hero';  // Generic Nintendo Game
-      } else if (brand?.toLowerCase().includes('fps') || brand?.toLowerCase().includes('call of duty')) {
-        return '/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png';  // Call of Duty image for FPS games
-      } else if (brand?.toLowerCase().includes('rainbow six') || category.toLowerCase().includes('rainbow six')) {
-        return '/lovable-uploads/2b732385-bcb9-459e-981e-bb57c1860769.png';  // Rainbow Six games with the new image
+        return '/lovable-uploads/54b67814-dd27-4a46-ac69-4beaf7bd7851.png';  // Nintendo games
       } else {
         return 'https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg';  // Generic PC Game (Elden Ring)
       }
@@ -99,7 +113,9 @@ export const getCategoryImage = (category: string, brand?: string): string => {
 export const getGameImage = (title: string): string => {
   const lowerTitle = title.toLowerCase();
   
-  if (lowerTitle.includes('elden ring')) {
+  if (lowerTitle.includes('battlefield')) {
+    return '/lovable-uploads/d496c5e1-cf2a-4e3a-ad70-e121a939a763.png'; // Battlefield image
+  } else if (lowerTitle.includes('elden ring')) {
     return 'https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg';
   } else if (lowerTitle.includes('death stranding')) {
     return '/lovable-uploads/e61d09d1-fb3f-4e38-aaca-2342513b89de.png';
@@ -107,10 +123,8 @@ export const getGameImage = (title: string): string => {
     return '/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png';
   } else if (lowerTitle.includes('counter strike') || lowerTitle.includes('cs:go') || lowerTitle.includes('cs go')) {
     return '/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png'; // Using Call of Duty image for now
-  } else if (lowerTitle.includes('battlefield')) {
-    return '/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png'; // Using Call of Duty image for now
   } else if (lowerTitle.includes('rainbow six')) {
-    return '/lovable-uploads/2b732385-bcb9-459e-981e-bb57c1860769.png'; // New Rainbow Six image
+    return '/lovable-uploads/2b732385-bcb9-459e-981e-bb57c1860769.png'; // Rainbow Six image
   } else if (lowerTitle.includes('cyberpunk 2077')) {
     return '/lovable-uploads/d0b5f6e9-d8a7-4e6d-92d9-0981cb533be3.png';
   } else if (lowerTitle.includes('horizon kings') && lowerTitle.includes('simulation')) {
@@ -119,6 +133,8 @@ export const getGameImage = (title: string): string => {
     return '/lovable-uploads/cf30cef5-878e-4911-b265-6fadc46cd9b1.png';
   } else if (lowerTitle.includes('ultimate fantasy') && lowerTitle.includes('racing')) {
     return '/lovable-uploads/49cf3cc6-b591-4fe9-b0ca-7e21178098d2.png';
+  } else if (lowerTitle.includes('nintendo') || lowerTitle.includes('switch')) {
+    return '/lovable-uploads/54b67814-dd27-4a46-ac69-4beaf7bd7851.png'; // Nintendo image
   }
   
   return getCategoryImage('games');
@@ -240,6 +256,10 @@ export const getProductPrice = (name: string, category: string, brand: string): 
       } else if (lowerName.includes('surface pro')) {
         return 1099;
       }
+    } else if (lowerBrand === 'google') {
+      if (lowerName.includes('chromebook')) {
+        return 349;
+      }
     }
     return 999; // Default laptop price
   }
@@ -347,8 +367,26 @@ export const getProductPrice = (name: string, category: string, brand: string): 
     return 399; // Default console price
   }
   
-  // TVs
+  // TVs with subcategories
   if (lowerCategory === 'tvs' || lowerCategory === 'tv') {
+    const subcategory = lowerName.split(' ')[0].toLowerCase();
+    
+    if (subcategory === 'oled') {
+      return 1999;
+    } else if (subcategory === 'qled') {
+      return 1499;
+    } else if (subcategory === '8k') {
+      return 3499;
+    } else if (subcategory === '4k') {
+      return 899;
+    } else if (subcategory === 'budget') {
+      return 399;
+    } else if (subcategory === 'smart') {
+      return 699;
+    } else if (subcategory === 'led') {
+      return 699;
+    }
+    
     if (lowerBrand === 'samsung') {
       if (lowerName.includes('8k')) {
         return 2999;

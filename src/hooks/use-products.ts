@@ -128,50 +128,151 @@ const additionalIPhones: Product[] = [
   }
 ];
 
+// TV subcategory products
+const tvSubcategoryProducts: Product[] = [
+  {
+    id: 15001,
+    name: "Samsung OLED 55-inch Smart TV",
+    price: 1999.99,
+    category: "TVs",
+    subcategory: "OLED",
+    brand: "Samsung",
+    description: "Premium OLED display with perfect blacks and vibrant colors, smart features, and sleek design.",
+    imageUrl: "/lovable-uploads/2f84a28b-83f8-4c69-96f8-ed61e49e631b.png",
+    quantity: 0,
+    rating: 4.8,
+    reviews: 156
+  },
+  {
+    id: 15002,
+    name: "LG QLED 65-inch UHD TV",
+    price: 1499.99,
+    category: "TVs",
+    subcategory: "QLED",
+    brand: "LG",
+    description: "Quantum dot technology for brilliant color accuracy, smart TV functionality, and slim design.",
+    imageUrl: "",
+    quantity: 0,
+    rating: 4.7,
+    reviews: 132
+  },
+  {
+    id: 15003,
+    name: "Sony LED 50-inch 4K TV",
+    price: 899.99,
+    category: "TVs",
+    subcategory: "LED",
+    brand: "Sony",
+    description: "High-quality LED panel with 4K resolution, HDR support, and advanced processing.",
+    imageUrl: "",
+    quantity: 0,
+    rating: 4.6,
+    reviews: 98
+  },
+  {
+    id: 15004,
+    name: "Samsung 8K 75-inch Ultra HD TV",
+    price: 3499.99,
+    category: "TVs",
+    subcategory: "8K",
+    brand: "Samsung",
+    description: "Future-proof 8K resolution with AI upscaling, premium audio, and smart home integration.",
+    imageUrl: "",
+    quantity: 0,
+    rating: 4.9,
+    reviews: 67
+  },
+  {
+    id: 15005,
+    name: "TCL 43-inch Budget Smart TV",
+    price: 399.99,
+    category: "TVs",
+    subcategory: "Budget",
+    brand: "TCL",
+    description: "Affordable smart TV with good picture quality, streaming apps, and voice control.",
+    imageUrl: "",
+    quantity: 0,
+    rating: 4.3,
+    reviews: 215
+  }
+];
+
 export const useProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
   
   useEffect(() => {
-    // Generate the additional 100+ products per category
+    // Generate the additional products with limited numbers
     const generatedProducts = generateAdditionalProducts();
     
-    // Combine initial products with additional iPhones and generated products
-    const allProducts = [...initialProducts, ...additionalIPhones, ...generatedProducts];
+    // Combine initial products with additional iPhones, TV subcategories, and generated products
+    const allProducts = [...initialProducts, ...additionalIPhones, ...tvSubcategoryProducts, ...generatedProducts];
     
     // Remove duplicates (in case they already exist)
     const uniqueProducts = allProducts.filter((product, index, self) => 
       index === self.findIndex(p => p.id === product.id)
     );
 
-    // Remove microwaves numbered from 23 to 100
-    const filteredProducts = uniqueProducts.filter(product => {
-      if (product.category === "Microwaves") {
-        const match = product.name.match(/\d+$/);
-        if (match) {
-          const num = parseInt(match[0], 10);
-          return num < 23 || num > 100;
-        }
+    // Deduplicate: Keep only one of each product type and remove numbered versions
+    const filteredProducts = uniqueProducts.reduce((acc: Product[], product) => {
+      // Extract base product name without numbers at the end
+      const baseNameMatch = product.name.match(/(.*?)(?:\s+\d+)?$/);
+      const baseName = baseNameMatch ? baseNameMatch[1].trim() : product.name;
+      
+      // Check if we already have this base product in our accumulator
+      const existingProduct = acc.find(p => {
+        const pBaseNameMatch = p.name.match(/(.*?)(?:\s+\d+)?$/);
+        const pBaseName = pBaseNameMatch ? pBaseNameMatch[1].trim() : p.name;
+        
+        return (
+          pBaseName === baseName && 
+          p.brand === product.brand && 
+          p.category === product.category
+        );
+      });
+      
+      // Only add if we don't already have this base product type
+      // But keep all iPhones, specific games, and TVs with subcategories
+      if (!existingProduct || 
+          (product.brand === "Apple" && product.name.includes("iPhone")) ||
+          product.category === "Games" || 
+          (product.category === "TVs" && product.subcategory) ||
+          product.name.toLowerCase().includes("battlefield") ||
+          product.name.toLowerCase().includes("rainbow six") ||
+          product.name.toLowerCase().includes("call of duty") ||
+          product.name.toLowerCase().includes("switch") ||
+          (product.brand === "Google" && product.name.toLowerCase().includes("chromebook"))) {
+        return [...acc, product];
       }
-      return true;
-    });
+      
+      return acc;
+    }, []);
 
-    // Add FPS subcategory to games
-    const productsWithFPSSubcategory = filteredProducts.map(product => {
-      if (product.category === "Games" || 
-          product.name.toLowerCase().includes("call of duty") || 
-          product.name.toLowerCase().includes("rainbow six")) {
+    // Update product images based on category, brand, and requested changes
+    const updatedProducts = filteredProducts.map(product => {
+      // Battlefield games get the first uploaded image
+      if (product.name.toLowerCase().includes("battlefield")) {
         return {
           ...product,
-          subcategory: "FPS"
+          imageUrl: "/lovable-uploads/d496c5e1-cf2a-4e3a-ad70-e121a939a763.png",
+          subcategory: "FPS Games"
         };
       }
-      return product;
-    });
-
-    // Update product images based on category and brand
-    const updatedProducts = productsWithFPSSubcategory.map(product => {
+      // Chromebooks get the second uploaded image
+      else if (product.brand === "Google" && product.name.toLowerCase().includes("chromebook")) {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/f36c4267-74e8-4514-8f6d-ba947eea3a13.png"
+        };
+      }
+      // Nintendo products get the third uploaded image
+      else if (product.brand === "Nintendo" || product.name.toLowerCase().includes("nintendo") || product.name.toLowerCase().includes("switch")) {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/54b67814-dd27-4a46-ac69-4beaf7bd7851.png"
+        };
+      }
       // Samsung phones get the first image
-      if (product.brand === "Samsung" && (product.category === "Smartphones" || product.category === "Phone")) {
+      else if (product.brand === "Samsung" && (product.category === "Smartphones" || product.category === "Phone")) {
         return {
           ...product,
           imageUrl: "/lovable-uploads/ec449e2d-bb1c-4e51-9af8-cb2419b6785f.png"
@@ -195,7 +296,8 @@ export const useProducts = () => {
       else if (product.name.toLowerCase().includes("rainbow six")) {
         return {
           ...product,
-          imageUrl: "/lovable-uploads/2b732385-bcb9-459e-981e-bb57c1860769.png"
+          imageUrl: "/lovable-uploads/2b732385-bcb9-459e-981e-bb57c1860769.png",
+          subcategory: "FPS Games"
         };
       }
       // Other vacuum cleaners get the third new image
@@ -269,11 +371,11 @@ export const useProducts = () => {
         };
       }
       // Call of Duty Black Ops 6 gets the new fourth image
-      else if (product.name.toLowerCase().includes("call of duty black ops 6") || 
-               product.name.toLowerCase().includes("call of duty: black ops 6")) {
+      else if (product.name.toLowerCase().includes("call of duty")) {
         return {
           ...product,
-          imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png"
+          imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
+          subcategory: "FPS Games"
         };
       }
       // QuietComfort products get the user-provided image
@@ -316,13 +418,6 @@ export const useProducts = () => {
         return {
           ...product,
           imageUrl: "/lovable-uploads/d0b5f6e9-d8a7-4e6d-92d9-0981cb533be3.png"
-        };
-      }
-      // All Call of Duty games
-      else if (product.name.toLowerCase().includes("call of duty")) {
-        return {
-          ...product,
-          imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png"
         };
       }
       // Sports headphones get the newly uploaded image
