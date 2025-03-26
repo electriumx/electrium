@@ -1,4 +1,5 @@
-import { productData } from '../data/productData';
+
+import { products } from '../data/productData';
 
 export const getProductImage = (productId: number, productName: string, productBrand: string, productCategory: string): string => {
   const imageName = productName.toLowerCase().replace(/ /g, '-');
@@ -37,7 +38,7 @@ export const getProductImage = (productId: number, productName: string, productB
 export const updateProductsData = () => {
   // Update game prices to have a minimum of $34.99
   // And fix Call of Duty: Warzone price
-  const updatedProducts = productData.map(product => {
+  const updatedProducts = products.map(product => {
     if (product.category === 'Games') {
       // Set Call of Duty: Warzone price specifically
       if (product.name === 'Call of Duty: Warzone') {

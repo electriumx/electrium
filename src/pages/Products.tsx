@@ -38,7 +38,6 @@ const Products = () => {
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
 
   useEffect(() => {
-    // Apply price updates
     const updatedProducts = updateProductsData();
     setFilteredProducts(updatedProducts);
     setAllProducts(updatedProducts);
@@ -161,6 +160,18 @@ const Products = () => {
   
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
   
+  const emptyProduct: Product = {
+    id: 0,
+    name: '',
+    description: '',
+    price: 0,
+    imageUrl: '',
+    brand: '',
+    category: '',
+    rating: 0,
+    reviews: 0
+  };
+  
   return (
     <div className="min-h-screen bg-background pb-16">
       <div className="container mx-auto px-4 py-8">
@@ -265,15 +276,7 @@ const Products = () => {
         </div>
         
         <ProductDetailModal
-          product={selectedProduct || {
-            id: 0,
-            name: '',
-            description: '',
-            price: 0,
-            imageUrl: '',
-            brand: '',
-            category: ''
-          }}
+          product={selectedProduct || emptyProduct}
           isOpen={isDetailModalOpen}
           onClose={handleCloseDetailModal}
           onQuantityChange={handleQuantityChange}
