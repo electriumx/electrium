@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Product } from '../data/productData';
 import { useToast } from '@/hooks/use-toast';
@@ -166,17 +165,29 @@ const ProductGrid = ({
         let imageUrl = product.imageUrl;
         
         // Use the provided images for specific product types
-        // Battlefield games
+        // Battlefield games - first image
         if (product.name.toLowerCase().includes('battlefield')) {
-          imageUrl = '/lovable-uploads/d496c5e1-cf2a-4e3a-ad70-e121a939a763.png';
+          imageUrl = '/lovable-uploads/ab3d21b8-041b-4137-865c-22fe07795d75.png';
         } 
-        // Chromebooks
+        // Chromebooks - second image
         else if (product.brand.toLowerCase() === 'google' && product.name.toLowerCase().includes('chromebook')) {
-          imageUrl = '/lovable-uploads/f36c4267-74e8-4514-8f6d-ba947eea3a13.png';
+          imageUrl = '/lovable-uploads/81f5b72a-7846-4240-b8e3-bd6e636a2128.png';
         }
         // Nintendo products
         else if (product.brand.toLowerCase() === 'nintendo' || product.name.toLowerCase().includes('nintendo') || product.name.toLowerCase().includes('switch')) {
           imageUrl = '/lovable-uploads/54b67814-dd27-4a46-ac69-4beaf7bd7851.png';
+        }
+        // Xiaomi phones - third image
+        else if (product.brand.toLowerCase() === 'xiaomi' && product.category.toLowerCase() === 'smartphones') {
+          imageUrl = '/lovable-uploads/19334ecf-42e6-4db9-8443-15db93e88166.png';
+        }
+        // Speakers - fourth image
+        else if (product.name.toLowerCase().includes('speaker') || product.category.toLowerCase().includes('speaker')) {
+          imageUrl = '/lovable-uploads/4d754bb4-c77a-436a-8470-ef066e888a5d.png';
+        }
+        // Microphones - fifth image
+        else if (product.name.toLowerCase().includes('microphone') || product.category.toLowerCase().includes('microphone')) {
+          imageUrl = '/lovable-uploads/55a7c5a8-4ffa-4448-8ada-7591813f3755.png';
         }
         // Check for QuietComfort products
         else if (product.name.toLowerCase().includes('quietcomfort') && product.brand.toLowerCase() === 'bose') {

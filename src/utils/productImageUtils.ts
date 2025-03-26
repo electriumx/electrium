@@ -1,9 +1,12 @@
-
 // Maps product categories to appropriate image URLs
 export const getCategoryImage = (category: string, brand?: string): string => {
   switch (category.toLowerCase()) {
     case 'smartphones':
     case 'phone':
+      // Xiaomi phones use specific image
+      if (brand?.toLowerCase() === 'xiaomi') {
+        return '/lovable-uploads/19334ecf-42e6-4db9-8443-15db93e88166.png';
+      }
       return brand?.toLowerCase() === 'apple' 
         ? 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-7inch_GEO_US?wid=5120&hei=2880&fmt=p-jpg&qlt=80&.v=1693009284541'  // iPhone 15 Pro
         : 'https://lh3.googleusercontent.com/spp/AE_ITi1D72-F7PydJdVTGgKbTrpvrZEzZC7L0a3Wv_QQMF3M4FUGhdJBrPjQlJnVoK65QbPLm0CjOZ_lR3m1Ws5xKT5-Y2JzDQcjAUcoGkALIxRQYMC67lnGFOUQUOUw2TIAuFEHKvCN8oUTqEkQ5C3R7wKNvWkTGJSQ_k_8=s512-rw-pd-pc0x0'; // Generic Smartphone
@@ -11,7 +14,7 @@ export const getCategoryImage = (category: string, brand?: string): string => {
     case 'laptops':
     case 'laptop':
       if (brand?.toLowerCase() === 'google' && category.toLowerCase().includes('chromebook')) {
-        return '/lovable-uploads/f36c4267-74e8-4514-8f6d-ba947eea3a13.png';  // Chromebook image
+        return '/lovable-uploads/81f5b72a-7846-4240-b8e3-bd6e636a2128.png';  // Chromebook image
       }
       return 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/mbp14-spacegray-select-202301?wid=904&hei=840&fmt=jpeg&qlt=90&.v=1671304673229';  // Generic Laptop
     
@@ -38,12 +41,17 @@ export const getCategoryImage = (category: string, brand?: string): string => {
       return 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-pro-finish-select-202210-11inch-space-gray-wifi?wid=2560&hei=1440&fmt=p-jpg&qlt=95&.v=1664411207213';  // Generic Tablet
     
     case 'pc accessories':
+      if (category.toLowerCase().includes('microphone') || brand?.toLowerCase().includes('microphone')) {
+        return '/lovable-uploads/55a7c5a8-4ffa-4448-8ada-7591813f3755.png';  // Microphone image
+      } else if (category.toLowerCase().includes('speaker') || brand?.toLowerCase().includes('speaker')) {
+        return '/lovable-uploads/4d754bb4-c77a-436a-8470-ef066e888a5d.png';  // Speaker image
+      }
       return 'https://resource.logitech.com/content/dam/logitech/en/products/mice/mx-master-3s/gallery/mx-master-3s-mouse-pale-gray-top-view.png';  // Generic PC Accessory
     
     case 'games':
-      // Battlefield games get the specific image
+      // Battlefield games get the new image
       if (category.toLowerCase().includes('battlefield') || brand?.toLowerCase()?.includes('battlefield')) {
-        return '/lovable-uploads/d496c5e1-cf2a-4e3a-ad70-e121a939a763.png';  // Battlefield image
+        return '/lovable-uploads/ab3d21b8-041b-4137-865c-22fe07795d75.png';  // New Battlefield image
       } 
       // Rainbow Six games get the specific image
       else if (category.toLowerCase().includes('rainbow six') || brand?.toLowerCase()?.includes('rainbow six')) {
@@ -63,6 +71,16 @@ export const getCategoryImage = (category: string, brand?: string): string => {
       } else {
         return 'https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg';  // Generic PC Game (Elden Ring)
       }
+    
+    // Speakers
+    case 'speakers':
+    case 'speaker':
+      return '/lovable-uploads/4d754bb4-c77a-436a-8470-ef066e888a5d.png'; // Speaker image
+    
+    // Microphones
+    case 'microphones':
+    case 'microphone':
+      return '/lovable-uploads/55a7c5a8-4ffa-4448-8ada-7591813f3755.png'; // Microphone image
     
     // Appliance categories
     case 'microwaves':
@@ -114,7 +132,7 @@ export const getGameImage = (title: string): string => {
   const lowerTitle = title.toLowerCase();
   
   if (lowerTitle.includes('battlefield')) {
-    return '/lovable-uploads/d496c5e1-cf2a-4e3a-ad70-e121a939a763.png'; // Battlefield image
+    return '/lovable-uploads/ab3d21b8-041b-4137-865c-22fe07795d75.png'; // New Battlefield image
   } else if (lowerTitle.includes('elden ring')) {
     return 'https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg';
   } else if (lowerTitle.includes('death stranding')) {

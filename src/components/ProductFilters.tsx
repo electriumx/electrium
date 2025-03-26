@@ -38,7 +38,7 @@ const ProductFilters = ({
     "Headphones": ["Over-ear", "In-ear", "Wireless", "Noise-cancelling", "Gaming", "Sports"],
     "PC Accessories": ["Keyboards", "Mice", "Monitors", "Webcams", "Microphones", "Speakers"],
     "Tablets": ["iOS", "Android", "Windows", "E-readers", "Budget", "Premium"],
-    "Games": ["Action", "RPG", "Strategy", "Sports", "Simulation", "Racing", "Puzzle"],
+    "Games": ["Action", "RPG", "Strategy", "Sports", "Simulation", "Racing", "Puzzle", "FPS"],
     "Microwaves": ["Countertop", "Built-in", "Convection", "Smart", "Compact"],
     "Washing Machines": ["Front Load", "Top Load", "Compact", "Smart", "Commercial"],
     "Refrigerators": ["French Door", "Side-by-Side", "Top Freezer", "Bottom Freezer", "Mini", "Smart"],
@@ -87,6 +87,14 @@ const ProductFilters = ({
     setSelectedSubcategories(newSelectedSubcategories);
     if (onSubCategoryChange) {
       onSubCategoryChange(newSelectedSubcategories);
+    }
+  };
+
+  const handleClearAll = () => {
+    onFilterChange([]);
+    if (onSubCategoryChange) {
+      setSelectedSubcategories([]);
+      onSubCategoryChange([]);
     }
   };
 
@@ -187,9 +195,9 @@ const ProductFilters = ({
               {capitalizeWords(brand)}
             </button>
           ))}
-          {selectedBrands.length > 0 && (
+          {(selectedBrands.length > 0 || selectedSubcategories.length > 0) && (
             <button 
-              onClick={() => onFilterChange([])} 
+              onClick={handleClearAll} 
               className="px-3 py-1 text-sm rounded-full bg-muted-foreground/20 text-foreground hover:bg-muted-foreground/30 transition-colors"
             >
               Clear All
@@ -202,3 +210,4 @@ const ProductFilters = ({
 };
 
 export default ProductFilters;
+
