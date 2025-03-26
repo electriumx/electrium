@@ -1,1026 +1,169 @@
-export interface Product {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  imageUrl: string;
-  brand: string;
-  category: string;
-  subcategory?: string;
-  rating: number;
-  reviews: number;
-  quantity?: number;
-  discount?: number;
-  accessories?: ProductAccessory[];
-  selectedColor?: string;
-}
-
-export interface ProductAccessory {
-  id: string;
-  name: string;
-  price: number;
-  category: string;
-  selected?: boolean;
-  image?: string;
-}
-
-const generateReasonablePrice = (category: string, premium: boolean = false): number => {
-  const priceRanges: Record<string, [number, number]> = {
-    'Smartphones': premium ? [699, 1299] : [299, 699],
-    'Laptops': premium ? [999, 1999] : [499, 999],
-    'Gaming Consoles': [299, 599],
-    'TVs': premium ? [799, 2499] : [299, 799],
-    'Headphones': premium ? [199, 399] : [49, 199],
-    'PC Accessories': [29, 199],
-    'Tablets': premium ? [499, 999] : [199, 499],
-    'Games': [29, 69],
-    'Accessories': [9, 99]
-  };
-  
-  const [min, max] = priceRanges[category] || [29, 299];
-  return Math.round((Math.random() * (max - min) + min) * 100) / 100;
-}
+import { Product } from '@/types/product';
 
 export const products: Product[] = [
   {
     id: 1,
-    name: 'iPhone 13 Pro Max',
-    description: 'The best iPhone ever. Super Retina XDR display with ProMotion. A15 Bionic chip. Advanced camera system.',
-    price: 1199,
-    imageUrl: '/lovable-uploads/iphone-13-pro-max.jpg',
-    brand: 'Apple',
-    category: 'Smartphones',
-    rating: 4.8,
-    reviews: 235,
-    accessories: [
-      { id: '1', name: 'AirPods Pro', price: 249, category: 'Headphones', image: '/lovable-uploads/bose-quietcomfort-45-headphones.jpg' },
-      { id: '2', name: 'Leather Case', price: 59, category: 'Cases', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
-      { id: '3', name: '20W USB-C Power Adapter', price: 19, category: 'Chargers', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
+    name: "Battlefield 2042",
+    brand: "EA",
+    category: "Video Games",
+    subcategory: "FPS",
+    price: 39.99,
+    discount: 0,
+    quantity: 0,
+    imageUrl: "/images/battlefield-2042.jpg",
+    colors: ["N/A"],
+    description: "Epic multiplayer first-person shooter with massive battles"
   },
   {
     id: 2,
-    name: 'Samsung Galaxy S21 Ultra',
-    description: 'The ultimate smartphone. 8K video recording. 108MP camera. Super fast processor.',
-    price: 1099,
-    imageUrl: '/lovable-uploads/samsung-galaxy-s21-ultra.jpg',
-    brand: 'Samsung',
-    category: 'Smartphones',
-    rating: 4.7,
-    reviews: 198,
-    accessories: [
-      { id: '4', name: 'Galaxy Buds Pro', price: 199, category: 'Headphones', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
-      { id: '5', name: 'Silicone Cover', price: 29, category: 'Cases', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
-      { id: '6', name: '25W Travel Adapter', price: 24, category: 'Chargers', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
+    name: "Death Stranding",
+    brand: "Sony",
+    category: "Video Games",
+    subcategory: "Action",
+    price: 44.99,
+    discount: 0,
+    quantity: 0,
+    imageUrl: "/images/death-stranding.jpg",
+    colors: ["N/A"],
+    description: "A genre-defying experience from Hideo Kojima"
   },
   {
     id: 3,
-    name: 'Sony PlayStation 5',
-    description: 'Next-gen gaming console. Lightning-fast SSD. Immersive 3D audio. Haptic feedback.',
-    price: 499,
-    imageUrl: '/lovable-uploads/sony-playstation-5.jpg',
-    brand: 'PlayStation',
-    category: 'Gaming Consoles',
-    rating: 4.9,
-    reviews: 312,
-    accessories: [
-      { id: '7', name: 'DualSense Controller', price: 69, category: 'Controllers', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
-      { id: '8', name: 'Pulse 3D Wireless Headset', price: 99, category: 'Headphones', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
+    name: "Elden Ring",
+    brand: "FromSoftware",
+    category: "Video Games",
+    subcategory: "RPG",
+    price: 59.99,
+    discount: 0,
+    quantity: 0,
+    imageUrl: "/images/elden-ring.jpg",
+    colors: ["N/A"],
+    description: "An epic action RPG adventure"
   },
   {
     id: 4,
-    name: 'Microsoft Xbox Series X',
-    description: 'The fastest, most powerful Xbox ever. 4K gaming at 120FPS. 1TB SSD.',
-    price: 499,
-    imageUrl: '/lovable-uploads/microsoft-xbox-series-x.jpg',
-    brand: 'Microsoft',
-    category: 'Gaming Consoles',
-    rating: 4.8,
-    reviews: 287,
-    accessories: [
-      { id: '9', name: 'Xbox Wireless Controller', price: 59, category: 'Controllers', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
-      { id: '10', name: 'Xbox Wireless Headset', price: 99, category: 'Headphones', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
+    name: "Call of Duty: Modern Warfare",
+    brand: "Activision",
+    category: "Video Games",
+    subcategory: "FPS",
+    price: 49.99,
+    discount: 0,
+    quantity: 0,
+    imageUrl: "/images/cod-mw.jpg",
+    colors: ["N/A"],
+    description: "Intense military first-person shooter"
   },
   {
     id: 5,
-    name: 'Apple MacBook Pro 16"',
-    description: 'The ultimate pro notebook. M1 Pro or M1 Max chip. Stunning Liquid Retina XDR display.',
-    price: 2499,
-    imageUrl: '/lovable-uploads/apple-macbook-pro-16.jpg',
-    brand: 'Apple',
-    category: 'Laptops',
-    rating: 4.9,
-    reviews: 265,
-    accessories: [
-      { id: '11', name: 'Magic Mouse', price: 99, category: 'Accessories', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
-      { id: '12', name: 'USB-C to USB Adapter', price: 19, category: 'Adapters', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
+    name: "Call of Duty: Warzone",
+    brand: "Activision",
+    category: "Video Games",
+    subcategory: "FPS",
+    price: 24.99,
+    discount: 0,
+    quantity: 0,
+    imageUrl: "/images/cod-warzone.jpg",
+    colors: ["N/A"],
+    description: "Free-to-play battle royale game from the Call of Duty franchise"
   },
   {
     id: 6,
-    name: 'Samsung 65" QLED 8K TV',
-    description: 'Experience the future of TV. Quantum Dot technology. 8K resolution. Immersive sound.',
-    price: 3499,
-    imageUrl: '/lovable-uploads/samsung-65-qled-8k-tv.jpg',
-    brand: 'Samsung',
-    category: 'TVs',
-    rating: 4.7,
-    reviews: 189
+    name: "Rainbow Six Siege",
+    brand: "Ubisoft",
+    category: "Video Games",
+    subcategory: "FPS",
+    price: 34.99,
+    discount: 0,
+    quantity: 0,
+    imageUrl: "/images/rainbow-six.jpg",
+    colors: ["N/A"],
+    description: "Tactical team-based shooter"
   },
   {
     id: 7,
-    name: 'Sony WH-1000XM4 Headphones',
-    description: 'Industry-leading noise cancellation. Exceptional sound quality. All-day comfort.',
-    price: 349,
-    imageUrl: '/lovable-uploads/sony-wh-1000xm4-headphones.jpg',
-    brand: 'Sony',
-    category: 'Headphones',
-    rating: 4.8,
-    reviews: 212
+    name: "Cyberpunk 2077",
+    brand: "CD Projekt",
+    category: "Video Games",
+    subcategory: "RPG",
+    price: 49.99,
+    discount: 0,
+    quantity: 0,
+    imageUrl: "/images/cyberpunk-2077.jpg",
+    colors: ["N/A"],
+    description: "Open-world action RPG set in Night City"
   },
   {
     id: 8,
-    name: 'Bose QuietComfort 45 Headphones',
-    description: 'The perfect balance of quiet, comfort, and sound. Iconic design. Simple to use.',
-    price: 329,
-    imageUrl: '/lovable-uploads/bose-quietcomfort-45-headphones.jpg',
-    brand: 'Audio',
-    category: 'Headphones',
-    rating: 4.6,
-    reviews: 167
+    name: "Horizon Kings Racing Simulation",
+    brand: "Racing Games Co",
+    category: "Video Games",
+    subcategory: "Racing",
+    price: 39.99,
+    discount: 0,
+    quantity: 0,
+    imageUrl: "/images/horizon-kings.jpg",
+    colors: ["N/A"],
+    description: "Realistic racing simulation game"
   },
   {
     id: 9,
-    name: 'Apple iPad Pro 12.9"',
-    description: 'The ultimate iPad experience. M1 chip. Liquid Retina XDR display. Thunderbolt port.',
-    price: 1099,
-    imageUrl: '/lovable-uploads/apple-ipad-pro-12-9.jpg',
-    brand: 'Apple',
-    category: 'Tablets',
-    rating: 4.9,
-    reviews: 293,
-    accessories: [
-      { id: '13', name: 'Apple Pencil (2nd generation)', price: 129, category: 'Accessories', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
-      { id: '14', name: 'Smart Keyboard Folio', price: 179, category: 'Accessories', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
+    name: "World of Warriors Racing",
+    brand: "Racing Games Co",
+    category: "Video Games",
+    subcategory: "Racing",
+    price: 34.99,
+    discount: 0,
+    quantity: 0,
+    imageUrl: "/images/world-warriors.jpg",
+    colors: ["N/A"],
+    description: "Action-packed racing game"
   },
   {
     id: 10,
-    name: 'Samsung Galaxy Tab S8 Ultra',
-    description: 'The biggest, boldest Galaxy Tab S yet. 14.6" display. S Pen included. Super fast charging.',
-    price: 1199,
-    imageUrl: '/lovable-uploads/samsung-galaxy-tab-s8-ultra.jpg',
-    brand: 'Samsung',
-    category: 'Tablets',
-    rating: 4.8,
-    reviews: 245,
-    accessories: [
-      { id: '15', name: 'Book Cover Keyboard', price: 149, category: 'Accessories', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
-  },
-  {
-    id: 11,
-    name: 'Google Pixel 6 Pro',
-    description: 'The smartest smartphone yet. Google Tensor chip. Advanced camera system. Smooth display.',
-    price: 899,
-    imageUrl: '/lovable-uploads/google-pixel-6-pro.jpg',
-    brand: 'Google',
-    category: 'Smartphones',
-    rating: 4.7,
-    reviews: 201
-  },
-  {
-    id: 12,
-    name: 'Xiaomi 12 Pro',
-    description: 'Flagship smartphone with Snapdragon 8 Gen 1. 120W fast charging. 50MP triple camera.',
-    price: 799,
-    imageUrl: '/lovable-uploads/xiaomi-12-pro.jpg',
-    brand: 'Xiaomi',
-    category: 'Smartphones',
-    rating: 4.6,
-    reviews: 176
-  },
-  {
-    id: 13,
-    name: 'Logitech MX Master 3 Mouse',
-    description: 'The ultimate mouse for productivity. MagSpeed scrolling. Ergonomic design. Customizable buttons.',
-    price: 99,
-    imageUrl: '/lovable-uploads/logitech-mx-master-3-mouse.jpg',
-    brand: 'Accessories',
-    category: 'PC Accessories',
-    rating: 4.9,
-    reviews: 302
-  },
-  {
-    id: 14,
-    name: 'Razer BlackWidow V3 Keyboard',
-    description: 'The iconic gaming keyboard. Razer Green mechanical switches. Chroma RGB lighting.',
-    price: 139,
-    imageUrl: '/lovable-uploads/razer-blackwidow-v3-keyboard.jpg',
-    brand: 'Accessories',
-    category: 'PC Accessories',
-    rating: 4.8,
-    reviews: 254
-  },
-  {
-    id: 15,
-    name: 'Elden Ring',
-    description: 'A fantasy action RPG set in a world created by Hidetaka Miyazaki and George R. R. Martin.',
-    price: 59.99,
-    imageUrl: '/lovable-uploads/elden-ring.jpg',
-    brand: 'PC Games',
-    category: 'Games',
-    rating: 4.9,
-    reviews: 420,
-    accessories: [
-      { id: '40', name: 'Digital Art Book', price: 9.99, category: 'Digital Content', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
-      { id: '41', name: 'Season Pass', price: 29.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
-  },
-  {
-    id: 16,
-    name: 'Horizon Forbidden West',
-    description: 'Explore distant lands, fight bigger and more awe-inspiring machines, and encounter astonishing new tribes.',
-    price: 69.99,
-    imageUrl: '/lovable-uploads/horizon-forbidden-west.jpg',
-    brand: 'PlayStation',
-    category: 'Games',
-    rating: 4.8,
-    reviews: 350,
-    accessories: [
-      { id: '42', name: 'Digital Soundtrack', price: 14.99, category: 'Digital Content', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
-      { id: '43', name: 'Digital Deluxe Upgrade', price: 19.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
-  },
-  {
-    id: 17,
-    name: 'The Last of Us Part II',
-    description: 'Five years after their dangerous journey across the post-pandemic United States, Ellie and Joel have settled down in Jackson, Wyoming.',
-    price: 39.99,
-    imageUrl: '/lovable-uploads/the-last-of-us-part-ii.jpg',
-    brand: 'PlayStation',
-    category: 'Games',
-    rating: 4.7,
-    reviews: 300,
-    accessories: [
-      { id: '44', name: 'Digital Soundtrack', price: 9.99, category: 'Digital Content', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
-      { id: '45', name: 'Concept Art Book', price: 14.99, category: 'Digital Content', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
-  },
-  {
-    id: 18,
-    name: 'Cyberpunk 2077',
-    description: 'Cyberpunk 2077 is an open-world, action-adventure RPG set in the megalopolis of Night City, where you play as a cyberpunk mercenary wrapped up in a do-or-die fight for survival.',
-    price: 49.99,
-    imageUrl: '/lovable-uploads/cyberpunk-2077.jpg',
-    brand: 'PC Games',
-    category: 'Games',
-    rating: 4.6,
-    reviews: 280,
-    accessories: [
-      { id: '46', name: 'Expansion Pass', price: 29.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
-      { id: '47', name: 'Digital Art Book', price: 9.99, category: 'Digital Content', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
-  },
-  {
-    id: 19,
-    name: 'Death Stranding',
-    description: 'From legendary game creator Hideo Kojima comes an all-new, genre-defying experience.',
-    price: 29.99,
-    imageUrl: '/lovable-uploads/death-stranding.jpg',
-    brand: 'PC Games',
-    category: 'Games',
-    rating: 4.5,
-    reviews: 250,
-    accessories: [
-      { id: '48', name: 'Digital Deluxe Content', price: 9.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
-      { id: '49', name: 'Original Score', price: 14.99, category: 'Digital Content', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
-  },
-  {
-    id: 20,
-    name: 'Ghost of Tsushima',
-    description: 'In the late 13th century, the Mongol empire has laid waste to entire nations along their path to conquer the East. Tsushima Island is all that stands between mainland Japan and a massive Mongol invasion fleet led by the ruthless and cunning general, Khotun Khan.',
-    price: 49.99,
-    imageUrl: '/lovable-uploads/ghost-of-tsushima.jpg',
-    brand: 'PlayStation',
-    category: 'Games',
-    rating: 4.8,
-    reviews: 320,
-    accessories: [
-      { id: '50', name: 'Director\'s Cut Upgrade', price: 19.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
-      { id: '51', name: 'Digital Mini Art Book', price: 4.99, category: 'Digital Content', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
-  },
-  
-  {
-    id: 21,
-    name: 'Google Pixel 7 Pro',
-    description: 'The most advanced Pixel phone yet with the best camera and a powerful Tensor G2 processor.',
-    price: 899,
-    imageUrl: '/lovable-uploads/google-pixel-6-pro.jpg',
-    brand: 'Google',
-    category: 'Smartphones',
-    rating: 4.7,
-    reviews: 189,
-    accessories: [
-      { id: '52', name: 'Pixel Stand', price: 79, category: 'Chargers', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
-      { id: '53', name: 'Pixel Buds Pro', price: 199, category: 'Headphones', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
-  },
-  
-  {
-    id: 22,
-    name: 'iPhone 14',
-    description: 'The latest iPhone with advanced camera features and powerful A16 chip.',
-    price: 799,
-    imageUrl: '/lovable-uploads/iphone-13-pro-max.jpg',
-    brand: 'Apple',
-    category: 'Smartphones',
-    rating: 4.8,
-    reviews: 210,
-    discount: 10,
-    accessories: [
-      { id: '54', name: 'MagSafe Charger', price: 39, category: 'Chargers', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
-      { id: '55', name: 'Silicone Case', price: 49, category: 'Cases', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
-  },
-  
-  {
-    id: 23,
-    name: 'Xbox Series X',
-    description: 'The most powerful Xbox ever with 4K gaming at up to 120 FPS.',
-    price: 499,
-    imageUrl: '/lovable-uploads/microsoft-xbox-series-x.jpg',
-    brand: 'Microsoft',
-    category: 'Gaming Consoles',
-    rating: 4.8,
-    reviews: 275,
-    accessories: [
-      { id: '56', name: 'Xbox Wireless Controller', price: 59, category: 'Controllers', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
-      { id: '57', name: 'Play & Charge Kit', price: 24.99, category: 'Accessories', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
-  },
-  
-  {
-    id: 24,
-    name: 'Dell XPS 15',
-    description: 'Premium laptop with InfinityEdge display and powerful performance.',
-    price: 1499,
-    imageUrl: '/lovable-uploads/apple-macbook-pro-16.jpg',
-    brand: 'Dell',
-    category: 'Laptops',
-    rating: 4.7,
-    reviews: 198,
-    accessories: [
-      { id: '58', name: 'USB-C Dock', price: 199, category: 'Accessories', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
-      { id: '59', name: 'Laptop Backpack', price: 69, category: 'Accessories', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
-  },
-  
-  {
-    id: 25,
-    name: 'Apple AirPods Max',
-    description: 'High-fidelity audio with Active Noise Cancellation and Transparency mode.',
-    price: 549,
-    imageUrl: '/lovable-uploads/sony-wh-1000xm4-headphones.jpg',
-    brand: 'Apple',
-    category: 'Headphones',
-    rating: 4.8,
-    reviews: 156,
-    discount: 15,
-    accessories: [
-      { id: '60', name: 'AirPods Max Smart Case', price: 59, category: 'Cases', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
-      { id: '61', name: 'AppleCare+ for Headphones', price: 29, category: 'Services', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
-  },
-  
-  {
-    id: 26,
-    name: 'God of War Ragnarök',
-    description: 'Embark on an epic journey as Kratos and Atreus in the Nordic realm.',
-    price: 69.99,
-    imageUrl: '/lovable-uploads/ghost-of-tsushima.jpg',
-    brand: 'PlayStation',
-    category: 'Games',
-    rating: 4.9,
-    reviews: 340,
-    accessories: [
-      { id: '62', name: 'Digital Soundtrack', price: 9.99, category: 'Digital Content', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
-      { id: '63', name: 'Art Book', price: 19.99, category: 'Digital Content', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
-  },
-  
-  {
-    id: 27,
-    name: 'Logitech G Pro X Keyboard',
-    description: 'Compact tenkeyless design with pro-grade switches for gaming.',
-    price: 149.99,
-    imageUrl: '/lovable-uploads/razer-blackwidow-v3-keyboard.jpg',
-    brand: 'Accessories',
-    category: 'PC Accessories',
-    rating: 4.7,
-    reviews: 187,
-    accessories: [
-      { id: '64', name: 'Wrist Rest', price: 19.99, category: 'Accessories', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' },
-      { id: '65', name: 'Keycap Set', price: 29.99, category: 'Accessories', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
+    name: "Ultimate Fantasy Racing",
+    brand: "Racing Games Co",
+    category: "Video Games",
+    subcategory: "Racing",
+    price: 34.99,
+    discount: 0,
+    quantity: 0,
+    imageUrl: "/images/ultimate-fantasy.jpg",
+    colors: ["N/A"],
+    description: "Fantasy-themed racing adventure"
   }
 ];
 
-// Find specific products and update their images
-for (let i = 0; i < products.length; i++) {
-  // Update Daikin Portable Air Conditioner 974
-  if (products[i].name === "Daikin Portable Air Conditioner 974") {
-    products[i].imageUrl = "https://5.imimg.com/data5/SELLER/Default/2023/7/337683112/EE/CV/NC/22007239791/daikin-portable-tower-air-conditioners.jpg";
-  }
+// Helper function to adjust the game prices
+export const adjustGamePrices = () => {
+  products.forEach(product => {
+    if (product.category === "Video Games" || product.category === "Games") {
+      if (product.name === "Call of Duty: Warzone") {
+        product.price = 24.99;
+      } else if (product.price < 34.99) {
+        product.price = 34.99;
+      }
+    }
+  });
   
-  // Update LG Portable Air Conditioner 595
-  if (products[i].name === "LG Portable Air Conditioner 595") {
-    products[i].imageUrl = "https://www.lg.com/us/images/air-conditioners/md08002082/gallery/desktop-01.jpg";
-  }
-  
-  // Update Frigidaire Portable Air Conditioner 319
-  if (products[i].name === "Frigidaire Portable Air Conditioner 319") {
-    products[i].imageUrl = "https://i5.walmartimages.com/asr/9387578d-7943-48a3-a868-bde54f30ea2a.bfe92d74ca7cf89a87ef62be1b0f9ba7.jpeg";
-  }
-}
-
-const categories = [
-  'Smartphones', 'Laptops', 'Gaming Consoles', 'TVs', 
-  'Headphones', 'PC Accessories', 'Tablets', 'Games',
-  'Microwaves', 'Washing Machines', 'Refrigerators', 'Smart Screens', 
-  'Air Conditioners', 'Vacuum Cleaners'
-];
-
-const subcategories: Record<string, string[]> = {
-  "Smartphones": ["iPhone", "Android", "Foldable", "Budget", "Premium", "Camera-focused", "Battery-focused"],
-  "Laptops": ["Gaming", "Business", "Ultrabook", "2-in-1", "Budget", "Premium", "Chromebook"],
-  "Gaming Consoles": ["Home Console", "Portable", "Retro", "VR", "Accessories"],
-  "TVs": ["OLED", "QLED", "LED", "Smart TV", "4K", "8K", "Budget"],
-  "Headphones": ["Over-ear", "In-ear", "Wireless", "Noise-cancelling", "Gaming", "Sports"],
-  "PC Accessories": ["Keyboards", "Mice", "Monitors", "Webcams", "Microphones", "Speakers"],
-  "Tablets": ["iOS", "Android", "Windows", "E-readers", "Budget", "Premium"],
-  "Games": ["Action", "RPG", "Strategy", "Sports", "Simulation", "Racing", "Puzzle", "FPS Games"],
-  "Microwaves": ["Countertop", "Built-in", "Convection", "Smart", "Compact"],
-  "Washing Machines": ["Front Load", "Top Load", "Compact", "Smart", "Commercial"],
-  "Refrigerators": ["French Door", "Side-by-Side", "Top Freezer", "Bottom Freezer", "Mini", "Smart"],
-  "Smart Screens": ["Digital Frames", "Smart Displays", "Interactive Panels", "Digital Signage"],
-  "Air Conditioners": ["Window", "Split", "Portable", "Central", "Smart"],
-  "Vacuum Cleaners": ["Robot", "Upright", "Canister", "Handheld", "Stick"]
+  return products;
 };
 
-const brandsByCategory: Record<string, string[]> = {
-  "Smartphones": ["Apple", "Samsung", "Google", "Xiaomi"],
-  "Laptops": ["Apple", "Dell", "HP", "Lenovo", "ASUS", "Microsoft"],
-  "Gaming Consoles": ["PlayStation", "Microsoft", "Nintendo"],
-  "TVs": ["Samsung", "Sony", "LG", "TCL"],
-  "Headphones": ["Sony", "Bose", "Apple", "JBL", "Audio"],
-  "PC Accessories": ["Logitech", "Razer", "Corsair", "SteelSeries"],
-  "Tablets": ["Apple", "Samsung", "Microsoft", "Amazon"],
-  "Games": ["PlayStation", "PC Games", "Microsoft", "Nintendo"],
-  "Microwaves": ["Samsung", "LG", "Whirlpool", "Panasonic", "GE"],
-  "Washing Machines": ["Samsung", "LG", "Whirlpool", "Maytag", "Bosch"],
-  "Refrigerators": ["Samsung", "LG", "Whirlpool", "GE", "Frigidaire"],
-  "Smart Screens": ["Samsung", "Google", "Amazon", "Facebook", "Lenovo"],
-  "Air Conditioners": ["LG", "Samsung", "Carrier", "Daikin", "Frigidaire"],
-  "Vacuum Cleaners": ["Dyson", "Shark", "iRobot", "Miele", "Bissell"]
+// Call the function to adjust prices when importing the file
+adjustGamePrices();
+
+export const getProductById = (id: number): Product | undefined => {
+  return products.find(product => product.id === id);
 };
 
-const generateAccessories = (category: string): ProductAccessory[] => {
-  const accessoryCount = Math.floor(Math.random() * 3) + 1;
-  const result: ProductAccessory[] = [];
-  
-  for (let i = 0; i < accessoryCount; i++) {
-    const accessoryType = Math.floor(Math.random() * 6);
-    let accessoryName = "";
-    let accessoryCat = "";
-    let price = 0;
-    
-    switch(accessoryType) {
-      case 0:
-        accessoryName = "Premium Case";
-        accessoryCat = "Cases";
-        price = generateReasonablePrice("Accessories", false);
-        break;
-      case 1:
-        accessoryName = "High-Speed Charger";
-        accessoryCat = "Chargers";
-        price = generateReasonablePrice("Accessories", false);
-        break;
-      case 2:
-        accessoryName = "Screen Protector";
-        accessoryCat = "Screen Protectors";
-        price = generateReasonablePrice("Accessories", false);
-        break;
-      case 3:
-        accessoryName = "Premium Headphones";
-        accessoryCat = "Headphones";
-        price = generateReasonablePrice("Headphones", false);
-        break;
-      case 4:
-        accessoryName = "Extended Warranty";
-        accessoryCat = "Services";
-        price = generateReasonablePrice("Accessories", true);
-        break;
-      case 5:
-        accessoryName = "Connectivity Cable";
-        accessoryCat = "Cables";
-        price = generateReasonablePrice("Accessories", false);
-        break;
-    }
-    
-    result.push({
-      id: `acc-${Date.now()}-${i}-${Math.random().toString(36).substring(2, 9)}`,
-      name: accessoryName,
-      price: price,
-      category: accessoryCat,
-      image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png'
-    });
+export const updateProductQuantity = (id: number, quantity: number) => {
+  const product = products.find(p => p.id === id);
+  if (product) {
+    product.quantity = quantity;
   }
-  
-  return result;
 };
 
-let nextId = 100;
-
-categories.forEach(category => {
-  const categorySubcategories = subcategories[category] || [];
-  const categoryBrands = brandsByCategory[category] || ["Generic"];
-  
-  for (let i = 0; i < 100; i++) {
-    const isPremium = Math.random() > 0.7;
-    const subcategory = categorySubcategories[Math.floor(Math.random() * categorySubcategories.length)];
-    const brand = categoryBrands[Math.floor(Math.random() * categoryBrands.length)];
-    
-    let productName, productDesc;
-    
-    switch (category) {
-      case 'Smartphones':
-        productName = `${brand} ${subcategory} Phone ${Math.floor(Math.random() * 20 + 1)}`;
-        productDesc = `A powerful ${subcategory.toLowerCase()} smartphone with great battery life and camera performance.`;
-        break;
-      case 'Laptops':
-        productName = `${brand} ${subcategory} Laptop ${String.fromCharCode(65 + Math.floor(Math.random() * 26))}${Math.floor(Math.random() * 900 + 100)}`;
-        productDesc = `High-performance ${subcategory.toLowerCase()} laptop ideal for productivity and entertainment.`;
-        break;
-      case 'Gaming Consoles':
-        productName = `${brand} ${subcategory} ${Math.floor(Math.random() * 10 + 1)}`;
-        productDesc = `Next-generation gaming experience with immersive graphics and fast loading times.`;
-        break;
-      case 'TVs':
-        const size = Math.floor(Math.random() * 30 + 32);
-        productName = `${brand} ${size}" ${subcategory} TV`;
-        productDesc = `Crystal clear display with smart features and immersive sound.`;
-        break;
-      case 'Headphones':
-        productName = `${brand} ${subcategory} Headphones ${Math.floor(Math.random() * 1000 + 100)}`;
-        productDesc = `Premium audio experience with comfortable fit and long battery life.`;
-        break;
-      case 'PC Accessories':
-        productName = `${brand} ${subcategory} ${Math.floor(Math.random() * 1000 + 100)}`;
-        productDesc = `High-quality PC accessory designed for gamers and professionals.`;
-        break;
-      case 'Tablets':
-        productName = `${brand} ${subcategory} Tablet ${Math.floor(Math.random() * 20 + 1)}`;
-        productDesc = `Versatile tablet for work and entertainment with a beautiful display.`;
-        break;
-      case 'Games':
-        const gameNames = ["Legend of", "World of", "Rise of", "Call to", "Ultimate", "Horizon", "Eternal", "Epic", "Chronicles of", "Shadow"];
-        const gameSuffixes = ["Champions", "Heroes", "Legends", "Adventure", "Quest", "Warriors", "Conquest", "Realms", "Kings", "Fantasy"];
-        productName = `${gameNames[Math.floor(Math.random() * gameNames.length)]} ${gameSuffixes[Math.floor(Math.random() * gameSuffixes.length)]} - ${subcategory}`;
-        productDesc = `Immersive ${subcategory.toLowerCase()} game with stunning graphics and engaging gameplay.`;
-        break;
-      case 'Microwaves':
-        productName = `${brand} ${subcategory} Microwave ${Math.floor(Math.random() * 1000 + 100)}`;
-        productDesc = `High-efficiency ${subcategory.toLowerCase()} with multiple cooking presets.`;
-        break;
-      case 'Washing Machines':
-        productName = `${brand} ${subcategory} Washing Machine ${Math.floor(Math.random() * 1000 + 100)}`;
-        productDesc = `Energy-efficient ${subcategory.toLowerCase()} with steam cleaning technology.`;
-        break;
-      case 'Refrigerators':
-        productName = `${brand} ${subcategory} Refrigerator ${Math.floor(Math.random() * 1000 + 100)}`;
-        productDesc = `Smart refrigerator with touchscreen and camera to see inside from your phone.`;
-        break;
-      case 'Smart Screens':
-        productName = `${brand} ${subcategory} Smart Screen ${Math.floor(Math.random() * 1000 + 100)}`;
-        productDesc = `High-quality ${subcategory.toLowerCase()} display with Google Assistant integration.`;
-        break;
-      case 'Air Conditioners':
-        productName = `${brand} ${subcategory} Air Conditioner ${Math.floor(Math.random() * 1000 + 100)}`;
-        productDesc = `Energy-efficient ${subcategory.toLowerCase()} with smart controls and quiet operation.`;
-        break;
-      case 'Vacuum Cleaners':
-        productName = `${brand} ${subcategory} Vacuum Cleaner ${Math.floor(Math.random() * 1000 + 100)}`;
-        productDesc = `Powerful cordless vacuum with advanced filtration and up to 60 minutes of runtime.`;
-        break;
-      default:
-        productName = `${brand} ${category} ${Math.floor(Math.random() * 1000 + 100)}`;
-        productDesc = `High-quality ${category.toLowerCase()} product with premium features.`;
-    }
-    
-    const price = generateReasonablePrice(category, isPremium);
-    
-    const hasDiscount = Math.random() > 0.8;
-    const discount = hasDiscount ? Math.floor(Math.random() * 15) + 5 : 0;
-    
-    let imageUrl = '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png';
-    
-    switch (category) {
-      case 'Smartphones':
-        imageUrl = '/lovable-uploads/iphone-13-pro-max.jpg';
-        break;
-      case 'Laptops':
-        imageUrl = '/lovable-uploads/apple-macbook-pro-16.jpg';
-        break;
-      case 'Gaming Consoles':
-        imageUrl = Math.random() > 0.5 ? '/lovable-uploads/sony-playstation-5.jpg' : '/lovable-uploads/microsoft-xbox-series-x.jpg';
-        break;
-      case 'TVs':
-        imageUrl = '/lovable-uploads/samsung-65-qled-8k-tv.jpg';
-        break;
-      case 'Headphones':
-        imageUrl = Math.random() > 0.5 ? '/lovable-uploads/sony-wh-1000xm4-headphones.jpg' : '/lovable-uploads/bose-quietcomfort-45-headphones.jpg';
-        break;
-      case 'Games':
-        const gameImages = [
-          '/lovable-uploads/elden-ring.jpg',
-          '/lovable-uploads/horizon-forbidden-west.jpg',
-          '/lovable-uploads/the-last-of-us-part-ii.jpg',
-          '/lovable-uploads/cyberpunk-2077.jpg',
-          '/lovable-uploads/death-stranding.jpg',
-          '/lovable-uploads/ghost-of-tsushima.jpg'
-        ];
-        imageUrl = gameImages[Math.floor(Math.random() * gameImages.length)];
-        break;
-      case 'Microwaves':
-        imageUrl = Math.random() > 0.5 ? '/lovable-uploads/samsung-65-qled-8k-tv.jpg' : '/lovable-uploads/sony-wh-1000xm4-headphones.jpg';
-        break;
-      case 'Washing Machines':
-        imageUrl = Math.random() > 0.5 ? '/lovable-uploads/samsung-65-qled-8k-tv.jpg' : '/lovable-uploads/sony-wh-1000xm4-headphones.jpg';
-        break;
-      case 'Refrigerators':
-        imageUrl = Math.random() > 0.5 ? '/lovable-uploads/samsung-65-qled-8k-tv.jpg' : '/lovable-uploads/sony-wh-1000xm4-headphones.jpg';
-        break;
-      case 'Smart Screens':
-        imageUrl = Math.random() > 0.5 ? '/lovable-uploads/samsung-65-qled-8k-tv.jpg' : '/lovable-uploads/sony-wh-1000xm4-headphones.jpg';
-        break;
-      case 'Air Conditioners':
-        imageUrl = Math.random() > 0.5 ? '/lovable-uploads/samsung-65-qled-8k-tv.jpg' : '/lovable-uploads/sony-wh-1000xm4-headphones.jpg';
-        break;
-      case 'Vacuum Cleaners':
-        imageUrl = Math.random() > 0.5 ? '/lovable-uploads/samsung-65-qled-8k-tv.jpg' : '/lovable-uploads/sony-wh-1000xm4-headphones.jpg';
-        break;
-    }
-    
-    const newProduct: Product = {
-      id: nextId++,
-      name: productName,
-      description: productDesc,
-      price: price,
-      imageUrl: imageUrl,
-      brand: brand,
-      category: category,
-      subcategory: subcategory,
-      rating: 3 + Math.random() * 2,
-      reviews: Math.floor(Math.random() * 400) + 10,
-      accessories: generateAccessories(category)
-    };
-    
-    if (discount > 0) {
-      newProduct.discount = discount;
-    }
-    
-    products.push(newProduct);
-  }
-});
-
-const applianceProducts: Product[] = [
-  {
-    id: 1001,
-    name: "Samsung Smart Microwave",
-    description: "Smart microwave with voice control and multiple cooking presets.",
-    price: 299.99,
-    imageUrl: '/lovable-uploads/samsung-65-qled-8k-tv.jpg',
-    brand: "Samsung",
-    category: "Microwaves",
-    subcategory: "Smart",
-    rating: 4.5,
-    reviews: 128,
-    accessories: [{
-      id: 'acc-microwave-1',
-      name: 'Extended Warranty',
-      price: 49.99,
-      category: 'Services',
-      image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png'
-    }]
-  },
-  {
-    id: 1002,
-    name: "LG Front Load Washing Machine",
-    description: "Energy efficient washing machine with steam cleaning technology.",
-    price: 899.99,
-    imageUrl: '/lovable-uploads/samsung-65-qled-8k-tv.jpg',
-    brand: "LG",
-    category: "Washing Machines",
-    subcategory: "Front Load",
-    rating: 4.7,
-    reviews: 215,
-    accessories: [{
-      id: 'acc-washer-1',
-      name: 'Installation Kit',
-      price: 29.99,
-      category: 'Accessories',
-      image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png'
-    }]
-  },
-  {
-    id: 1003,
-    name: "Samsung Family Hub Refrigerator",
-    description: "Smart refrigerator with touchscreen and camera to see inside from your phone.",
-    price: 2899.99,
-    imageUrl: '/lovable-uploads/samsung-65-qled-8k-tv.jpg',
-    brand: "Samsung",
-    category: "Refrigerators",
-    subcategory: "Smart",
-    rating: 4.8,
-    reviews: 178,
-    accessories: [{
-      id: 'acc-fridge-1',
-      name: 'Water Filter',
-      price: 49.99,
-      category: 'Accessories',
-      image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png'
-    }]
-  },
-  {
-    id: 1004,
-    name: "Google Nest Hub",
-    description: "Smart display with Google Assistant to control your smart home.",
-    price: 129.99,
-    imageUrl: '/lovable-uploads/google-pixel-6-pro.jpg',
-    brand: "Google",
-    category: "Smart Screens",
-    subcategory: "Smart Displays",
-    rating: 4.6,
-    reviews: 310,
-    accessories: [{
-      id: 'acc-display-1',
-      name: 'Wall Mount',
-      price: 19.99,
-      category: 'Accessories',
-      image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png'
-    }]
-  },
-  {
-    id: 1005,
-    name: "LG Dual Inverter Window AC",
-    description: "Energy efficient air conditioner with smart controls and quiet operation.",
-    price: 549.99,
-    imageUrl: '/lovable-uploads/samsung-65-qled-8k-tv.jpg',
-    brand: "LG",
-    category: "Air Conditioners",
-    subcategory: "Window",
-    rating: 4.4,
-    reviews: 156,
-    accessories: [{
-      id: 'acc-ac-1',
-      name: 'Installation Kit',
-      price: 39.99,
-      category: 'Accessories',
-      image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png'
-    }]
-  },
-  {
-    id: 1006,
-    name: "Dyson V11 Stick Vacuum",
-    description: "Powerful cordless vacuum with advanced filtration and up to 60 minutes of runtime.",
-    price: 599.99,
-    imageUrl: '/lovable-uploads/logitech-mx-master-3-mouse.jpg',
-    brand: "Dyson",
-    category: "Vacuum Cleaners",
-    subcategory: "Stick",
-    rating: 4.9,
-    reviews: 412,
-    accessories: [{
-      id: 'acc-vacuum-1',
-      name: 'Extra Battery',
-      price: 129.99,
-      category: 'Accessories',
-      image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png'
-    }]
-  }
-];
-
-applianceProducts.forEach(product => products.push(product));
-
-const fpsGames: Product[] = [
-  {
-    id: 3001,
-    name: "Call of Duty: Black Ops 6",
-    description: "The latest installment in the Black Ops series with intense multiplayer action.",
-    price: 69.99,
-    imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
-    brand: "PC Games",
-    category: "Games",
-    subcategory: "FPS Games",
-    rating: 4.8,
-    reviews: 310,
-    accessories: [
-      { id: 'acc-fps-1', name: 'Season Pass', price: 39.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
-  },
-  {
-    id: 3002,
-    name: "Call of Duty: Modern Warfare 3",
-    description: "Continue the gripping storyline in this action-packed first-person shooter.",
-    price: 59.99,
-    imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
-    brand: "PC Games",
-    category: "Games",
-    subcategory: "FPS Games",
-    rating: 4.7,
-    reviews: 285,
-    accessories: [
-      { id: 'acc-fps-2', name: 'Map Pack', price: 14.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
-  },
-  {
-    id: 3003,
-    name: "Call of Duty: Warzone",
-    description: "Free-to-play battle royale game with massive 150-player battles.",
-    price: 0,
-    imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
-    brand: "PC Games",
-    category: "Games",
-    subcategory: "FPS Games",
-    rating: 4.6,
-    reviews: 420,
-    accessories: [
-      { id: 'acc-fps-3', name: 'Battle Pass', price: 9.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
-  },
-  {
-    id: 3004,
-    name: "Counter-Strike 2",
-    description: "The iconic tactical shooter returns with enhanced graphics and gameplay.",
-    price: 49.99,
-    imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
-    brand: "PC Games",
-    category: "Games",
-    subcategory: "FPS Games",
-    rating: 4.9,
-    reviews: 550,
-    accessories: [
-      { id: 'acc-fps-4', name: 'Operation Pass', price: 14.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
-  },
-  {
-    id: 3005,
-    name: "Counter-Strike: Global Offensive",
-    description: "Classic competitive FPS with multiple game modes and a thriving esports scene.",
-    price: 14.99,
-    imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
-    brand: "PC Games",
-    category: "Games",
-    subcategory: "FPS Games",
-    rating: 4.8,
-    reviews: 620,
-    accessories: [
-      { id: 'acc-fps-5', name: 'Operation Pass', price: 9.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
-  },
-  {
-    id: 3006,
-    name: "Battlefield 2042",
-    description: "Large-scale warfare with destructible environments and dynamic weather.",
-    price: 39.99,
-    imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
-    brand: "PC Games",
-    category: "Games",
-    subcategory: "FPS Games",
-    rating: 4.2,
-    reviews: 380,
-    accessories: [
-      { id: 'acc-fps-6', name: 'Year 1 Pass', price: 39.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
-  },
-  {
-    id: 3007,
-    name: "Battlefield V",
-    description: "WWII-themed shooter with immersive single-player stories and multiplayer modes.",
-    price: 29.99,
-    imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
-    brand: "PC Games",
-    category: "Games",
-    subcategory: "FPS Games",
-    rating: 4.5,
-    reviews: 410,
-    accessories: [
-      { id: 'acc-fps-7', name: 'Definitive Edition Upgrade', price: 24.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
-  },
-  {
-    id: 3008,
-    name: "Rainbow Six Siege",
-    description: "Tactical team-based shooter focused on destructible environments and operator selection.",
-    price: 19.99,
-    imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
-    brand: "PC Games",
-    category: "Games",
-    subcategory: "FPS Games",
-    rating: 4.7,
-    reviews: 520,
-    accessories: [
-      { id: 'acc-fps-8', name: 'Year 8 Pass', price: 29.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
-  },
-  {
-    id: 3009,
-    name: "Call of Duty: Black Ops 5",
-    description: "Cold War-era first-person shooter with cinematic campaign and competitive multiplayer.",
-    price: 49.99,
-    imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
-    brand: "PC Games",
-    category: "Games",
-    subcategory: "FPS Games",
-    rating: 4.6,
-    reviews: 375,
-    accessories: [
-      { id: 'acc-fps-9', name: 'Season Pass', price: 34.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
-  },
-  {
-    id: 3010,
-    name: "Call of Duty: Black Ops 4",
-    description: "Multiplayer-focused FPS including the battle royale mode Blackout.",
-    price: 39.99,
-    imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
-    brand: "PC Games",
-    category: "Games",
-    subcategory: "FPS Games",
-    rating: 4.5,
-    reviews: 340,
-    accessories: [
-      { id: 'acc-fps-10', name: 'Black Ops Pass', price: 29.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
-  },
-  {
-    id: 3011,
-    name: "Call of Duty: Black Ops 3",
-    description: "Futuristic warfare with cybernetics, robotics, and cutting-edge military technology.",
-    price: 29.99,
-    imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
-    brand: "PC Games",
-    category: "Games",
-    subcategory: "FPS Games",
-    rating: 4.4,
-    reviews: 320,
-    accessories: [
-      { id: 'acc-fps-11', name: 'Season Pass', price: 24.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
-  },
-  {
-    id: 3012,
-    name: "Call of Duty: Black Ops 2",
-    description: "Near-future warfare with branching storylines and enhanced multiplayer experience.",
-    price: 19.99,
-    imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
-    brand: "PC Games",
-    category: "Games",
-    subcategory: "FPS Games",
-    rating: 4.7,
-    reviews: 360,
-    accessories: [
-      { id: 'acc-fps-12', name: 'Map Pack Bundle', price: 19.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
-  },
-  {
-    id: 3013,
-    name: "Call of Duty: Black Ops",
-    description: "Cold War-era shooter with a thrilling campaign and iconic multiplayer maps.",
-    price: 14.99,
-    imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
-    brand: "PC Games",
-    category: "Games",
-    subcategory: "FPS Games",
-    rating: 4.6,
-    reviews: 330,
-    accessories: [
-      { id: 'acc-fps-13', name: 'Rezurrection Pack', price: 9.99, category: 'DLC', image: '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png' }
-    ]
-  }
-];
-
-fpsGames.forEach(game => products.push(game));
-
-products.sort((a, b) => {
-  if (a.category === b.category) {
-    return a.price - b.price;
-  }
-  return a.category.localeCompare(b.category);
-});
+export const clearAllQuantities = () => {
+  products.forEach(product => {
+    product.quantity = 0;
+  });
+};

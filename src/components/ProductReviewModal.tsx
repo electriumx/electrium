@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
+import { Star } from 'lucide-react';
 
 interface ProductReviewModalProps {
   productId: number;
@@ -26,6 +27,7 @@ const ProductReviewModal = ({
 }: ProductReviewModalProps) => {
   const [name, setName] = useState('');
   const [rating, setRating] = useState(5);
+  const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState('');
   const [errors, setErrors] = useState({ name: false, comment: false });
   const { isAuthenticated, currentUser } = useAuth();
@@ -33,11 +35,11 @@ const ProductReviewModal = ({
   const { toast } = useToast();
 
   // Pre-fill name if user is authenticated
-  useState(() => {
+  useEffect(() => {
     if (currentUser?.displayName) {
       setName(currentUser.displayName);
     }
-  });
+  }, [currentUser]);
 
   const handleSubmit = () => {
     // Check if user is authenticated
@@ -68,6 +70,43 @@ const ProductReviewModal = ({
     }
   };
 
+  // Handle precise decimal ratings
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>, starIndex: number) => {
+    const starRect = e.currentTarget.getBoundingClientRect();
+    const starWidth = starRect.width;
+    const offsetX = e.clientX - starRect.left;
+    
+    // Calculate the precise position (0 to 1) within the star
+    const position = Math.max(0, Math.min(1, offsetX / starWidth));
+    
+    // Calculate rating with one decimal place (e.g., 3.7)
+    const preciseRating = Math.round((starIndex - 1 + position) * 10) / 10;
+    setHoverRating(preciseRating);
+  };
+
+  const handleMouseLeave = () => {
+    setHoverRating(0);
+  };
+
+  const handleStarClick = () => {
+    if (hoverRating > 0) {
+      setRating(hoverRating);
+    }
+  };
+
+  // Get the filled percentage for each star
+  const getStarFill = (starIndex: number) => {
+    const displayRating = hoverRating > 0 ? hoverRating : rating;
+    
+    if (starIndex <= Math.floor(displayRating)) {
+      return 100; // Fully filled
+    } else if (starIndex - 1 < displayRating && starIndex > displayRating) {
+      // Partially filled
+      return (displayRating - Math.floor(displayRating)) * 100;
+    }
+    return 0; // Not filled
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md">
@@ -88,30 +127,34 @@ const ProductReviewModal = ({
           </div>
           
           <div className="space-y-2">
-            <Label>Rating</Label>
+            <Label>Rating ({rating.toFixed(1)}/5)</Label>
             <div className="flex gap-1">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <button
-                  key={star}
-                  type="button"
-                  onClick={() => setRating(star)}
-                  className="focus:outline-none"
+              {[1, 2, 3, 4, 5].map((starIndex) => (
+                <div
+                  key={starIndex}
+                  className="relative cursor-pointer"
+                  onMouseMove={(e) => handleMouseMove(e, starIndex)}
+                  onMouseLeave={handleMouseLeave}
+                  onClick={handleStarClick}
                 >
-                  <svg 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    width="24" 
-                    height="24" 
-                    viewBox="0 0 24 24" 
-                    fill={star <= rating ? "gold" : "none"} 
-                    stroke="currentColor" 
-                    strokeWidth="2" 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round"
-                    className="text-yellow-500 hover:scale-110 transition-transform"
+                  {/* Background star (empty) */}
+                  <Star 
+                    size={24} 
+                    className="text-gray-300" 
+                  />
+                  
+                  {/* Foreground star (filled) with clip-path for partial filling */}
+                  <div 
+                    className="absolute top-0 left-0 overflow-hidden"
+                    style={{ width: `${getStarFill(starIndex)}%` }}
                   >
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                  </svg>
-                </button>
+                    <Star 
+                      size={24} 
+                      className="text-yellow-500" 
+                      fill="currentColor"
+                    />
+                  </div>
+                </div>
               ))}
             </div>
           </div>
