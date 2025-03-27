@@ -20,6 +20,7 @@ const CartSummary = ({
   }>>({});
   
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     const savedDiscounts = localStorage.getItem('discounts');
@@ -75,7 +76,7 @@ const CartSummary = ({
       detail: []
     });
     window.dispatchEvent(event);
-    useToast({
+    toast({
       title: "Cart Cleared",
       description: "All Items Have Been Removed From Your Cart."
     });
