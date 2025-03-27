@@ -9,14 +9,8 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { translateText } from "@/utils/translation";
 
 const Settings = () => {
-  const {
-    toast
-  } = useToast();
-  const {
-    currentUser,
-    logout,
-    isAuthenticated
-  } = useAuth();
+  const { toast } = useToast();
+  const { currentUser, logout, isAuthenticated } = useAuth();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -106,15 +100,8 @@ const Settings = () => {
 
         {/* Language Selection */}
         <div className="bg-card p-6 rounded-lg shadow-lg">
-          <h2 className="text-xl font-semibold mb-4">{translateText("language_selection", currentLanguage) || "Language Selection"}</h2>
-          <LanguageSwitcher 
-            currentLanguage={currentLanguage} 
-            onChange={(language) => {
-              setCurrentLanguage(language);
-              localStorage.setItem('preferredLanguage', language);
-              window.dispatchEvent(new CustomEvent('languageChange', { detail: language }));
-            }} 
-          />
+          <h2 className="text-xl font-semibold mb-4">{translateText("language_preferences", currentLanguage)}</h2>
+          <LanguageSwitcher currentLanguage={currentLanguage} />
         </div>
 
         {/* Password Change */}
