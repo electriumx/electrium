@@ -1,5 +1,6 @@
+
 import { useState, useEffect } from 'react';
-import { Product } from '@/types/product';
+import { Product } from '../data/productData';
 import ProductGrid from '../components/ProductGrid';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';

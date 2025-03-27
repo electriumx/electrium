@@ -1,4 +1,5 @@
-import { Product } from '@/types/product';
+
+import { Product } from '../data/productData';
 
 // Save cart to localStorage
 export const saveCartToLocalStorage = (cart: Product[]) => {

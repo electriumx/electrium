@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { Product } from '@/types/product';
+import { Product } from '../data/productData';
 import { useToast } from '@/hooks/use-toast';
 import ProductDetailModal from './ProductDetailModal';
 import { Heart } from 'lucide-react';

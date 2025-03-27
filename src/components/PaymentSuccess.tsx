@@ -1,10 +1,11 @@
 
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     // Clear the cart after successful payment
@@ -17,7 +18,7 @@ const PaymentSuccess = () => {
 
     // Redirect to thank you page
     navigate('/thank-you');
-  }, [navigate]);
+  }, [navigate, toast]);
 
   return null;
 };

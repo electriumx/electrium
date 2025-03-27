@@ -1,9 +1,9 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { Product } from '@/types/product';
+import { Product } from '../data/productData';
 import { calculateProductTotal } from '@/utils/cartUtils';
 
 interface CartSummaryProps {
@@ -19,6 +19,7 @@ const CartSummary = ({
     expiresAt: number;
   }>>({});
   
+  const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {

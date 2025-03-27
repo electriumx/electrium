@@ -1,9 +1,8 @@
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { addUser } from '../data/users';
-import { toast, useToast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Apple, Facebook, Eye, EyeOff } from 'lucide-react';

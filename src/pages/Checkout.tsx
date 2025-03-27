@@ -1,11 +1,10 @@
-
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { translateText } from '@/utils/translation';
-import { Product } from '@/types/product';
+import { Product } from '../data/productData';
 import { calculateProductTotal } from '@/utils/cartUtils';
 
 const Checkout = () => {
