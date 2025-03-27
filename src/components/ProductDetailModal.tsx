@@ -1,12 +1,10 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Minus, Plus } from 'lucide-react';
-import { Product } from '@/types/product';
+import { Product } from '../data/productData';
 import { formatText } from '@/utils/helpers';
 import ProductReviewButton from './ProductReviewButton';
-import ProductReviews from './ProductReviews';
 
 interface ProductDetailModalProps {
   product: Product;
@@ -171,9 +169,6 @@ const ProductDetailModal = ({
             <ProductReviewButton productId={product.id} productName={product.name} />
           </div>
         </div>
-        
-        {/* Product Reviews Section */}
-        <ProductReviews productId={product.id} productName={product.name} />
       </DialogContent>
     </Dialog>
   );
