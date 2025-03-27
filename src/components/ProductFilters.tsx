@@ -2,9 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
-import { Search, ChevronDown, ChevronUp, Trash } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { toast } from "@/hooks/use-toast";
+import { Search, ChevronDown, ChevronUp } from "lucide-react";
 
 interface SubCategory {
   name: string;
@@ -183,9 +181,7 @@ const ProductFilters = ({
       </div>
 
       <div className="p-4 rounded-lg bg-card shadow-md">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-foreground">Brands</h3>
-        </div>
+        <h3 className="text-lg font-semibold mb-4 text-foreground">Brands</h3>
         <div className="flex flex-wrap gap-2">
           {brands.map(brand => (
             <button 
@@ -214,3 +210,4 @@ const ProductFilters = ({
 };
 
 export default ProductFilters;
+
