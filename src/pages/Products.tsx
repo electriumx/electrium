@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import ProductFilters from '../components/ProductFilters';
 import ProductGrid from '../components/ProductGrid';
@@ -6,7 +5,7 @@ import CartSummary from '../components/CartSummary';
 import SpinWheel from '../components/SpinWheel';
 import FloatingActions from '../components/FloatingActions';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Product } from '../data/productData';
+import { Product } from '@/types/product';
 import { useProducts } from '../hooks/use-products';
 import { useToast } from '@/hooks/use-toast';
 import { translateText } from '@/utils/translation';

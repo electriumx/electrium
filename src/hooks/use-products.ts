@@ -1,5 +1,7 @@
+
 import { useState, useEffect } from 'react';
-import { Product, products as initialProducts } from '../data/productData';
+import { products as initialProducts } from '../data/productData';
+import { Product } from '@/types/product';
 import { generateAdditionalProducts } from '../data/additionalProducts';
 import { getCategoryImage } from '../utils/productImageUtils';
 
