@@ -1,7 +1,8 @@
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState, useEffect } from "react";
-import { Plus, Check, Star } from "lucide-react";
+import { Plus, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Product as ProductType, ProductAccessory } from '../data/productData';
 
@@ -13,7 +14,6 @@ interface ProductDetailModalProps {
   discount: number;
   reviews?: Review[];
   stock: number;
-  onReviewSubmit?: (productId: number, name: string, rating: number, comment: string) => void;
 }
 
 interface Review {
@@ -108,16 +108,7 @@ const accessories: Accessory[] = [
   { id: 112, name: "Premium Earbuds", price: 79.99, compatible: ["Apple", "Samsung", "Sony", "Google"], image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" }
 ];
 
-const ProductDetailModal = ({ 
-  product, 
-  isOpen, 
-  onClose, 
-  onQuantityChange, 
-  discount = 0, 
-  reviews = [], 
-  stock = 0,
-  onReviewSubmit 
-}: ProductDetailModalProps) => {
+const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discount = 0, reviews = [], stock = 0 }: ProductDetailModalProps) => {
   const { id, name, price, imageUrl, brand } = product;
   const discountedPrice = discount > 0 ? price * (1 - discount / 100) : price;
   const [activeTab, setActiveTab] = useState("overview");
@@ -148,9 +139,11 @@ const ProductDetailModal = ({
     }
   }, [isOpen, product]);
   
+  // Calculate total price whenever selected accessories change
   useEffect(() => {
     let total = discount > 0 ? discountedPrice : price;
     
+    // Add price of all selected accessories
     const accessoriesTotal = selectedAccessories.reduce((sum, acc) => sum + acc.price, 0);
     total += accessoriesTotal;
     
@@ -232,16 +225,6 @@ const ProductDetailModal = ({
     
     onQuantityChange(id, quantity);
     onClose();
-  };
-
-  const handleAddReviewClick = () => {
-    onClose();
-    setTimeout(() => {
-      const reviewButton = document.querySelector(`[data-product-id="${product.id}"]`) as HTMLButtonElement;
-      if (reviewButton) {
-        reviewButton.click();
-      }
-    }, 100);
   };
 
   return (
@@ -408,18 +391,7 @@ const ProductDetailModal = ({
           
           <TabsContent value="reviews">
             <div>
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="text-lg font-medium">Customer Reviews ({reviews.length})</h3>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="flex items-center gap-1"
-                  onClick={handleAddReviewClick}
-                >
-                  <Star className="h-4 w-4" />
-                  <span>Add Review</span>
-                </Button>
-              </div>
+              <h3 className="text-lg font-medium mb-3">Customer Reviews ({reviews.length})</h3>
               
               {reviews.length === 0 ? (
                 <p className="text-muted-foreground">No reviews yet. Be the first to review this product!</p>
@@ -429,33 +401,24 @@ const ProductDetailModal = ({
                     <div key={index} className="border-b pb-3 last:border-0">
                       <div className="flex justify-between items-center mb-1">
                         <p className="font-medium">{review.name}</p>
-                        <div className="flex items-center">
-                          <span className="mr-1 font-medium">{review.rating.toFixed(1)}</span>
-                          <div className="flex">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <svg 
-                                key={star}
-                                xmlns="http://www.w3.org/2000/svg" 
-                                width="14" 
-                                height="14" 
-                                viewBox="0 0 24 24" 
-                                fill={star <= Math.floor(review.rating) ? "gold" : (star <= Math.ceil(review.rating) && star > Math.floor(review.rating) ? "url(#partial)" : "none")} 
-                                stroke="currentColor" 
-                                strokeWidth="2" 
-                                strokeLinecap="round" 
-                                strokeLinejoin="round"
-                                className="text-yellow-500"
-                              >
-                                <defs>
-                                  <linearGradient id="partial" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset={`${(review.rating % 1) * 100}%`} stopColor="gold" />
-                                    <stop offset={`${(review.rating % 1) * 100}%`} stopColor="transparent" stopOpacity="0" />
-                                  </linearGradient>
-                                </defs>
-                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                              </svg>
-                            ))}
-                          </div>
+                        <div className="flex">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <svg 
+                              key={star}
+                              xmlns="http://www.w3.org/2000/svg" 
+                              width="14" 
+                              height="14" 
+                              viewBox="0 0 24 24" 
+                              fill={star <= review.rating ? "gold" : "none"} 
+                              stroke="currentColor" 
+                              strokeWidth="2" 
+                              strokeLinecap="round" 
+                              strokeLinejoin="round"
+                              className="text-yellow-500"
+                            >
+                              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                          ))}
                         </div>
                       </div>
                       <p className="text-sm">{review.comment}</p>

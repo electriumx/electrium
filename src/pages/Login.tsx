@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -77,6 +78,7 @@ const Login = () => {
     }
     
     try {
+      // Try to register the user with the provided email and password
       const newUser = {
         username: socialEmail.toLowerCase(),
         password: socialPassword,
@@ -85,6 +87,7 @@ const Login = () => {
       
       addUser(newUser);
       
+      // Login with the newly created credentials
       if (login(newUser.username, newUser.password)) {
         toast({
           title: "Welcome!",
@@ -95,6 +98,7 @@ const Login = () => {
         navigate(from);
       }
     } catch (error) {
+      // If user already exists, just try to log in
       if (login(socialEmail.toLowerCase(), socialPassword)) {
         toast({
           title: "Welcome back!",
@@ -113,34 +117,9 @@ const Login = () => {
     }
   };
 
-  const handleGoogleLogin = () => {
-    const width = 500;
-    const height = 600;
-    const left = window.screen.width / 2 - width / 2;
-    const top = window.screen.height / 2 - height / 2;
-    
-    window.open(
-      "https://accounts.google.com/o/oauth2/auth?" +
-      "client_id=DEMO_CLIENT_ID" +
-      "&redirect_uri=" + encodeURIComponent(window.location.origin + "/auth/callback") +
-      "&response_type=code" +
-      "&scope=email%20profile" +
-      "&prompt=select_account",
-      "Google Sign In",
-      `width=${width},height=${height},left=${left},top=${top}`
-    );
-    
-    setSocialProvider('Google');
-    setShowSocialLogin(true);
-  };
-
   const handleSocialLogin = (provider: string) => {
-    if (provider === 'Google') {
-      handleGoogleLogin();
-    } else {
-      setSocialProvider(provider);
-      setShowSocialLogin(true);
-    }
+    setSocialProvider(provider);
+    setShowSocialLogin(true);
   };
 
   return (
