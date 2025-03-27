@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 
 interface CartProps {
   total: number;
@@ -14,6 +14,7 @@ const Cart = ({ total, itemCount }: CartProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated } = useAuth();
+  const { toast } = useToast();
 
   const handleCheckout = () => {
     if (!isAuthenticated) {

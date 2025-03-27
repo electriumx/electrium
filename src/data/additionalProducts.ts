@@ -1,4 +1,5 @@
-import { Product } from '@/types/product';
+
+import { Product } from './productData';
 import { getCategoryImage, getGameImage } from '../utils/productImageUtils';
 
 // Generate a random price between min and max
@@ -61,9 +62,7 @@ const generateProducts = (
       quantity: 0,
       rating: randomRating(),
       reviews: randomReviews(),
-      subcategory,
-      discount: 0,
-      colors: ["N/A"]
+      subcategory
     };
   });
 };
@@ -104,9 +103,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/f36c4267-74e8-4514-8f6d-ba947eea3a13.png",
     quantity: 0,
     rating: 4.2,
-    reviews: 189,
-    discount: 0,
-    colors: ["N/A"]
+    reviews: 189
   });
   
   // Laptops - Add other representative laptops
@@ -141,9 +138,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/54b67814-dd27-4a46-ac69-4beaf7bd7851.png",
     quantity: 0,
     rating: 4.8,
-    reviews: 342,
-    discount: 0,
-    colors: ["N/A"]
+    reviews: 342
   });
   
   products.push({
@@ -156,9 +151,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/54b67814-dd27-4a46-ac69-4beaf7bd7851.png",
     quantity: 0,
     rating: 4.7,
-    reviews: 278,
-    discount: 0,
-    colors: ["N/A"]
+    reviews: 278
   });
   
   products.push({
@@ -171,9 +164,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/54b67814-dd27-4a46-ac69-4beaf7bd7851.png",
     quantity: 0,
     rating: 4.9,
-    reviews: 215,
-    discount: 0,
-    colors: ["N/A"]
+    reviews: 215
   });
   
   // Gaming consoles - Add other representative consoles
@@ -208,9 +199,7 @@ export const generateAdditionalProducts = (): Product[] => {
       quantity: 0,
       rating: 4.5 + (i * 0.1 > 0.5 ? 0.5 : i * 0.1),
       reviews: 150 + (i * 30),
-      subcategory: "FPS Games",
-      discount: 0,
-      colors: ["N/A"]
+      subcategory: "FPS Games"
     });
   }
   
@@ -226,9 +215,7 @@ export const generateAdditionalProducts = (): Product[] => {
     quantity: 0,
     rating: randomRating(),
     reviews: randomReviews(),
-    subcategory: "FPS Games",
-    discount: 0,
-    colors: ["N/A"]
+    subcategory: "FPS Games"
   });
   
   products.push({
@@ -242,9 +229,7 @@ export const generateAdditionalProducts = (): Product[] => {
     quantity: 0,
     rating: randomRating(),
     reviews: randomReviews(),
-    subcategory: "FPS Games",
-    discount: 0,
-    colors: ["N/A"]
+    subcategory: "FPS Games"
   });
   
   products.push({
@@ -258,9 +243,7 @@ export const generateAdditionalProducts = (): Product[] => {
     quantity: 0,
     rating: randomRating(),
     reviews: randomReviews(),
-    subcategory: "FPS Games",
-    discount: 0,
-    colors: ["N/A"]
+    subcategory: "FPS Games"
   });
   
   // Add Call of Duty games
@@ -276,9 +259,7 @@ export const generateAdditionalProducts = (): Product[] => {
       quantity: 0,
       rating: randomRating(),
       reviews: randomReviews(),
-      subcategory: "FPS Games",
-      discount: 0,
-      colors: ["N/A"]
+      subcategory: "FPS Games"
     });
   }
   
@@ -294,9 +275,7 @@ export const generateAdditionalProducts = (): Product[] => {
     quantity: 0,
     rating: 4.2,
     reviews: 320,
-    subcategory: "RPG",
-    discount: 0,
-    colors: ["N/A"]
+    subcategory: "RPG"
   });
   
   products.push({
@@ -310,9 +289,7 @@ export const generateAdditionalProducts = (): Product[] => {
     quantity: 0,
     rating: 4.9,
     reviews: 410,
-    subcategory: "RPG",
-    discount: 0,
-    colors: ["N/A"]
+    subcategory: "RPG"
   });
   
   products.push({
@@ -326,9 +303,7 @@ export const generateAdditionalProducts = (): Product[] => {
     quantity: 0,
     rating: 4.6,
     reviews: 280,
-    subcategory: "Adventure",
-    discount: 0,
-    colors: ["N/A"]
+    subcategory: "Adventure"
   });
   
   // Add one representative product for each appliance category
@@ -342,9 +317,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/86bf4158-8228-4965-8b2d-1f5a3feed7e9.png",
     quantity: 0,
     rating: 4.5,
-    reviews: 132,
-    discount: 0,
-    colors: ["N/A"]
+    reviews: 132
   });
   
   products.push({
@@ -357,9 +330,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/67a3f208-e588-471a-88d1-c0db17913854.png",
     quantity: 0,
     rating: 4.4,
-    reviews: 118,
-    discount: 0,
-    colors: ["N/A"]
+    reviews: 118
   });
   
   products.push({
@@ -372,9 +343,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/0140d4cf-1335-41c7-9dbd-d5c2fc67a2f8.png",
     quantity: 0,
     rating: 4.3,
-    reviews: 98,
-    discount: 0,
-    colors: ["N/A"]
+    reviews: 98
   });
   
   products.push({
@@ -387,9 +356,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/05649a66-79e2-4aa3-b369-2496bac58ad7.png",
     quantity: 0,
     rating: 4.6,
-    reviews: 142,
-    discount: 0,
-    colors: ["N/A"]
+    reviews: 142
   });
   
   // Add representative products for other categories
@@ -403,9 +370,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/2ae5236f-4492-452a-b393-492c225380c1.png",
     quantity: 0,
     rating: 4.7,
-    reviews: 156,
-    discount: 0,
-    colors: ["N/A"]
+    reviews: 156
   });
   
   products.push({
@@ -418,9 +383,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/b43ca66e-4dd7-4f6f-9b2d-f2af3a926756.png",
     quantity: 0,
     rating: 4.8,
-    reviews: 189,
-    discount: 0,
-    colors: ["N/A"]
+    reviews: 189
   });
   
   products.push({
@@ -433,9 +396,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/a964141c-5fe9-49ec-9aa0-6b0bd558181c.png",
     quantity: 0,
     rating: 4.5,
-    reviews: 142,
-    discount: 0,
-    colors: ["N/A"]
+    reviews: 142
   });
   
   products.push({
@@ -448,9 +409,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/99ac0da2-0189-48a9-8115-cbad8e1b079c.png",
     quantity: 0,
     rating: 4.9,
-    reviews: 213,
-    discount: 0,
-    colors: ["N/A"]
+    reviews: 213
   });
   
   products.push({
@@ -463,9 +422,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/aefe184c-a90a-46d3-b244-124b1062a6f0.png",
     quantity: 0,
     rating: 4.7,
-    reviews: 187,
-    discount: 0,
-    colors: ["N/A"]
+    reviews: 187
   });
   
   products.push({
@@ -478,9 +435,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/15fa551c-cf90-4a18-b949-a21c2a6f44d4.png",
     quantity: 0,
     rating: 4.3,
-    reviews: 98,
-    discount: 0,
-    colors: ["N/A"]
+    reviews: 98
   });
   
   products.push({
@@ -493,9 +448,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/f4d18f61-e011-41e1-8945-0862b8e9cb22.png",
     quantity: 0,
     rating: 4.5,
-    reviews: 123,
-    discount: 0,
-    colors: ["N/A"]
+    reviews: 123
   });
   
   products.push({
@@ -508,9 +461,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/e4e5c805-99ee-44b2-bac6-a7549cd85562.png",
     quantity: 0,
     rating: 4.6,
-    reviews: 87,
-    discount: 0,
-    colors: ["N/A"]
+    reviews: 87
   });
   
   products.push({
@@ -523,9 +474,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/83220acc-b41f-488f-996c-70c790349093.png",
     quantity: 0,
     rating: 4.8,
-    reviews: 76,
-    discount: 0,
-    colors: ["N/A"]
+    reviews: 76
   });
   
   return products;
