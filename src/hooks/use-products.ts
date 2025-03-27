@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Product, products as initialProducts } from '../data/productData';
 import { generateAdditionalProducts } from '../data/additionalProducts';
 import { getCategoryImage } from '../utils/productImageUtils';
+import { allNewProducts } from '../data/newProducts';
 
 // Add new iPhone models
 const additionalIPhones: Product[] = [
@@ -204,8 +205,8 @@ export const useProducts = () => {
     // Generate the additional products with limited numbers
     const generatedProducts = generateAdditionalProducts();
     
-    // Combine initial products with additional iPhones, TV subcategories, and generated products
-    const allProducts = [...initialProducts, ...additionalIPhones, ...tvSubcategoryProducts, ...generatedProducts];
+    // Combine initial products with additional iPhones, TV subcategories, generated products, and all new products
+    const allProducts = [...initialProducts, ...additionalIPhones, ...tvSubcategoryProducts, ...generatedProducts, ...allNewProducts];
     
     // Remove duplicates (in case they already exist)
     const uniqueProducts = allProducts.filter((product, index, self) => 
@@ -231,7 +232,8 @@ export const useProducts = () => {
       });
       
       // Only add if we don't already have this base product type
-      // But keep all iPhones, specific games, and TVs with subcategories
+      // But keep all iPhones, specific games, TVs with subcategories, and all new products 
+      // (those with IDs over 10000 which we've just added)
       if (!existingProduct || 
           (product.brand === "Apple" && product.name.includes("iPhone")) ||
           product.category === "Games" || 
@@ -240,7 +242,9 @@ export const useProducts = () => {
           product.name.toLowerCase().includes("rainbow six") ||
           product.name.toLowerCase().includes("call of duty") ||
           product.name.toLowerCase().includes("switch") ||
-          (product.brand === "Google" && product.name.toLowerCase().includes("chromebook"))) {
+          product.id >= 10000 ||
+          (product.brand === "Google" && product.name.toLowerCase().includes("chromebook")) ||
+          product.name === "Vankyo Cosmos 6") {
         return [...acc, product];
       }
       
@@ -249,19 +253,40 @@ export const useProducts = () => {
 
     // Update product images based on category, brand, and requested changes
     const updatedProducts = filteredProducts.map(product => {
+      // Vankyo Cosmos 6 gets the first uploaded image
+      if (product.name === "Vankyo Cosmos 6") {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/7f739f1f-3772-4ead-89b5-34d5c94221bb.png"
+        };
+      }
+      // All keyboards get the second uploaded image
+      else if (product.category === "PC Accessories" && product.subcategory === "Keyboards") {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/3f391803-44c1-4437-a246-5070b31d60a5.png"
+        };
+      }
+      // All tablets get the third uploaded image
+      else if (product.category === "Tablets") {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/ca7ef935-a15a-44db-8d0a-25f62f3b929a.png"
+        };
+      }
+      // All Chromebooks get the fourth uploaded image
+      else if (product.brand === "Google" && product.name.toLowerCase().includes("chromebook")) {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/fc1b00d0-a962-4050-9b43-2b36399b0651.png"
+        };
+      }
       // Battlefield games get the first uploaded image
-      if (product.name.toLowerCase().includes("battlefield")) {
+      else if (product.name.toLowerCase().includes("battlefield")) {
         return {
           ...product,
           imageUrl: "/lovable-uploads/d496c5e1-cf2a-4e3a-ad70-e121a939a763.png",
           subcategory: "FPS Games"
-        };
-      }
-      // Chromebooks get the second uploaded image
-      else if (product.brand === "Google" && product.name.toLowerCase().includes("chromebook")) {
-        return {
-          ...product,
-          imageUrl: "/lovable-uploads/f36c4267-74e8-4514-8f6d-ba947eea3a13.png"
         };
       }
       // Nintendo products get the third uploaded image
@@ -446,13 +471,6 @@ export const useProducts = () => {
         return {
           ...product,
           imageUrl: "/lovable-uploads/05649a66-79e2-4aa3-b369-2496bac58ad7.png"
-        };
-      }
-      // All tablets get the second image
-      else if (product.category === "Tablets") {
-        return {
-          ...product,
-          imageUrl: "/lovable-uploads/ce523ec7-d793-4a5d-b548-b1f7a0193bf1.png"
         };
       }
       // All refrigerators get the third image

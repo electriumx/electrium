@@ -90,14 +90,6 @@ const ProductFilters = ({
     }
   };
 
-  const handleClearAll = () => {
-    onFilterChange([]);
-    if (onSubCategoryChange) {
-      setSelectedSubcategories([]);
-      onSubCategoryChange([]);
-    }
-  };
-
   // Function to capitalize first letter of each word and remove underscores
   const capitalizeWords = (text: string) => {
     return text
@@ -195,14 +187,6 @@ const ProductFilters = ({
               {capitalizeWords(brand)}
             </button>
           ))}
-          {(selectedBrands.length > 0 || selectedSubcategories.length > 0) && (
-            <button 
-              onClick={handleClearAll} 
-              className="px-3 py-1 text-sm rounded-full bg-muted-foreground/20 text-foreground hover:bg-muted-foreground/30 transition-colors"
-            >
-              Clear All
-            </button>
-          )}
         </div>
       </div>
     </div>
@@ -210,4 +194,3 @@ const ProductFilters = ({
 };
 
 export default ProductFilters;
-
