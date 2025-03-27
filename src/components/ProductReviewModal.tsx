@@ -7,8 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { Star } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
 
 interface ProductReviewModalProps {
   productId: number;
@@ -27,7 +28,6 @@ const ProductReviewModal = ({
 }: ProductReviewModalProps) => {
   const [name, setName] = useState('');
   const [rating, setRating] = useState(5);
-  const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState('');
   const [errors, setErrors] = useState({ name: false, comment: false });
   const { isAuthenticated, currentUser } = useAuth();
@@ -39,7 +39,7 @@ const ProductReviewModal = ({
     if (currentUser?.displayName) {
       setName(currentUser.displayName);
     }
-  }, [currentUser]);
+  }, [currentUser, isOpen]);
 
   const handleSubmit = () => {
     // Check if user is authenticated
@@ -70,46 +70,13 @@ const ProductReviewModal = ({
     }
   };
 
-  // Handle precise decimal ratings
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>, starIndex: number) => {
-    const starRect = e.currentTarget.getBoundingClientRect();
-    const starWidth = starRect.width;
-    const offsetX = e.clientX - starRect.left;
-    
-    // Calculate the precise position (0 to 1) within the star
-    const position = Math.max(0, Math.min(1, offsetX / starWidth));
-    
-    // Calculate rating with one decimal place (e.g., 3.7)
-    const preciseRating = Math.round((starIndex - 1 + position) * 10) / 10;
-    setHoverRating(preciseRating);
-  };
-
-  const handleMouseLeave = () => {
-    setHoverRating(0);
-  };
-
-  const handleStarClick = () => {
-    if (hoverRating > 0) {
-      setRating(hoverRating);
-    }
-  };
-
-  // Get the filled percentage for each star
-  const getStarFill = (starIndex: number) => {
-    const displayRating = hoverRating > 0 ? hoverRating : rating;
-    
-    if (starIndex <= Math.floor(displayRating)) {
-      return 100; // Fully filled
-    } else if (starIndex - 1 < displayRating && starIndex > displayRating) {
-      // Partially filled
-      return (displayRating - Math.floor(displayRating)) * 100;
-    }
-    return 0; // Not filled
+  const handleRatingChange = (values: number[]) => {
+    setRating(values[0]);
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md" data-product-id={productId}>
         <DialogHeader>
           <DialogTitle>Write a Review for {productName}</DialogTitle>
         </DialogHeader>
@@ -127,34 +94,26 @@ const ProductReviewModal = ({
           </div>
           
           <div className="space-y-2">
-            <Label>Rating ({rating.toFixed(1)}/5)</Label>
-            <div className="flex gap-1">
-              {[1, 2, 3, 4, 5].map((starIndex) => (
-                <div
-                  key={starIndex}
-                  className="relative cursor-pointer"
-                  onMouseMove={(e) => handleMouseMove(e, starIndex)}
-                  onMouseLeave={handleMouseLeave}
-                  onClick={handleStarClick}
-                >
-                  {/* Background star (empty) */}
-                  <Star 
-                    size={24} 
-                    className="text-gray-300" 
-                  />
-                  
-                  {/* Foreground star (filled) with clip-path for partial filling */}
-                  <div 
-                    className="absolute top-0 left-0 overflow-hidden"
-                    style={{ width: `${getStarFill(starIndex)}%` }}
-                  >
-                    <Star 
-                      size={24} 
-                      className="text-yellow-500" 
-                      fill="currentColor"
-                    />
-                  </div>
-                </div>
+            <Label>Rating ({rating.toFixed(1)} out of 5 stars)</Label>
+            <div className="py-4 px-1">
+              <Slider 
+                defaultValue={[5]} 
+                value={[rating]}
+                min={0.5}
+                max={5} 
+                step={0.1} 
+                onValueChange={handleRatingChange}
+              />
+            </div>
+            <div className="flex justify-between">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star 
+                  key={star}
+                  className={`h-6 w-6 cursor-pointer transition-colors ${
+                    star <= Math.round(rating) ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"
+                  }`}
+                  onClick={() => setRating(star)}
+                />
               ))}
             </div>
           </div>

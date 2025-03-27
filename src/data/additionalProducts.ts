@@ -33,7 +33,7 @@ const generateProducts = (
     const productName = `${namePrefix} ${i + 1}`;
     
     // Choose appropriate image based on category and name
-    let imageUrl = getCategoryImage(category, brand);
+    let imageUrl = getCategoryImage(category);
     
     // Special case for games
     if (category.toLowerCase() === 'games') {

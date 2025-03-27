@@ -107,21 +107,34 @@ const Register = () => {
     }
   };
 
-  const handleSocialRegister = (provider: string) => {
-    setSocialProvider(provider);
+  const handleGoogleRegistration = () => {
+    const width = 500;
+    const height = 600;
+    const left = window.screen.width / 2 - width / 2;
+    const top = window.screen.height / 2 - height / 2;
     
-    if (provider === 'Google') {
-      const mockGoogleAccounts = [
-        { email: 'user1@gmail.com', name: 'User One' },
-        { email: 'user2@gmail.com', name: 'User Two' }
-      ];
-      
-      const selectedAccount = mockGoogleAccounts[0];
-      setSocialEmail(selectedAccount.email);
-      setSocialName(selectedAccount.name || selectedAccount.email.split('@')[0]);
-    }
+    window.open(
+      "https://accounts.google.com/o/oauth2/auth?" +
+      "client_id=DEMO_CLIENT_ID" +
+      "&redirect_uri=" + encodeURIComponent(window.location.origin + "/auth/callback") +
+      "&response_type=code" +
+      "&scope=email%20profile" +
+      "&prompt=select_account",
+      "Google Sign In",
+      `width=${width},height=${height},left=${left},top=${top}`
+    );
     
+    setSocialProvider('Google');
     setShowSocialRegister(true);
+  };
+
+  const handleSocialRegister = (provider: string) => {
+    if (provider === 'Google') {
+      handleGoogleRegistration();
+    } else {
+      setSocialProvider(provider);
+      setShowSocialRegister(true);
+    }
   };
 
   const validateSocialForm = () => {

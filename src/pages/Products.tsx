@@ -1,362 +1,290 @@
-
 import { useState, useEffect } from 'react';
-import ProductFilters from '../components/ProductFilters';
-import ProductGrid from '../components/ProductGrid';
-import CartSummary from '../components/CartSummary';
-import SpinWheel from '../components/SpinWheel';
-import FloatingActions from '../components/FloatingActions';
-import { useLocation, useNavigate } from 'react-router-dom';
 import { Product } from '../data/productData';
-import { useProducts } from '../hooks/use-products';
-import { useToast } from '@/hooks/use-toast';
-import { translateText } from '@/utils/translation';
+import { Button } from "@/components/ui/button";
+import { Heart, ShoppingCart } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import ProductDetailModal from '@/components/ProductDetailModal';
+import ProductFilters from '@/components/ProductFilters';
+import { getProductImage } from '@/utils/productImageUtils';
+import ProductReviewButton from '@/components/ProductReviewButton';
+import { updateProductsData } from '@/utils/productImageUtils';
+
+interface Review {
+  name: string;
+  rating: number;
+  comment: string;
+}
 
 const Products = () => {
-  const { products: allProducts } = useProducts();
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-  const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
-  const [cart, setCart] = useState<Product[]>([]);
-  const [discounts, setDiscounts] = useState<Record<string, {
-    value: number;
-    expiresAt: number;
-  }>>({});
-  const [showSpinWheel, setShowSpinWheel] = useState(false);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [currentProducts, setCurrentProducts] = useState<Product[]>([]);
+  const [wishlist, setWishlist] = useState<number[]>([]);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 12;
+  const [brands, setBrands] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState('english');
-  const location = useLocation();
-  const navigate = useNavigate();
-  const maxPrice = allProducts.length > 0 ? Math.max(...allProducts.map(p => p.price)) : 2000;
+  const [maxPrice, setMaxPrice] = useState(1000);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, maxPrice]);
-  const [productStocks, setProductStocks] = useState<Record<number, number>>({});
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
-
-  // Function to capitalize first letter of each word and remove underscores
-  const formatText = (text: string) => {
-    return text.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
-  };
-
-  const resetStocks = () => {
-    const stockMap: Record<number, number> = {};
-    allProducts.forEach(product => {
-      stockMap[product.id] = 100;
-    });
-    setProductStocks(stockMap);
-    localStorage.setItem('productStocks', JSON.stringify(stockMap));
-    localStorage.setItem('lastStockReset', Date.now().toString());
-    
-    toast({
-      title: "Stock Reset",
-      description: "All product stocks have been reset to 100 units.",
-    });
-  };
-
-  const checkStockReset = () => {
-    const lastReset = localStorage.getItem('lastStockReset');
-    const now = Date.now();
-    
-    if (!lastReset || (now - parseInt(lastReset)) > 12 * 60 * 60 * 1000) {
-      resetStocks();
-    }
-  };
+  const isAdmin = false;
+  const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
 
   useEffect(() => {
-    const savedLanguage = localStorage.getItem('preferredLanguage');
-    if (savedLanguage) {
-      setCurrentLanguage(savedLanguage);
+    const updatedProducts = updateProductsData();
+    setFilteredProducts(updatedProducts);
+    setAllProducts(updatedProducts);
+    
+    const initialWishlist = localStorage.getItem('wishlist');
+    if (initialWishlist) {
+      setWishlist(JSON.parse(initialWishlist));
     }
     
-    const handleLanguageChange = (e: CustomEvent) => {
-      setCurrentLanguage(e.detail);
-    };
-    
-    window.addEventListener('languageChange', handleLanguageChange as EventListener);
-    
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-      try {
-        const parsedCart = JSON.parse(savedCart);
-        setCart(parsedCart);
-      } catch (error) {
-        console.error('Error parsing cart from localStorage:', error);
-      }
-    }
-    
-    const savedDiscounts = localStorage.getItem('discounts');
-    if (savedDiscounts) {
-      try {
-        const parsedDiscounts = JSON.parse(savedDiscounts);
-        const formattedDiscounts: Record<string, {
-          value: number;
-          expiresAt: number;
-        }> = {};
-        
-        Object.entries(parsedDiscounts).forEach(([brand, value]) => {
-          if (typeof value === 'number') {
-            // Skip discounts that don't have an expiresAt (not set by admin or wheel)
-            return;
-          } else if (typeof value === 'object' && value !== null && 'value' in value && 'expiresAt' in value) {
-            formattedDiscounts[brand] = value as {
-              value: number;
-              expiresAt: number;
-            };
-          }
-        });
-        
-        const currentTime = Date.now();
-        Object.keys(formattedDiscounts).forEach(brand => {
-          if (formattedDiscounts[brand].expiresAt < currentTime || formattedDiscounts[brand].value === 0) {
-            delete formattedDiscounts[brand];
-          }
-        });
-        
-        setDiscounts(formattedDiscounts);
-        localStorage.setItem('discounts', JSON.stringify(formattedDiscounts));
-      } catch (error) {
-        console.error('Error parsing discounts from localStorage:', error);
-      }
-    }
-    
-    const savedStocks = localStorage.getItem('productStocks');
-    if (savedStocks) {
-      try {
-        setProductStocks(JSON.parse(savedStocks));
-        checkStockReset();
-      } catch (error) {
-        console.error('Error parsing product stocks:', error);
-        resetStocks();
-      }
-    } else {
-      resetStocks();
-    }
-    
-    const stockResetInterval = setInterval(checkStockReset, 60 * 60 * 1000);
-    window.scrollTo(0, 0);
-    
-    return () => {
-      clearInterval(stockResetInterval);
-      window.removeEventListener('languageChange', handleLanguageChange as EventListener);
-    };
-  }, [allProducts.length]);
-
-  useEffect(() => {
-    const handleCartUpdate = (e: CustomEvent) => {
-      setCart(e.detail || []);
-    };
-    
-    window.addEventListener('cartUpdate', handleCartUpdate as EventListener);
-    return () => window.removeEventListener('cartUpdate', handleCartUpdate as EventListener);
+    const initialMaxPrice = Math.max(...updatedProducts.map(p => p.price));
+    setMaxPrice(initialMaxPrice);
+    setPriceRange([0, initialMaxPrice]);
   }, []);
-
+  
   useEffect(() => {
-    if (allProducts.length > 0) {
-      const updatedStocks = { ...productStocks };
-      let needsUpdate = false;
+    const lastIndex = currentPage * productsPerPage;
+    const firstIndex = lastIndex - productsPerPage;
+    setCurrentProducts(filteredProducts.slice(firstIndex, lastIndex));
+  }, [currentPage, filteredProducts]);
+  
+  useEffect(() => {
+    const filtered = allProducts.filter(product => {
+      const brandMatch = brands.length === 0 || brands.includes(product.brand);
+      const searchMatch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const priceMatch = product.price >= priceRange[0] && product.price <= priceRange[1];
+      const subcategoryMatch = selectedSubcategories.length === 0 || selectedSubcategories.some(subcategory =>
+        product.name.toLowerCase().includes(subcategory.toLowerCase()) ||
+        product.category.toLowerCase().includes(subcategory.toLowerCase())
+      );
       
-      allProducts.forEach(product => {
-        if (updatedStocks[product.id] === undefined) {
-          updatedStocks[product.id] = 100;
-          needsUpdate = true;
-        }
-      });
-      
-      if (needsUpdate) {
-        setProductStocks(updatedStocks);
-        localStorage.setItem('productStocks', JSON.stringify(updatedStocks));
-      }
-    }
-  }, [allProducts, productStocks]);
-
-  const handleFilterChange = (brands: string[]) => {
-    setSelectedBrands(brands);
+      return brandMatch && searchMatch && priceMatch && subcategoryMatch;
+    });
+    setFilteredProducts(filtered);
+    setCurrentPage(1);
+  }, [allProducts, brands, searchQuery, priceRange, selectedSubcategories]);
+  
+  useEffect(() => {
+    localStorage.setItem('wishlist', JSON.stringify(wishlist));
+  }, [wishlist]);
+  
+  const handleProductClick = (product: Product) => {
+    setSelectedProduct(product);
+    setIsDetailModalOpen(true);
   };
   
-  const handleSubCategoryChange = (subcategories: string[]) => {
-    setSelectedSubcategories(subcategories);
+  const handleCloseDetailModal = () => {
+    setIsDetailModalOpen(false);
   };
-
-  const handlePriceRangeChange = (range: [number, number]) => {
-    setPriceRange(range);
+  
+  const handlePageClick = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
   };
-
+  
+  const handleFilterChange = (brands: string[]) => {
+    setBrands(brands);
+  };
+  
   const handleSearch = (query: string) => {
     setSearchQuery(query);
   };
-
-  const handleQuantityChange = (id: number, quantity: number, selectedColor?: string) => {
-    const updatedCart = [...cart];
-    const existingItemIndex = updatedCart.findIndex(item => 
-      item.id === id && (!selectedColor || item.selectedColor === selectedColor)
-    );
-    
-    if (existingItemIndex !== -1) {
-      if (quantity === 0) {
-        updatedCart.splice(existingItemIndex, 1);
-      } else {
-        updatedCart[existingItemIndex].quantity = quantity;
-        if (selectedColor) {
-          updatedCart[existingItemIndex].selectedColor = selectedColor;
-        }
-      }
-    } else if (quantity > 0) {
-      const product = allProducts.find(p => p.id === id);
-      if (product) {
-        updatedCart.push({
-          ...product,
-          quantity,
-          selectedColor: selectedColor || "Blue" // Default color if none selected
-        });
-      }
-    }
-    
-    setCart(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
-
-    const event = new CustomEvent('cartUpdate', {
-      detail: updatedCart
-    });
-    window.dispatchEvent(event);
+  
+  const handlePriceRangeChange = (range: [number, number]) => {
+    setPriceRange(range);
   };
-
-  const handleSpinWin = (brand: string, discount: number, expiresAt: number) => {
-    if (discount <= 0 || discount > 100) {
+  
+  const handleAddToCart = (product: Product) => {
+    if (!isAuthenticated) {
       toast({
         variant: "destructive",
-        title: "Invalid Discount",
-        description: "The discount must be between 1% and 100%.",
+        title: "Authentication Required",
+        description: "Please log in to add items to your cart"
       });
+      navigate('/login', { state: { from: '/products' } });
       return;
     }
-
-    const newDiscounts = {
-      ...discounts,
-      [brand]: {
-        value: discount,
-        expiresAt
-      }
-    };
-    
-    setDiscounts(newDiscounts);
-    localStorage.setItem('discounts', JSON.stringify(newDiscounts));
     
     toast({
-      title: "Discount Applied!",
-      description: `You've won a ${discount}% discount on all ${brand} products.`,
+      title: "Added to cart",
+      description: `${product.name} has been added to your cart`
     });
   };
-
-  const updateStock = (id: number, newStock: number) => {
-    const updatedStocks = {
-      ...productStocks,
-      [id]: newStock
-    };
-    setProductStocks(updatedStocks);
-    localStorage.setItem('productStocks', JSON.stringify(updatedStocks));
+  
+  const handleWishlistToggle = (productId: number) => {
+    if (!isAuthenticated) {
+      toast({
+        variant: "destructive",
+        title: "Authentication Required",
+        description: "Please log in to save items to your wishlist"
+      });
+      navigate('/login', { state: { from: '/products' } });
+      return;
+    }
+    
+    if (wishlist.includes(productId)) {
+      setWishlist(wishlist.filter(id => id !== productId));
+      toast({
+        title: "Removed from wishlist",
+        description: "This item has been removed from your wishlist"
+      });
+    } else {
+      setWishlist([...wishlist, productId]);
+      toast({
+        title: "Added to wishlist",
+        description: "This item has been saved to your wishlist"
+      });
+    }
+  };
+  
+  const isInWishlist = (productId: number) => {
+    return wishlist.includes(productId);
   };
 
-  let filteredProducts = allProducts;
-  
-  if (selectedBrands.length > 0) {
-    filteredProducts = filteredProducts.filter(product => selectedBrands.includes(product.brand) || selectedBrands.includes(product.category));
-  }
-  
-  if (selectedSubcategories.length > 0) {
-    filteredProducts = filteredProducts.filter(product => {
-      const productText = `${product.name} ${product.description}`.toLowerCase();
-      return selectedSubcategories.some(subcategory => 
-        productText.includes(subcategory.toLowerCase())
-      );
-    });
-  }
-  
-  if (priceRange[0] > 0 || priceRange[1] < maxPrice) {
-    filteredProducts = filteredProducts.filter(product => product.price >= priceRange[0] && product.price <= priceRange[1]);
-  }
-  
-  if (searchQuery) {
-    const query = searchQuery.toLowerCase();
-    filteredProducts = filteredProducts.filter(product => 
-      product.name.toLowerCase().includes(query) || 
-      product.brand.toLowerCase().includes(query) ||
-      product.description.toLowerCase().includes(query)
-    );
-  }
+  const handleQuantityChange = (id: number, quantity: number) => {
+    console.log(`Product ${id} quantity updated to ${quantity}`);
+  };
 
-  const cartItemCount = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
+  const handleSubCategoryChange = (subcategories: string[]) => {
+    setSelectedSubcategories(subcategories);
+  };
   
-  const activeDiscounts = Object.entries(discounts)
-    .filter(([_, discount]) => discount.value > 0 && discount.expiresAt > Date.now())
-    .sort((a, b) => b[1].value - a[1].value);
-
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+  
+  const emptyProduct: Product = {
+    id: 0,
+    name: '',
+    description: '',
+    price: 0,
+    imageUrl: '',
+    brand: '',
+    category: '',
+    rating: 0,
+    reviews: 0
+  };
+  
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-8">
-      <h1 className="text-2xl font-bold mb-4 text-center text-foreground">
-        {formatText(translateText("our_products", currentLanguage) || "Our Products")}
-      </h1>
-      
-      <div className="mb-6 flex justify-center">
-        <button onClick={() => setShowSpinWheel(!showSpinWheel)} className="px-4 py-2 bg-card text-foreground rounded-md border border-border hover:bg-accent transition-colors">
-          {showSpinWheel ? formatText(translateText("hide_spin", currentLanguage) || "Hide Spin") : "Try Your Luck With A Daily Spin!"}
-        </button>
-      </div>
-      
-      {showSpinWheel && (
-        <div className="mb-4 text-center">
-          <SpinWheel onWin={handleSpinWin} />
-        </div>
-      )}
-      
-      <div className="mb-6 p-4 bg-card rounded-lg border border-border">
-        <h2 className="text-lg font-semibold mb-2 text-center">{formatText(translateText("active_discounts", currentLanguage) || "Active Discounts")}</h2>
-        <div className="flex flex-wrap gap-2 justify-center">
-          {activeDiscounts.length > 0 ? (
-            activeDiscounts.map(([brand, discount]) => {
-              const now = Date.now();
-              const timeRemaining = discount.expiresAt - now;
-              const hoursRemaining = Math.floor(timeRemaining / (1000 * 60 * 60));
-              return (
-                <span key={brand} className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-destructive text-white">
-                  {brand}: {discount.value}% {formatText(translateText("off", currentLanguage) || "Off")} ({hoursRemaining}h {formatText(translateText("left", currentLanguage) || "Left")})
-                </span>
-              );
-            })
-          ) : (
-            <p className="text-muted-foreground">{formatText(translateText("no_active_discounts", currentLanguage) || "No Active Discounts")}</p>
-          )}
-        </div>
-      </div>
-      
-      <div className="flex flex-col lg:flex-row gap-8">
-        <div className="lg:w-1/4">
-          <ProductFilters 
-            onFilterChange={handleFilterChange} 
-            selectedBrands={selectedBrands} 
-            priceRange={priceRange} 
-            onPriceRangeChange={handlePriceRangeChange} 
-            maxPrice={maxPrice} 
-            onSearch={handleSearch}
-            onSubCategoryChange={handleSubCategoryChange}
-          />
+    <div className="min-h-screen bg-background pb-16">
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-4xl font-bold mb-8">Products</h1>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
+          <div className="md:col-span-1 space-y-6">
+            <ProductFilters
+              selectedBrands={brands}
+              onFilterChange={handleFilterChange}
+              priceRange={priceRange}
+              onPriceRangeChange={handlePriceRangeChange}
+              maxPrice={maxPrice}
+              onSearch={handleSearch}
+              onSubCategoryChange={handleSubCategoryChange}
+            />
+          </div>
+          
+          <div className="md:col-span-2 lg:col-span-3">
+            <div className="flex justify-between items-center mb-4">
+              <p className="text-sm text-muted-foreground">
+                Showing {currentProducts.length} of {filteredProducts.length} products
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {currentProducts.map((product) => (
+                <div 
+                  key={product.id} 
+                  className="bg-card rounded-lg overflow-hidden border border-border shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <div className="aspect-w-16 aspect-h-9 bg-muted">
+                    <img 
+                      src={getProductImage(product.id, product.name, product.brand, product.category)} 
+                      alt={product.name} 
+                      className="object-cover w-full h-full cursor-pointer"
+                      onClick={() => handleProductClick(product)}
+                    />
+                  </div>
+                  <div className="p-4">
+                    <h3 
+                      className="font-medium truncate cursor-pointer hover:text-primary"
+                      onClick={() => handleProductClick(product)}
+                    >
+                      {product.name}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-3">{product.brand}</p>
+                    
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="font-semibold">
+                        ${product.price.toFixed(2)}
+                      </span>
+                      <ProductReviewButton productId={product.id} productName={product.name} />
+                    </div>
+                    
+                    <div className="flex justify-between items-center">
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="flex items-center gap-1"
+                        onClick={() => handleWishlistToggle(product.id)}
+                      >
+                        {isInWishlist(product.id) ? (
+                          <>
+                            <Heart className="h-4 w-4 fill-destructive text-destructive" />
+                            <span>Saved</span>
+                          </>
+                        ) : (
+                          <>
+                            <Heart className="h-4 w-4" />
+                            <span>Wishlist</span>
+                          </>
+                        )}
+                      </Button>
+                      
+                      <Button 
+                        size="sm"
+                        onClick={() => handleAddToCart(product)}
+                        className="flex items-center gap-1"
+                      >
+                        <ShoppingCart className="h-4 w-4" />
+                        <span>Add to Cart</span>
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <div className="flex justify-center mt-8">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNumber => (
+                <button
+                  key={pageNumber}
+                  className={`mx-1 px-4 py-2 rounded-md ${currentPage === pageNumber ? 'bg-primary text-primary-foreground' : 'bg-secondary hover:bg-muted'}`}
+                  onClick={() => handlePageClick(pageNumber)}
+                >
+                  {pageNumber}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
         
-        <div className="lg:w-3/4">
-          <ProductGrid 
-            products={filteredProducts} 
-            onQuantityChange={handleQuantityChange} 
-            discounts={discounts} 
-            showWishlistButton={true}
-            productStocks={productStocks}
-            updateStock={updateStock}
-          />
-        </div>
+        <ProductDetailModal
+          product={selectedProduct || emptyProduct}
+          isOpen={isDetailModalOpen}
+          onClose={handleCloseDetailModal}
+          onQuantityChange={handleQuantityChange}
+          reviews={reviews}
+          discount={0}
+          stock={10}
+        />
       </div>
-      
-      <CartSummary cart={cart} />
-      
-      <FloatingActions 
-        showCheckout={true} 
-        cartItemCount={cartItemCount} 
-      />
     </div>
   );
 };

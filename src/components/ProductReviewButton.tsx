@@ -1,7 +1,7 @@
 
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Star } from 'lucide-react';
+import { useState } from 'react';
 import ProductReviewModal from './ProductReviewModal';
 
 interface ProductReviewButtonProps {
@@ -10,47 +10,31 @@ interface ProductReviewButtonProps {
 }
 
 const ProductReviewButton = ({ productId, productName }: ProductReviewButtonProps) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
   const handleReviewSubmit = (name: string, rating: number, comment: string) => {
-    // Here we would typically save the review to a database
+    // In a real app, this would send the review to an API
     console.log('Review submitted:', { productId, name, rating, comment });
-    
-    // Store review in localStorage for now
-    const storedReviews = JSON.parse(localStorage.getItem('productReviews') || '{}');
-    if (!storedReviews[productId]) {
-      storedReviews[productId] = [];
-    }
-    
-    storedReviews[productId].push({
-      id: Date.now(),
-      name,
-      rating,
-      comment,
-      date: new Date().toISOString()
-    });
-    
-    localStorage.setItem('productReviews', JSON.stringify(storedReviews));
-    
-    setIsModalOpen(false);
+    setIsReviewModalOpen(false);
   };
 
   return (
     <>
       <Button 
-        onClick={() => setIsModalOpen(true)}
-        variant="outline"
-        className="w-full flex items-center justify-center gap-2"
+        variant="outline" 
+        size="sm" 
+        className="flex items-center gap-1"
+        onClick={() => setIsReviewModalOpen(true)}
       >
         <Star className="h-4 w-4" />
-        Write a Review
+        <span>Write Review</span>
       </Button>
       
       <ProductReviewModal
         productId={productId}
         productName={productName}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={isReviewModalOpen}
+        onClose={() => setIsReviewModalOpen(false)}
         onSubmit={handleReviewSubmit}
       />
     </>
