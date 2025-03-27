@@ -166,20 +166,8 @@ const ProductGrid = ({
         let imageUrl = product.imageUrl;
         
         // Use the provided images for specific product types
-        // Vankyo Cosmos 6 - first image
-        if (product.name.toLowerCase().includes('vankyo cosmos 6')) {
-          imageUrl = '/lovable-uploads/5d027cd9-133c-4fb3-9cfa-fd6de305cd63.png';
-        }
-        // All keyboards - second image
-        else if (product.category === 'PC Accessories' && product.subcategory === 'Keyboards') {
-          imageUrl = '/lovable-uploads/2d37dabc-ed4e-4de1-bc85-32c8c2efe88c.png';
-        }
-        // All tablets - third image
-        else if (product.category === 'Tablets') {
-          imageUrl = '/lovable-uploads/13233859-ad6b-4338-b9aa-5e3ab58c9eb7.png';
-        }
         // Battlefield games - first image
-        else if (product.name.toLowerCase().includes('battlefield')) {
+        if (product.name.toLowerCase().includes('battlefield')) {
           imageUrl = '/lovable-uploads/ab3d21b8-041b-4137-865c-22fe07795d75.png';
         } 
         // Chromebooks - second image

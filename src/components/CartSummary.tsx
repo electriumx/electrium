@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { useToast } from '@/hooks/use-toast';
+import { toast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { Product } from '@/types/product';
 import { calculateProductTotal } from '@/utils/cartUtils';
@@ -20,7 +20,6 @@ const CartSummary = ({
   }>>({});
   
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   useEffect(() => {
     const savedDiscounts = localStorage.getItem('discounts');
