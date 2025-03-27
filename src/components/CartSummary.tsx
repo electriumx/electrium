@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { Product } from '@/types/product';
 import { calculateProductTotal } from '@/utils/cartUtils';
@@ -75,7 +75,7 @@ const CartSummary = ({
       detail: []
     });
     window.dispatchEvent(event);
-    toast({
+    useToast({
       title: "Cart Cleared",
       description: "All Items Have Been Removed From Your Cart."
     });
