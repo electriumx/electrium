@@ -4,12 +4,12 @@ export interface Product {
   name: string;
   brand: string;
   category: string;
-  subcategory: string;
+  subcategory?: string;
   price: number;
-  discount: number;
+  discount?: number;
   quantity: number;
   imageUrl: string;
-  colors: string[];
+  colors?: string[];
   description: string;
   rating?: number;
   reviews?: number;
