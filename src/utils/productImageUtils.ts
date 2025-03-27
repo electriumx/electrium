@@ -41,6 +41,12 @@ export const getCategoryImage = (category: string, brand: string): string => {
     } else {
       return '/lovable-uploads/86bf4158-8228-4965-8b2d-1f5a3feed7e9.png';
     }
+  } else if (category === 'PC Accessories' && category.includes('Keyboards')) {
+    // Use the new keyboard image for all keyboards
+    return '/lovable-uploads/2d37dabc-ed4e-4de1-bc85-32c8c2efe88c.png';
+  } else if (category === 'Tablets' || category === 'Tablet') {
+    // Use the new tablet image for all tablets
+    return '/lovable-uploads/13233859-ad6b-4338-b9aa-5e3ab58c9eb7.png';
   }
   
   // Default image if no specific one is found
@@ -93,3 +99,4 @@ export const getHeadphoneImage = (name: string, brand: string): string => {
   // Default headphone image
   return '/lovable-uploads/b48e7d14-29ab-4227-a09c-eb324e7620d7.png';
 };
+
