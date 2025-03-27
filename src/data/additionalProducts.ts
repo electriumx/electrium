@@ -1,5 +1,5 @@
 
-import { Product } from './productData';
+import { Product } from '@/types/product';
 import { getCategoryImage, getGameImage } from '../utils/productImageUtils';
 
 // Generate a random price between min and max

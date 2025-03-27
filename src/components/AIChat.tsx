@@ -158,8 +158,17 @@ const AIChat: React.FC<AIChatProps> = ({ onClose }) => {
         const categoryProducts = products.filter(p => p.category === category);
         if (categoryProducts.length === 0) return `I'm sorry, we don't have any ${category} products in stock at the moment.`;
         
-        const topRated = [...categoryProducts].sort((a, b) => b.rating - a.rating).slice(0, 3);
-        const topRatedText = topRated.map(p => `${p.brand} ${p.name} (rated ${p.rating}/5 by ${p.reviews} customers)`).join(', ');
+        const sortedProducts = [...categoryProducts].sort((a, b) => {
+          const ratingA = a.rating || 0;
+          const ratingB = b.rating || 0;
+          return ratingB - ratingA;
+        }).slice(0, 3);
+        
+        const topRatedText = sortedProducts.map(p => {
+          const rating = p.rating || 4.5;
+          const reviewCount = p.reviews || 100;
+          return `${p.brand} ${p.name} (rated ${rating}/5 by ${reviewCount} customers)`;
+        }).join(', ');
         
         return `We have ${categoryProducts.length} ${category} products available. Our top-rated ${category} products are: ${topRatedText}. Would you like information about a specific brand or model?`;
       }

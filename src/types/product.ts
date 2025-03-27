@@ -11,6 +11,15 @@ export interface Product {
   imageUrl: string;
   colors: string[];
   description: string;
+  rating?: number;
+  reviews?: number;
+  accessories?: Array<{
+    id: number | string;
+    name: string;
+    price: number;
+    selected: boolean;
+  }>;
+  selectedColor?: string;
 }
 
 export interface ProductReview {
