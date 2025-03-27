@@ -1,3 +1,4 @@
+
 import { Product } from '@/types/product';
 import { getCategoryImage, getGameImage } from '../utils/productImageUtils';
 
@@ -101,7 +102,7 @@ export const generateAdditionalProducts = (): Product[] => {
     category: "Laptop",
     brand: "Google",
     description: "Affordable, lightweight Chromebook with Chrome OS and cloud-based applications.",
-    imageUrl: "/lovable-uploads/f36c4267-74e8-4514-8f6d-ba947eea3a13.png",
+    imageUrl: "/lovable-uploads/42c20503-f943-4848-985f-0972f82629cc.png", // Updated to use the new image
     quantity: 0,
     rating: 4.2,
     reviews: 189,

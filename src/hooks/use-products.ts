@@ -1,8 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { products as initialProducts } from '../data/productData';
 import { Product } from '@/types/product';
 import { generateAdditionalProducts } from '../data/additionalProducts';
+import { generateSmartphoneProducts, generateGamingConsoleProducts, generateHeadphoneProducts } from '@/utils/productGenerators';
 import { getCategoryImage } from '../utils/productImageUtils';
 
 // Add new iPhone models
@@ -17,7 +17,8 @@ const additionalIPhones: Product[] = [
     imageUrl: "/lovable-uploads/27df906c-346c-4282-ba2b-a0b7e8fab3b8.png",
     quantity: 0,
     rating: 4.3,
-    reviews: 142
+    reviews: 142,
+    colors: ["Black", "Silver", "Gold", "Rose Gold"],
   },
   {
     id: 2002,
@@ -143,7 +144,8 @@ const tvSubcategoryProducts: Product[] = [
     imageUrl: "/lovable-uploads/2f84a28b-83f8-4c69-96f8-ed61e49e631b.png",
     quantity: 0,
     rating: 4.8,
-    reviews: 156
+    reviews: 156,
+    colors: ["Black"],
   },
   {
     id: 15002,
@@ -206,64 +208,44 @@ export const useProducts = () => {
     // Generate the additional products with limited numbers
     const generatedProducts = generateAdditionalProducts();
     
+    // Generate new subcategory products
+    const smartphoneProducts = generateSmartphoneProducts();
+    const gamingConsoleProducts = generateGamingConsoleProducts();
+    const headphoneProducts = generateHeadphoneProducts();
+    
     // Combine initial products with additional iPhones, TV subcategories, and generated products
-    const allProducts = [...initialProducts, ...additionalIPhones, ...tvSubcategoryProducts, ...generatedProducts];
+    const allProducts = [
+      ...initialProducts, 
+      ...additionalIPhones, 
+      ...tvSubcategoryProducts, 
+      ...generatedProducts,
+      ...smartphoneProducts,
+      ...gamingConsoleProducts,
+      ...headphoneProducts
+    ];
     
     // Remove duplicates (in case they already exist)
     const uniqueProducts = allProducts.filter((product, index, self) => 
       index === self.findIndex(p => p.id === product.id)
     );
 
-    // Deduplicate: Keep only one of each product type and remove numbered versions
-    const filteredProducts = uniqueProducts.reduce((acc: Product[], product) => {
-      // Extract base product name without numbers at the end
-      const baseNameMatch = product.name.match(/(.*?)(?:\s+\d+)?$/);
-      const baseName = baseNameMatch ? baseNameMatch[1].trim() : product.name;
-      
-      // Check if we already have this base product in our accumulator
-      const existingProduct = acc.find(p => {
-        const pBaseNameMatch = p.name.match(/(.*?)(?:\s+\d+)?$/);
-        const pBaseName = pBaseNameMatch ? pBaseNameMatch[1].trim() : p.name;
-        
-        return (
-          pBaseName === baseName && 
-          p.brand === product.brand && 
-          p.category === product.category
-        );
-      });
-      
-      // Only add if we don't already have this base product type
-      // But keep all iPhones, specific games, and TVs with subcategories
-      if (!existingProduct || 
-          (product.brand === "Apple" && product.name.includes("iPhone")) ||
-          product.category === "Games" || 
-          (product.category === "TVs" && product.subcategory) ||
-          product.name.toLowerCase().includes("battlefield") ||
-          product.name.toLowerCase().includes("rainbow six") ||
-          product.name.toLowerCase().includes("call of duty") ||
-          product.name.toLowerCase().includes("switch") ||
-          (product.brand === "Google" && product.name.toLowerCase().includes("chromebook"))) {
-        return [...acc, product];
+    // Update product images based on category, brand, and requested changes
+    const updatedProducts = uniqueProducts.map(product => {
+      // IMPORTANT: Update Chromebook image with the new image
+      if (product.brand === "Google" && product.name.toLowerCase().includes("chromebook")) {
+        return {
+          ...product,
+          imageUrl: "/lovable-uploads/42c20503-f943-4848-985f-0972f82629cc.png"
+        };
       }
       
-      return acc;
-    }, []);
-
-    // Update product images based on category, brand, and requested changes
-    const updatedProducts = filteredProducts.map(product => {
+      // Keep the rest of the image assignment logic
       // Battlefield games get the first uploaded image
       if (product.name.toLowerCase().includes("battlefield")) {
         return {
           ...product,
           imageUrl: "/lovable-uploads/d496c5e1-cf2a-4e3a-ad70-e121a939a763.png",
           subcategory: "FPS Games"
-        };
-      }
-      // Chromebooks get the second uploaded image
-      else if (product.brand === "Google" && product.name.toLowerCase().includes("chromebook")) {
-        return {
-          ...product,
-          imageUrl: "/lovable-uploads/f36c4267-74e8-4514-8f6d-ba947eea3a13.png"
         };
       }
       // Nintendo products get the third uploaded image

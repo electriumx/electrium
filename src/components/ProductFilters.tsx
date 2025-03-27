@@ -2,7 +2,9 @@
 import { useState, useEffect } from 'react';
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
-import { Search, ChevronDown, ChevronUp } from "lucide-react";
+import { Search, ChevronDown, ChevronUp, Trash } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/hooks/use-toast";
 
 interface SubCategory {
   name: string;
@@ -98,6 +100,22 @@ const ProductFilters = ({
     }
   };
 
+  const handleClearItems = () => {
+    // Clear the cart
+    localStorage.setItem('cart', JSON.stringify([]));
+    
+    // Trigger cart update event
+    const event = new CustomEvent('cartUpdate', {
+      detail: []
+    });
+    window.dispatchEvent(event);
+    
+    toast({
+      title: "Cart Cleared",
+      description: "All items have been removed from your cart."
+    });
+  };
+
   // Function to capitalize first letter of each word and remove underscores
   const capitalizeWords = (text: string) => {
     return text
@@ -181,7 +199,18 @@ const ProductFilters = ({
       </div>
 
       <div className="p-4 rounded-lg bg-card shadow-md">
-        <h3 className="text-lg font-semibold mb-4 text-foreground">Brands</h3>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold text-foreground">Brands</h3>
+          <Button 
+            size="sm" 
+            variant="outline" 
+            className="flex items-center gap-1"
+            onClick={handleClearItems}
+          >
+            <Trash className="h-4 w-4" />
+            <span>Clear Items</span>
+          </Button>
+        </div>
         <div className="flex flex-wrap gap-2">
           {brands.map(brand => (
             <button 
@@ -210,4 +239,3 @@ const ProductFilters = ({
 };
 
 export default ProductFilters;
-
