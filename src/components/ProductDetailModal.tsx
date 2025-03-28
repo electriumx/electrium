@@ -139,10 +139,8 @@ const ProductDetailModal = ({
   };
   
   const handleAddReview = (name: string, rating: number, comment: string) => {
-    // Ensure reviews is an array
-    if (typeof product.reviews === 'number') {
-      product.reviews = [];
-    }
+    // Create a deep copy of the product to avoid modifying the original
+    const updatedProduct = ensureReviewsArray(product);
     
     // Here we would typically make an API call to add the review
     // For now, we'll just show a toast notification
@@ -160,10 +158,7 @@ const ProductDetailModal = ({
   };
 
   // Ensure reviews is an array
-  const safeProduct = { ...product };
-  if (typeof safeProduct.reviews === 'number') {
-    safeProduct.reviews = [];
-  }
+  const safeProduct = ensureReviewsArray(product);
 
   return (
     <>
@@ -176,7 +171,7 @@ const ProductDetailModal = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
             <div>
               <img 
-                src={product.imageUrl || product.image} 
+                src={product.imageUrl} 
                 alt={product.name} 
                 className="w-full object-contain rounded-lg h-64"
               />

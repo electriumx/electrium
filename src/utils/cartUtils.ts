@@ -118,11 +118,13 @@ export const adjustGamePrices = () => {
 
 // Ensure product reviews are always an array
 export const ensureReviewsArray = (product: Product) => {
+  const updatedProduct = { ...product };
   // If reviews is a number (representing review count), convert to an empty array
-  if (typeof product.reviews === 'number') {
-    product.reviews = [];
+  if (typeof updatedProduct.reviews === 'number') {
+    // Create a new copy of the product with reviews as an array
+    updatedProduct.reviews = [];
   }
-  return product;
+  return updatedProduct;
 };
 
 // Call this function when the app initializes to adjust game prices
