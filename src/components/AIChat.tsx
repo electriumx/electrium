@@ -82,12 +82,13 @@ const AIChat: React.FC<AIChatProps> = ({ onClose }) => {
       
       if (productMatch) {
         const originalPrice = productMatch.price.toFixed(2);
-        const discountedPrice = productMatch.discount ? 
-          (productMatch.price * (1 - productMatch.discount/100)).toFixed(2) : 
+        const discountPercentage = productMatch.discount || 0;
+        const discountedPrice = discountPercentage > 0 ? 
+          (productMatch.price * (1 - discountPercentage/100)).toFixed(2) : 
           originalPrice;
         
-        if (productMatch.discount) {
-          return `The ${productMatch.name} from ${productMatch.brand} regularly costs $${originalPrice}, but it's currently on sale for $${discountedPrice} (${productMatch.discount}% off). It's in the ${productMatch.category} category. Would you like to know more about its features?`;
+        if (discountPercentage > 0) {
+          return `The ${productMatch.name} from ${productMatch.brand} regularly costs $${originalPrice}, but it's currently on sale for $${discountedPrice} (${discountPercentage}% off). It's in the ${productMatch.category} category. Would you like to know more about its features?`;
         } else {
           return `The ${productMatch.name} from ${productMatch.brand} costs $${originalPrice}. It's in the ${productMatch.category} category. Would you like to see similar products or know more about its features?`;
         }

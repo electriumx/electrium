@@ -1,11 +1,14 @@
+
 export interface Product {
   id: number;
   name: string;
   description: string;
   price: number;
   image: string;
+  imageUrl?: string; // Add this for components expecting imageUrl
   brand: string;
   category: string;
+  subcategory?: string; // Add this for components referencing subcategory
   colors: string[];
   rating: number;
   stockStatus: string;
@@ -13,6 +16,17 @@ export interface Product {
   variations?: Variation[];
   quantity?: number;
   selectedColor?: string;
+  discount?: number; // Add this for discount functionality
+  accessories?: ProductAccessory[]; // Add this for product accessories
+}
+
+export interface ProductAccessory {
+  id: string;
+  name: string;
+  price: number;
+  selected: boolean;
+  category?: string;
+  image?: string;
 }
 
 export interface Review {
@@ -589,6 +603,19 @@ export const products: Product[] = [
     ]
   }
 ];
+
+// Make sure to fix the products that are missing required properties
+products.forEach(product => {
+  // Ensure all products have colors property
+  if (!product.colors) {
+    product.colors = ["N/A"];
+  }
+  
+  // Set imageUrl to image if not defined
+  if (!product.imageUrl) {
+    product.imageUrl = product.image;
+  }
+});
 
 export const categories = [...new Set(products.map(product => product.category))];
 export const brands = [...new Set(products.map(product => product.brand))];
