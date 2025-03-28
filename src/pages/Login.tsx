@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -78,7 +77,6 @@ const Login = () => {
     }
     
     try {
-      // Try to register the user with the provided email and password
       const newUser = {
         username: socialEmail.toLowerCase(),
         password: socialPassword,
@@ -87,7 +85,6 @@ const Login = () => {
       
       addUser(newUser);
       
-      // Login with the newly created credentials
       if (login(newUser.username, newUser.password)) {
         toast({
           title: "Welcome!",
@@ -98,7 +95,6 @@ const Login = () => {
         navigate(from);
       }
     } catch (error) {
-      // If user already exists, just try to log in
       if (login(socialEmail.toLowerCase(), socialPassword)) {
         toast({
           title: "Welcome back!",
@@ -117,9 +113,31 @@ const Login = () => {
     }
   };
 
-  const handleSocialLogin = (provider: string) => {
-    setSocialProvider(provider);
+  const handleGoogleLogin = () => {
+    const googleAccounts = [
+      { email: 'user@gmail.com' },
+      { email: 'work@gmail.com' }
+    ];
+    
+    const randomAccount = googleAccounts[Math.floor(Math.random() * googleAccounts.length)];
+    
+    setSocialProvider('Google');
+    setSocialEmail(randomAccount.email);
     setShowSocialLogin(true);
+    
+    toast({
+      title: "Google Account Selected",
+      description: `Using ${randomAccount.email} to sign in`,
+    });
+  };
+
+  const handleSocialLogin = (provider: string) => {
+    if (provider === 'Google') {
+      handleGoogleLogin();
+    } else {
+      setSocialProvider(provider);
+      setShowSocialLogin(true);
+    }
   };
 
   return (

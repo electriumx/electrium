@@ -1,307 +1,304 @@
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { useGlobalDonation } from '../hooks/use-global-donation';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { useToast } from '@/hooks/use-toast';
-import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
-import { Heart, CreditCard } from 'lucide-react';
-import { useGlobalDonation } from '@/hooks/use-global-donation';
-import { formatCardNumber, formatExpiryDate, formatCVV } from '@/utils/cardFormatting';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { useToast } from '@/hooks/use-toast';
+import { formatCreditCardNumber, formatExpiryDate, formatCVC } from '@/utils/cardFormatting';
 
 const Donation = () => {
-  const { toast } = useToast();
-  const [amount, setAmount] = useState(10);
   const { totalDonations, addDonation, DONATION_LIMIT } = useGlobalDonation();
-  const [cooldown, setCooldown] = useState(0);
-  const [cardName, setCardName] = useState('');
+  const [amount, setAmount] = useState<number>(10);
   const [cardNumber, setCardNumber] = useState('');
-  const [cardExpiry, setCardExpiry] = useState('');
-  const [cardCvv, setCvv] = useState('');
-  const [showCardForm, setShowCardForm] = useState(false);
-  const [message, setMessage] = useState('');
+  const [cardName, setCardName] = useState('');
+  const [expiryDate, setExpiryDate] = useState('');
+  const [cvc, setCvc] = useState('');
+  const [errors, setErrors] = useState({
+    amount: '',
+    cardNumber: '',
+    cardName: '',
+    expiryDate: '',
+    cvc: ''
+  });
+  const [step, setStep] = useState(1);
+  const { toast } = useToast();
   
-  const presetAmounts = [5, 10, 25, 50, 100];
-  
-  useEffect(() => {
-    // Handle cooldown timer
-    if (cooldown > 0) {
-      const timer = setTimeout(() => setCooldown(cooldown - 1), 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [cooldown]);
-
-  const handleAmountSelect = (value: number) => {
-    // Ensure amount doesn't exceed the per-transaction limit
-    setAmount(Math.min(value, DONATION_LIMIT));
-  };
-  
-  const handleSliderChange = (values: number[]) => {
-    // Ensure amount doesn't exceed the per-transaction limit
-    setAmount(Math.min(values[0], DONATION_LIMIT));
-  };
-  
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseFloat(e.target.value);
-    if (!isNaN(value) && value >= 0) {
-      // Ensure amount doesn't exceed the per-transaction limit
-      setAmount(Math.min(value, DONATION_LIMIT));
+    if (!isNaN(value)) {
+      setAmount(value);
+      
+      // Clear error if value is valid
+      if (value > 0) {
+        setErrors(prev => ({ ...prev, amount: '' }));
+      }
+    } else {
+      setAmount(0);
     }
   };
   
   const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCardNumber(formatCardNumber(e.target.value));
+    const formattedValue = formatCreditCardNumber(e.target.value);
+    setCardNumber(formattedValue);
+    if (formattedValue.replace(/\s/g, '').length === 16) {
+      setErrors(prev => ({ ...prev, cardNumber: '' }));
+    }
   };
   
-  const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCardExpiry(formatExpiryDate(e.target.value));
+  const handleExpiryDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formattedValue = formatExpiryDate(e.target.value);
+    setExpiryDate(formattedValue);
+    if (formattedValue.length === 5) {
+      setErrors(prev => ({ ...prev, expiryDate: '' }));
+    }
   };
   
-  const handleCvvChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCvv(formatCVV(e.target.value));
+  const handleCvcChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formattedValue = formatCVC(e.target.value);
+    setCvc(formattedValue);
+    if (formattedValue.length === 3) {
+      setErrors(prev => ({ ...prev, cvc: '' }));
+    }
+  };
+  
+  const validateFirstStep = () => {
+    const newErrors = { ...errors };
+    let isValid = true;
+    
+    if (amount <= 0) {
+      newErrors.amount = 'Please enter a valid donation amount';
+      isValid = false;
+    }
+    
+    setErrors(newErrors);
+    return isValid;
   };
   
   const validateCardDetails = () => {
+    const newErrors = { ...errors };
+    let isValid = true;
+    
     if (!cardName.trim()) {
-      toast({
-        variant: "destructive",
-        title: "Missing information",
-        description: "Please enter the cardholder name."
-      });
-      return false;
+      newErrors.cardName = 'Please enter the cardholder name';
+      isValid = false;
     }
     
-    if (cardNumber.replace(/\s/g, '').length < 16) {
-      toast({
-        variant: "destructive",
-        title: "Invalid card number",
-        description: "Please enter a valid 16-digit card number."
-      });
-      return false;
+    if (cardNumber.replace(/\s/g, '').length !== 16) {
+      newErrors.cardNumber = 'Please enter a valid 16-digit card number';
+      isValid = false;
     }
     
-    if (cardExpiry.length < 5) {
-      toast({
-        variant: "destructive",
-        title: "Invalid expiry date",
-        description: "Please enter a valid expiry date in MM/YY format."
-      });
-      return false;
+    if (expiryDate.length !== 5) {
+      newErrors.expiryDate = 'Please enter a valid expiry date (MM/YY)';
+      isValid = false;
+    } else {
+      const [month, year] = expiryDate.split('/');
+      const currentDate = new Date();
+      const currentYear = currentDate.getFullYear() % 100;
+      const currentMonth = currentDate.getMonth() + 1;
+      
+      const expiryMonth = parseInt(month, 10);
+      const expiryYear = parseInt(year, 10);
+      
+      if (
+        expiryMonth < 1 || 
+        expiryMonth > 12 || 
+        (expiryYear < currentYear) || 
+        (expiryYear === currentYear && expiryMonth < currentMonth)
+      ) {
+        newErrors.expiryDate = 'Card has expired';
+        isValid = false;
+      }
     }
     
-    if (cardCvv.length < 3) {
-      toast({
-        variant: "destructive",
-        title: "Invalid security code",
-        description: "Please enter a valid 3-digit security code."
-      });
-      return false;
+    if (cvc.length !== 3) {
+      newErrors.cvc = 'Please enter a valid 3-digit CVC';
+      isValid = false;
     }
     
-    return true;
+    setErrors(newErrors);
+    return isValid;
+  };
+  
+  const handleContinue = () => {
+    if (validateFirstStep()) {
+      setStep(2);
+    }
   };
   
   const handleDonate = () => {
-    if (amount <= 0 || amount > DONATION_LIMIT) {
-      toast({
-        title: "Invalid donation amount",
-        description: `Please enter an amount between $1 and $${DONATION_LIMIT.toFixed(2)}.`
-      });
-      return;
-    }
-
-    // Always require card details for any donation
-    if (!showCardForm) {
-      setShowCardForm(true);
-      toast({
-        title: "Card details required",
-        description: "Please enter your card details to complete your donation."
-      });
-      return;
-    }
-
-    // Validate card details
     if (!validateCardDetails()) {
       return;
     }
     
     const newTotal = addDonation(amount);
     
+    // Reset form
+    setAmount(10);
+    setCardNumber('');
+    setCardName('');
+    setExpiryDate('');
+    setCvc('');
+    setStep(1);
+    
     toast({
       title: "Thank you for your donation!",
-      description: `Your donation of $${amount.toFixed(2)} has been received.`
+      description: `Your donation of $${amount.toFixed(2)} has been received. Total raised: $${newTotal.toFixed(2)}`,
     });
-    
-    // Set the cooldown
-    setCooldown(10);
-    
-    // Reset form after donation
-    setCardName('');
-    setCardNumber('');
-    setCardExpiry('');
-    setCvv('');
-    setMessage('');
-    setShowCardForm(false);
   };
   
   return (
-    <div className="w-full max-w-3xl mx-auto p-4 pt-10">
-      <Card>
-        <CardHeader className="text-center">
-          <div className="mx-auto bg-primary-foreground p-4 rounded-full w-16 h-16 flex items-center justify-center mb-2">
-            <Heart className="h-8 w-8 text-destructive" />
-          </div>
-          <CardTitle className="text-2xl">Make a Donation</CardTitle>
-          <CardDescription>Your contribution helps support our mission</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <h3 className="font-medium text-lg">Donation Amount</h3>
-              <div className="text-sm">
-                <span className="text-muted-foreground">
-                  Total Raised: ${totalDonations.toFixed(2)}
-                </span>
-                <span className="ml-2 text-muted-foreground">
-                  (Max per donation: ${DONATION_LIMIT.toFixed(2)})
-                </span>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-5 gap-2">
-              {presetAmounts.map((presetAmount) => (
-                <Button 
-                  key={presetAmount}
-                  variant={amount === presetAmount ? "default" : "outline"}
-                  onClick={() => handleAmountSelect(presetAmount)}
-                >
-                  ${presetAmount}
-                </Button>
-              ))}
-            </div>
-            
-            <div className="pt-6 pb-2">
-              <Slider
-                value={[amount]}
-                min={1}
-                max={DONATION_LIMIT}
-                step={1}
-                onValueChange={handleSliderChange}
-              />
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <Label htmlFor="customAmount">Custom Amount:</Label>
-              <div className="relative flex-1">
-                <span className="absolute left-3 top-2.5">$</span>
-                <Input
-                  id="customAmount"
-                  type="number"
-                  min="1"
-                  max={DONATION_LIMIT}
-                  value={amount}
-                  onChange={handleInputChange}
-                  className="pl-7"
-                />
-              </div>
-            </div>
-          </div>
+    <div className="container mx-auto max-w-7xl py-12 px-4 sm:px-6 lg:px-8">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-xl mx-auto"
+      >
+        <div className="text-center mb-12">
+          <h1 className="text-3xl font-bold mb-4">Support Our Mission</h1>
+          <p className="text-muted-foreground">
+            Your contribution helps us continue to develop and improve our products and services.
+          </p>
+        </div>
+        
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="text-center">Total Raised</CardTitle>
+            <CardDescription className="text-center">
+              <span className="text-4xl font-bold text-primary">${totalDonations.toFixed(2)}</span>
+            </CardDescription>
+          </CardHeader>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Make a Donation</CardTitle>
+            <CardDescription>
+              Every contribution makes a difference, no matter the size.
+            </CardDescription>
+          </CardHeader>
           
-          <div className="space-y-2">
-            <Label htmlFor="message">Message (Optional)</Label>
-            <Input
-              id="message"
-              placeholder="Add a message with your donation"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-            />
-          </div>
-
-          <div className={`space-y-4 border border-border rounded-lg p-4 ${showCardForm ? 'block' : 'hidden'}`}>
-            <div className="flex items-center gap-2">
-              <CreditCard className="h-5 w-5 text-muted-foreground" />
-              <h3 className="text-lg font-medium">Payment Information</h3>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="cardName">Cardholder Name</Label>
-              <Input
-                id="cardName"
-                value={cardName}
-                onChange={(e) => setCardName(e.target.value)}
-                placeholder="Name on card"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="cardNumber">Card Number</Label>
-              <Input
-                id="cardNumber"
-                value={cardNumber}
-                onChange={handleCardNumberChange}
-                placeholder="1234 5678 9012 3456"
-                maxLength={19}
-              />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="cardExpiry">Expiry Date</Label>
-                <Input
-                  id="cardExpiry"
-                  value={cardExpiry}
-                  onChange={handleExpiryChange}
-                  placeholder="MM/YY"
-                  maxLength={5}
-                />
+          <CardContent>
+            {step === 1 ? (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="amount">Donation Amount ($)</Label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-2.5 text-muted-foreground">$</span>
+                    <Input
+                      id="amount"
+                      type="number"
+                      min="1"
+                      step="0.01"
+                      value={amount || ''}
+                      onChange={handleAmountChange}
+                      className="pl-8"
+                    />
+                  </div>
+                  {errors.amount && <p className="text-destructive text-sm">{errors.amount}</p>}
+                  
+                  <div className="text-sm text-muted-foreground mt-2">
+                    Maximum donation per transaction: ${DONATION_LIMIT.toLocaleString()}
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-3 gap-2 mt-4">
+                  {[10, 25, 50, 100, 250, 500].map(value => (
+                    <Button
+                      key={value}
+                      type="button"
+                      variant={amount === value ? "default" : "outline"}
+                      onClick={() => setAmount(value)}
+                      className="w-full"
+                    >
+                      ${value}
+                    </Button>
+                  ))}
+                </div>
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="cardCvv">CVV</Label>
-                <Input
-                  id="cardCvv"
-                  value={cardCvv}
-                  onChange={handleCvvChange}
-                  placeholder="123"
-                  maxLength={3}
-                />
+            ) : (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="cardName">Cardholder Name</Label>
+                  <Input
+                    id="cardName"
+                    value={cardName}
+                    onChange={(e) => {
+                      setCardName(e.target.value);
+                      if (e.target.value.trim()) {
+                        setErrors(prev => ({ ...prev, cardName: '' }));
+                      }
+                    }}
+                    placeholder="Name on card"
+                  />
+                  {errors.cardName && <p className="text-destructive text-sm">{errors.cardName}</p>}
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="cardNumber">Card Number</Label>
+                  <Input
+                    id="cardNumber"
+                    value={cardNumber}
+                    onChange={handleCardNumberChange}
+                    placeholder="1234 5678 9012 3456"
+                    maxLength={19}
+                  />
+                  {errors.cardNumber && <p className="text-destructive text-sm">{errors.cardNumber}</p>}
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="expiryDate">Expiry Date</Label>
+                    <Input
+                      id="expiryDate"
+                      value={expiryDate}
+                      onChange={handleExpiryDateChange}
+                      placeholder="MM/YY"
+                      maxLength={5}
+                    />
+                    {errors.expiryDate && <p className="text-destructive text-sm">{errors.expiryDate}</p>}
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="cvc">CVC</Label>
+                    <Input
+                      id="cvc"
+                      value={cvc}
+                      onChange={handleCvcChange}
+                      placeholder="123"
+                      maxLength={3}
+                    />
+                    {errors.cvc && <p className="text-destructive text-sm">{errors.cvc}</p>}
+                  </div>
+                </div>
+                
+                <div className="mt-4">
+                  <p className="text-sm text-muted-foreground">
+                    You are donating <span className="font-medium">${amount.toFixed(2)}</span>
+                  </p>
+                </div>
               </div>
-            </div>
-            
-            <div className="flex items-center pt-2">
-              <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              <span className="text-sm text-muted-foreground">Your payment information is secure and encrypted</span>
-            </div>
-          </div>
+            )}
+          </CardContent>
           
-          <div className="rounded-lg bg-muted p-4">
-            <h4 className="font-medium mb-2">How your donation helps:</h4>
-            <ul className="space-y-1 text-sm">
-              <li>• Supporting community initiatives</li>
-              <li>• Funding educational programs</li>
-              <li>• Providing resources to those in need</li>
-              <li>• Advancing our shared mission</li>
-            </ul>
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Button 
-            className="w-full" 
-            size="lg" 
-            onClick={handleDonate}
-            disabled={amount <= 0 || cooldown > 0}
-          >
-            {cooldown > 0 
-              ? `Donate (${cooldown}s)` 
-              : showCardForm 
-                ? `Complete Donation $${amount.toFixed(2)}` 
-                : `Donate $${amount.toFixed(2)}`}
-          </Button>
-        </CardFooter>
-      </Card>
+          <CardFooter className="flex justify-between">
+            {step === 2 && (
+              <Button variant="outline" onClick={() => setStep(1)}>
+                Back
+              </Button>
+            )}
+            <Button 
+              onClick={step === 1 ? handleContinue : handleDonate}
+              className={step === 1 ? "ml-auto" : ""}
+            >
+              {step === 1 ? 'Continue' : 'Donate Now'}
+            </Button>
+          </CardFooter>
+        </Card>
+      </motion.div>
     </div>
   );
 };

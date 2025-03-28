@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -28,7 +27,6 @@ const Register = () => {
     const newErrors = { email: '', password: '', name: '', confirmPassword: '' };
     let isValid = true;
 
-    // Validate name
     if (!name.trim()) {
       newErrors.name = 'Name is required';
       isValid = false;
@@ -37,7 +35,6 @@ const Register = () => {
       isValid = false;
     }
 
-    // Validate email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) {
       newErrors.email = 'Email is required';
@@ -47,7 +44,6 @@ const Register = () => {
       isValid = false;
     }
 
-    // Validate password (only if it's provided for social login)
     if (password) {
       if (password.length < 8) {
         newErrors.password = 'Password must be at least 8 characters';
@@ -63,7 +59,6 @@ const Register = () => {
         isValid = false;
       }
 
-      // Validate password confirmation
       if (password !== confirmPassword) {
         newErrors.confirmPassword = 'Passwords do not match';
         isValid = false;
@@ -86,7 +81,6 @@ const Register = () => {
 
       try {
         addUser(newUser);
-        // Automatically log in after successful registration
         if (login(newUser.username, newUser.password)) {
           toast({
             title: "Welcome!",
@@ -102,7 +96,6 @@ const Register = () => {
         });
       }
     } else {
-      // Show toast with validation errors
       const errorMessages = Object.values(errors).filter(error => error !== '');
       if (errorMessages.length > 0) {
         toast({
@@ -114,22 +107,43 @@ const Register = () => {
     }
   };
 
-  const handleSocialRegister = (provider: string) => {
-    setSocialProvider(provider);
+  const handleGoogleRegister = () => {
+    const googleAccounts = [
+      { email: 'user@gmail.com', name: 'User Name' },
+      { email: 'work@gmail.com', name: 'Work Account' }
+    ];
+    
+    const randomAccount = googleAccounts[Math.floor(Math.random() * googleAccounts.length)];
+    
+    setSocialProvider('Google');
+    setSocialEmail(randomAccount.email);
+    setSocialName(randomAccount.name);
     setShowSocialRegister(true);
+    
+    toast({
+      title: "Google Account Selected",
+      description: `Using ${randomAccount.email} to sign up`,
+    });
   };
-  
+
+  const handleSocialRegister = (provider: string) => {
+    if (provider === 'Google') {
+      handleGoogleRegister();
+    } else {
+      setSocialProvider(provider);
+      setShowSocialRegister(true);
+    }
+  };
+
   const validateSocialForm = () => {
     const newErrors: {[key: string]: string} = {};
     let isValid = true;
     
-    // Validate name
     if (!socialName.trim()) {
       newErrors.socialName = 'Name is required';
       isValid = false;
     }
     
-    // Validate email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!socialEmail) {
       newErrors.socialEmail = 'Email is required';
@@ -139,7 +153,6 @@ const Register = () => {
       isValid = false;
     }
     
-    // Validate password
     if (!socialPassword || socialPassword.length < 6) {
       newErrors.socialPassword = 'Password must be at least 6 characters';
       isValid = false;
@@ -156,7 +169,7 @@ const Register = () => {
     
     return isValid;
   };
-  
+
   const handleSocialSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
