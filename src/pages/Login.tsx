@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -53,6 +52,17 @@ const Login = () => {
         const from = location.state?.from?.pathname || '/';
         navigate(from);
       }
+    }
+  };
+
+  const handleSocialLogin = (provider: string) => {
+    setSocialProvider(provider);
+    setShowSocialLogin(true);
+    
+    // Generate a random password if needed
+    if (!socialPassword) {
+      const randomPass = Math.random().toString(36).substring(2, 10);
+      setSocialPassword(randomPass);
     }
   };
 
@@ -115,11 +125,8 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-    // Simply trigger the social login flow with Google as the provider
-    // This approach avoids the OAuth error by not actually trying to connect to Google's OAuth
     handleSocialLogin('Google');
     
-    // Show toast to indicate the mock flow
     toast({
       title: "Google Sign-In",
       description: "Google authentication simulated for demo purposes",
@@ -132,7 +139,6 @@ const Login = () => {
     const left = window.screenX + (window.outerWidth - width) / 2;
     const top = window.screenY + (window.outerHeight - height) / 2;
     
-    // Demo URL for Apple login
     const appleAuthUrl = 'https://appleid.apple.com/auth/authorize?client_id=mock-client-id&redirect_uri=' + 
       encodeURIComponent(window.location.origin + '/auth/callback');
     
@@ -144,7 +150,6 @@ const Login = () => {
     
     handleSocialLogin('Apple');
     
-    // Show toast to indicate the mock flow
     toast({
       title: "Apple Sign-In",
       description: "Apple authentication simulated for demo purposes",
@@ -157,7 +162,6 @@ const Login = () => {
     const left = window.screenX + (window.outerWidth - width) / 2;
     const top = window.screenY + (window.outerHeight - height) / 2;
     
-    // Demo URL for Facebook login
     const facebookAuthUrl = 'https://www.facebook.com/v12.0/dialog/oauth?client_id=mock-client-id&redirect_uri=' + 
       encodeURIComponent(window.location.origin + '/auth/callback');
     
@@ -169,7 +173,6 @@ const Login = () => {
     
     handleSocialLogin('Facebook');
     
-    // Show toast to indicate the mock flow
     toast({
       title: "Facebook Sign-In",
       description: "Facebook authentication simulated for demo purposes",

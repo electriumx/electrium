@@ -47,7 +47,7 @@ export const shouldApplyDiscount = (productId: number): boolean => {
   return wheelProductIds.includes(productId);
 }
 
-// Get discount expiration time - 34 hours instead of 48
+// Get discount expiration time - 24 hours instead of 34
 export const getDiscountExpirationTime = (): number => {
-  return 34 * 60 * 60 * 1000; // 34 hours in milliseconds
+  return 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 }
