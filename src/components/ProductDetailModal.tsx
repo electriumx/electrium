@@ -6,6 +6,7 @@ import { Check, Minus, Plus, Star } from 'lucide-react';
 import { Product } from '../data/productData';
 import { useToast } from '@/hooks/use-toast';
 import ProductReviewModal from './ProductReviewModal';
+import { ensureReviewsArray } from '../utils/cartUtils';
 
 interface ProductDetailModalProps {
   product: Product;
@@ -138,6 +139,11 @@ const ProductDetailModal = ({
   };
   
   const handleAddReview = (name: string, rating: number, comment: string) => {
+    // Ensure reviews is an array
+    if (typeof product.reviews === 'number') {
+      product.reviews = [];
+    }
+    
     // Here we would typically make an API call to add the review
     // For now, we'll just show a toast notification
     toast({
@@ -152,6 +158,12 @@ const ProductDetailModal = ({
     const date = new Date();
     return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
   };
+
+  // Ensure reviews is an array
+  const safeProduct = { ...product };
+  if (typeof safeProduct.reviews === 'number') {
+    safeProduct.reviews = [];
+  }
 
   return (
     <>
@@ -254,7 +266,7 @@ const ProductDetailModal = ({
                       />
                     ))}
                     <span className="ml-2 text-sm text-muted-foreground">
-                      {product.rating.toFixed(1)} ({product.reviews?.length || 0} reviews)
+                      {product.rating.toFixed(1)} ({Array.isArray(safeProduct.reviews) ? safeProduct.reviews.length : 0} reviews)
                     </span>
                   </div>
                 </div>
@@ -326,9 +338,9 @@ const ProductDetailModal = ({
                   Write a Review
                 </Button>
                 
-                {product.reviews && product.reviews.length > 0 ? (
+                {Array.isArray(safeProduct.reviews) && safeProduct.reviews.length > 0 ? (
                   <div className="space-y-4">
-                    {product.reviews.map((review, index) => (
+                    {safeProduct.reviews.map((review, index) => (
                       <div key={index} className="border-b border-border pb-4">
                         <div className="flex items-center justify-between mb-1">
                           <div className="font-medium">{review.userName}</div>

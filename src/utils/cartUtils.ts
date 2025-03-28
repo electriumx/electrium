@@ -116,6 +116,15 @@ export const adjustGamePrices = () => {
   return updatedCart;
 };
 
+// Ensure product reviews are always an array
+export const ensureReviewsArray = (product: Product) => {
+  // If reviews is a number (representing review count), convert to an empty array
+  if (typeof product.reviews === 'number') {
+    product.reviews = [];
+  }
+  return product;
+};
+
 // Call this function when the app initializes to adjust game prices
 setTimeout(() => {
   adjustGamePrices();
