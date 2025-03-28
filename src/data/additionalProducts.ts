@@ -1,4 +1,3 @@
-
 import { Product } from './productData';
 import { getCategoryImage, getGameImage } from '../utils/productImageUtils';
 
@@ -12,9 +11,9 @@ const randomRating = (): number => {
   return parseFloat((Math.random() * 1.5 + 3.5).toFixed(1));
 };
 
-// Generate a random number of reviews between 10 and 300
-const randomReviews = (): number => {
-  return Math.floor(Math.random() * 300) + 10;
+// Convert numeric reviews to array format for TypeScript compatibility
+const createReviewsArray = (count: number = 0): any[] => {
+  return [];
 };
 
 // Function to generate products for a specific category and brand (limited to just a few per category)
@@ -475,6 +474,15 @@ export const generateAdditionalProducts = (): Product[] => {
     quantity: 0,
     rating: 4.8,
     reviews: 76
+  });
+  
+  // Ensure all generated products have proper reviews format
+  products = products.map(product => {
+    // Convert numeric reviews to empty array
+    if (typeof product.reviews === 'number' || product.reviews === undefined) {
+      product.reviews = createReviewsArray();
+    }
+    return product;
   });
   
   return products;

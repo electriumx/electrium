@@ -1,3 +1,4 @@
+
 export interface Product {
   id: number;
   name: string;
@@ -11,6 +12,9 @@ export interface Product {
   selectedColor?: string;
   accessories?: ProductAccessory[];
   reviews?: Review[];
+  subcategory?: string;
+  rating?: number;
+  image?: string;
 }
 
 export interface Review {

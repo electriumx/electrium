@@ -3,6 +3,7 @@ import { Product, products as initialProducts } from '../data/productData';
 import { generateAdditionalProducts } from '../data/additionalProducts';
 import { getCategoryImage } from '../utils/productImageUtils';
 import { allNewProducts } from '../data/newProducts';
+import { convertNumericReviews, ensureProductsReviewsFormat, ensureAccessoriesFormat } from '../utils/productUtils';
 
 // Add new iPhone models
 const additionalIPhones: Product[] = [
@@ -213,8 +214,11 @@ export const useProducts = () => {
       index === self.findIndex(p => p.id === product.id)
     );
 
+    // Apply formatting fixes
+    const formattedProducts = ensureAccessoriesFormat(ensureProductsReviewsFormat(uniqueProducts));
+    
     // Deduplicate: Keep only one of each product type and remove numbered versions
-    const filteredProducts = uniqueProducts.reduce((acc: Product[], product) => {
+    const filteredProducts = formattedProducts.reduce((acc: Product[], product) => {
       // Extract base product name without numbers at the end
       const baseNameMatch = product.name.match(/(.*?)(?:\s+\d+)?$/);
       const baseName = baseNameMatch ? baseNameMatch[1].trim() : product.name;
