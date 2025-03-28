@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -28,7 +27,6 @@ const Register = () => {
     const newErrors = { email: '', password: '', name: '', confirmPassword: '' };
     let isValid = true;
 
-    // Validate name
     if (!name.trim()) {
       newErrors.name = 'Name is required';
       isValid = false;
@@ -37,7 +35,6 @@ const Register = () => {
       isValid = false;
     }
 
-    // Validate email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) {
       newErrors.email = 'Email is required';
@@ -47,7 +44,6 @@ const Register = () => {
       isValid = false;
     }
 
-    // Validate password (only if it's provided for social login)
     if (password) {
       if (password.length < 8) {
         newErrors.password = 'Password must be at least 8 characters';
@@ -63,7 +59,6 @@ const Register = () => {
         isValid = false;
       }
 
-      // Validate password confirmation
       if (password !== confirmPassword) {
         newErrors.confirmPassword = 'Passwords do not match';
         isValid = false;
@@ -86,7 +81,6 @@ const Register = () => {
 
       try {
         addUser(newUser);
-        // Automatically log in after successful registration
         if (login(newUser.username, newUser.password)) {
           toast({
             title: "Welcome!",
@@ -102,7 +96,6 @@ const Register = () => {
         });
       }
     } else {
-      // Show toast with validation errors
       const errorMessages = Object.values(errors).filter(error => error !== '');
       if (errorMessages.length > 0) {
         toast({
@@ -114,22 +107,37 @@ const Register = () => {
     }
   };
 
+  const handleGoogleRegister = () => {
+    const width = 500;
+    const height = 600;
+    const left = window.screenX + (window.outerWidth - width) / 2;
+    const top = window.screenY + (window.outerHeight - height) / 2;
+    
+    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=mock-client-id&redirect_uri=${encodeURIComponent(window.location.origin + '/auth/callback')}&response_type=code&scope=email%20profile&prompt=select_account`;
+    
+    window.open(
+      googleAuthUrl,
+      'Google Sign In',
+      `width=${width},height=${height},left=${left},top=${top}`
+    );
+    
+    handleSocialRegister('Google');
+  };
+
   const handleSocialRegister = (provider: string) => {
     setSocialProvider(provider);
     setShowSocialRegister(true);
   };
-  
+
   const validateSocialForm = () => {
     const newErrors: {[key: string]: string} = {};
     let isValid = true;
     
-    // Validate name
     if (!socialName.trim()) {
       newErrors.socialName = 'Name is required';
       isValid = false;
     }
     
-    // Validate email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!socialEmail) {
       newErrors.socialEmail = 'Email is required';
@@ -139,7 +147,6 @@ const Register = () => {
       isValid = false;
     }
     
-    // Validate password
     if (!socialPassword || socialPassword.length < 6) {
       newErrors.socialPassword = 'Password must be at least 6 characters';
       isValid = false;
@@ -204,7 +211,7 @@ const Register = () => {
               <Button 
                 variant="outline" 
                 className="w-full"
-                onClick={() => handleSocialRegister('Google')}
+                onClick={handleGoogleRegister}
               >
                 <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24">
                   <path

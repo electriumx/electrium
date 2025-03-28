@@ -1,7 +1,8 @@
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState, useEffect } from "react";
-import { Plus, Check, MessageSquare } from "lucide-react";
+import { Plus, Check, MessageSquare, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Product as ProductType, ProductAccessory } from '../data/productData';
 import ProductReviewModal from "./ProductReviewModal";
@@ -13,7 +14,7 @@ interface ProductDetailModalProps {
   onClose: () => void;
   onQuantityChange: (id: number, quantity: number) => void;
   discount: number;
-  reviews?: Review[];
+  reviews?: any[];
   stock: number;
 }
 
@@ -31,6 +32,12 @@ interface Accessory {
   image: string;
   selected?: boolean;
 }
+
+const ensureReviewsArray = (reviews: any): Review[] => {
+  if (!reviews) return [];
+  if (Array.isArray(reviews)) return reviews;
+  return [];
+};
 
 const getTechSpecs = (productId: number, brand: string) => {
   const specs = {
@@ -109,15 +116,25 @@ const accessories: Accessory[] = [
   { id: 112, name: "Premium Earbuds", price: 79.99, compatible: ["Apple", "Samsung", "Sony", "Google"], image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" }
 ];
 
-const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discount = 0, reviews = [], stock = 0 }: ProductDetailModalProps) => {
+const ProductDetailModal = ({ 
+  product, 
+  isOpen, 
+  onClose, 
+  onQuantityChange, 
+  discount = 0, 
+  reviews = [], 
+  stock = 0 
+}: ProductDetailModalProps) => {
   const { id, name, price, imageUrl, brand, category } = product;
   const discountedPrice = discount > 0 ? price * (1 - discount / 100) : price;
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedAccessories, setSelectedAccessories] = useState<Accessory[]>([]);
+  const [confirmedAccessories, setConfirmedAccessories] = useState<Accessory[]>([]);
   const [quantity, setQuantity] = useState(1);
   const [totalPrice, setTotalPrice] = useState(discountedPrice);
   const [selectedColor, setSelectedColor] = useState("Blue");
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [productReviews, setProductReviews] = useState<Review[]>(ensureReviewsArray(reviews));
   const { toast } = useToast();
 
   const getAvailableColors = () => {
@@ -164,8 +181,10 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
           }));
         
         setSelectedAccessories(productAccessories);
+        setConfirmedAccessories(productAccessories);
       } else {
         setSelectedAccessories([]);
+        setConfirmedAccessories([]);
       }
       
       if (product.selectedColor) {
@@ -179,11 +198,11 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
   useEffect(() => {
     let total = discount > 0 ? discountedPrice : price;
     
-    const accessoriesTotal = selectedAccessories.reduce((sum, acc) => sum + acc.price, 0);
+    const accessoriesTotal = confirmedAccessories.reduce((sum, acc) => sum + acc.price, 0);
     total += accessoriesTotal;
     
     setTotalPrice(total);
-  }, [selectedAccessories, price, discountedPrice, discount]);
+  }, [confirmedAccessories, price, discountedPrice, discount]);
   
   const specs = getTechSpecs(id, brand);
   
@@ -244,12 +263,20 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
     });
   };
 
+  const handleConfirmAccessories = () => {
+    setConfirmedAccessories([...selectedAccessories]);
+    toast({
+      title: "Accessories Confirmed",
+      description: `${selectedAccessories.length} accessories added to your product`,
+    });
+  };
+
   const handleAddToCart = () => {
     const productToAdd = {
       ...product,
       quantity: quantity,
       selectedColor: selectedColor,
-      accessories: selectedAccessories.map(acc => ({
+      accessories: confirmedAccessories.map(acc => ({
         id: String(acc.id),
         name: acc.name,
         price: acc.price,
@@ -272,11 +299,106 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
   };
   
   const handleReviewSubmit = (name: string, rating: number, comment: string) => {
+    const newReview = { name, rating, comment };
+    setProductReviews(prev => [...prev, newReview]);
     setReviewModalOpen(false);
     toast({
       title: "Review Submitted",
       description: "Thank you for your feedback!",
     });
+  };
+
+  const renderStarRating = (rating: number) => {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+    const stars = [];
+    
+    // Full stars
+    for (let i = 0; i < fullStars; i++) {
+      stars.push(
+        <svg 
+          key={`full-${i}`}
+          xmlns="http://www.w3.org/2000/svg" 
+          width="14" 
+          height="14" 
+          viewBox="0 0 24 24" 
+          fill="gold"
+          stroke="currentColor" 
+          strokeWidth="1" 
+          strokeLinecap="round" 
+          strokeLinejoin="round"
+          className="text-yellow-500"
+        >
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+      );
+    }
+    
+    // Half star
+    if (hasHalfStar) {
+      stars.push(
+        <div key="half" className="relative inline-block" style={{ width: "14px", height: "14px" }}>
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            width="14" 
+            height="14" 
+            viewBox="0 0 24 24" 
+            fill="none"
+            stroke="currentColor" 
+            strokeWidth="1" 
+            strokeLinecap="round" 
+            strokeLinejoin="round"
+            className="text-yellow-500 absolute"
+          >
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+          </svg>
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            width="14" 
+            height="14" 
+            viewBox="0 0 24 24" 
+            fill="gold"
+            stroke="currentColor" 
+            strokeWidth="1" 
+            strokeLinecap="round" 
+            strokeLinejoin="round"
+            className="text-yellow-500 absolute"
+            style={{ clipPath: "polygon(0 0, 50% 0, 50% 100%, 0 100%)" }}
+          >
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+          </svg>
+        </div>
+      );
+    }
+    
+    // Empty stars
+    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+    for (let i = 0; i < emptyStars; i++) {
+      stars.push(
+        <svg 
+          key={`empty-${i}`}
+          xmlns="http://www.w3.org/2000/svg" 
+          width="14" 
+          height="14" 
+          viewBox="0 0 24 24" 
+          fill="none"
+          stroke="currentColor" 
+          strokeWidth="1" 
+          strokeLinecap="round" 
+          strokeLinejoin="round"
+          className="text-yellow-500"
+        >
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+      );
+    }
+    
+    return (
+      <div className="flex">
+        {stars}
+        <span className="ml-1 text-xs">{rating.toFixed(1)}</span>
+      </div>
+    );
   };
 
   return (
@@ -295,7 +417,7 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="specs">Specifications</TabsTrigger>
               <TabsTrigger value="accessories">Accessories</TabsTrigger>
-              <TabsTrigger value="reviews">Reviews ({reviews.length})</TabsTrigger>
+              <TabsTrigger value="reviews">Reviews ({productReviews.length})</TabsTrigger>
             </TabsList>
             
             <TabsContent value="overview" className="space-y-4">
@@ -324,7 +446,7 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
                     <span>${price.toFixed(2)}</span>
                   )}
                 </p>
-                {selectedAccessories.length > 0 && (
+                {confirmedAccessories.length > 0 && (
                   <p className="text-sm mt-1">
                     With accessories: <span className="font-semibold">${totalPrice.toFixed(2)}</span>
                   </p>
@@ -449,7 +571,17 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
                     )
                   )}
                   
-                  {selectedAccessories.length > 0 && (
+                  <div className="mt-4 flex justify-center">
+                    <Button 
+                      onClick={handleConfirmAccessories}
+                      className="w-full"
+                      disabled={selectedAccessories.length === 0}
+                    >
+                      Confirm Accessories
+                    </Button>
+                  </div>
+                  
+                  {confirmedAccessories.length > 0 && (
                     <div className="bg-card rounded-lg p-4 mt-4 border border-border">
                       <h4 className="font-medium mb-2">Selected Accessories</h4>
                       <div className="flex justify-between items-center mb-2">
@@ -457,7 +589,7 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
                         <p className="text-sm">${(discount > 0 ? discountedPrice : price).toFixed(2)}</p>
                       </div>
                       <ul className="space-y-2 mb-2">
-                        {selectedAccessories.map(accessory => (
+                        {confirmedAccessories.map(accessory => (
                           <li key={accessory.id} className="flex justify-between text-sm">
                             <span>{accessory.name}</span>
                             <span>${accessory.price.toFixed(2)}</span>
@@ -477,7 +609,7 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
             <TabsContent value="reviews">
               <div>
                 <div className="flex justify-between items-center mb-3">
-                  <h3 className="text-lg font-medium">Customer Reviews ({reviews.length})</h3>
+                  <h3 className="text-lg font-medium">Customer Reviews ({productReviews.length})</h3>
                   <Button 
                     size="sm" 
                     variant="outline" 
@@ -489,33 +621,15 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
                   </Button>
                 </div>
                 
-                {reviews.length === 0 ? (
+                {productReviews.length === 0 ? (
                   <p className="text-muted-foreground">No reviews yet. Be the first to review this product!</p>
                 ) : (
                   <div className="space-y-4">
-                    {reviews.map((review, index) => (
+                    {productReviews.map((review, index) => (
                       <div key={index} className="border-b pb-3 last:border-0">
                         <div className="flex justify-between items-center mb-1">
                           <p className="font-medium">{review.name}</p>
-                          <div className="flex">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <svg 
-                                key={star}
-                                xmlns="http://www.w3.org/2000/svg" 
-                                width="14" 
-                                height="14" 
-                                viewBox="0 0 24 24" 
-                                fill={star <= review.rating ? "gold" : "none"} 
-                                stroke="currentColor" 
-                                strokeWidth="2" 
-                                strokeLinecap="round" 
-                                strokeLinejoin="round"
-                                className="text-yellow-500"
-                              >
-                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                              </svg>
-                            ))}
-                          </div>
+                          {renderStarRating(review.rating)}
                         </div>
                         <p className="text-sm">{review.comment}</p>
                       </div>

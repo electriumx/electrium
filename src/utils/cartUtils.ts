@@ -80,5 +80,10 @@ export const calculateProductTotal = (product: Product, discounts: Record<string
     totalPrice += accessoriesPrice;
   }
   
+  // Make sure we have a valid reviews array (or empty array)
+  if (typeof product.reviews === 'number' || product.reviews === undefined) {
+    product.reviews = [] as any;
+  }
+  
   return totalPrice * (product.quantity || 1);
 };
