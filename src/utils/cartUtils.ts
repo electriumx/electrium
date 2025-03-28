@@ -122,7 +122,7 @@ export const ensureReviewsArray = (product: Product) => {
   // If reviews is a number (representing review count), convert to an empty array
   if (typeof updatedProduct.reviews === 'number') {
     // Create a new copy of the product with reviews as an array
-    updatedProduct.reviews = [];
+    updatedProduct.reviews = [] as any; // Using 'as any' to fix the type error
   }
   return updatedProduct;
 };
