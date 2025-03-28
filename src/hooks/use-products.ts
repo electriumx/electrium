@@ -17,7 +17,7 @@ const additionalIPhones: Product[] = [
     imageUrl: "/lovable-uploads/27df906c-346c-4282-ba2b-a0b7e8fab3b8.png",
     quantity: 0,
     rating: 4.3,
-    reviews: 142
+    reviews: []
   },
   {
     id: 2002,
@@ -29,7 +29,7 @@ const additionalIPhones: Product[] = [
     imageUrl: "/lovable-uploads/27df906c-346c-4282-ba2b-a0b7e8fab3b8.png",
     quantity: 0,
     rating: 4.4,
-    reviews: 156
+    reviews: []
   },
   {
     id: 2003,
@@ -41,7 +41,7 @@ const additionalIPhones: Product[] = [
     imageUrl: "/lovable-uploads/27df906c-346c-4282-ba2b-a0b7e8fab3b8.png",
     quantity: 0,
     rating: 4.5,
-    reviews: 178
+    reviews: []
   },
   {
     id: 2004,
@@ -53,7 +53,7 @@ const additionalIPhones: Product[] = [
     imageUrl: "/lovable-uploads/27df906c-346c-4282-ba2b-a0b7e8fab3b8.png",
     quantity: 0,
     rating: 4.5,
-    reviews: 192
+    reviews: []
   },
   {
     id: 2005,
@@ -65,7 +65,7 @@ const additionalIPhones: Product[] = [
     imageUrl: "/lovable-uploads/27df906c-346c-4282-ba2b-a0b7e8fab3b8.png",
     quantity: 0,
     rating: 4.6,
-    reviews: 215
+    reviews: []
   },
   {
     id: 2006,
@@ -77,7 +77,7 @@ const additionalIPhones: Product[] = [
     imageUrl: "/lovable-uploads/27df906c-346c-4282-ba2b-a0b7e8fab3b8.png",
     quantity: 0,
     rating: 4.7,
-    reviews: 235
+    reviews: []
   },
   {
     id: 2007,
@@ -89,7 +89,7 @@ const additionalIPhones: Product[] = [
     imageUrl: "/lovable-uploads/27df906c-346c-4282-ba2b-a0b7e8fab3b8.png",
     quantity: 0,
     rating: 4.8,
-    reviews: 248
+    reviews: []
   },
   {
     id: 2008,
@@ -101,7 +101,7 @@ const additionalIPhones: Product[] = [
     imageUrl: "/lovable-uploads/27df906c-346c-4282-ba2b-a0b7e8fab3b8.png",
     quantity: 0,
     rating: 4.9,
-    reviews: 256
+    reviews: []
   },
   {
     id: 2009,
@@ -113,7 +113,7 @@ const additionalIPhones: Product[] = [
     imageUrl: "/lovable-uploads/27df906c-346c-4282-ba2b-a0b7e8fab3b8.png",
     quantity: 0,
     rating: 4.9,
-    reviews: 243
+    reviews: []
   },
   {
     id: 2010,
@@ -126,7 +126,7 @@ const additionalIPhones: Product[] = [
     quantity: 0,
     discount: 5,
     rating: 5.0,
-    reviews: 212
+    reviews: []
   }
 ];
 
@@ -143,7 +143,7 @@ const tvSubcategoryProducts: Product[] = [
     imageUrl: "/lovable-uploads/2f84a28b-83f8-4c69-96f8-ed61e49e631b.png",
     quantity: 0,
     rating: 4.8,
-    reviews: 156
+    reviews: []
   },
   {
     id: 15002,
@@ -156,7 +156,7 @@ const tvSubcategoryProducts: Product[] = [
     imageUrl: "",
     quantity: 0,
     rating: 4.7,
-    reviews: 132
+    reviews: []
   },
   {
     id: 15003,
@@ -169,7 +169,7 @@ const tvSubcategoryProducts: Product[] = [
     imageUrl: "",
     quantity: 0,
     rating: 4.6,
-    reviews: 98
+    reviews: []
   },
   {
     id: 15004,
@@ -182,7 +182,7 @@ const tvSubcategoryProducts: Product[] = [
     imageUrl: "",
     quantity: 0,
     rating: 4.9,
-    reviews: 67
+    reviews: []
   },
   {
     id: 15005,
@@ -195,7 +195,7 @@ const tvSubcategoryProducts: Product[] = [
     imageUrl: "",
     quantity: 0,
     rating: 4.3,
-    reviews: 215
+    reviews: []
   }
 ];
 

@@ -1,3 +1,4 @@
+
 import { Product } from './productData';
 import { getCategoryImage, getGameImage } from '../utils/productImageUtils';
 
@@ -60,7 +61,7 @@ const generateProducts = (
       imageUrl: imageUrl,
       quantity: 0,
       rating: randomRating(),
-      reviews: randomReviews(),
+      reviews: createReviewsArray(),
       subcategory
     };
   });
@@ -102,7 +103,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/f36c4267-74e8-4514-8f6d-ba947eea3a13.png",
     quantity: 0,
     rating: 4.2,
-    reviews: 189
+    reviews: createReviewsArray()
   });
   
   // Laptops - Add other representative laptops
@@ -137,7 +138,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/54b67814-dd27-4a46-ac69-4beaf7bd7851.png",
     quantity: 0,
     rating: 4.8,
-    reviews: 342
+    reviews: createReviewsArray()
   });
   
   products.push({
@@ -150,7 +151,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/54b67814-dd27-4a46-ac69-4beaf7bd7851.png",
     quantity: 0,
     rating: 4.7,
-    reviews: 278
+    reviews: createReviewsArray()
   });
   
   products.push({
@@ -163,7 +164,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/54b67814-dd27-4a46-ac69-4beaf7bd7851.png",
     quantity: 0,
     rating: 4.9,
-    reviews: 215
+    reviews: createReviewsArray()
   });
   
   // Gaming consoles - Add other representative consoles
@@ -197,7 +198,7 @@ export const generateAdditionalProducts = (): Product[] => {
       imageUrl: "/lovable-uploads/d496c5e1-cf2a-4e3a-ad70-e121a939a763.png",
       quantity: 0,
       rating: 4.5 + (i * 0.1 > 0.5 ? 0.5 : i * 0.1),
-      reviews: 150 + (i * 30),
+      reviews: createReviewsArray(150 + (i * 30)),
       subcategory: "FPS Games"
     });
   }
@@ -213,7 +214,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/2b732385-bcb9-459e-981e-bb57c1860769.png",
     quantity: 0,
     rating: randomRating(),
-    reviews: randomReviews(),
+    reviews: createReviewsArray(),
     subcategory: "FPS Games"
   });
   
@@ -227,7 +228,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/2b732385-bcb9-459e-981e-bb57c1860769.png",
     quantity: 0,
     rating: randomRating(),
-    reviews: randomReviews(),
+    reviews: createReviewsArray(),
     subcategory: "FPS Games"
   });
   
@@ -241,7 +242,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/2b732385-bcb9-459e-981e-bb57c1860769.png",
     quantity: 0,
     rating: randomRating(),
-    reviews: randomReviews(),
+    reviews: createReviewsArray(),
     subcategory: "FPS Games"
   });
   
@@ -257,7 +258,7 @@ export const generateAdditionalProducts = (): Product[] => {
       imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
       quantity: 0,
       rating: randomRating(),
-      reviews: randomReviews(),
+      reviews: createReviewsArray(),
       subcategory: "FPS Games"
     });
   }
@@ -273,7 +274,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/d0b5f6e9-d8a7-4e6d-92d9-0981cb533be3.png",
     quantity: 0,
     rating: 4.2,
-    reviews: 320,
+    reviews: createReviewsArray(320),
     subcategory: "RPG"
   });
   
@@ -287,7 +288,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg",
     quantity: 0,
     rating: 4.9,
-    reviews: 410,
+    reviews: createReviewsArray(410),
     subcategory: "RPG"
   });
   
@@ -301,7 +302,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/e61d09d1-fb3f-4e38-aaca-2342513b89de.png",
     quantity: 0,
     rating: 4.6,
-    reviews: 280,
+    reviews: createReviewsArray(280),
     subcategory: "Adventure"
   });
   
@@ -316,7 +317,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/86bf4158-8228-4965-8b2d-1f5a3feed7e9.png",
     quantity: 0,
     rating: 4.5,
-    reviews: 132
+    reviews: createReviewsArray(132)
   });
   
   products.push({
@@ -329,7 +330,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/67a3f208-e588-471a-88d1-c0db17913854.png",
     quantity: 0,
     rating: 4.4,
-    reviews: 118
+    reviews: createReviewsArray(118)
   });
   
   products.push({
@@ -342,7 +343,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/0140d4cf-1335-41c7-9dbd-d5c2fc67a2f8.png",
     quantity: 0,
     rating: 4.3,
-    reviews: 98
+    reviews: createReviewsArray(98)
   });
   
   products.push({
@@ -355,7 +356,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/05649a66-79e2-4aa3-b369-2496bac58ad7.png",
     quantity: 0,
     rating: 4.6,
-    reviews: 142
+    reviews: createReviewsArray(142)
   });
   
   // Add representative products for other categories
@@ -369,7 +370,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/2ae5236f-4492-452a-b393-492c225380c1.png",
     quantity: 0,
     rating: 4.7,
-    reviews: 156
+    reviews: createReviewsArray(156)
   });
   
   products.push({
@@ -382,7 +383,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/b43ca66e-4dd7-4f6f-9b2d-f2af3a926756.png",
     quantity: 0,
     rating: 4.8,
-    reviews: 189
+    reviews: createReviewsArray(189)
   });
   
   products.push({
@@ -395,7 +396,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/a964141c-5fe9-49ec-9aa0-6b0bd558181c.png",
     quantity: 0,
     rating: 4.5,
-    reviews: 142
+    reviews: createReviewsArray(142)
   });
   
   products.push({
@@ -408,7 +409,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/99ac0da2-0189-48a9-8115-cbad8e1b079c.png",
     quantity: 0,
     rating: 4.9,
-    reviews: 213
+    reviews: createReviewsArray(213)
   });
   
   products.push({
@@ -421,7 +422,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/aefe184c-a90a-46d3-b244-124b1062a6f0.png",
     quantity: 0,
     rating: 4.7,
-    reviews: 187
+    reviews: createReviewsArray(187)
   });
   
   products.push({
@@ -434,7 +435,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/15fa551c-cf90-4a18-b949-a21c2a6f44d4.png",
     quantity: 0,
     rating: 4.3,
-    reviews: 98
+    reviews: createReviewsArray(98)
   });
   
   products.push({
@@ -447,7 +448,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/f4d18f61-e011-41e1-8945-0862b8e9cb22.png",
     quantity: 0,
     rating: 4.5,
-    reviews: 123
+    reviews: createReviewsArray(123)
   });
   
   products.push({
@@ -460,7 +461,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/e4e5c805-99ee-44b2-bac6-a7549cd85562.png",
     quantity: 0,
     rating: 4.6,
-    reviews: 87
+    reviews: createReviewsArray(87)
   });
   
   products.push({
@@ -473,7 +474,7 @@ export const generateAdditionalProducts = (): Product[] => {
     imageUrl: "/lovable-uploads/83220acc-b41f-488f-996c-70c790349093.png",
     quantity: 0,
     rating: 4.8,
-    reviews: 76
+    reviews: createReviewsArray(76)
   });
   
   // Ensure all generated products have proper reviews format
