@@ -82,3 +82,41 @@ export const calculateProductTotal = (product: Product, discounts: Record<string
   
   return totalPrice * (product.quantity || 1);
 };
+
+// Helper function to ensure game prices are at least $34.99 and fix Call of Duty: Warzone
+export const adjustGamePrices = () => {
+  const MIN_GAME_PRICE = 34.99;
+  const COD_WARZONE_PRICE = 24.99;
+  
+  // Get all products from localStorage or other sources
+  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  let updated = false;
+  
+  const updatedCart = cart.map((product: Product) => {
+    const updatedProduct = { ...product };
+    
+    // Check if it's a game and adjust price if needed
+    if (product.category?.toLowerCase() === 'games' || product.name?.toLowerCase().includes('game')) {
+      if (product.name?.toLowerCase().includes('call of duty: warzone')) {
+        updatedProduct.price = COD_WARZONE_PRICE;
+        updated = true;
+      } else if (product.price < MIN_GAME_PRICE) {
+        updatedProduct.price = MIN_GAME_PRICE;
+        updated = true;
+      }
+    }
+    
+    return updatedProduct;
+  });
+  
+  if (updated) {
+    saveCartToLocalStorage(updatedCart);
+  }
+  
+  return updatedCart;
+};
+
+// Call this function when the app initializes to adjust game prices
+setTimeout(() => {
+  adjustGamePrices();
+}, 100);

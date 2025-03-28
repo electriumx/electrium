@@ -52,6 +52,16 @@ const ProductCard = ({
     
     // Update local stock if prop changes
     setCurrentStock(stock);
+
+    // Check if the product is already in the cart and update the quantity and selected color
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const cartItem = cart.find((item: any) => item.id === id);
+    if (cartItem) {
+      setQuantity(cartItem.quantity || 0);
+      if (cartItem.selectedColor) {
+        setSelectedColor(cartItem.selectedColor);
+      }
+    }
   }, [id, stock]);
   
   const handleAddToCart = () => {
