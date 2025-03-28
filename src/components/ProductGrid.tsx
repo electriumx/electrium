@@ -4,7 +4,6 @@ import { useToast } from '@/hooks/use-toast';
 import ProductDetailModal from './ProductDetailModal';
 import { Heart } from 'lucide-react';
 import { getHeadphoneImage } from '@/utils/productImageUtils';
-
 interface ProductGridProps {
   products: Product[];
   onQuantityChange: (id: number, quantity: number, selectedColor?: string) => void;
@@ -16,7 +15,6 @@ interface ProductGridProps {
   productStocks?: Record<number, number>;
   updateStock?: (id: number, newStock: number) => void;
 }
-
 const ProductGrid = ({
   products,
   onQuantityChange,
@@ -33,11 +31,9 @@ const ProductGrid = ({
   const {
     toast
   } = useToast();
-
   const formatText = (text: string) => {
     return text.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
   };
-
   useEffect(() => {
     const savedWishlist = localStorage.getItem('wishlist');
     if (savedWishlist) {
@@ -55,22 +51,18 @@ const ProductGrid = ({
       }
     }
   }, [products]);
-
   const handleUpdateStock = (id: number, newStock: number) => {
     if (updateStock) {
       updateStock(id, newStock);
     }
   };
-
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);
     setIsDetailModalOpen(true);
   };
-
   const closeModal = () => {
     setIsDetailModalOpen(false);
   };
-
   const toggleWishlist = (e: React.MouseEvent, product: Product) => {
     e.stopPropagation();
     const existingWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
@@ -105,7 +97,6 @@ const ProductGrid = ({
       });
     }
   };
-
   const getProductPrice = (product: Product) => {
     let price = product.price;
     const brandDiscount = discounts[product.brand];
@@ -119,7 +110,6 @@ const ProductGrid = ({
     }
     return price < product.price ? price : price;
   };
-
   const getDiscountPercentage = (product: Product) => {
     if (product.discount && product.discount > 0) {
       return product.discount;
@@ -132,7 +122,6 @@ const ProductGrid = ({
     }
     return 0;
   };
-
   const handleDetailQuantityChange = (id: number, quantity: number, selectedColor?: string) => {
     onQuantityChange(id, quantity, selectedColor);
     const product = products.find(p => p.id === id);
@@ -146,7 +135,6 @@ const ProductGrid = ({
       }
     }
   };
-
   return <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {products.map(product => {
       const discountPercentage = getDiscountPercentage(product);
@@ -154,23 +142,39 @@ const ProductGrid = ({
       const isInWishlist = wishlist[product.id] || false;
       const stock = productStocks[product.id] || 0;
       const finalPrice = getProductPrice(product);
-      let imageUrl = product.imageUrl || product.image;
+      let imageUrl = product.imageUrl;
 
+      // Use the provided images for specific product types
+      // Battlefield games - first image
       if (product.name.toLowerCase().includes('battlefield')) {
         imageUrl = '/lovable-uploads/ab3d21b8-041b-4137-865c-22fe07795d75.png';
-      } else if (product.brand.toLowerCase() === 'google' && product.name.toLowerCase().includes('chromebook')) {
+      }
+      // Chromebooks - second image
+      else if (product.brand.toLowerCase() === 'google' && product.name.toLowerCase().includes('chromebook')) {
         imageUrl = '/lovable-uploads/81f5b72a-7846-4240-b8e3-bd6e636a2128.png';
-      } else if (product.brand.toLowerCase() === 'nintendo' || product.name.toLowerCase().includes('nintendo') || product.name.toLowerCase().includes('switch')) {
+      }
+      // Nintendo products
+      else if (product.brand.toLowerCase() === 'nintendo' || product.name.toLowerCase().includes('nintendo') || product.name.toLowerCase().includes('switch')) {
         imageUrl = '/lovable-uploads/54b67814-dd27-4a46-ac69-4beaf7bd7851.png';
-      } else if (product.brand.toLowerCase() === 'xiaomi' && product.category.toLowerCase() === 'smartphones') {
+      }
+      // Xiaomi phones - third image
+      else if (product.brand.toLowerCase() === 'xiaomi' && product.category.toLowerCase() === 'smartphones') {
         imageUrl = '/lovable-uploads/19334ecf-42e6-4db9-8443-15db93e88166.png';
-      } else if (product.name.toLowerCase().includes('speaker') || product.category.toLowerCase().includes('speaker')) {
+      }
+      // Speakers - fourth image
+      else if (product.name.toLowerCase().includes('speaker') || product.category.toLowerCase().includes('speaker')) {
         imageUrl = '/lovable-uploads/4d754bb4-c77a-436a-8470-ef066e888a5d.png';
-      } else if (product.name.toLowerCase().includes('microphone') || product.category.toLowerCase().includes('microphone')) {
+      }
+      // Microphones - fifth image
+      else if (product.name.toLowerCase().includes('microphone') || product.category.toLowerCase().includes('microphone')) {
         imageUrl = '/lovable-uploads/55a7c5a8-4ffa-4448-8ada-7591813f3755.png';
-      } else if (product.name.toLowerCase().includes('quietcomfort') && product.brand.toLowerCase() === 'bose') {
+      }
+      // Check for QuietComfort products
+      else if (product.name.toLowerCase().includes('quietcomfort') && product.brand.toLowerCase() === 'bose') {
         imageUrl = '/lovable-uploads/7be48add-b36a-4617-8856-47352e844bae.png';
-      } else if (product.name.toLowerCase().includes('death stranding')) {
+      }
+      // Handle other product images
+      else if (product.name.toLowerCase().includes('death stranding')) {
         imageUrl = '/lovable-uploads/e61d09d1-fb3f-4e38-aaca-2342513b89de.png';
       } else if (product.name.toLowerCase().includes('elden ring')) {
         imageUrl = 'https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg';
@@ -207,7 +211,6 @@ const ProductGrid = ({
       } else if (product.brand === 'Panasonic' && product.category === 'Microwaves') {
         imageUrl = '/lovable-uploads/05649a66-79e2-4aa3-b369-2496bac58ad7.png';
       }
-
       return <div key={product.id} onClick={() => handleProductClick(product)} className="bg-card rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow">
             <div className="relative">
               <img src={imageUrl} alt={product.name} className="product-image w-full h-48 object-contain" />
@@ -257,5 +260,4 @@ const ProductGrid = ({
         </div>}
     </div>;
 };
-
 export default ProductGrid;
