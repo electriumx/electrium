@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -6,30 +7,30 @@ import { useAuth } from "@/contexts/AuthContext";
 import { users } from "@/data/users";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { translateText } from "@/utils/translation";
+
 const Settings = () => {
-  const {
-    toast
-  } = useToast();
-  const {
-    currentUser,
-    logout,
-    isAuthenticated
-  } = useAuth();
+  const { toast } = useToast();
+  const { currentUser, logout, isAuthenticated } = useAuth();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [currentLanguage, setCurrentLanguage] = useState("english");
+  
   useEffect(() => {
     const savedLanguage = localStorage.getItem('preferredLanguage');
     if (savedLanguage) {
       setCurrentLanguage(savedLanguage);
     }
+    
     const handleLanguageChange = (e: CustomEvent) => {
       setCurrentLanguage(e.detail);
     };
+    
     window.addEventListener('languageChange', handleLanguageChange as EventListener);
+    
     return () => window.removeEventListener('languageChange', handleLanguageChange as EventListener);
   }, []);
+  
   if (!isAuthenticated) {
     return <div className="container mx-auto px-4 py-8 min-h-screen">
         <h1 className="text-4xl font-bold mb-8 text-center">
@@ -37,6 +38,7 @@ const Settings = () => {
         </h1>
       </div>;
   }
+  
   const handlePasswordChange = () => {
     // Verify current password
     const user = users.find(u => u.username === currentUser?.username);
@@ -79,6 +81,7 @@ const Settings = () => {
     setNewPassword("");
     setConfirmPassword("");
   };
+  
   return <div className="container mx-auto px-4 py-8 min-h-screen transition-colors duration-300">
       <h1 className="text-4xl font-bold mb-8">{translateText("settings_title", currentLanguage)}</h1>
       
@@ -99,7 +102,13 @@ const Settings = () => {
         </div>
 
         {/* Language Selection */}
-        
+        <div className="bg-card p-6 rounded-lg shadow-lg">
+          <h2 className="text-xl font-semibold mb-4">{translateText("language_settings", currentLanguage)}</h2>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">{translateText("select_language", currentLanguage)}</label>
+            <LanguageSwitcher />
+          </div>
+        </div>
 
         {/* Password Change */}
         <div className="bg-card p-6 rounded-lg shadow-lg">
@@ -132,4 +141,5 @@ const Settings = () => {
       </div>
     </div>;
 };
+
 export default Settings;
