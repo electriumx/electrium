@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -8,7 +8,6 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { Star, StarHalf } from 'lucide-react';
 
 interface ProductReviewModalProps {
   productId: number;
@@ -34,11 +33,11 @@ const ProductReviewModal = ({
   const { toast } = useToast();
 
   // Pre-fill name if user is authenticated
-  useEffect(() => {
+  useState(() => {
     if (currentUser?.displayName) {
       setName(currentUser.displayName);
     }
-  }, [currentUser]);
+  });
 
   const handleSubmit = () => {
     // Check if user is authenticated
@@ -69,102 +68,6 @@ const ProductReviewModal = ({
     }
   };
 
-  // Function to handle precise decimal star ratings
-  const handleStarClick = (index: number, half: boolean = false) => {
-    const newRating = half ? index + 0.5 : index + 1;
-    setRating(newRating);
-  };
-
-  // Render stars based on current rating
-  const renderStars = () => {
-    const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
-
-    for (let i = 0; i < 5; i++) {
-      if (i < fullStars) {
-        // Full star
-        stars.push(
-          <div key={`star-${i}`} className="flex items-center">
-            <button
-              type="button"
-              onClick={() => handleStarClick(i, false)}
-              className="focus:outline-none mr-1"
-            >
-              <Star 
-                fill="gold" 
-                className="text-yellow-500 w-8 h-8 hover:scale-110 transition-transform"
-              />
-            </button>
-            <button
-              type="button"
-              onClick={() => handleStarClick(i, true)}
-              className="focus:outline-none -ml-4"
-            >
-              <StarHalf 
-                fill="gold" 
-                className="text-yellow-500 w-8 h-8 hover:scale-110 transition-transform"
-              />
-            </button>
-          </div>
-        );
-      } else if (i === fullStars && hasHalfStar) {
-        // Half star
-        stars.push(
-          <div key={`star-${i}`} className="flex items-center">
-            <button
-              type="button"
-              onClick={() => handleStarClick(i, false)}
-              className="focus:outline-none mr-1"
-            >
-              <Star 
-                fill="none" 
-                className="text-yellow-500 w-8 h-8 hover:scale-110 transition-transform"
-              />
-            </button>
-            <button
-              type="button"
-              onClick={() => handleStarClick(i, true)}
-              className="focus:outline-none -ml-4"
-            >
-              <StarHalf 
-                fill="gold" 
-                className="text-yellow-500 w-8 h-8 hover:scale-110 transition-transform"
-              />
-            </button>
-          </div>
-        );
-      } else {
-        // Empty star
-        stars.push(
-          <div key={`star-${i}`} className="flex items-center">
-            <button
-              type="button"
-              onClick={() => handleStarClick(i, false)}
-              className="focus:outline-none mr-1"
-            >
-              <Star 
-                fill="none" 
-                className="text-yellow-500 w-8 h-8 hover:scale-110 transition-transform"
-              />
-            </button>
-            <button
-              type="button"
-              onClick={() => handleStarClick(i, true)}
-              className="focus:outline-none -ml-4"
-            >
-              <StarHalf 
-                className="text-yellow-500 w-8 h-8 hover:scale-110 transition-transform"
-                fill="none"
-              />
-            </button>
-          </div>
-        );
-      }
-    }
-    return stars;
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md">
@@ -185,9 +88,31 @@ const ProductReviewModal = ({
           </div>
           
           <div className="space-y-2">
-            <Label>Rating: {rating.toFixed(1)} stars</Label>
-            <div className="flex gap-1 justify-center">
-              {renderStars()}
+            <Label>Rating</Label>
+            <div className="flex gap-1">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  onClick={() => setRating(star)}
+                  className="focus:outline-none"
+                >
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    width="24" 
+                    height="24" 
+                    viewBox="0 0 24 24" 
+                    fill={star <= rating ? "gold" : "none"} 
+                    stroke="currentColor" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                    className="text-yellow-500 hover:scale-110 transition-transform"
+                  >
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                  </svg>
+                </button>
+              ))}
             </div>
           </div>
           
