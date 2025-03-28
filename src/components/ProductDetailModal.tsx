@@ -1,10 +1,10 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState, useEffect } from "react";
-import { Plus, Check } from "lucide-react";
+import { Plus, Check, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Product as ProductType, ProductAccessory } from '../data/productData';
+import ProductReviewModal from "./ProductReviewModal";
 
 interface ProductDetailModalProps {
   product: ProductType;
@@ -109,12 +109,41 @@ const accessories: Accessory[] = [
 ];
 
 const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discount = 0, reviews = [], stock = 0 }: ProductDetailModalProps) => {
-  const { id, name, price, imageUrl, brand } = product;
+  const { id, name, price, imageUrl, brand, category } = product;
   const discountedPrice = discount > 0 ? price * (1 - discount / 100) : price;
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedAccessories, setSelectedAccessories] = useState<Accessory[]>([]);
   const [quantity, setQuantity] = useState(1);
   const [totalPrice, setTotalPrice] = useState(discountedPrice);
+  const [selectedColor, setSelectedColor] = useState("Blue");
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  
+  const getAvailableColors = () => {
+    const defaultColors = ["Blue", "White", "Black"];
+    
+    if (category === "Smartphones" || brand === "Apple" || brand === "Samsung" || category === "Tablets") {
+      return ["Blue", "White", "Black", "Silver", "Gold", "Red", "Green", "Purple", "Titanium"];
+    } else if (category === "Laptops") {
+      return ["Silver", "Space Gray", "Black", "White", "Blue"];
+    } else if (category === "Gaming Consoles") {
+      return ["Black", "White", "Red", "Blue"];
+    } else if (category.includes("Headphones") || category === "Audio") {
+      return ["Black", "White", "Silver", "Blue", "Red", "Green"];
+    }
+    
+    return defaultColors;
+  };
+  
+  const availableColors = getAvailableColors();
+  
+  const showColorSelection = category === "Smartphones" || 
+                             category === "Tablets" || 
+                             category === "Laptops" || 
+                             brand === "Apple" ||
+                             brand === "Samsung" ||
+                             category === "Gaming Consoles" ||
+                             category.includes("Headphones") ||
+                             category === "Audio";
   
   useEffect(() => {
     if (isOpen) {
@@ -136,14 +165,18 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
       } else {
         setSelectedAccessories([]);
       }
+      
+      if (product.selectedColor) {
+        setSelectedColor(product.selectedColor);
+      } else {
+        setSelectedColor(availableColors[0]);
+      }
     }
   }, [isOpen, product]);
   
-  // Calculate total price whenever selected accessories change
   useEffect(() => {
     let total = discount > 0 ? discountedPrice : price;
     
-    // Add price of all selected accessories
     const accessoriesTotal = selectedAccessories.reduce((sum, acc) => sum + acc.price, 0);
     total += accessoriesTotal;
     
@@ -213,6 +246,7 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
     const productToAdd = {
       ...product,
       quantity: quantity,
+      selectedColor: selectedColor,
       accessories: selectedAccessories.map(acc => ({
         id: String(acc.id),
         name: acc.name,
@@ -226,211 +260,281 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
     onQuantityChange(id, quantity);
     onClose();
   };
+  
+  const handleColorSelect = (color: string) => {
+    setSelectedColor(color);
+  };
+  
+  const handleOpenReviewModal = () => {
+    setReviewModalOpen(true);
+  };
+  
+  const handleReviewSubmit = (name: string, rating: number, comment: string) => {
+    setReviewModalOpen(false);
+    // In a real application, this would send the review to the server
+    toast({
+      title: "Review Submitted",
+      description: "Thank you for your feedback!",
+    });
+  };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[650px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{name}</DialogTitle>
-          <DialogDescription>
-            Detailed information about {name} by {brand}
-          </DialogDescription>
-        </DialogHeader>
-        
-        <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="mt-4">
-          <TabsList className="grid grid-cols-4 mb-4">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="specs">Specifications</TabsTrigger>
-            <TabsTrigger value="accessories">Accessories</TabsTrigger>
-            <TabsTrigger value="reviews">Reviews ({reviews.length})</TabsTrigger>
-          </TabsList>
+    <>
+      <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+        <DialogContent className="sm:max-w-[650px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{name}</DialogTitle>
+            <DialogDescription>
+              Detailed information about {name} by {brand}
+            </DialogDescription>
+          </DialogHeader>
           
-          <TabsContent value="overview" className="space-y-4">
-            <div 
-              className="rounded-lg overflow-hidden cursor-zoom-in"
-              onClick={handleImageClick}
-            >
-              <img 
-                src={imageUrl} 
-                alt={name} 
-                className="w-full h-auto object-cover"
-              />
-            </div>
+          <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="mt-4">
+            <TabsList className="grid grid-cols-4 mb-4">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="specs">Specifications</TabsTrigger>
+              <TabsTrigger value="accessories">Accessories</TabsTrigger>
+              <TabsTrigger value="reviews">Reviews ({reviews.length})</TabsTrigger>
+            </TabsList>
             
-            <div>
-              <p className="text-lg font-semibold">
-                {discount > 0 ? (
-                  <>
-                    <span className="line-through text-muted-foreground mr-2">${price.toFixed(2)}</span>
-                    <span className="text-destructive">${discountedPrice.toFixed(2)}</span>
-                    <span className="ml-2 text-xs bg-destructive text-white px-2 py-1 rounded-full">
-                      {discount}% OFF
-                    </span>
-                  </>
-                ) : (
-                  <span>${price.toFixed(2)}</span>
-                )}
-              </p>
-              {selectedAccessories.length > 0 && (
-                <p className="text-sm mt-1">
-                  With accessories: <span className="font-semibold">${totalPrice.toFixed(2)}</span>
-                </p>
-              )}
-              <p className="text-muted-foreground">Brand: {brand}</p>
-              <p className="mt-4">
-                {name} is a premium device from {brand}, designed for optimal performance and user experience.
-                Click on the Specifications tab to see detailed technical information.
-              </p>
-              
-              <p className="mt-2 text-sm text-muted-foreground">
-                In Stock: {stock}
-              </p>
-              
-              <div className="mt-6 flex items-center justify-between">
-                <div className="flex items-center">
-                  <button 
-                    onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
-                    className="px-3 py-1 bg-secondary rounded-l-md border-r border-border"
-                  >
-                    -
-                  </button>
-                  <span className="px-4 py-1 bg-secondary">{quantity}</span>
-                  <button 
-                    onClick={() => setQuantity(prev => prev + 1)}
-                    className="px-3 py-1 bg-secondary rounded-r-md border-l border-border"
-                  >
-                    +
-                  </button>
-                </div>
-                
-                <Button onClick={handleAddToCart} className="ml-4">
-                  Add to Cart
-                </Button>
+            <TabsContent value="overview" className="space-y-4">
+              <div 
+                className="rounded-lg overflow-hidden cursor-zoom-in"
+                onClick={handleImageClick}
+              >
+                <img 
+                  src={imageUrl} 
+                  alt={name} 
+                  className="w-full h-auto object-cover"
+                />
               </div>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="specs">
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium">Technical Specifications</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Object.entries(specs).map(([key, value]) => (
-                  <div key={key} className="flex justify-between py-2 border-b">
-                    <span className="font-medium">{key.charAt(0).toUpperCase() + key.slice(1)}</span>
-                    <span>{value}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="accessories" className="space-y-4">
-            <h3 className="text-lg font-medium">Compatible Accessories</h3>
-            {compatibleAccessories.length === 0 ? (
-              <p className="text-muted-foreground">No compatible accessories found for this product.</p>
-            ) : (
+              
               <div>
-                {Object.entries(accessoryCategories).map(([category, items]) => 
-                  items.length > 0 && (
-                    <div key={category} className="mb-6">
-                      <h4 className="font-medium text-sm uppercase text-muted-foreground mb-2">{category}</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {items.map((accessory) => {
-                          const isSelected = selectedAccessories.some(a => a.id === accessory.id);
-                          return (
-                            <div 
-                              key={accessory.id} 
-                              className={`border rounded-lg p-3 cursor-pointer transition-all ${
-                                isSelected ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/50'
-                              }`}
-                              onClick={() => handleToggleAccessory(accessory)}
-                            >
-                              <div className="flex justify-between items-start">
-                                <div className="flex-1">
-                                  <h4 className="font-medium">{accessory.name}</h4>
-                                  <p className="text-sm text-muted-foreground">${accessory.price.toFixed(2)}</p>
-                                </div>
-                                <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                                  isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted'
-                                }`}>
-                                  {isSelected ? <Check size={14} /> : <Plus size={14} />}
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )
-                )}
-                
+                <p className="text-lg font-semibold">
+                  {discount > 0 ? (
+                    <>
+                      <span className="line-through text-muted-foreground mr-2">${price.toFixed(2)}</span>
+                      <span className="text-destructive">${discountedPrice.toFixed(2)}</span>
+                      <span className="ml-2 text-xs bg-destructive text-white px-2 py-1 rounded-full">
+                        {discount}% OFF
+                      </span>
+                    </>
+                  ) : (
+                    <span>${price.toFixed(2)}</span>
+                  )}
+                </p>
                 {selectedAccessories.length > 0 && (
-                  <div className="bg-card rounded-lg p-4 mt-4 border border-border">
-                    <h4 className="font-medium mb-2">Selected Accessories</h4>
-                    <div className="flex justify-between items-center mb-2">
-                      <p className="text-sm">Base price:</p>
-                      <p className="text-sm">${(discount > 0 ? discountedPrice : price).toFixed(2)}</p>
-                    </div>
-                    <ul className="space-y-2 mb-2">
-                      {selectedAccessories.map(accessory => (
-                        <li key={accessory.id} className="flex justify-between text-sm">
-                          <span>{accessory.name}</span>
-                          <span>${accessory.price.toFixed(2)}</span>
-                        </li>
+                  <p className="text-sm mt-1">
+                    With accessories: <span className="font-semibold">${totalPrice.toFixed(2)}</span>
+                  </p>
+                )}
+                <p className="text-muted-foreground">Brand: {brand}</p>
+                <p className="mt-4">
+                  {name} is a premium device from {brand}, designed for optimal performance and user experience.
+                  Click on the Specifications tab to see detailed technical information.
+                </p>
+                
+                {showColorSelection && (
+                  <div className="mt-4">
+                    <p className="font-medium mb-2">Available Colors:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {availableColors.map(color => (
+                        <button
+                          key={color}
+                          onClick={() => handleColorSelect(color)}
+                          className={`w-8 h-8 rounded-full border-2 transition-all ${
+                            selectedColor === color ? 'border-primary ring-2 ring-primary/30' : 'border-gray-300'
+                          }`}
+                          style={{ 
+                            backgroundColor: 
+                              color.toLowerCase() === 'blue' ? '#1e90ff' : 
+                              color.toLowerCase() === 'white' ? '#ffffff' :
+                              color.toLowerCase() === 'black' ? '#000000' :
+                              color.toLowerCase() === 'silver' ? '#c0c0c0' :
+                              color.toLowerCase() === 'gold' ? '#ffd700' :
+                              color.toLowerCase() === 'red' ? '#ff0000' :
+                              color.toLowerCase() === 'green' ? '#008000' :
+                              color.toLowerCase() === 'purple' ? '#800080' :
+                              color.toLowerCase() === 'space gray' ? '#88898b' :
+                              color.toLowerCase() === 'titanium' ? '#878681' : '#cccccc',
+                          }}
+                          title={color}
+                        />
                       ))}
-                    </ul>
-                    <div className="flex justify-between items-center pt-2 border-t">
-                      <p className="font-medium">Total price:</p>
-                      <p className="font-medium">${totalPrice.toFixed(2)}</p>
                     </div>
+                    <p className="text-sm text-muted-foreground mt-1">Selected: {selectedColor}</p>
                   </div>
                 )}
+                
+                <p className="mt-2 text-sm text-muted-foreground">
+                  In Stock: {stock}
+                </p>
+                
+                <div className="mt-6 flex items-center justify-between">
+                  <div className="flex items-center">
+                    <button 
+                      onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
+                      className="px-3 py-1 bg-secondary rounded-l-md border-r border-border"
+                    >
+                      -
+                    </button>
+                    <span className="px-4 py-1 bg-secondary">{quantity}</span>
+                    <button 
+                      onClick={() => setQuantity(prev => prev + 1)}
+                      className="px-3 py-1 bg-secondary rounded-r-md border-l border-border"
+                    >
+                      +
+                    </button>
+                  </div>
+                  
+                  <Button onClick={handleAddToCart} className="ml-4">
+                    Add to Cart
+                  </Button>
+                </div>
               </div>
-            )}
-          </TabsContent>
-          
-          <TabsContent value="reviews">
-            <div>
-              <h3 className="text-lg font-medium mb-3">Customer Reviews ({reviews.length})</h3>
-              
-              {reviews.length === 0 ? (
-                <p className="text-muted-foreground">No reviews yet. Be the first to review this product!</p>
-              ) : (
-                <div className="space-y-4">
-                  {reviews.map((review, index) => (
-                    <div key={index} className="border-b pb-3 last:border-0">
-                      <div className="flex justify-between items-center mb-1">
-                        <p className="font-medium">{review.name}</p>
-                        <div className="flex">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <svg 
-                              key={star}
-                              xmlns="http://www.w3.org/2000/svg" 
-                              width="14" 
-                              height="14" 
-                              viewBox="0 0 24 24" 
-                              fill={star <= review.rating ? "gold" : "none"} 
-                              stroke="currentColor" 
-                              strokeWidth="2" 
-                              strokeLinecap="round" 
-                              strokeLinejoin="round"
-                              className="text-yellow-500"
-                            >
-                              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                            </svg>
-                          ))}
-                        </div>
-                      </div>
-                      <p className="text-sm">{review.comment}</p>
+            </TabsContent>
+            
+            <TabsContent value="specs">
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Technical Specifications</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {Object.entries(specs).map(([key, value]) => (
+                    <div key={key} className="flex justify-between py-2 border-b">
+                      <span className="font-medium">{key.charAt(0).toUpperCase() + key.slice(1)}</span>
+                      <span>{value}</span>
                     </div>
                   ))}
                 </div>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="accessories" className="space-y-4">
+              <h3 className="text-lg font-medium">Compatible Accessories</h3>
+              {compatibleAccessories.length === 0 ? (
+                <p className="text-muted-foreground">No compatible accessories found for this product.</p>
+              ) : (
+                <div>
+                  {Object.entries(accessoryCategories).map(([category, items]) => 
+                    items.length > 0 && (
+                      <div key={category} className="mb-6">
+                        <h4 className="font-medium text-sm uppercase text-muted-foreground mb-2">{category}</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {items.map((accessory) => {
+                            const isSelected = selectedAccessories.some(a => a.id === accessory.id);
+                            return (
+                              <div 
+                                key={accessory.id} 
+                                className={`border rounded-lg p-3 cursor-pointer transition-all ${
+                                  isSelected ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/50'
+                                }`}
+                                onClick={() => handleToggleAccessory(accessory)}
+                              >
+                                <div className="flex justify-between items-start">
+                                  <div className="flex-1">
+                                    <h4 className="font-medium">{accessory.name}</h4>
+                                    <p className="text-sm text-muted-foreground">${accessory.price.toFixed(2)}</p>
+                                  </div>
+                                  <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                                    isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                                  }`}>
+                                    {isSelected ? <Check size={14} /> : <Plus size={14} />}
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )
+                  )}
+                  
+                  {selectedAccessories.length > 0 && (
+                    <div className="bg-card rounded-lg p-4 mt-4 border border-border">
+                      <h4 className="font-medium mb-2">Selected Accessories</h4>
+                      <div className="flex justify-between items-center mb-2">
+                        <p className="text-sm">Base price:</p>
+                        <p className="text-sm">${(discount > 0 ? discountedPrice : price).toFixed(2)}</p>
+                      </div>
+                      <ul className="space-y-2 mb-2">
+                        {selectedAccessories.map(accessory => (
+                          <li key={accessory.id} className="flex justify-between text-sm">
+                            <span>{accessory.name}</span>
+                            <span>${accessory.price.toFixed(2)}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="flex justify-between items-center pt-2 border-t">
+                        <p className="font-medium">Total price:</p>
+                        <p className="font-medium">${totalPrice.toFixed(2)}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
-            </div>
-          </TabsContent>
-        </Tabs>
-      </DialogContent>
-    </Dialog>
+            </TabsContent>
+            
+            <TabsContent value="reviews">
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="text-lg font-medium">Customer Reviews ({reviews.length})</h3>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="flex items-center"
+                    onClick={handleOpenReviewModal}
+                  >
+                    <MessageSquare className="mr-2 h-4 w-4" />
+                    Write a Review
+                  </Button>
+                </div>
+                
+                {reviews.length === 0 ? (
+                  <p className="text-muted-foreground">No reviews yet. Be the first to review this product!</p>
+                ) : (
+                  <div className="space-y-4">
+                    {reviews.map((review, index) => (
+                      <div key={index} className="border-b pb-3 last:border-0">
+                        <div className="flex justify-between items-center mb-1">
+                          <p className="font-medium">{review.name}</p>
+                          <div className="flex">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <svg 
+                                key={star}
+                                xmlns="http://www.w3.org/2000/svg" 
+                                width="14" 
+                                height="14" 
+                                viewBox="0 0 24 24" 
+                                fill={star <= review.rating ? "gold" : "none"} 
+                                stroke="currentColor" 
+                                strokeWidth="2" 
+                                strokeLinecap="round" 
+                                strokeLinejoin="round"
+                                className="text-yellow-500"
+                              >
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                              </svg>
+                            ))}
+                          </div>
+                        </div>
+                        <p className="text-sm">{review.comment}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
+        </DialogContent>
+      </Dialog>
+      
+      <ProductReviewModal
+        productId={id}
+        productName={name}
+        isOpen={reviewModalOpen}
+        onClose={() => setReviewModalOpen(false)}
+        onSubmit={handleReviewSubmit}
+      />
+    </>
   );
 };
 

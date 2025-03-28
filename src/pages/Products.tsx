@@ -8,7 +8,7 @@ import FloatingActions from '../components/FloatingActions';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Product } from '../data/productData';
 import { useProducts } from '../hooks/use-products';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 import { translateText } from '@/utils/translation';
 
 const Products = () => {
@@ -183,6 +183,17 @@ const Products = () => {
     setSearchQuery(query);
   };
 
+  const handleClearFilters = () => {
+    setSelectedBrands([]);
+    setSelectedSubcategories([]);
+    setPriceRange([0, maxPrice]);
+    setSearchQuery('');
+    
+    toast({
+      description: "All filters have been cleared",
+    });
+  };
+
   const handleQuantityChange = (id: number, quantity: number, selectedColor?: string) => {
     const updatedCart = [...cart];
     const existingItemIndex = updatedCart.findIndex(item => 
@@ -336,6 +347,7 @@ const Products = () => {
             maxPrice={maxPrice} 
             onSearch={handleSearch}
             onSubCategoryChange={handleSubCategoryChange}
+            onClearFilters={handleClearFilters}
           />
         </div>
         

@@ -2,7 +2,8 @@
 import { useState, useEffect } from 'react';
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
-import { Search, ChevronDown, ChevronUp } from "lucide-react";
+import { Search, ChevronDown, ChevronUp, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface SubCategory {
   name: string;
@@ -17,6 +18,7 @@ interface ProductFiltersProps {
   maxPrice: number;
   onSearch: (query: string) => void;
   onSubCategoryChange?: (subcategories: string[]) => void;
+  onClearFilters?: () => void;
 }
 
 const ProductFilters = ({
@@ -26,7 +28,8 @@ const ProductFilters = ({
   onPriceRangeChange,
   maxPrice,
   onSearch,
-  onSubCategoryChange
+  onSubCategoryChange,
+  onClearFilters
 }: ProductFiltersProps) => {
   const brands = ["Apple", "Samsung", "Sony", "Google", "Microsoft", "Xiaomi", "Audio", "PlayStation", "PC Games", "LG", "Whirlpool", "Dyson", "Bosch", "Panasonic"];
   const accessories = ["Headphones", "Cases", "Chargers", "Screen Protectors", "Cables", "Memory Cards", "Warranties", "Installation Kits"];
@@ -52,10 +55,22 @@ const ProductFilters = ({
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
   const [maxPriceValue, setMaxPriceValue] = useState(maxPrice);
+  const [hasActiveFilters, setHasActiveFilters] = useState(false);
 
   useEffect(() => {
     setMaxPriceValue(maxPrice);
   }, [maxPrice]);
+
+  useEffect(() => {
+    // Check if any filters are active
+    const filtersActive = selectedBrands.length > 0 || 
+                          selectedSubcategories.length > 0 || 
+                          priceRange[0] > 0 || 
+                          priceRange[1] < maxPrice ||
+                          searchQuery.trim() !== '';
+    
+    setHasActiveFilters(filtersActive);
+  }, [selectedBrands, selectedSubcategories, priceRange, maxPrice, searchQuery]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,6 +103,14 @@ const ProductFilters = ({
     if (onSubCategoryChange) {
       onSubCategoryChange(newSelectedSubcategories);
     }
+  };
+
+  const handleClearFilters = () => {
+    if (onClearFilters) {
+      onClearFilters();
+    }
+    setSearchQuery('');
+    setSelectedSubcategories([]);
   };
 
   // Function to capitalize first letter of each word and remove underscores
@@ -173,7 +196,20 @@ const ProductFilters = ({
       </div>
 
       <div className="p-4 rounded-lg bg-card shadow-md">
-        <h3 className="text-lg font-semibold mb-4 text-foreground">Brands</h3>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold text-foreground">Brands</h3>
+          {hasActiveFilters && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleClearFilters}
+              className="flex items-center"
+            >
+              <X size={14} className="mr-1" />
+              Clear Filters
+            </Button>
+          )}
+        </div>
         <div className="flex flex-wrap gap-2">
           {brands.map(brand => (
             <button 
