@@ -39,3 +39,15 @@ export const ensureAccessoriesFormat = (products: Product[]): Product[] => {
     return product;
   });
 };
+
+// Check if a product should have a discount based on the SpinWheel
+export const shouldApplyDiscount = (productId: number): boolean => {
+  // Products to be shown under the wheel - can be customized as needed
+  const wheelProductIds = [1, 2, 4, 10, 17, 19];
+  return wheelProductIds.includes(productId);
+}
+
+// Get discount expiration time - 34 hours instead of 48
+export const getDiscountExpirationTime = (): number => {
+  return 34 * 60 * 60 * 1000; // 34 hours in milliseconds
+}

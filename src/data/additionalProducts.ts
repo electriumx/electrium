@@ -1,4 +1,3 @@
-
 import { Product } from './productData';
 import { getCategoryImage, getGameImage } from '../utils/productImageUtils';
 
