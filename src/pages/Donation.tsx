@@ -6,9 +6,8 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
-import { Heart, CreditCard } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { useGlobalDonation } from '@/hooks/use-global-donation';
-import { formatCardNumber, formatExpiryDate, formatCVV } from '@/utils/cardFormatting';
 
 const Donation = () => {
   const { toast } = useToast();
@@ -34,17 +33,11 @@ const Donation = () => {
   const handleAmountSelect = (value: number) => {
     // Ensure amount doesn't exceed the per-transaction limit
     setAmount(Math.min(value, DONATION_LIMIT));
-    
-    // Show card form for all donations
-    setShowCardForm(true);
   };
   
   const handleSliderChange = (values: number[]) => {
     // Ensure amount doesn't exceed the per-transaction limit
     setAmount(Math.min(values[0], DONATION_LIMIT));
-    
-    // Show card form for all donations
-    setShowCardForm(true);
   };
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,9 +45,6 @@ const Donation = () => {
     if (!isNaN(value) && value >= 0) {
       // Ensure amount doesn't exceed the per-transaction limit
       setAmount(Math.min(value, DONATION_LIMIT));
-      
-      // Show card form for all donations
-      setShowCardForm(true);
     }
   };
   
@@ -67,13 +57,25 @@ const Donation = () => {
       return;
     }
 
-    // Always require card details for donations
-    if (!cardName || !cardNumber || !cardExpiry || !cardCvv) {
+    // Check if card details are required for large donations
+    if (amount > 100 && !cardName && !showCardForm) {
+      setShowCardForm(true);
       toast({
-        title: "Missing card information",
-        description: "Please fill in all card details to complete your donation."
+        title: "Card details required",
+        description: "Please enter your card details for donations over $100."
       });
       return;
+    }
+
+    // If card form is shown, validate card details
+    if (showCardForm) {
+      if (!cardName || !cardNumber || !cardExpiry || !cardCvv) {
+        toast({
+          title: "Missing card information",
+          description: "Please fill in all card details to complete your donation."
+        });
+        return;
+      }
     }
     
     const newTotal = addDonation(amount);
@@ -87,22 +89,13 @@ const Donation = () => {
     setCooldown(10);
     
     // Reset form after donation
-    setCardName('');
-    setCardNumber('');
-    setCardExpiry('');
-    setCvv('');
-  };
-
-  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCardNumber(formatCardNumber(e.target.value));
-  };
-
-  const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCardExpiry(formatExpiryDate(e.target.value));
-  };
-
-  const handleCvvChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCvv(formatCVV(e.target.value));
+    if (showCardForm) {
+      setCardName('');
+      setCardNumber('');
+      setCardExpiry('');
+      setCvv('');
+      setShowCardForm(false);
+    }
   };
   
   return (
@@ -176,61 +169,65 @@ const Donation = () => {
             />
           </div>
 
-          <div className="space-y-4 border border-border rounded-lg p-4">
-            <div className="flex items-center gap-2">
-              <CreditCard className="h-5 w-5 text-muted-foreground" />
-              <h3 className="text-lg font-medium">Payment Details</h3>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="cardName">Cardholder Name</Label>
-              <Input
-                id="cardName"
-                value={cardName}
-                onChange={(e) => setCardName(e.target.value)}
-                placeholder="Name on card"
-                required
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="cardNumber">Card Number</Label>
-              <Input
-                id="cardNumber"
-                value={cardNumber}
-                onChange={handleCardNumberChange}
-                placeholder="1234 5678 9012 3456"
-                maxLength={19}
-                required
-              />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
+          {showCardForm && (
+            <div className="space-y-4 border border-border rounded-lg p-4">
+              <h3 className="text-lg font-medium">Card Details</h3>
+              
               <div className="space-y-2">
-                <Label htmlFor="cardExpiry">Expiry Date</Label>
+                <Label htmlFor="cardName">Cardholder Name</Label>
                 <Input
-                  id="cardExpiry"
-                  value={cardExpiry}
-                  onChange={handleExpiryChange}
-                  placeholder="MM/YY"
-                  maxLength={5}
-                  required
+                  id="cardName"
+                  value={cardName}
+                  onChange={(e) => setCardName(e.target.value)}
+                  placeholder="Name on card"
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="cardCvv">CVV</Label>
+                <Label htmlFor="cardNumber">Card Number</Label>
                 <Input
-                  id="cardCvv"
-                  value={cardCvv}
-                  onChange={handleCvvChange}
-                  placeholder="123"
-                  maxLength={3}
-                  required
+                  id="cardNumber"
+                  value={cardNumber}
+                  onChange={(e) => setCardNumber(e.target.value.replace(/\D/g, '').substring(0, 16))}
+                  placeholder="1234 5678 9012 3456"
+                  maxLength={16}
                 />
               </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="cardExpiry">Expiry Date</Label>
+                  <Input
+                    id="cardExpiry"
+                    value={cardExpiry}
+                    onChange={(e) => {
+                      const input = e.target.value.replace(/\D/g, '');
+                      if (input.length <= 4) {
+                        let formatted = input;
+                        if (input.length > 2) {
+                          formatted = input.substring(0, 2) + '/' + input.substring(2);
+                        }
+                        setCardExpiry(formatted);
+                      }
+                    }}
+                    placeholder="MM/YY"
+                    maxLength={5}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="cardCvv">CVV</Label>
+                  <Input
+                    id="cardCvv"
+                    value={cardCvv}
+                    onChange={(e) => setCvv(e.target.value.replace(/\D/g, '').substring(0, 3))}
+                    placeholder="123"
+                    maxLength={3}
+                  />
+                </div>
+              </div>
             </div>
-          </div>
+          )}
           
           <div className="rounded-lg bg-muted p-4">
             <h4 className="font-medium mb-2">How your donation helps:</h4>

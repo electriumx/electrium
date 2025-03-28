@@ -1,8 +1,8 @@
+
 import { useState, useEffect } from 'react';
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
-import { Search, ChevronDown, ChevronUp, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Search, ChevronDown, ChevronUp } from "lucide-react";
 
 interface SubCategory {
   name: string;
@@ -17,7 +17,6 @@ interface ProductFiltersProps {
   maxPrice: number;
   onSearch: (query: string) => void;
   onSubCategoryChange?: (subcategories: string[]) => void;
-  onClearFilters?: () => void;
 }
 
 const ProductFilters = ({
@@ -27,8 +26,7 @@ const ProductFilters = ({
   onPriceRangeChange,
   maxPrice,
   onSearch,
-  onSubCategoryChange,
-  onClearFilters
+  onSubCategoryChange
 }: ProductFiltersProps) => {
   const brands = ["Apple", "Samsung", "Sony", "Google", "Microsoft", "Xiaomi", "Audio", "PlayStation", "PC Games", "LG", "Whirlpool", "Dyson", "Bosch", "Panasonic"];
   const accessories = ["Headphones", "Cases", "Chargers", "Screen Protectors", "Cables", "Memory Cards", "Warranties", "Installation Kits"];
@@ -92,12 +90,7 @@ const ProductFilters = ({
     }
   };
 
-  const handleClearFilters = () => {
-    if (onClearFilters) {
-      onClearFilters();
-    }
-  };
-
+  // Function to capitalize first letter of each word and remove underscores
   const capitalizeWords = (text: string) => {
     return text
       .replace(/_/g, ' ')
@@ -121,17 +114,6 @@ const ProductFilters = ({
             <Search className="h-5 w-5" />
           </button>
         </form>
-        
-        <div className="mt-2 flex justify-end">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleClearFilters}
-            className="flex items-center gap-1 text-xs"
-          >
-            <X size={16} /> Clear Filters
-          </Button>
-        </div>
       </div>
 
       <div className="p-4 rounded-lg bg-card shadow-md">
