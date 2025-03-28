@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { formatCreditCardNumber, formatExpiryDate, formatCVC } from '@/utils/cardFormatting';
+import { formatCardNumber, formatExpiryDate, formatCVV } from '@/utils/cardFormatting';
 
 const Donation = () => {
   const { totalDonations, addDonation, DONATION_LIMIT } = useGlobalDonation();
@@ -41,7 +41,7 @@ const Donation = () => {
   };
   
   const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formattedValue = formatCreditCardNumber(e.target.value);
+    const formattedValue = formatCardNumber(e.target.value);
     setCardNumber(formattedValue);
     if (formattedValue.replace(/\s/g, '').length === 16) {
       setErrors(prev => ({ ...prev, cardNumber: '' }));
@@ -57,7 +57,7 @@ const Donation = () => {
   };
   
   const handleCvcChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formattedValue = formatCVC(e.target.value);
+    const formattedValue = formatCVV(e.target.value);
     setCvc(formattedValue);
     if (formattedValue.length === 3) {
       setErrors(prev => ({ ...prev, cvc: '' }));
