@@ -5,6 +5,7 @@ import { Plus, Check, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Product as ProductType, ProductAccessory } from '../data/productData';
 import ProductReviewModal from "./ProductReviewModal";
+import { useToast } from "@/hooks/use-toast";
 
 interface ProductDetailModalProps {
   product: ProductType;
@@ -117,7 +118,8 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
   const [totalPrice, setTotalPrice] = useState(discountedPrice);
   const [selectedColor, setSelectedColor] = useState("Blue");
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
-  
+  const { toast } = useToast();
+
   const getAvailableColors = () => {
     const defaultColors = ["Blue", "White", "Black"];
     
@@ -271,7 +273,6 @@ const ProductDetailModal = ({ product, isOpen, onClose, onQuantityChange, discou
   
   const handleReviewSubmit = (name: string, rating: number, comment: string) => {
     setReviewModalOpen(false);
-    // In a real application, this would send the review to the server
     toast({
       title: "Review Submitted",
       description: "Thank you for your feedback!",
