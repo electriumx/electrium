@@ -34,36 +34,10 @@ const Admin = () => {
   });
 
   const [categoryDiscounts, setCategoryDiscounts] = useState<Record<string, { value: number, expiresAt: number }>>(() => {
-    const savedDiscounts = localStorage.getItem('adminCategoryDiscounts');
-    if (savedDiscounts) {
-      try {
-        const parsed = JSON.parse(savedDiscounts);
-        if (typeof Object.values(parsed)[0] === 'number') {
-          return productBrands.reduce((acc, brand) => {
-            const value = parsed[brand] || 0;
-            return { 
-              ...acc, 
-              [brand]: { 
-                value, 
-                expiresAt: Date.now() + (48 * 60 * 60 * 1000) 
-              } 
-            };
-          }, {});
-        }
-        return parsed;
-      } catch (e) {
-        console.error('Error parsing discounts:', e);
-        return productBrands.reduce((acc, brand) => ({ 
-          ...acc, 
-          [brand]: { value: 0, expiresAt: Date.now() + (48 * 60 * 60 * 1000) } 
-        }), {});
-      }
-    } else {
-      return productBrands.reduce((acc, brand) => ({ 
-        ...acc, 
-        [brand]: { value: 0, expiresAt: Date.now() + (48 * 60 * 60 * 1000) } 
-      }), {});
-    }
+    return productBrands.reduce((acc, brand) => ({ 
+      ...acc, 
+      [brand]: { value: 0, expiresAt: Date.now() } 
+    }), {});
   });
 
   const [stats, setStats] = useState({

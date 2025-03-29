@@ -107,29 +107,10 @@ const ProductGrid = ({
   };
 
   const getProductPrice = (product: Product) => {
-    let price = product.price;
-    const brandDiscount = discounts[product.brand];
-    const allDiscount = discounts['All'];
-    if (brandDiscount && brandDiscount.expiresAt > Date.now() && brandDiscount.value > 0) {
-      price = price * (1 - brandDiscount.value / 100);
-    } else if (allDiscount && allDiscount.expiresAt > Date.now() && allDiscount.value > 0) {
-      price = price * (1 - allDiscount.value / 100);
-    } else if (product.discount && product.discount > 0) {
-      price = price * (1 - product.discount / 100);
-    }
-    return price < product.price ? price : price;
+    return product.price;
   };
 
   const getDiscountPercentage = (product: Product) => {
-    if (product.discount && product.discount > 0) {
-      return product.discount;
-    }
-    if (discounts[product.brand]?.expiresAt > Date.now() && discounts[product.brand]?.value > 0) {
-      return discounts[product.brand].value;
-    }
-    if (discounts['All']?.expiresAt > Date.now() && discounts['All']?.value > 0) {
-      return discounts['All'].value;
-    }
     return 0;
   };
 
@@ -226,7 +207,7 @@ const ProductGrid = ({
               <h3 className="text-lg font-semibold mb-1 line-clamp-1">{formatText(product.name)}</h3>
               <div className="flex justify-between items-center mb-3">
                 <div className="flex items-center">
-                  <span className={`font-bold text-lg ${hasDiscount ? 'text-destructive' : ''}`}>
+                  <span className="font-bold text-lg">
                     ${finalPrice.toFixed(2)}
                   </span>
                   {hasDiscount && <span className="text-muted-foreground line-through text-sm ml-2">

@@ -1,4 +1,3 @@
-
 export interface Product {
   id: number;
   name: string;
@@ -32,7 +31,6 @@ export const products: Product[] = [
     imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
     category: "Smartphones",
     brand: "Apple",
-    discount: 10,
     reviews: [
       { name: "John Doe", rating: 4.5, comment: "Great phone, love the camera!" },
       { name: "Jane Smith", rating: 5.0, comment: "Best iPhone ever!" }
@@ -46,7 +44,6 @@ export const products: Product[] = [
     imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
     category: "Smartphones",
     brand: "Samsung",
-    discount: 5,
     reviews: [
       { name: "Alice Johnson", rating: 4.0, comment: "Good phone, but battery life could be better." },
       { name: "Bob Williams", rating: 4.5, comment: "Excellent display and performance." }
@@ -73,7 +70,6 @@ export const products: Product[] = [
     imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
     category: "Headphones",
     brand: "Sony",
-    discount: 15,
     reviews: [
       { name: "Eve White", rating: 5.0, comment: "Amazing sound quality and noise cancellation." },
       { name: "Frank Green", rating: 4.0, comment: "Comfortable to wear for long periods." }
@@ -100,7 +96,6 @@ export const products: Product[] = [
     imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
     category: "Tablets",
     brand: "Samsung",
-    discount: 20,
     reviews: [
       { name: "Ivy Black", rating: 4.0, comment: "Good tablet, but the S Pen could be better." },
       { name: "Jack Brown", rating: 4.5, comment: "Excellent display and performance." }
@@ -153,7 +148,6 @@ export const products: Product[] = [
     imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
     category: "Smartphones",
     brand: "Xiaomi",
-    discount: 25,
     reviews: [
       { name: "Penelope Green", rating: 4.5, comment: "Great value for the price." },
       { name: "Quentin Red", rating: 4.0, comment: "Excellent display and fast charging." }
@@ -313,6 +307,11 @@ products.forEach(product => {
 products.forEach(product => {
   if (!product.reviews || typeof product.reviews === 'number') {
     product.reviews = [];
+  }
+  
+  // Remove any discount property
+  if ('discount' in product) {
+    delete product.discount;
   }
 });
 

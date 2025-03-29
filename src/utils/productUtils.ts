@@ -43,7 +43,7 @@ export const ensureAccessoriesFormat = (products: Product[]): Product[] => {
 // Check if a product should have a discount based on the SpinWheel
 export const shouldApplyDiscount = (productId: number): boolean => {
   // Products to be shown under the wheel - can be customized as needed
-  const wheelProductIds = [1, 2, 4, 10, 17, 19];
+  const wheelProductIds = []; // Emptied the array to remove all discounts
   return wheelProductIds.includes(productId);
 }
 

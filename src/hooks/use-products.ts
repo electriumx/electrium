@@ -124,7 +124,6 @@ const additionalIPhones: Product[] = [
     description: "iPhone 16 with the latest A18 chip, improved AI capabilities, and advanced camera system.",
     imageUrl: "/lovable-uploads/27df906c-346c-4282-ba2b-a0b7e8fab3b8.png",
     quantity: 0,
-    discount: 5,
     rating: 5.0,
     reviews: []
   }
