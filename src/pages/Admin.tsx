@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,8 +10,8 @@ import { Slider } from '@/components/ui/slider';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import CouponManagement from '../components/admin/CouponManagement';
+import { AlertTriangle } from 'lucide-react';
 
-// Get all unique brands from the products for discount settings
 const productBrands = ['Apple', 'Samsung', 'Sony', 'Google', 'Microsoft', 'Xiaomi', 'Audio', 'Accessories', 'PlayStation', 'PC Games', 'Games', 'All'];
 
 const Admin = () => {
@@ -21,7 +20,6 @@ const Admin = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   
-  // Admin settings state
   const [settings, setSettings] = useState({
     debugMode: false,
     darkMode: document.documentElement.classList.contains('dark'),
@@ -35,13 +33,11 @@ const Admin = () => {
     adminEmail: 'admin@example.com',
   });
 
-  // Category discount state
   const [categoryDiscounts, setCategoryDiscounts] = useState<Record<string, { value: number, expiresAt: number }>>(() => {
     const savedDiscounts = localStorage.getItem('adminCategoryDiscounts');
     if (savedDiscounts) {
       try {
         const parsed = JSON.parse(savedDiscounts);
-        // Convert from old format if needed
         if (typeof Object.values(parsed)[0] === 'number') {
           return productBrands.reduce((acc, brand) => {
             const value = parsed[brand] || 0;
@@ -70,7 +66,6 @@ const Admin = () => {
     }
   });
 
-  // Stats state
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalProducts: 0,
@@ -80,21 +75,18 @@ const Admin = () => {
     conversionRate: 0,
   });
 
-  // Wheel state
   const [wheelCooldown, setWheelCooldown] = useState({
     active: false,
     timeLeft: 0
   });
 
   useEffect(() => {
-    // Load settings from localStorage
     const savedSettings = localStorage.getItem('adminSettings');
     if (savedSettings) {
       try {
         const parsedSettings = JSON.parse(savedSettings);
         setSettings(parsedSettings);
         
-        // Apply dark mode from settings
         if (parsedSettings.darkMode) {
           document.documentElement.classList.add('dark');
         } else {
@@ -105,13 +97,12 @@ const Admin = () => {
       }
     }
 
-    // Check wheel cooldown status
     const lastSpinTime = localStorage.getItem('lastSpinTime');
     if (lastSpinTime) {
       const lastTime = parseInt(lastSpinTime, 10);
       const currentTime = Date.now();
       const timeDiff = currentTime - lastTime;
-      const cooldownPeriod = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+      const cooldownPeriod = 24 * 60 * 60 * 1000;
       
       if (timeDiff < cooldownPeriod) {
         const remainingTime = cooldownPeriod - timeDiff;
@@ -127,7 +118,6 @@ const Admin = () => {
       }
     }
 
-    // Simulate loading data
     const timer = setTimeout(() => {
       setStats({
         totalUsers: 1254,
@@ -143,7 +133,6 @@ const Admin = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Update wheel cooldown timer
   useEffect(() => {
     if (!wheelCooldown.active) return;
     
@@ -160,7 +149,6 @@ const Admin = () => {
     return () => clearInterval(interval);
   }, [wheelCooldown.active]);
 
-  // Format wheel cooldown time
   const formatWheelCooldown = () => {
     const hours = Math.floor(wheelCooldown.timeLeft / 3600);
     const minutes = Math.floor((wheelCooldown.timeLeft % 3600) / 60);
@@ -168,7 +156,6 @@ const Admin = () => {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
 
-  // This is a hidden page, redirect if accessed directly
   useEffect(() => {
     const hasSecretAccess = sessionStorage.getItem('adminAccess');
     if (!hasSecretAccess) {
@@ -180,7 +167,6 @@ const Admin = () => {
     const updatedSettings = { ...settings, [setting]: value };
     setSettings(updatedSettings);
     
-    // Save settings to localStorage
     localStorage.setItem('adminSettings', JSON.stringify(updatedSettings));
     
     if (setting === 'darkMode') {
@@ -198,7 +184,6 @@ const Admin = () => {
   };
 
   const handleCategoryDiscountChange = (category: string, value: number) => {
-    // Set expiration time to 48 hours from now
     const expiresAt = Date.now() + (48 * 60 * 60 * 1000);
     
     const updatedDiscounts = { 
@@ -207,10 +192,7 @@ const Admin = () => {
     };
     setCategoryDiscounts(updatedDiscounts);
     
-    // Save to localStorage for admin panel
     localStorage.setItem('adminCategoryDiscounts', JSON.stringify(updatedDiscounts));
-    
-    // Also save to the 'discounts' key for use by product components
     localStorage.setItem('discounts', JSON.stringify(updatedDiscounts));
     
     toast({
@@ -229,13 +211,27 @@ const Admin = () => {
     });
   };
 
+  const handleRemoveAllDiscounts = () => {
+    const resetDiscounts = productBrands.reduce((acc, brand) => ({ 
+      ...acc, 
+      [brand]: { value: 0, expiresAt: Date.now() } 
+    }), {});
+    
+    setCategoryDiscounts(resetDiscounts);
+    localStorage.setItem('adminCategoryDiscounts', JSON.stringify(resetDiscounts));
+    localStorage.setItem('discounts', JSON.stringify(resetDiscounts));
+    
+    toast({
+      title: "All discounts removed",
+      description: "All category discounts have been reset to 0%",
+    });
+  };
+
   const handleSaveSettings = () => {
-    // Simulate saving settings
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
       
-      // Save all settings to localStorage
       localStorage.setItem('adminSettings', JSON.stringify(settings));
       localStorage.setItem('adminCategoryDiscounts', JSON.stringify(categoryDiscounts));
       localStorage.setItem('discounts', JSON.stringify(categoryDiscounts));
@@ -248,7 +244,6 @@ const Admin = () => {
   };
 
   const handleClearCache = () => {
-    // Simulate clearing cache
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
@@ -260,7 +255,6 @@ const Admin = () => {
   };
 
   const handleResetDatabase = () => {
-    // Simulate database reset
     setIsLoading(true);
     setTimeout(() => {
       localStorage.clear();
@@ -354,7 +348,6 @@ const Admin = () => {
             </CardFooter>
           </Card>
           
-          {/* Add Wheel Cooldown Controls */}
           <Card>
             <CardHeader>
               <CardTitle>Wheel Spin Controls</CardTitle>
@@ -547,7 +540,15 @@ const Admin = () => {
                 })}
               </div>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="flex flex-col gap-4">
+              <Button 
+                variant="destructive" 
+                className="w-full" 
+                onClick={handleRemoveAllDiscounts}
+              >
+                <AlertTriangle className="mr-2 h-4 w-4" />
+                Remove All Discounts
+              </Button>
               <Button 
                 className="w-full" 
                 onClick={handleSaveSettings}
