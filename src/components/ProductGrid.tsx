@@ -4,6 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import ProductDetailModal from './ProductDetailModal';
 import { Heart } from 'lucide-react';
 import { getHeadphoneImage } from '@/utils/productImageUtils';
+
 interface ProductGridProps {
   products: Product[];
   onQuantityChange: (id: number, quantity: number, selectedColor?: string) => void;
@@ -15,6 +16,7 @@ interface ProductGridProps {
   productStocks?: Record<number, number>;
   updateStock?: (id: number, newStock: number) => void;
 }
+
 const ProductGrid = ({
   products,
   onQuantityChange,
@@ -31,9 +33,11 @@ const ProductGrid = ({
   const {
     toast
   } = useToast();
+
   const formatText = (text: string) => {
     return text.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
   };
+
   useEffect(() => {
     const savedWishlist = localStorage.getItem('wishlist');
     if (savedWishlist) {
@@ -51,18 +55,22 @@ const ProductGrid = ({
       }
     }
   }, [products]);
+
   const handleUpdateStock = (id: number, newStock: number) => {
     if (updateStock) {
       updateStock(id, newStock);
     }
   };
+
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);
     setIsDetailModalOpen(true);
   };
+
   const closeModal = () => {
     setIsDetailModalOpen(false);
   };
+
   const toggleWishlist = (e: React.MouseEvent, product: Product) => {
     e.stopPropagation();
     const existingWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
@@ -97,6 +105,7 @@ const ProductGrid = ({
       });
     }
   };
+
   const getProductPrice = (product: Product) => {
     let price = product.price;
     const brandDiscount = discounts[product.brand];
@@ -110,6 +119,7 @@ const ProductGrid = ({
     }
     return price < product.price ? price : price;
   };
+
   const getDiscountPercentage = (product: Product) => {
     if (product.discount && product.discount > 0) {
       return product.discount;
@@ -122,6 +132,7 @@ const ProductGrid = ({
     }
     return 0;
   };
+
   const handleDetailQuantityChange = (id: number, quantity: number, selectedColor?: string) => {
     onQuantityChange(id, quantity, selectedColor);
     const product = products.find(p => p.id === id);
@@ -135,6 +146,7 @@ const ProductGrid = ({
       }
     }
   };
+
   return <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {products.map(product => {
       const discountPercentage = getDiscountPercentage(product);
@@ -143,6 +155,7 @@ const ProductGrid = ({
       const stock = productStocks[product.id] || 0;
       const finalPrice = getProductPrice(product);
       let imageUrl = product.imageUrl;
+
       if (product.name.toLowerCase().includes('battlefield')) {
         imageUrl = '/lovable-uploads/ab3d21b8-041b-4137-865c-22fe07795d75.png';
       } else if (product.brand.toLowerCase() === 'google' && product.name.toLowerCase().includes('chromebook')) {
@@ -194,6 +207,7 @@ const ProductGrid = ({
       } else if (product.brand === 'Panasonic' && product.category === 'Microwaves') {
         imageUrl = '/lovable-uploads/05649a66-79e2-4aa3-b369-2496bac58ad7.png';
       }
+
       return <div key={product.id} onClick={() => handleProductClick(product)} className="bg-card rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow">
             <div className="relative">
               <img src={imageUrl} alt={product.name} className="product-image w-full h-48 object-contain" />
@@ -202,7 +216,9 @@ const ProductGrid = ({
                   <Heart className={isInWishlist ? "fill-destructive text-destructive" : ""} size={18} />
                 </button>}
               
-              {hasDiscount}
+              {hasDiscount && <div className="absolute top-2 left-2 bg-destructive text-white text-xs font-bold px-2 py-1 rounded">
+                  {discountPercentage}% OFF
+                </div>}
               
               {product.subcategory && <div className="subcategory-element">{product.subcategory}</div>}
             </div>
@@ -241,4 +257,5 @@ const ProductGrid = ({
         </div>}
     </div>;
 };
+
 export default ProductGrid;
