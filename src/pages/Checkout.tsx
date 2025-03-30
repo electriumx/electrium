@@ -1,3 +1,4 @@
+
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -160,8 +161,10 @@ const Checkout = () => {
             <>
               <div className="space-y-6">
                 {purchasedItems.map((item: Product) => {
-                  const itemTotal = calculateProductTotal(item, discounts);
+                  const itemBasePrice = item.price;
                   const selectedAccessories = item.accessories?.filter(acc => acc.selected) || [];
+                  const accessoriesTotal = selectedAccessories.reduce((sum, acc) => sum + acc.price, 0);
+                  const itemTotal = calculateProductTotal(item, discounts);
                   
                   return (
                     <div key={item.id} className="flex gap-4 items-center p-4 border rounded-lg border-border">
@@ -185,11 +188,14 @@ const Checkout = () => {
                         <p className="text-muted-foreground text-sm">
                           {translateText("purchase_date", currentLanguage) || "Purchase Date"}: {purchaseDate}
                         </p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {translateText("base_price", currentLanguage) || "Base price"}: ${itemBasePrice.toFixed(2)}
+                        </p>
                         
                         {selectedAccessories.length > 0 && (
                           <div className="mt-2">
-                            <p className="text-sm text-muted-foreground">
-                              {translateText("with", currentLanguage) || "With"}:
+                            <p className="text-sm text-muted-foreground font-medium">
+                              {translateText("accessories", currentLanguage) || "Accessories"}: +${accessoriesTotal.toFixed(2)}
                             </p>
                             <ul className="text-sm text-muted-foreground list-disc ml-5">
                               {selectedAccessories.map((acc, index) => (
@@ -208,16 +214,11 @@ const Checkout = () => {
                           {translateText("item_total", currentLanguage) || "Item Total"}: ${itemTotal.toFixed(2)}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          ${item.price.toFixed(2)} {translateText("each", currentLanguage) || "each"}
+                          ${(itemBasePrice + accessoriesTotal).toFixed(2)} {translateText("each", currentLanguage) || "each"}
                         </p>
                         {item.brand && discounts[item.brand] && (
                           <p className="text-sm text-destructive">
                             -{discounts[item.brand].value}% {translateText("off", currentLanguage) || "off"}
-                          </p>
-                        )}
-                        {selectedAccessories.length > 0 && (
-                          <p className="text-sm text-muted-foreground">
-                            +${selectedAccessories.reduce((sum, acc) => sum + acc.price, 0).toFixed(2)} {translateText("accessories", currentLanguage) || "accessories"}
                           </p>
                         )}
                       </div>
