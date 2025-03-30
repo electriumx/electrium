@@ -34,19 +34,19 @@ const ProductFilters = ({
   const brands = ["Apple", "Samsung", "Sony", "Google", "Microsoft", "Xiaomi", "Audio", "PlayStation", "PC Games", "LG", "Whirlpool", "Dyson", "Bosch", "Panasonic"];
   const accessories = ["Headphones", "Cases", "Chargers", "Screen Protectors", "Cables", "Memory Cards", "Warranties", "Installation Kits"];
   const subcategories: Record<string, string[]> = {
-    "Smartphones": ["iPhone", "Android", "Foldable", "Budget", "Premium", "Camera-focused", "Battery-focused"],
-    "Laptops": ["Gaming", "Business", "Ultrabook", "2-in-1", "Budget", "Premium", "Chromebook"],
+    "Smartphones": ["iPhone", "Android", "Foldable", "Budget", "Premium"],
+    "Laptops": ["Gaming", "Business", "Budget", "Premium", "Chromebook"],
     "Gaming Consoles": ["Home Console", "Portable", "Retro", "VR", "Accessories"],
     "TVs": ["OLED", "QLED", "LED", "Smart TV", "4K", "8K", "Budget"],
-    "Headphones": ["Over-ear", "In-ear", "Wireless", "Noise-cancelling", "Gaming", "Sports"],
+    "Headphones": ["Over-ear", "In-ear", "Wireless", "Noise-cancelling", "Gaming"],
     "PC Accessories": ["Keyboards", "Mice", "Monitors", "Webcams", "Microphones", "Speakers"],
     "Tablets": ["iOS", "Android", "Windows", "E-readers", "Budget", "Premium"],
-    "Games": ["Action", "RPG", "Strategy", "Sports", "Simulation", "Racing", "Puzzle", "FPS"],
+    "Games": ["Action", "RPG", "Sports", "Simulation", "Racing", "Puzzle", "FPS"],
     "Microwaves": ["Countertop", "Built-in", "Convection", "Smart", "Compact"],
     "Washing Machines": ["Front Load", "Top Load", "Compact", "Smart", "Commercial"],
-    "Refrigerators": ["French Door", "Side-by-Side", "Top Freezer", "Bottom Freezer", "Mini", "Smart"],
+    "Refrigerators": ["French Door", "Side-by-Side", "Top Freezer", "Bottom Freezer", "Mini"],
     "Smart Screens": ["Digital Frames", "Smart Displays", "Interactive Panels", "Digital Signage"],
-    "Air Conditioners": ["Window", "Split", "Portable", "Central", "Smart"],
+    "Air Conditioners": ["Window", "Split", "Portable", "Central"],
     "Vacuum Cleaners": ["Robot", "Upright", "Canister", "Handheld", "Stick"]
   };
 
