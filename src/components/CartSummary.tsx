@@ -97,6 +97,13 @@ const CartSummary = ({
               {cart.map(item => {
                 const itemTotal = calculateProductTotal(item, discounts);
                 const hasAccessories = item.accessories && item.accessories.some(acc => acc.selected);
+                
+                // Calculate base price and accessories total
+                const basePrice = item.price * (item.quantity || 1);
+                const accessoriesTotal = item.accessories 
+                  ? item.accessories.filter(acc => acc.selected).reduce((sum, acc) => sum + acc.price, 0) * (item.quantity || 1)
+                  : 0;
+                
                 return (
                   <div key={item.id} className="flex justify-between items-center py-2 border-b border-border">
                     <div className="flex gap-3 items-center">
@@ -114,6 +121,11 @@ const CartSummary = ({
                         {hasAccessories && (
                           <div className="text-xs text-muted-foreground">
                             With: {item.accessories.filter(acc => acc.selected).map(acc => formatProductName(acc.name)).join(', ')}
+                          </div>
+                        )}
+                        {accessoriesTotal > 0 && (
+                          <div className="text-xs text-muted-foreground">
+                            Base: ${(item.price).toFixed(2)} + Accessories: ${(accessoriesTotal / (item.quantity || 1)).toFixed(2)}
                           </div>
                         )}
                       </div>

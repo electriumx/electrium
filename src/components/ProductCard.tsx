@@ -37,12 +37,12 @@ const ProductCard = ({
   const [wishlist, setWishlist] = useState(false);
   const [currentStock, setCurrentStock] = useState(stock);
   const [showOutOfStockAlert, setShowOutOfStockAlert] = useState(false);
-  const [selectedColor, setSelectedColor] = useState("Blue");
+  const [selectedColor, setSelectedColor] = useState("Dark Blue");
   const { toast } = useToast();
   const navigate = useNavigate();
   
   // Available product colors
-  const productColors = ["Blue", "White", "Titanium", "Black"];
+  const productColors = ["Dark Blue", "White", "Titanium", "Black", "Dark Green", "Dark Red"];
   
   useEffect(() => {
     // Check if the product is already in the wishlist when the component mounts
@@ -205,9 +205,12 @@ const ProductCard = ({
                   selectedColor === color ? 'border-primary ring-2 ring-primary/30' : 'border-gray-300'
                 }`}
                 style={{ 
-                  backgroundColor: color.toLowerCase() === 'blue' ? '#1e90ff' : 
+                  backgroundColor: color.toLowerCase() === 'dark blue' ? '#0A4D68' : 
                                   color.toLowerCase() === 'white' ? '#ffffff' :
-                                  color.toLowerCase() === 'titanium' ? '#878681' : '#000000',
+                                  color.toLowerCase() === 'titanium' ? '#878681' :
+                                  color.toLowerCase() === 'dark green' ? '#154734' :
+                                  color.toLowerCase() === 'dark red' ? '#8B0000' :
+                                  '#000000',
                   cursor: 'pointer'
                 }}
                 aria-label={`Select ${color} color`}

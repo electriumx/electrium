@@ -1,4 +1,3 @@
-
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -189,7 +188,7 @@ const Checkout = () => {
                           {translateText("purchase_date", currentLanguage) || "Purchase Date"}: {purchaseDate}
                         </p>
                         <p className="text-sm text-muted-foreground mt-1">
-                          {translateText("base_price", currentLanguage) || "Base price"}: ${itemBasePrice.toFixed(2)}
+                          {translateText("base_price", currentLanguage) || "Base Price"}: ${itemBasePrice.toFixed(2)}
                         </p>
                         
                         {selectedAccessories.length > 0 && (
