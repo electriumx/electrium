@@ -17,33 +17,28 @@ const Checkout = () => {
   const { toast } = useToast();
   
   useEffect(() => {
-    // Get language preference
     const savedLanguage = localStorage.getItem('preferredLanguage');
     if (savedLanguage) {
       setCurrentLanguage(savedLanguage);
     }
     
-    // Listen for language changes
     const handleLanguageChange = (e: CustomEvent) => {
       setCurrentLanguage(e.detail);
     };
     
     window.addEventListener('languageChange', handleLanguageChange as EventListener);
     
-    // Load cart data
     const cart = localStorage.getItem('cart');
     if (cart) {
       setCartData(JSON.parse(cart));
     }
     
-    // Load discounts
     const savedDiscounts = localStorage.getItem('discounts');
     if (savedDiscounts) {
       try {
         const parsedDiscounts = JSON.parse(savedDiscounts);
         const currentTime = Date.now();
         
-        // Keep only valid discounts
         const validDiscounts: Record<string, { value: number; expiresAt: number; }> = {};
         Object.entries(parsedDiscounts).forEach(([brand, value]) => {
           if (typeof value === 'object' && value !== null && 'value' in value && 'expiresAt' in value) {
@@ -60,7 +55,6 @@ const Checkout = () => {
       }
     }
     
-    // Add auto-scroll to top when page loads
     window.scrollTo(0, 0);
     
     return () => {
@@ -68,7 +62,6 @@ const Checkout = () => {
     };
   }, []);
 
-  // Function to format product name (capitalize each word and remove underscores)
   const formatProductName = (name: string) => {
     return name
       .replace(/_/g, ' ')
@@ -87,17 +80,13 @@ const Checkout = () => {
   });
 
   const handleProceedToPayment = () => {
-    // Check stock availability for all items
     let stockIssue = false;
     
-    // Get product stocks from localStorage
     const productStocks = JSON.parse(localStorage.getItem('productStocks') || '{}');
     
-    // Check each item
     for (const item of purchasedItems) {
       const currentStock = productStocks[item.id] || 0;
       
-      // If not enough stock
       if (currentStock < item.quantity) {
         stockIssue = true;
         setOutOfStockItem(item.name);
@@ -107,22 +96,18 @@ const Checkout = () => {
     }
     
     if (!stockIssue) {
-      // Update stock for each item
       for (const item of purchasedItems) {
         const currentStock = productStocks[item.id] || 0;
         productStocks[item.id] = Math.max(0, currentStock - item.quantity);
       }
       
-      // Save updated stocks
       localStorage.setItem('productStocks', JSON.stringify(productStocks));
       
-      // Proceed to payment
       navigate('/payment');
     }
   };
 
   const handleClearItems = () => {
-    // Clear cart
     localStorage.setItem('cart', JSON.stringify([]));
     setCartData([]);
     
