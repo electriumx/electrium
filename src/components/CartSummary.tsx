@@ -91,6 +91,13 @@ const CartSummary = ({
   return (
     <div className={`fixed bottom-0 right-0 z-40 transition-transform duration-300 transform ${isOpen ? 'translate-y-0' : 'translate-y-[calc(100%-3.5rem)]'}`}>
       <div className="bg-card rounded-tl-lg shadow-lg border border-border max-w-md w-full">
+        <button 
+          onClick={toggleCart} 
+          className="w-full text-sm font-semibold py-2 bg-card border-b border-border flex items-center justify-center"
+        >
+          Order Summary ({cart.reduce((sum, item) => sum + (item.quantity || 1), 0)} items)
+          <span className="ml-2">{isOpen ? '▼' : '▲'}</span>
+        </button>
         <div className={`max-h-96 overflow-y-auto ${isOpen ? 'block' : 'hidden'}`}>
           <div className="p-4 space-y-4">
             <div className="space-y-2">
@@ -125,7 +132,7 @@ const CartSummary = ({
                         )}
                         {accessoriesTotal > 0 && (
                           <div className="text-xs text-muted-foreground">
-                            Base: ${(item.price).toFixed(2)} + Accessories: ${(accessoriesTotal / (item.quantity || 1)).toFixed(2)}
+                            Base Price: ${(item.price).toFixed(2)} + Accessories: ${(accessoriesTotal / (item.quantity || 1)).toFixed(2)}
                           </div>
                         )}
                       </div>
