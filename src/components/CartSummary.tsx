@@ -113,10 +113,10 @@ const CartSummary = ({
                       <div>
                         <h4 className={`text-sm font-medium ${item.discount && item.discount > 0 ? 'pl-2' : ''}`}>
                           {formatProductName(item.name)}
+                          {item.selectedColor && <span className="ml-1">({item.selectedColor})</span>}
                         </h4>
                         <div className="text-xs text-muted-foreground">
                           Quantity: {item.quantity}
-                          {item.selectedColor && <span className="ml-1">({item.selectedColor})</span>}
                         </div>
                         {hasAccessories && (
                           <div className="text-xs text-muted-foreground">
