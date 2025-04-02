@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
@@ -105,6 +104,11 @@ const CartSummary = ({
                 const itemTotal = calculateProductTotal(item, discounts);
                 const hasAccessories = item.accessories && item.accessories.some(acc => acc.selected);
                 
+                const basePrice = item.price;
+                const accessoriesTotal = item.accessories 
+                  ? item.accessories.filter(acc => acc.selected).reduce((sum, acc) => sum + acc.price, 0)
+                  : 0;
+                
                 return (
                   <div key={item.id} className="flex justify-between items-center py-2 border-b border-border">
                     <div className="flex gap-3 items-center">
@@ -122,6 +126,9 @@ const CartSummary = ({
                         {hasAccessories && (
                           <div className="text-xs text-muted-foreground">
                             With: {item.accessories.filter(acc => acc.selected).map(acc => formatProductName(acc.name)).join(', ')}
+                            {accessoriesTotal > 0 && (
+                              <span className="ml-1">(+${accessoriesTotal.toFixed(2)})</span>
+                            )}
                           </div>
                         )}
                       </div>
