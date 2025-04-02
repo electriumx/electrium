@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
@@ -106,9 +105,9 @@ const CartSummary = ({
                 const hasAccessories = item.accessories && item.accessories.some(acc => acc.selected);
                 
                 // Calculate base price and accessories total
-                const basePrice = item.price * (item.quantity || 1);
+                const basePrice = item.price;
                 const accessoriesTotal = item.accessories 
-                  ? item.accessories.filter(acc => acc.selected).reduce((sum, acc) => sum + acc.price, 0) * (item.quantity || 1)
+                  ? item.accessories.filter(acc => acc.selected).reduce((sum, acc) => sum + acc.price, 0)
                   : 0;
                 
                 return (
@@ -120,7 +119,7 @@ const CartSummary = ({
                       <div>
                         <h4 className={`text-sm font-medium ${item.discount && item.discount > 0 ? 'pl-2' : ''}`}>
                           {formatProductName(item.name)}
-                          {item.selectedColor && <span className="ml-1">({item.selectedColor})</span>}
+                          {item.selectedColor && <span className="ml-1 text-muted-foreground">({item.selectedColor})</span>}
                         </h4>
                         <div className="text-xs text-muted-foreground">
                           Quantity: {item.quantity}
@@ -132,7 +131,7 @@ const CartSummary = ({
                         )}
                         {accessoriesTotal > 0 && (
                           <div className="text-xs text-muted-foreground">
-                            Base Price: ${(item.price).toFixed(2)} + Accessories: ${(accessoriesTotal / (item.quantity || 1)).toFixed(2)}
+                            ${basePrice.toFixed(2)} + ${accessoriesTotal.toFixed(2)} (accessories)
                           </div>
                         )}
                       </div>
