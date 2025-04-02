@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import ProductFilters from '../components/ProductFilters';
 import ProductGrid from '../components/ProductGrid';
@@ -31,7 +30,6 @@ const Products = () => {
   const [productStocks, setProductStocks] = useState<Record<number, number>>({});
   const { toast } = useToast();
 
-  // Function to capitalize first letter of each word and remove underscores
   const formatText = (text: string) => {
     return text.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
   };
@@ -93,7 +91,6 @@ const Products = () => {
         
         Object.entries(parsedDiscounts).forEach(([brand, value]) => {
           if (typeof value === 'number') {
-            // Skip discounts that don't have an expiresAt (not set by admin or wheel)
             return;
           } else if (typeof value === 'object' && value !== null && 'value' in value && 'expiresAt' in value) {
             formattedDiscounts[brand] = value as {

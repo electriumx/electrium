@@ -111,6 +111,22 @@ const ProductGrid = ({
   };
 
   const getDiscountPercentage = (product: Product) => {
+    if (discounts[product.brand] && discounts[product.brand].expiresAt > Date.now()) {
+      return discounts[product.brand].value;
+    }
+    
+    if (discounts['All'] && discounts['All'].expiresAt > Date.now()) {
+      return discounts['All'].value;
+    }
+    
+    if (product.category && discounts[product.category] && discounts[product.category].expiresAt > Date.now()) {
+      return discounts[product.category].value;
+    }
+    
+    if (product.subcategory && discounts[product.subcategory] && discounts[product.subcategory].expiresAt > Date.now()) {
+      return discounts[product.subcategory].value;
+    }
+    
     return 0;
   };
 
@@ -134,7 +150,10 @@ const ProductGrid = ({
       const hasDiscount = discountPercentage > 0;
       const isInWishlist = wishlist[product.id] || false;
       const stock = productStocks[product.id] || 0;
-      const finalPrice = getProductPrice(product);
+      const finalPrice = hasDiscount 
+        ? parseFloat((product.price * (1 - discountPercentage / 100)).toFixed(2))
+        : product.price;
+      
       let imageUrl = product.imageUrl;
 
       if (product.name.toLowerCase().includes('battlefield')) {
