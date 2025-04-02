@@ -51,3 +51,17 @@ export const shouldApplyDiscount = (productId: number): boolean => {
 export const getDiscountExpirationTime = (): number => {
   return 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 }
+
+// Filter out specific products from categories
+export const filterRestrictedProducts = (products: Product[]): Product[] => {
+  return products.filter(product => {
+    // Filter out "Nintendo Switch Lite" from Vacuum Cleaners, Smart Screens, and Refrigerators
+    if (product.name === "Nintendo Switch Lite" && 
+        (product.category === "Vacuum Cleaners" || 
+         product.category === "Smart Screens" ||
+         product.category === "Refrigerators")) {
+      return false;
+    }
+    return true;
+  });
+};

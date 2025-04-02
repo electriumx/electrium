@@ -34,16 +34,16 @@ const ProductFilters = ({
   const brands = ["Apple", "Samsung", "Sony", "Google", "Microsoft", "Xiaomi", "Audio", "PlayStation", "PC Games", "LG", "Whirlpool", "Dyson", "Bosch", "Panasonic"];
   const accessories = ["Headphones", "Cases", "Chargers", "Screen Protectors", "Cables", "Memory Cards", "Warranties", "Installation Kits"];
   const subcategories: Record<string, string[]> = {
-    "Smartphones": ["iPhone", "Android", "Foldable", "Budget", "Premium"],
-    "Laptops": ["Gaming", "Business", "Budget", "Premium", "Chromebook"],
+    "Smartphones": ["iPhone", "Android", "Foldable"],
+    "Laptops": ["Business", "Chromebook"],
     "Gaming Consoles": ["Home Console", "Portable", "Retro", "VR", "Accessories"],
     "TVs": ["OLED", "QLED", "LED", "Smart TV", "4K", "8K", "Budget"],
-    "Headphones": ["Over-ear", "In-ear", "Wireless", "Noise-cancelling", "Gaming"],
+    "Headphones": ["Over-ear", "In-ear", "Wireless"],
     "PC Accessories": ["Keyboards", "Mice", "Monitors", "Webcams", "Microphones", "Speakers"],
-    "Tablets": ["iOS", "Android", "Windows", "E-readers", "Budget", "Premium"],
-    "Games": ["Action", "RPG", "Sports", "Simulation", "Racing", "Puzzle", "FPS"],
-    "Microwaves": ["Countertop", "Built-in", "Convection", "Smart", "Compact"],
-    "Washing Machines": ["Front Load", "Top Load", "Compact", "Smart", "Commercial"],
+    "Tablets": ["iOS", "Android", "Windows", "E-readers"],
+    "Games": ["Action", "RPG", "Sports", "Simulation", "Racing"],
+    "Microwaves": ["Countertop", "Built-in", "Smart"],
+    "Washing Machines": ["Front Load", "Top Load", "Smart"],
     "Refrigerators": ["French Door", "Side-by-Side", "Top Freezer", "Bottom Freezer", "Mini"],
     "Smart Screens": ["Digital Frames", "Smart Displays", "Interactive Panels", "Digital Signage"],
     "Air Conditioners": ["Window", "Split", "Portable", "Central"],

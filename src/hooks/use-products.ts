@@ -3,7 +3,8 @@ import { Product, products as initialProducts } from '../data/productData';
 import { generateAdditionalProducts } from '../data/additionalProducts';
 import { getCategoryImage } from '../utils/productImageUtils';
 import { allNewProducts } from '../data/newProducts';
-import { convertNumericReviews, ensureProductsReviewsFormat, ensureAccessoriesFormat } from '../utils/productUtils';
+import { convertNumericReviews, ensureProductsReviewsFormat, ensureAccessoriesFormat, filterRestrictedProducts } from '../utils/productUtils';
+import { refrigeratorProducts } from '../data/refrigeratorProducts';
 
 // Add new iPhone models
 const additionalIPhones: Product[] = [
@@ -205,8 +206,8 @@ export const useProducts = () => {
     // Generate the additional products with limited numbers
     const generatedProducts = generateAdditionalProducts();
     
-    // Combine initial products with additional iPhones, TV subcategories, generated products, and all new products
-    const allProducts = [...initialProducts, ...additionalIPhones, ...tvSubcategoryProducts, ...generatedProducts, ...allNewProducts];
+    // Combine initial products with additional iPhones, TV subcategories, refrigerator products, generated products, and all new products
+    const allProducts = [...initialProducts, ...additionalIPhones, ...tvSubcategoryProducts, ...refrigeratorProducts, ...generatedProducts, ...allNewProducts];
     
     // Remove duplicates (in case they already exist)
     const uniqueProducts = allProducts.filter((product, index, self) => 
@@ -500,7 +501,10 @@ export const useProducts = () => {
       return product;
     });
     
-    setProducts(updatedProducts);
+    // Filter out restricted products
+    const filteredFinalProducts = filterRestrictedProducts(updatedProducts);
+    
+    setProducts(filteredFinalProducts);
   }, []);
   
   return { products };
