@@ -229,7 +229,8 @@ const SpinWheel = ({
         const segmentIndex = Math.floor((normalizedRotation + 90) % 360 / segmentAngle);
         const landedSegment = segments[segmentIndex % numSegments];
         
-        setResult(`You won ${landedSegment.discount}% off ${landedSegment.brand} products!`);
+        const resultMessage = `You won ${landedSegment.discount}% off ${landedSegment.brand} products! Expires in 48 hours. Come back in 24 hours to spin again.`;
+        setResult(resultMessage);
         onWin(landedSegment.brand, landedSegment.discount, Date.now() + 48 * 60 * 60 * 1000);
         setIsSpinning(false);
         localStorage.setItem('lastSpinTime', Date.now().toString());
@@ -238,7 +239,7 @@ const SpinWheel = ({
         
         toast({
           title: "Discount Applied!",
-          description: `You won ${landedSegment.discount}% off ${landedSegment.brand} products! Expires in 48 hours. Come back in 24 hours to spin again.`
+          description: resultMessage
         });
       }
     };
