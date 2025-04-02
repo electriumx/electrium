@@ -68,16 +68,18 @@ export const calculateProductTotal = (product: Product, discounts: Record<string
     basePrice = basePrice * (1 - product.discount / 100);
   }
   
-  // Add accessory prices if selected
-  let accessoriesPrice = 0;
+  // Add accessory prices directly to the base price
   if (product.accessories) {
-    accessoriesPrice = product.accessories
+    const accessoriesPrice = product.accessories
       .filter(acc => acc.selected)
       .reduce((sum, acc) => sum + acc.price, 0);
+    
+    // Add accessories price to base price
+    basePrice += accessoriesPrice;
   }
   
-  // Total price is base price plus accessories price, multiplied by quantity
-  const totalPrice = (basePrice + accessoriesPrice) * (product.quantity || 1);
+  // Multiply by quantity for total
+  const totalPrice = basePrice * (product.quantity || 1);
   
   // Make sure we have a valid reviews array (or empty array)
   if (typeof product.reviews === 'number' || product.reviews === undefined) {
