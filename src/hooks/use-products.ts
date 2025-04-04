@@ -223,6 +223,14 @@ export const useProducts = () => {
       const baseNameMatch = product.name.match(/(.*?)(?:\s+\d+)?$/);
       const baseName = baseNameMatch ? baseNameMatch[1].trim() : product.name;
       
+      // Keep only one Battlefield game (remove numbered versions)
+      if (product.name.toLowerCase().includes('battlefield')) {
+        const existingBattlefield = acc.find(p => p.name.toLowerCase().includes('battlefield'));
+        if (existingBattlefield) {
+          return acc;
+        }
+      }
+      
       // Check if we already have this base product in our accumulator
       const existingProduct = acc.find(p => {
         const pBaseNameMatch = p.name.match(/(.*?)(?:\s+\d+)?$/);
@@ -240,14 +248,20 @@ export const useProducts = () => {
       // (those with IDs over 10000 which we've just added)
       if (!existingProduct || 
           (product.brand === "Apple" && product.name.includes("iPhone")) ||
-          product.category === "Games" || 
+          (product.category === "Games" && !product.name.toLowerCase().includes("battlefield 2") && 
+           !product.name.toLowerCase().includes("battlefield 3") && 
+           !product.name.toLowerCase().includes("battlefield 4") && 
+           !product.name.toLowerCase().includes("battlefield 5")) || 
           (product.category === "TVs" && product.subcategory) ||
-          product.name.toLowerCase().includes("battlefield") ||
+          (product.name.toLowerCase().includes("battlefield") && !product.name.toLowerCase().match(/battlefield\s+[2-5]/)) ||
           product.name.toLowerCase().includes("rainbow six") ||
           product.name.toLowerCase().includes("call of duty") ||
-          product.name.toLowerCase().includes("switch") ||
+          (product.name.toLowerCase().includes("switch") && product.category !== "Vacuum Cleaners" && product.subcategory !== "Handheld") ||
           product.id >= 10000 ||
           (product.brand === "Google" && product.name.toLowerCase().includes("chromebook")) ||
+          (product.brand.toLowerCase() === "xbox" || 
+           (product.brand.toLowerCase() === "microsoft" && product.category.toLowerCase() === "gaming consoles")) ||
+          (product.name.toLowerCase().includes("playstation") && !product.name.toLowerCase().includes("playstation 1")) ||
           product.name === "Vankyo Cosmos 6") {
         return [...acc, product];
       }
@@ -255,10 +269,44 @@ export const useProducts = () => {
       return acc;
     }, []);
 
+    // Filter out restricted products based on rules
+    const restrictedFilteredProducts = filterRestrictedProducts(filteredProducts);
+
     // Update product images based on category, brand, and requested changes
-    const updatedProducts = filteredProducts.map(product => {
+    const updatedProducts = restrictedFilteredProducts.map(product => {
+      // Google Chromebook gets the first uploaded image
+      if (product.brand.toLowerCase() === 'google' && product.name.toLowerCase().includes('chromebook')) {
+        return {
+          ...product,
+          imageUrl: '/lovable-uploads/c0f2c21e-2504-4832-acad-c32a492a5a24.png'
+        };
+      }
+      // Xbox products get the second uploaded image
+      else if (product.brand.toLowerCase() === 'xbox' || 
+               (product.brand.toLowerCase() === 'microsoft' && product.category.toLowerCase() === 'gaming consoles')) {
+        return {
+          ...product,
+          imageUrl: '/lovable-uploads/77956929-c717-415b-aad8-f8e0bf0069b0.png'
+        };
+      }
+      // PlayStation 5 get the third uploaded image
+      else if (product.name.toLowerCase() === 'playstation 5' || 
+               (product.brand.toLowerCase() === 'playstation' && !product.name.toLowerCase().includes('digital'))) {
+        return {
+          ...product,
+          imageUrl: '/lovable-uploads/36ef7021-a306-4cf2-a331-b1b3a0e4b33d.png'
+        };
+      }
+      // PlayStation 5 Digital Edition get the fourth uploaded image
+      else if (product.name.toLowerCase().includes('playstation 5 digital') || 
+               (product.name.toLowerCase().includes('playstation') && product.name.toLowerCase().includes('digital'))) {
+        return {
+          ...product,
+          imageUrl: '/lovable-uploads/7b9e23e5-ee70-49a4-ba87-c43c5bd73ce4.png'
+        };
+      }
       // Vankyo Cosmos 6 gets the first uploaded image
-      if (product.name === "Vankyo Cosmos 6") {
+      else if (product.name === "Vankyo Cosmos 6") {
         return {
           ...product,
           imageUrl: "/lovable-uploads/7f739f1f-3772-4ead-89b5-34d5c94221bb.png"
@@ -278,23 +326,16 @@ export const useProducts = () => {
           imageUrl: "/lovable-uploads/ca7ef935-a15a-44db-8d0a-25f62f3b929a.png"
         };
       }
-      // All Chromebooks get the fourth uploaded image
-      else if (product.brand === "Google" && product.name.toLowerCase().includes("chromebook")) {
+      // Battlefield game gets the first uploaded image
+      else if (product.name.toLowerCase().includes('battlefield')) {
         return {
           ...product,
-          imageUrl: "/lovable-uploads/fc1b00d0-a962-4050-9b43-2b36399b0651.png"
-        };
-      }
-      // Battlefield games get the first uploaded image
-      else if (product.name.toLowerCase().includes("battlefield")) {
-        return {
-          ...product,
-          imageUrl: "/lovable-uploads/d496c5e1-cf2a-4e3a-ad70-e121a939a763.png",
+          imageUrl: '/lovable-uploads/ab3d21b8-041b-4137-865c-22fe07795d75.png',
           subcategory: "FPS Games"
         };
       }
       // Nintendo products get the third uploaded image
-      else if (product.brand === "Nintendo" || product.name.toLowerCase().includes("nintendo") || product.name.toLowerCase().includes("switch")) {
+      else if (product.brand === "Nintendo" || product.name.toLowerCase().includes('nintendo') || product.name.toLowerCase().includes('switch')) {
         return {
           ...product,
           imageUrl: "/lovable-uploads/54b67814-dd27-4a46-ac69-4beaf7bd7851.png"

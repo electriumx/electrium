@@ -1,4 +1,3 @@
-
 import { Product, Review } from '../data/productData';
 
 // Convert number reviews to proper Review array format
@@ -62,6 +61,27 @@ export const filterRestrictedProducts = (products: Product[]): Product[] => {
          product.category === "Refrigerators")) {
       return false;
     }
+    
+    // Filter out "Nintendo Switch" from the "Handheld" subcategory in "Vacuum Cleaners"
+    if (product.name.toLowerCase().includes("nintendo switch") && 
+        product.category === "Vacuum Cleaners" && 
+        product.subcategory === "Handheld") {
+      return false;
+    }
+    
+    // Filter out "PlayStation 1" products
+    if (product.name.toLowerCase().includes("playstation 1")) {
+      return false;
+    }
+    
+    // Filter out multiple Battlefield versions (keep only one)
+    if (product.name.toLowerCase().includes("battlefield")) {
+      // Keep only the generic "Battlefield" or the newest version
+      if (product.name.toLowerCase().match(/battlefield\s+[2-5]/)) {
+        return false;
+      }
+    }
+    
     return true;
   });
 };

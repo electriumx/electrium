@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Product } from '../data/productData';
 import { useToast } from '@/hooks/use-toast';
@@ -156,10 +157,20 @@ const ProductGrid = ({
       
       let imageUrl = product.imageUrl;
 
-      if (product.name.toLowerCase().includes('battlefield')) {
+      // Apply new image URLs based on product details
+      if (product.brand.toLowerCase() === 'google' && product.name.toLowerCase().includes('chromebook')) {
+        imageUrl = '/lovable-uploads/c0f2c21e-2504-4832-acad-c32a492a5a24.png';
+      } else if (product.brand.toLowerCase() === 'xbox' || 
+                (product.brand.toLowerCase() === 'microsoft' && product.category.toLowerCase() === 'gaming consoles')) {
+        imageUrl = '/lovable-uploads/77956929-c717-415b-aad8-f8e0bf0069b0.png';
+      } else if (product.name.toLowerCase() === 'playstation 5' || 
+                (product.brand.toLowerCase() === 'playstation' && !product.name.toLowerCase().includes('digital'))) {
+        imageUrl = '/lovable-uploads/36ef7021-a306-4cf2-a331-b1b3a0e4b33d.png';
+      } else if (product.name.toLowerCase().includes('playstation 5 digital') || 
+                (product.name.toLowerCase().includes('playstation') && product.name.toLowerCase().includes('digital'))) {
+        imageUrl = '/lovable-uploads/7b9e23e5-ee70-49a4-ba87-c43c5bd73ce4.png';
+      } else if (product.name.toLowerCase().includes('battlefield')) {
         imageUrl = '/lovable-uploads/ab3d21b8-041b-4137-865c-22fe07795d75.png';
-      } else if (product.brand.toLowerCase() === 'google' && product.name.toLowerCase().includes('chromebook')) {
-        imageUrl = '/lovable-uploads/81f5b72a-7846-4240-b8e3-bd6e636a2128.png';
       } else if (product.brand.toLowerCase() === 'nintendo' || product.name.toLowerCase().includes('nintendo') || product.name.toLowerCase().includes('switch')) {
         imageUrl = '/lovable-uploads/54b67814-dd27-4a46-ac69-4beaf7bd7851.png';
       } else if (product.brand.toLowerCase() === 'xiaomi' && product.category.toLowerCase() === 'smartphones') {
