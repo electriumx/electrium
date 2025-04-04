@@ -9,6 +9,7 @@ import { Product } from '../data/productData';
 import { useProducts } from '../hooks/use-products';
 import { useToast } from '@/components/ui/use-toast';
 import { translateText } from '@/utils/translation';
+import { filterRestrictedProducts, updateProductNames } from '@/utils/productUtils';
 
 const Products = () => {
   const { products: allProducts } = useProducts();
@@ -263,6 +264,8 @@ const Products = () => {
   };
 
   let filteredProducts = allProducts;
+  
+  filteredProducts = updateProductNames(filterRestrictedProducts(filteredProducts));
   
   if (selectedBrands.length > 0) {
     filteredProducts = filteredProducts.filter(product => selectedBrands.includes(product.brand) || selectedBrands.includes(product.category));

@@ -159,10 +159,11 @@ const ProductGrid = ({
 
       // Apply new image URLs based on product details
       if (product.brand.toLowerCase() === 'google' && product.name.toLowerCase().includes('chromebook')) {
-        imageUrl = '/lovable-uploads/c0f2c21e-2504-4832-acad-c32a492a5a24.png';
+        imageUrl = '/lovable-uploads/ebedb3ff-8b26-4997-a966-7b49d7fd04e0.png';
       } else if (product.brand.toLowerCase() === 'xbox' || 
-                (product.brand.toLowerCase() === 'microsoft' && product.category.toLowerCase() === 'gaming consoles')) {
-        imageUrl = '/lovable-uploads/77956929-c717-415b-aad8-f8e0bf0069b0.png';
+                (product.brand.toLowerCase() === 'microsoft' && product.category.toLowerCase() === 'gaming consoles') ||
+                product.name.toLowerCase().includes('xbox')) {
+        imageUrl = '/lovable-uploads/4b5ba4b7-1d75-4c44-aa6c-c1d6e0d028c4.png';
       } else if (product.name.toLowerCase() === 'playstation 5' || 
                 (product.brand.toLowerCase() === 'playstation' && !product.name.toLowerCase().includes('digital'))) {
         imageUrl = '/lovable-uploads/36ef7021-a306-4cf2-a331-b1b3a0e4b33d.png';

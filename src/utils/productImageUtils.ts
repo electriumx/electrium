@@ -14,15 +14,16 @@ export const getCategoryImage = (category: string, brand?: string): string => {
     case 'laptops':
     case 'laptop':
       if (brand?.toLowerCase() === 'google' && category.toLowerCase().includes('chromebook')) {
-        return '/lovable-uploads/c0f2c21e-2504-4832-acad-c32a492a5a24.png';  // Updated Chromebook image
+        return '/lovable-uploads/ebedb3ff-8b26-4997-a966-7b49d7fd04e0.png';  // Updated Chromebook image
       }
       return 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/mbp14-spacegray-select-202301?wid=904&hei=840&fmt=jpeg&qlt=90&.v=1671304673229';  // Generic Laptop
     
     case 'gaming consoles':
       if (brand?.toLowerCase() === 'nintendo' || category.toLowerCase().includes('nintendo') || category.toLowerCase().includes('switch')) {
         return '/lovable-uploads/54b67814-dd27-4a46-ac69-4beaf7bd7851.png';  // Nintendo image
-      } else if (brand?.toLowerCase() === 'xbox' || brand?.toLowerCase() === 'microsoft') {
-        return '/lovable-uploads/77956929-c717-415b-aad8-f8e0bf0069b0.png';  // Xbox image
+      } else if (brand?.toLowerCase() === 'xbox' || brand?.toLowerCase() === 'microsoft' || 
+                category.toLowerCase().includes('xbox')) {
+        return '/lovable-uploads/4b5ba4b7-1d75-4c44-aa6c-c1d6e0d028c4.png';  // Updated Xbox image
       } else if (brand?.toLowerCase() === 'playstation' || brand?.toLowerCase() === 'sony') {
         if (category.toLowerCase().includes('digital')) {
           return '/lovable-uploads/7b9e23e5-ee70-49a4-ba87-c43c5bd73ce4.png';  // PS5 Digital Edition
@@ -374,10 +375,10 @@ export const getProductPrice = (name: string, category: string, brand: string): 
         return 499;
       } else if (lowerName.includes('series s')) {
         return 299;
-      } else if (lowerName.includes('one x')) {
-        return 399;
-      } else if (lowerName.includes('one s')) {
+      } else if (lowerName.includes('one')) {
         return 299;
+      } else if (lowerName.includes('360')) {
+        return 199;
       }
     } else if (lowerBrand === 'nintendo') {
       if (lowerName.includes('switch')) {

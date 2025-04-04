@@ -1,3 +1,4 @@
+
 import { Product, Review } from '../data/productData';
 
 // Convert number reviews to proper Review array format
@@ -81,7 +82,29 @@ export const filterRestrictedProducts = (products: Product[]): Product[] => {
         return false;
       }
     }
+
+    // Filter out Xbox 3 products
+    if (product.name.toLowerCase() === "xbox 3") {
+      return false;
+    }
     
     return true;
+  });
+};
+
+// Rename and update products based on specific rules
+export const updateProductNames = (products: Product[]): Product[] => {
+  return products.map(product => {
+    // Rename Xbox 1 to Xbox One
+    if (product.name.toLowerCase() === "xbox 1") {
+      product.name = "Xbox One";
+    }
+    
+    // Rename Xbox 2 to Xbox 360
+    if (product.name.toLowerCase() === "xbox 2") {
+      product.name = "Xbox 360";
+    }
+    
+    return product;
   });
 };
