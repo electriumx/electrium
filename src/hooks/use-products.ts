@@ -274,11 +274,11 @@ export const useProducts = () => {
 
     // Update product images based on category, brand, and requested changes
     const updatedProducts = restrictedFilteredProducts.map(product => {
-      // Google Chromebook gets the first uploaded image
+      // Google Chromebook gets the newly uploaded image
       if (product.brand.toLowerCase() === 'google' && product.name.toLowerCase().includes('chromebook')) {
         return {
           ...product,
-          imageUrl: '/lovable-uploads/c0f2c21e-2504-4832-acad-c32a492a5a24.png'
+          imageUrl: '/lovable-uploads/6b47797a-7950-4e45-9ec1-b49920bedce3.png'
         };
       }
       // Xbox products get the second uploaded image
@@ -286,23 +286,23 @@ export const useProducts = () => {
                (product.brand.toLowerCase() === 'microsoft' && product.category.toLowerCase() === 'gaming consoles')) {
         return {
           ...product,
-          imageUrl: '/lovable-uploads/77956929-c717-415b-aad8-f8e0bf0069b0.png'
+          imageUrl: '/lovable-uploads/4b5ba4b7-1d75-4c44-aa6c-c1d6e0d028c4.png'
         };
       }
-      // PlayStation 5 get the third uploaded image
+      // PlayStation 5 get the newly uploaded PS5 image
       else if (product.name.toLowerCase() === 'playstation 5' || 
                (product.brand.toLowerCase() === 'playstation' && !product.name.toLowerCase().includes('digital'))) {
         return {
           ...product,
-          imageUrl: '/lovable-uploads/36ef7021-a306-4cf2-a331-b1b3a0e4b33d.png'
+          imageUrl: '/lovable-uploads/245080f6-be80-47c6-b153-72bc982b50ac.png'
         };
       }
-      // PlayStation 5 Digital Edition get the fourth uploaded image
+      // PlayStation 5 Digital Edition get the same new PS5 image
       else if (product.name.toLowerCase().includes('playstation 5 digital') || 
                (product.name.toLowerCase().includes('playstation') && product.name.toLowerCase().includes('digital'))) {
         return {
           ...product,
-          imageUrl: '/lovable-uploads/7b9e23e5-ee70-49a4-ba87-c43c5bd73ce4.png'
+          imageUrl: '/lovable-uploads/245080f6-be80-47c6-b153-72bc982b50ac.png'
         };
       }
       // Vankyo Cosmos 6 gets the first uploaded image

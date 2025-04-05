@@ -14,7 +14,7 @@ export const getCategoryImage = (category: string, brand?: string): string => {
     case 'laptops':
     case 'laptop':
       if (brand?.toLowerCase() === 'google' && category.toLowerCase().includes('chromebook')) {
-        return '/lovable-uploads/ebedb3ff-8b26-4997-a966-7b49d7fd04e0.png';  // Updated Chromebook image
+        return '/lovable-uploads/6b47797a-7950-4e45-9ec1-b49920bedce3.png';  // Updated Chromebook image
       }
       return 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/mbp14-spacegray-select-202301?wid=904&hei=840&fmt=jpeg&qlt=90&.v=1671304673229';  // Generic Laptop
     
@@ -26,11 +26,11 @@ export const getCategoryImage = (category: string, brand?: string): string => {
         return '/lovable-uploads/4b5ba4b7-1d75-4c44-aa6c-c1d6e0d028c4.png';  // Updated Xbox image
       } else if (brand?.toLowerCase() === 'playstation' || brand?.toLowerCase() === 'sony') {
         if (category.toLowerCase().includes('digital')) {
-          return '/lovable-uploads/7b9e23e5-ee70-49a4-ba87-c43c5bd73ce4.png';  // PS5 Digital Edition
+          return '/lovable-uploads/245080f6-be80-47c6-b153-72bc982b50ac.png';  // New PS5 Digital Edition image
         }
-        return '/lovable-uploads/36ef7021-a306-4cf2-a331-b1b3a0e4b33d.png';  // PS5 Standard
+        return '/lovable-uploads/245080f6-be80-47c6-b153-72bc982b50ac.png';  // New PS5 Standard image
       }
-      return '/lovable-uploads/36ef7021-a306-4cf2-a331-b1b3a0e4b33d.png';  // Default to PS5 image
+      return '/lovable-uploads/245080f6-be80-47c6-b153-72bc982b50ac.png';  // Default to PS5 image
     
     case 'tvs':
       return 'https://image-us.samsung.com/SamsungUS/home/television-home-theater/tvs/tvs/01192022/NeoQLED-S95C-2023/NQ9C_75-55_FrontV_Black.jpg';  // Generic TV

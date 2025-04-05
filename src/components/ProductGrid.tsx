@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Product } from '../data/productData';
 import { useToast } from '@/hooks/use-toast';
@@ -159,17 +158,17 @@ const ProductGrid = ({
 
       // Apply new image URLs based on product details
       if (product.brand.toLowerCase() === 'google' && product.name.toLowerCase().includes('chromebook')) {
-        imageUrl = '/lovable-uploads/ebedb3ff-8b26-4997-a966-7b49d7fd04e0.png';
+        imageUrl = '/lovable-uploads/6b47797a-7950-4e45-9ec1-b49920bedce3.png';
       } else if (product.brand.toLowerCase() === 'xbox' || 
                 (product.brand.toLowerCase() === 'microsoft' && product.category.toLowerCase() === 'gaming consoles') ||
                 product.name.toLowerCase().includes('xbox')) {
         imageUrl = '/lovable-uploads/4b5ba4b7-1d75-4c44-aa6c-c1d6e0d028c4.png';
       } else if (product.name.toLowerCase() === 'playstation 5' || 
                 (product.brand.toLowerCase() === 'playstation' && !product.name.toLowerCase().includes('digital'))) {
-        imageUrl = '/lovable-uploads/36ef7021-a306-4cf2-a331-b1b3a0e4b33d.png';
+        imageUrl = '/lovable-uploads/245080f6-be80-47c6-b153-72bc982b50ac.png';
       } else if (product.name.toLowerCase().includes('playstation 5 digital') || 
                 (product.name.toLowerCase().includes('playstation') && product.name.toLowerCase().includes('digital'))) {
-        imageUrl = '/lovable-uploads/7b9e23e5-ee70-49a4-ba87-c43c5bd73ce4.png';
+        imageUrl = '/lovable-uploads/245080f6-be80-47c6-b153-72bc982b50ac.png';
       } else if (product.name.toLowerCase().includes('battlefield')) {
         imageUrl = '/lovable-uploads/ab3d21b8-041b-4137-865c-22fe07795d75.png';
       } else if (product.brand.toLowerCase() === 'nintendo' || product.name.toLowerCase().includes('nintendo') || product.name.toLowerCase().includes('switch')) {

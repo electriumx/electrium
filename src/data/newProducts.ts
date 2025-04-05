@@ -89,7 +89,7 @@ export const allNewProducts: Product[] = [
     category: "Laptops",
     brand: "Google",
     description: "Affordable, lightweight Chromebook with Chrome OS and cloud-based applications.",
-    imageUrl: "/lovable-uploads/fc1b00d0-a962-4050-9b43-2b36399b0651.png",
+    imageUrl: "/lovable-uploads/6b47797a-7950-4e45-9ec1-b49920bedce3.png",
     quantity: 0,
     rating: 4.2,
     reviews: createEmptyReviews()
