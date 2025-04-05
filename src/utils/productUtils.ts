@@ -1,4 +1,3 @@
-
 import { Product, Review } from '../data/productData';
 
 // Convert number reviews to proper Review array format
@@ -75,6 +74,11 @@ export const filterRestrictedProducts = (products: Product[]): Product[] => {
       return false;
     }
     
+    // Filter out "PlayStation 2" products
+    if (product.name.toLowerCase().includes("playstation 2")) {
+      return false;
+    }
+    
     // Filter out multiple Battlefield versions (keep only one)
     if (product.name.toLowerCase().includes("battlefield")) {
       // Keep only the generic "Battlefield" or the newest version
@@ -86,6 +90,15 @@ export const filterRestrictedProducts = (products: Product[]): Product[] => {
     // Filter out Xbox 3 products
     if (product.name.toLowerCase() === "xbox 3") {
       return false;
+    }
+    
+    // Filter out duplicate Chromebook products (keep only one)
+    if (product.name.toLowerCase().includes("chromebook")) {
+      // This will keep only the first Chromebook encountered and filter out any others
+      const chromebookId = products.find(p => p.name.toLowerCase().includes("chromebook"))?.id;
+      if (chromebookId && product.id !== chromebookId) {
+        return false;
+      }
     }
     
     return true;
@@ -103,6 +116,11 @@ export const updateProductNames = (products: Product[]): Product[] => {
     // Rename Xbox 2 to Xbox 360
     if (product.name.toLowerCase() === "xbox 2") {
       product.name = "Xbox 360";
+    }
+    
+    // Rename PlayStation 3 to PlayStation 4
+    if (product.name.toLowerCase() === "playstation 3") {
+      product.name = "PlayStation 4";
     }
     
     return product;
