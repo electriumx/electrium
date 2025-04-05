@@ -1,3 +1,4 @@
+
 // At the top of the file, import the Product interface
 import { Product, Review } from './productData';
 
@@ -192,13 +193,13 @@ export const allNewProducts: Product[] = [
     category: "Gaming Consoles",
     brand: "Sony",
     description: "Next-gen gaming console without disc drive, featuring lightning-fast loading.",
-    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
+    imageUrl: "/lovable-uploads/67d0bb7c-dce4-421b-9ccc-4e0b5f12c545.png",
     quantity: 0,
     rating: 4.8,
     reviews: createEmptyReviews(),
     accessories: [
-      fixAccessoryFormat({ id: "107", name: "DualSense Controller", price: 69.99, category: 'accessory', image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" }),
-      fixAccessoryFormat({ id: "108", name: "Media Remote", price: 29.99, category: 'accessory', image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" })
+      fixAccessoryFormat({ id: "107", name: "DualSense Controller", price: 69.99, category: 'accessory', image: "/lovable-uploads/67d0bb7c-dce4-421b-9ccc-4e0b5f12c545.png" }),
+      fixAccessoryFormat({ id: "108", name: "Media Remote", price: 29.99, category: 'accessory', image: "/lovable-uploads/67d0bb7c-dce4-421b-9ccc-4e0b5f12c545.png" })
     ]
   },
   {

@@ -164,9 +164,8 @@ const ProductGrid = ({
                 product.name.toLowerCase().includes('xbox')) {
         imageUrl = '/lovable-uploads/4b5ba4b7-1d75-4c44-aa6c-c1d6e0d028c4.png';
       } else if (product.name.toLowerCase() === 'playstation 5' || 
-                (product.brand.toLowerCase() === 'playstation' && !product.name.toLowerCase().includes('digital'))) {
-        imageUrl = '/lovable-uploads/245080f6-be80-47c6-b153-72bc982b50ac.png';
-      } else if (product.name.toLowerCase().includes('playstation 5 digital') || 
+                (product.brand.toLowerCase() === 'playstation' && !product.name.toLowerCase().includes('digital')) ||
+                product.name.toLowerCase().includes('playstation 5 digital') || 
                 (product.name.toLowerCase().includes('playstation') && product.name.toLowerCase().includes('digital'))) {
         imageUrl = '/lovable-uploads/245080f6-be80-47c6-b153-72bc982b50ac.png';
       } else if (product.name.toLowerCase().includes('battlefield')) {
