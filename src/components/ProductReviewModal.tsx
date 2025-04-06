@@ -75,7 +75,7 @@ const ProductReviewModal = ({
   };
 
   const handleStarClick = (value: number) => {
-    setRating(parseFloat(value.toFixed(1)));
+    setRating(value);
   };
 
   const renderStarRating = () => {
@@ -83,31 +83,34 @@ const ProductReviewModal = ({
     const maxStars = 5;
     const starsArray = [];
     
-    for (let i = 0; i < 50; i++) {
-      // Each segment represents 0.1 stars
-      const currentValue = (i + 1) / 10;
-      const isFilled = activeRating >= currentValue;
-      
-      // Determine if this is the start of a new star
-      const isNewStar = i % 10 === 0;
-      
-      // Calculate which star this segment belongs to (1-5)
-      const starNumber = Math.floor(i / 10) + 1;
-      
-      starsArray.push(
-        <div 
-          key={i}
-          className={`inline-block w-[2.5px] h-5 cursor-pointer ${isFilled ? 'bg-yellow-400' : 'bg-gray-300'} ${isNewStar ? 'rounded-l' : i % 10 === 9 ? 'rounded-r' : ''}`}
-          onClick={() => handleStarClick(currentValue)}
-          onMouseEnter={() => handleStarHover(currentValue)}
-          onMouseLeave={() => setHoverRating(0)}
-          title={`${currentValue.toFixed(1)} stars`}
-        />
-      );
+    for (let i = 1; i <= maxStars; i++) {
+      // For each star, we'll create two half-star clickable areas
+      for (let half = 0; half < 2; half++) {
+        const starValue = i - 0.5 + half * 0.5;
+        const isFilled = activeRating >= starValue;
+        
+        starsArray.push(
+          <div 
+            key={`star-${i}-${half}`}
+            className="inline-block cursor-pointer relative"
+            onClick={() => handleStarClick(starValue)}
+            onMouseEnter={() => handleStarHover(starValue)}
+            onMouseLeave={() => setHoverRating(0)}
+            title={`${starValue.toFixed(1)} stars`}
+          >
+            <Star 
+              className={`h-6 w-6 ${isFilled ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
+              style={{ 
+                clipPath: half === 0 ? 'polygon(0 0, 50% 0, 50% 100%, 0 100%)' : 'polygon(50% 0, 100% 0, 100% 100%, 50% 100%)'
+              }}
+            />
+          </div>
+        );
+      }
     }
     
     return (
-      <div className="flex">
+      <div className="flex items-center">
         {starsArray}
         <span className="ml-2 text-sm">({activeRating.toFixed(1)})</span>
       </div>
@@ -134,7 +137,7 @@ const ProductReviewModal = ({
           </div>
           
           <div className="space-y-2">
-            <Label>Rating (1-5 stars, precise to 0.1)</Label>
+            <Label>Rating (0.5-5 stars)</Label>
             {renderStarRating()}
           </div>
           
