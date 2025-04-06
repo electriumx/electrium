@@ -70,76 +70,48 @@ const ProductReviewModal = ({
     }
   };
 
-  const handleStarClick = (index: number, portion: number) => {
-    // 0 = left half, 1 = right half
-    const newRating = index + (portion === 1 ? 1.0 : 0.5);
-    setRating(newRating);
+  const handleStarHover = (value: number) => {
+    setHoverRating(value);
   };
 
-  const handleStarHover = (index: number, portion: number) => {
-    const newHoverRating = index + (portion === 1 ? 1.0 : 0.5);
-    setHoverRating(newHoverRating);
+  const handleStarClick = (value: number) => {
+    setRating(parseFloat(value.toFixed(1)));
   };
 
-  const renderStars = () => {
-    const stars = [];
+  const renderStarRating = () => {
     const activeRating = hoverRating || rating;
+    const maxStars = 5;
+    const starsArray = [];
     
-    for (let i = 0; i < 5; i++) {
-      const leftFill = activeRating >= i + 0.5 ? "gold" : "none";
-      const rightFill = activeRating >= i + 1 ? "gold" : "none";
+    for (let i = 0; i < 50; i++) {
+      // Each segment represents 0.1 stars
+      const currentValue = (i + 1) / 10;
+      const isFilled = activeRating >= currentValue;
       
-      stars.push(
-        <div key={i} className="relative inline-block" style={{ width: "24px", height: "24px" }}>
-          <div 
-            className="absolute left-0 top-0 w-1/2 h-full cursor-pointer overflow-hidden" 
-            onClick={() => handleStarClick(i, 0)}
-            onMouseEnter={() => handleStarHover(i, 0)}
-            onMouseLeave={() => setHoverRating(0)}
-          >
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              width="24" 
-              height="24" 
-              viewBox="0 0 24 24" 
-              fill={leftFill} 
-              stroke="currentColor" 
-              strokeWidth="1.5" 
-              strokeLinecap="round" 
-              strokeLinejoin="round"
-              className="text-yellow-500 transition-colors"
-              style={{ clipPath: "polygon(0 0, 50% 0, 50% 100%, 0 100%)" }}
-            >
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-            </svg>
-          </div>
-          <div 
-            className="absolute left-1/2 top-0 w-1/2 h-full cursor-pointer overflow-hidden" 
-            onClick={() => handleStarClick(i, 1)}
-            onMouseEnter={() => handleStarHover(i, 1)}
-            onMouseLeave={() => setHoverRating(0)}
-          >
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              width="24" 
-              height="24" 
-              viewBox="0 0 24 24" 
-              fill={rightFill} 
-              stroke="currentColor" 
-              strokeWidth="1.5" 
-              strokeLinecap="round" 
-              strokeLinejoin="round"
-              className="text-yellow-500 transition-colors"
-              style={{ clipPath: "polygon(50% 0, 100% 0, 100% 100%, 50% 100%)" }}
-            >
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-            </svg>
-          </div>
-        </div>
+      // Determine if this is the start of a new star
+      const isNewStar = i % 10 === 0;
+      
+      // Calculate which star this segment belongs to (1-5)
+      const starNumber = Math.floor(i / 10) + 1;
+      
+      starsArray.push(
+        <div 
+          key={i}
+          className={`inline-block w-[2.5px] h-5 cursor-pointer ${isFilled ? 'bg-yellow-400' : 'bg-gray-300'} ${isNewStar ? 'rounded-l' : i % 10 === 9 ? 'rounded-r' : ''}`}
+          onClick={() => handleStarClick(currentValue)}
+          onMouseEnter={() => handleStarHover(currentValue)}
+          onMouseLeave={() => setHoverRating(0)}
+          title={`${currentValue.toFixed(1)} stars`}
+        />
       );
     }
     
-    return stars;
+    return (
+      <div className="flex">
+        {starsArray}
+        <span className="ml-2 text-sm">({activeRating.toFixed(1)})</span>
+      </div>
+    );
   };
 
   return (
@@ -162,10 +134,8 @@ const ProductReviewModal = ({
           </div>
           
           <div className="space-y-2">
-            <Label>Rating ({rating.toFixed(1)} out of 5)</Label>
-            <div className="flex gap-1">
-              {renderStars()}
-            </div>
+            <Label>Rating (1-5 stars, precise to 0.1)</Label>
+            {renderStarRating()}
           </div>
           
           <div className="space-y-2">
