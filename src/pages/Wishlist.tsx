@@ -21,7 +21,20 @@ const Wishlist = () => {
     const savedWishlist = localStorage.getItem('wishlist');
     if (savedWishlist) {
       try {
-        setWishlistItems(JSON.parse(savedWishlist));
+        const parsedWishlist = JSON.parse(savedWishlist);
+        // Ensure each wishlist item has required properties
+        const validItems = parsedWishlist.map((item: any) => ({
+          id: item.id || 0,
+          name: item.name || '',
+          price: item.price || 0,
+          imageUrl: item.imageUrl || '',
+          brand: item.brand || '',
+          description: item.description || '',
+          category: item.category || '',
+          quantity: item.quantity || 0,
+          reviews: item.reviews || []
+        }));
+        setWishlistItems(validItems);
       } catch (error) {
         console.error('Error parsing wishlist:', error);
       }
