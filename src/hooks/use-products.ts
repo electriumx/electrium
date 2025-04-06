@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Product, products as initialProducts } from '../data/productData';
 import { generateAdditionalProducts } from '../data/additionalProducts';
@@ -306,30 +305,6 @@ export const useProducts = () => {
           imageUrl: '/lovable-uploads/245080f6-be80-47c6-b153-72bc982b50ac.png'
         };
       }
-      // Red Dead Redemption 2 gets the newly uploaded image
-      else if (product.name.toLowerCase().includes('red dead redemption')) {
-        return {
-          ...product,
-          imageUrl: '/lovable-uploads/26e6e062-7742-4fc2-a35f-284e14029789.png'
-        };
-      }
-      // Sony WH-1000XM4 gets the newly uploaded image
-      else if (product.name.toLowerCase().includes('sony wh-1000xm4') || 
-               (product.brand.toLowerCase() === 'sony' && product.name.toLowerCase().includes('wh-1000xm4'))) {
-        return {
-          ...product,
-          imageUrl: '/lovable-uploads/448f842e-5c19-44d1-8657-1685577d1d5b.png'
-        };
-      }
-      // All refrigerators (mini) get the newly uploaded image
-      else if (product.category === 'Refrigerators' || 
-               product.name.toLowerCase().includes('mini refrigerator') ||
-               product.name.toLowerCase().includes('mini fridge')) {
-        return {
-          ...product,
-          imageUrl: '/lovable-uploads/36fdb57d-95cb-4f52-a96a-aaf2f174a210.png'
-        };
-      }
       // Vankyo Cosmos 6 gets the first uploaded image
       else if (product.name === "Vankyo Cosmos 6") {
         return {
@@ -547,7 +522,7 @@ export const useProducts = () => {
       else if (product.category === "Refrigerators") {
         return {
           ...product,
-          imageUrl: "/lovable-uploads/36fdb57d-95cb-4f52-a96a-aaf2f174a210.png"
+          imageUrl: "/lovable-uploads/b43ca66e-4dd7-4f6f-9b2d-f2af3a926756.png"
         };
       }
       // All air conditioners get the fourth image
@@ -567,25 +542,8 @@ export const useProducts = () => {
       return product;
     });
     
-    // Add FPS Games subcategory to more games
-    const productsWithSubcategories = updatedProducts.map(product => {
-      if (product.category === "PC Games" || product.category === "Games" || product.category === "Gaming") {
-        if (product.name.toLowerCase().includes("call of duty") || 
-            product.name.toLowerCase().includes("battlefield") || 
-            product.name.toLowerCase().includes("rainbow six") || 
-            product.name.toLowerCase().includes("counter-strike") || 
-            product.name.toLowerCase().includes("fps")) {
-          return {
-            ...product,
-            subcategory: "FPS Games"
-          };
-        }
-      }
-      return product;
-    });
-    
     // Filter out restricted products
-    const filteredFinalProducts = filterRestrictedProducts(productsWithSubcategories);
+    const filteredFinalProducts = filterRestrictedProducts(updatedProducts);
     
     setProducts(filteredFinalProducts);
   }, []);

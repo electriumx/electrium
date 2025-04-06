@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Product } from '../data/productData';
 import { useToast } from '@/hooks/use-toast';
@@ -168,7 +167,7 @@ const ProductGrid = ({
                 (product.brand.toLowerCase() === 'playstation' && !product.name.toLowerCase().includes('digital')) ||
                 product.name.toLowerCase().includes('playstation 5 digital') || 
                 (product.name.toLowerCase().includes('playstation') && product.name.toLowerCase().includes('digital'))) {
-        imageUrl = '/lovable-uploads/67d0bb7c-dce4-421b-9ccc-4e0b5f12c545.png';
+        imageUrl = '/lovable-uploads/245080f6-be80-47c6-b153-72bc982b50ac.png';
       } else if (product.name.toLowerCase().includes('battlefield')) {
         imageUrl = '/lovable-uploads/ab3d21b8-041b-4137-865c-22fe07795d75.png';
       } else if (product.brand.toLowerCase() === 'nintendo' || product.name.toLowerCase().includes('nintendo') || product.name.toLowerCase().includes('switch')) {
@@ -199,15 +198,6 @@ const ProductGrid = ({
         imageUrl = '/lovable-uploads/49cf3cc6-b591-4fe9-b0ca-7e21178098d2.png';
       } else if (product.category === 'Washing Machines') {
         imageUrl = '/lovable-uploads/2ae5236f-4492-452a-b393-492c225380c1.png';
-      } else if (product.name.toLowerCase().includes('wh-1000xm4') || 
-                (product.brand.toLowerCase() === 'sony' && product.name.toLowerCase().includes('wh-1000xm4'))) {
-        imageUrl = '/lovable-uploads/448f842e-5c19-44d1-8657-1685577d1d5b.png';
-      } else if (product.name.toLowerCase().includes('red dead redemption')) {
-        imageUrl = '/lovable-uploads/26e6e062-7742-4fc2-a35f-284e14029789.png';
-      } else if (product.category === 'Refrigerators' || 
-                 product.name.toLowerCase().includes('mini refrigerator') ||
-                 product.name.toLowerCase().includes('mini fridge')) {
-        imageUrl = '/lovable-uploads/36fdb57d-95cb-4f52-a96a-aaf2f174a210.png';
       } else if (product.category === 'Headphones') {
         imageUrl = getHeadphoneImage(product.name, product.brand);
       } else if (product.brand === 'Samsung') {
@@ -240,9 +230,7 @@ const ProductGrid = ({
                   {discountPercentage}% OFF
                 </div>}
               
-              {product.subcategory && <div className="absolute bottom-2 left-2 bg-primary text-primary-foreground text-xs font-medium px-2 py-1 rounded">
-                  {product.subcategory}
-                </div>}
+              {product.subcategory && <div className="subcategory-element">{product.subcategory}</div>}
             </div>
             <div className="p-4">
               <h3 className="text-lg font-semibold mb-1 line-clamp-1">{formatText(product.name)}</h3>

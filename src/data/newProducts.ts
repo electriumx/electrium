@@ -209,13 +209,13 @@ export const allNewProducts: Product[] = [
     category: "Gaming Consoles",
     brand: "Microsoft",
     description: "Smallest Xbox ever, all-digital console for next-gen gaming.",
-    imageUrl: "/lovable-uploads/4b5ba4b7-1d75-4c44-aa6c-c1d6e0d028c4.png",
+    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
     quantity: 0,
     rating: 4.7,
     reviews: createEmptyReviews(),
     accessories: [
-      fixAccessoryFormat({ id: "109", name: "Xbox Wireless Controller", price: 59.99, category: 'accessory', image: "/lovable-uploads/4b5ba4b7-1d75-4c44-aa6c-c1d6e0d028c4.png" }),
-      fixAccessoryFormat({ id: "110", name: "Play & Charge Kit", price: 24.99, category: 'accessory', image: "/lovable-uploads/4b5ba4b7-1d75-4c44-aa6c-c1d6e0d028c4.png" })
+      fixAccessoryFormat({ id: "109", name: "Xbox Wireless Controller", price: 59.99, category: 'accessory', image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" }),
+      fixAccessoryFormat({ id: "110", name: "Play & Charge Kit", price: 24.99, category: 'accessory', image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" })
     ]
   }
 ];
