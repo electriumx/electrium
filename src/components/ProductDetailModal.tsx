@@ -38,66 +38,231 @@ const ensureReviewsArray = (reviews: any): Review[] => {
   return [];
 };
 
-const getTechSpecs = (productId: number, brand: string) => {
-  const specs = {
-    Apple: {
+const getTechSpecs = (productId: number, brand: string, name: string, category: string): Record<string, string> => {
+  const defaultSpecs = {
+    ram: "8GB",
+    storage: "256GB SSD",
+    processor: "Octa-core",
+    display: "13.3-inch Retina Display",
+    battery: "Up to 18 hours",
+    camera: "1080p FaceTime HD Camera",
+    connectivity: "Wi-Fi 6, Bluetooth 5.0"
+  };
+  
+  if (name.toLowerCase().includes('iphone 13 pro')) {
+    return {
+      processor: "A15 Bionic chip",
+      ram: "6GB",
+      storage: "128GB/256GB/512GB/1TB",
+      display: "6.1-inch Super Retina XDR with ProMotion",
+      camera: "Pro 12MP camera system with Telephoto, Wide, and Ultra Wide",
+      battery: "Up to 22 hours video playback",
+      connectivity: "5G, Wi-Fi 6, Bluetooth 5.0, NFC"
+    };
+  } else if (name.toLowerCase().includes('galaxy s21')) {
+    return {
+      processor: "Snapdragon 888 or Exynos 2100",
       ram: "8GB",
-      storage: "256GB SSD",
-      processor: "Apple M2 Chip",
-      display: "13.3-inch Retina Display",
-      battery: "Up to 18 hours",
-      camera: "1080p FaceTime HD Camera",
-      connectivity: "Wi-Fi 6, Bluetooth 5.0"
-    },
-    Samsung: {
-      ram: "12GB",
-      storage: "512GB",
-      processor: "Snapdragon 8 Gen 2",
-      display: "6.8-inch Dynamic AMOLED 2X",
-      battery: "5000mAh",
-      camera: "108MP main camera",
-      connectivity: "5G, Wi-Fi 6E, Bluetooth 5.3"
-    },
-    Sony: {
-      ram: "8GB",
-      storage: "1TB SSD",
-      processor: "AMD Ryzen 7",
-      display: "15.6-inch 4K OLED",
+      storage: "128GB/256GB",
+      display: "6.2-inch Dynamic AMOLED 2X, 120Hz",
+      camera: "12MP + 12MP + 64MP triple rear camera",
+      battery: "4000mAh",
+      connectivity: "5G, Wi-Fi 6, Bluetooth 5.0, NFC"
+    };
+  } else if (name.toLowerCase().includes('dell xps 15')) {
+    return {
+      processor: "11th Gen Intel Core i7-11800H",
+      ram: "16GB DDR4",
+      storage: "512GB SSD",
+      display: "15.6-inch 4K UHD+ (3840 x 2400)",
+      graphics: "NVIDIA GeForce RTX 3050 Ti 4GB GDDR6",
       battery: "Up to 10 hours",
-      camera: "HD Webcam",
-      connectivity: "Wi-Fi 6, Bluetooth 5.1"
-    },
-    PlayStation: {
-      processor: "Custom AMD Zen 2, 8 cores",
+      connectivity: "Wi-Fi 6, Bluetooth 5.1, Thunderbolt 4"
+    };
+  } else if (name.toLowerCase().includes('sony wh-1000xm4')) {
+    return {
+      driver: "40mm, dome type (CCAW Voice coil)",
+      frequency: "4Hz-40,000Hz",
+      battery: "Up to 30 hours with noise canceling on",
+      charging: "USB-C, 10 min charge for 5 hours playback",
+      connectivity: "Bluetooth 5.0, NFC, 3.5mm audio cable",
+      noise_cancellation: "HD Noise Canceling Processor QN1",
+      additional: "Touch controls, speak-to-chat, multi-device pairing"
+    };
+  } else if (name.toLowerCase().includes('ipad pro')) {
+    return {
+      processor: "Apple M1 chip",
+      ram: "8GB/16GB",
+      storage: "128GB/256GB/512GB/1TB/2TB",
+      display: "11-inch or 12.9-inch Liquid Retina XDR",
+      camera: "12MP Wide + 10MP Ultra Wide + LiDAR Scanner",
+      battery: "Up to 10 hours",
+      connectivity: "5G, Wi-Fi 6, Bluetooth 5.0, USB-C"
+    };
+  } else if (name.toLowerCase().includes('playstation 5')) {
+    return {
+      cpu: "Custom AMD Zen 2, 8 cores at 3.5GHz",
       gpu: "Custom RDNA 2, 10.28 TFLOPs",
       ram: "16GB GDDR6",
       storage: "825GB SSD",
-      resolution: "Up to 4K at 120fps",
-      audioOutput: "Tempest 3D AudioTech",
+      resolution: "Up to 8K, 4K at 120fps",
+      audio: "Tempest 3D AudioTech",
       connectivity: "Wi-Fi 6, Bluetooth 5.1, HDMI 2.1"
-    },
-    "PC Games": {
-      minCpu: "Intel Core i5 or AMD Ryzen 5",
-      recCpu: "Intel Core i7 or AMD Ryzen 7",
-      minGpu: "NVIDIA GTX 1660 or AMD RX 5600 XT",
-      recGpu: "NVIDIA RTX 3060 or AMD RX 6700 XT",
-      minRam: "8GB RAM",
-      recRam: "16GB RAM",
-      storage: "70GB available space",
-      os: "Windows 10 64-bit"
-    },
-    default: {
-      ram: "6GB",
-      storage: "128GB",
-      processor: "Octa-core",
-      display: "6.5-inch IPS LCD",
-      battery: "4500mAh",
-      camera: "64MP main camera",
-      connectivity: "4G LTE, Wi-Fi 5, Bluetooth 5.0"
+    };
+  } else if (name.toLowerCase().includes('xbox series x')) {
+    return {
+      cpu: "Custom AMD Zen 2, 8 cores at 3.8GHz",
+      gpu: "Custom RDNA 2, 12 TFLOPs",
+      ram: "16GB GDDR6",
+      storage: "1TB Custom NVMe SSD",
+      resolution: "Up to 8K, 4K at 120fps",
+      audio: "Dolby Atmos, DTS:X",
+      connectivity: "Wi-Fi 6, Bluetooth 5.1, HDMI 2.1"
+    };
+  } else if (name.toLowerCase().includes('elden ring')) {
+    return {
+      developer: "FromSoftware",
+      publisher: "Bandai Namco",
+      genre: "Action RPG",
+      release_date: "February 25, 2022",
+      platforms: "PC, PS4, PS5, Xbox One, Xbox Series X/S",
+      engine: "Custom engine",
+      multiplayer: "Online co-op and PvP"
+    };
+  } else if (name.toLowerCase().includes('red dead redemption 2')) {
+    return {
+      developer: "Rockstar Games",
+      publisher: "Rockstar Games",
+      genre: "Action-Adventure",
+      release_date: "October 26, 2018",
+      platforms: "PC, PS4, Xbox One",
+      engine: "RAGE",
+      setting: "American Old West, 1899"
+    };
+  } else if (brand === "Apple" && category === "Audio") {
+    return {
+      driver: "Custom high-excursion Apple driver",
+      chip: "H1 chip",
+      battery: "Up to 4.5 hours listening time, 24 hours with charging case",
+      charging: "Lightning connector, Qi-certified wireless charging",
+      connectivity: "Bluetooth 5.0",
+      features: "Active Noise Cancellation, Transparency mode, Adaptive EQ",
+      resistance: "Sweat and water resistant (IPX4)"
+    };
+  }
+  
+  if (brand) {
+    switch(brand.toLowerCase()) {
+      case "apple":
+        return {
+          processor: "Apple Silicon",
+          ram: "8GB",
+          storage: "256GB SSD",
+          display: "Retina Display",
+          battery: "Up to 20 hours",
+          camera: "12MP camera",
+          connectivity: "Wi-Fi 6, Bluetooth 5.0"
+        };
+      case "samsung":
+        return {
+          processor: "Snapdragon or Exynos",
+          ram: "8GB",
+          storage: "128GB",
+          display: "AMOLED Display",
+          battery: "4500mAh",
+          camera: "64MP main camera",
+          connectivity: "5G, Wi-Fi 6, Bluetooth 5.1"
+        };
+      case "sony":
+        return {
+          processor: "Snapdragon 888",
+          ram: "12GB",
+          storage: "256GB",
+          display: "4K HDR OLED",
+          battery: "4500mAh",
+          camera: "Zeiss optics, 108MP",
+          connectivity: "5G, Wi-Fi 6, Bluetooth 5.2"
+        };
+      case "bose":
+        return {
+          driver: "TriPort acoustic headphone structure",
+          battery: "Up to 20 hours",
+          charging: "USB-C",
+          connectivity: "Bluetooth 5.0, 3.5mm audio cable",
+          noise_cancellation: "11 levels of noise cancellation",
+          microphone: "Four-microphone system",
+          features: "Voice assistants, touch controls"
+        };
     }
-  };
-
-  return specs[brand as keyof typeof specs] || specs.default;
+  }
+  
+  if (category) {
+    switch(category.toLowerCase()) {
+      case "smartphones":
+        return {
+          processor: "Octa-core processor",
+          ram: "6GB",
+          storage: "128GB",
+          display: "6.5-inch Full HD+",
+          battery: "4500mAh",
+          camera: "Quad camera setup",
+          connectivity: "5G, Wi-Fi, Bluetooth 5.0"
+        };
+      case "laptops":
+        return {
+          processor: "Intel Core i7 or AMD Ryzen 7",
+          ram: "16GB DDR4",
+          storage: "512GB SSD",
+          display: "15.6-inch Full HD",
+          graphics: "Integrated or dedicated GPU",
+          battery: "Up to 8 hours",
+          connectivity: "Wi-Fi 6, Bluetooth 5.1, USB-C"
+        };
+      case "headphones":
+        return {
+          driver: "40mm dynamic driver",
+          frequency: "20Hz-20,000Hz",
+          battery: "Up to 30 hours",
+          charging: "USB-C",
+          connectivity: "Bluetooth 5.0, 3.5mm audio",
+          features: "Noise cancellation, built-in mic",
+          weight: "Approximately 250g"
+        };
+      case "tablets":
+        return {
+          processor: "Octa-core processor",
+          ram: "4GB",
+          storage: "64GB",
+          display: "10.1-inch Full HD",
+          battery: "7000mAh",
+          camera: "8MP rear, 5MP front",
+          connectivity: "Wi-Fi, Bluetooth 5.0"
+        };
+      case "gaming consoles":
+        return {
+          cpu: "Custom processor",
+          gpu: "Custom graphics",
+          ram: "16GB",
+          storage: "1TB SSD",
+          resolution: "4K gaming",
+          features: "Ray tracing, HDR",
+          connectivity: "Wi-Fi 6, Bluetooth 5.1"
+        };
+      case "pc games":
+      case "gaming":
+        return {
+          developer: "Game studio",
+          publisher: "Publishing company",
+          genre: "Game genre",
+          release_date: "Release year",
+          platforms: "Available platforms",
+          modes: "Single-player, Multiplayer",
+          rating: "ESRB rating"
+        };
+    }
+  }
+  
+  return defaultSpecs;
 };
 
 const accessories: Accessory[] = [
@@ -200,10 +365,10 @@ const ProductDetailModal = ({
     const accessoriesTotal = confirmedAccessories.reduce((sum, acc) => sum + acc.price, 0);
     total += accessoriesTotal;
     
-    setTotalPrice(total);
-  }, [confirmedAccessories, price, discountedPrice, discount]);
+    setTotalPrice(total * quantity);
+  }, [confirmedAccessories, price, discountedPrice, discount, quantity]);
   
-  const specs = getTechSpecs(id, brand);
+  const specs = getTechSpecs(id, brand, name, category);
   
   const compatibleAccessories = accessories.filter(acc => 
     acc.compatible.includes(brand)
@@ -264,6 +429,12 @@ const ProductDetailModal = ({
 
   const handleConfirmAccessories = () => {
     setConfirmedAccessories([...selectedAccessories]);
+    
+    const basePrice = discount > 0 ? discountedPrice : price;
+    const accessoriesTotal = selectedAccessories.reduce((sum, acc) => sum + acc.price, 0);
+    const newTotal = (basePrice + accessoriesTotal) * quantity;
+    setTotalPrice(newTotal);
+    
     toast({
       title: "Accessories Confirmed",
       description: `${selectedAccessories.length} accessories added to your product`,
@@ -448,6 +619,10 @@ const ProductDetailModal = ({
                 {confirmedAccessories.length > 0 && (
                   <p className="text-sm mt-1">
                     With accessories: <span className="font-semibold">${totalPrice.toFixed(2)}</span>
+                    <span className="text-xs ml-2 text-muted-foreground">
+                      (Base: ${(discount > 0 ? discountedPrice : price) * quantity}.toFixed(2)} + Accessories: $
+                      {confirmedAccessories.reduce((sum, acc) => sum + acc.price, 0).toFixed(2)}) × {quantity}
+                    </span>
                   </p>
                 )}
                 <p className="text-muted-foreground">Brand: {brand}</p>
@@ -495,14 +670,26 @@ const ProductDetailModal = ({
                 <div className="mt-6 flex items-center justify-between">
                   <div className="flex items-center">
                     <button 
-                      onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
+                      onClick={() => {
+                        const newQuantity = Math.max(1, quantity - 1);
+                        setQuantity(newQuantity);
+                        const basePrice = discount > 0 ? discountedPrice : price;
+                        const accessoriesTotal = confirmedAccessories.reduce((sum, acc) => sum + acc.price, 0);
+                        setTotalPrice((basePrice + accessoriesTotal) * newQuantity);
+                      }}
                       className="px-3 py-1 bg-secondary rounded-l-md border-r border-border"
                     >
                       -
                     </button>
                     <span className="px-4 py-1 bg-secondary">{quantity}</span>
                     <button 
-                      onClick={() => setQuantity(prev => prev + 1)}
+                      onClick={() => {
+                        const newQuantity = quantity + 1;
+                        setQuantity(newQuantity);
+                        const basePrice = discount > 0 ? discountedPrice : price;
+                        const accessoriesTotal = confirmedAccessories.reduce((sum, acc) => sum + acc.price, 0);
+                        setTotalPrice((basePrice + accessoriesTotal) * newQuantity);
+                      }}
                       className="px-3 py-1 bg-secondary rounded-r-md border-l border-border"
                     >
                       +
@@ -522,7 +709,7 @@ const ProductDetailModal = ({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {Object.entries(specs).map(([key, value]) => (
                     <div key={key} className="flex justify-between py-2 border-b">
-                      <span className="font-medium">{key.charAt(0).toUpperCase() + key.slice(1)}</span>
+                      <span className="font-medium">{key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ')}</span>
                       <span>{value}</span>
                     </div>
                   ))}
@@ -585,13 +772,13 @@ const ProductDetailModal = ({
                       <h4 className="font-medium mb-2">Selected Accessories</h4>
                       <div className="flex justify-between items-center mb-2">
                         <p className="text-sm">Base price:</p>
-                        <p className="text-sm">${(discount > 0 ? discountedPrice : price).toFixed(2)}</p>
+                        <p className="text-sm">${((discount > 0 ? discountedPrice : price) * quantity).toFixed(2)}</p>
                       </div>
                       <ul className="space-y-2 mb-2">
                         {confirmedAccessories.map(accessory => (
                           <li key={accessory.id} className="flex justify-between text-sm">
                             <span>{accessory.name}</span>
-                            <span>${accessory.price.toFixed(2)}</span>
+                            <span>${(accessory.price * quantity).toFixed(2)}</span>
                           </li>
                         ))}
                       </ul>

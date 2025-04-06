@@ -2,13 +2,14 @@
 import { useState, useEffect } from 'react';
 import { Product } from '../data/productData';
 import ProductGrid from '../components/ProductGrid';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Wishlist = () => {
   const [wishlistItems, setWishlistItems] = useState<Product[]>([]);
+  const [productStocks, setProductStocks] = useState<Record<number, number>>({});
   const { toast } = useToast();
   const navigate = useNavigate();
   
@@ -18,6 +19,17 @@ const Wishlist = () => {
   };
   
   useEffect(() => {
+    // Load product stocks from localStorage
+    const savedStocks = localStorage.getItem('productStocks');
+    if (savedStocks) {
+      try {
+        setProductStocks(JSON.parse(savedStocks));
+      } catch (error) {
+        console.error('Error parsing product stocks:', error);
+      }
+    }
+    
+    // Load wishlist items from localStorage
     const savedWishlist = localStorage.getItem('wishlist');
     if (savedWishlist) {
       try {
@@ -37,11 +49,12 @@ const Wishlist = () => {
         setWishlistItems(validItems);
       } catch (error) {
         console.error('Error parsing wishlist:', error);
+        setWishlistItems([]);
       }
     }
   }, []);
 
-  const handleQuantityChange = (id: number, quantity: number) => {
+  const handleQuantityChange = (id: number, quantity: number, selectedColor?: string) => {
     const updatedWishlist = [...wishlistItems];
     const existingItemIndex = updatedWishlist.findIndex(item => item.id === id);
     
@@ -54,6 +67,9 @@ const Wishlist = () => {
         });
       } else {
         updatedWishlist[existingItemIndex].quantity = quantity;
+        if (selectedColor) {
+          updatedWishlist[existingItemIndex].selectedColor = selectedColor;
+        }
       }
     }
     
@@ -62,7 +78,9 @@ const Wishlist = () => {
     
     // If quantity is greater than 0, add to cart
     if (quantity > 0) {
+      // Find the product
       const product = updatedWishlist[existingItemIndex];
+      if (!product) return;
       
       // Get current cart
       const savedCart = localStorage.getItem('cart');
@@ -77,16 +95,23 @@ const Wishlist = () => {
       }
       
       // Check if product is already in cart
-      const cartItemIndex = cartItems.findIndex(item => item.id === id);
+      const cartItemIndex = cartItems.findIndex(item => 
+        item.id === id && 
+        (!selectedColor || item.selectedColor === selectedColor)
+      );
       
       if (cartItemIndex !== -1) {
         // Update quantity if already in cart
         cartItems[cartItemIndex].quantity = quantity;
+        if (selectedColor) {
+          cartItems[cartItemIndex].selectedColor = selectedColor;
+        }
       } else {
         // Add new product to cart
         cartItems.push({
           ...product,
-          quantity
+          quantity,
+          selectedColor: selectedColor || "Blue" // Default color if none selected
         });
       }
       
@@ -97,7 +122,25 @@ const Wishlist = () => {
         detail: cartItems
       });
       window.dispatchEvent(event);
+      
+      // Update product stock
+      const updatedStocks = { ...productStocks };
+      const currentStock = updatedStocks[id] || 0;
+      const oldQuantity = product.quantity || 0;
+      const quantityDiff = quantity - oldQuantity;
+      
+      if (quantityDiff > 0) {
+        updatedStocks[id] = Math.max(0, currentStock - quantityDiff);
+        setProductStocks(updatedStocks);
+        localStorage.setItem('productStocks', JSON.stringify(updatedStocks));
+      }
     }
+  };
+
+  const handleUpdateStock = (id: number, newStock: number) => {
+    const updatedStocks = { ...productStocks, [id]: newStock };
+    setProductStocks(updatedStocks);
+    localStorage.setItem('productStocks', JSON.stringify(updatedStocks));
   };
 
   return (
@@ -120,6 +163,8 @@ const Wishlist = () => {
             onQuantityChange={handleQuantityChange}
             discounts={{}}
             showWishlistButton={true}
+            productStocks={productStocks}
+            updateStock={handleUpdateStock}
           />
           
           <div className="mt-8 flex justify-center">
