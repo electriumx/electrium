@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Product } from '../data/productData';
 import ProductGrid from '../components/ProductGrid';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
