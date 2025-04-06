@@ -21,6 +21,7 @@ const Trade = () => {
   const [tradeForProducts, setTradeForProducts] = useState<Product[]>([]);
   const [secondSearchQuery, setSecondSearchQuery] = useState('');
   const [secondCategory, setSecondCategory] = useState('all');
+  const [wantedItemQuery, setWantedItemQuery] = useState('');
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -71,12 +72,17 @@ const Trade = () => {
                              product.brand.toLowerCase().includes(secondSearchQuery.toLowerCase());
         const matchesCategory = secondCategory === 'all' || product.category === secondCategory;
         
-        return inPriceRange && matchesSearch && matchesCategory;
+        // Filter by wanted item search if provided
+        const matchesWantedItem = wantedItemQuery === '' || 
+                                 product.name.toLowerCase().includes(wantedItemQuery.toLowerCase()) || 
+                                 product.brand.toLowerCase().includes(wantedItemQuery.toLowerCase());
+        
+        return inPriceRange && matchesSearch && matchesCategory && matchesWantedItem;
       });
       
       setTradeForProducts(eligibleProducts);
     }
-  }, [selectedProduct, secondSearchQuery, secondCategory, allProducts]);
+  }, [selectedProduct, secondSearchQuery, secondCategory, wantedItemQuery, allProducts]);
 
   const handleSelectProduct = (product: Product) => {
     setSelectedProduct(product);
@@ -135,6 +141,10 @@ const Trade = () => {
                   <h3 className="text-xl font-medium">{selectedProduct.name}</h3>
                   <p className="text-muted-foreground">{selectedProduct.brand}</p>
                   <p className="font-semibold text-lg mt-2">${selectedProduct.price.toFixed(2)}</p>
+                  <div className="mt-4 p-3 bg-muted rounded-md text-center">
+                    <p className="text-sm text-muted-foreground">Estimated Trade Value</p>
+                    <p className="font-bold text-lg">${selectedProduct.price.toFixed(2)}</p>
+                  </div>
                   <Button 
                     variant="outline" 
                     className="mt-4" 
@@ -248,6 +258,23 @@ const Trade = () => {
                       </Select>
                     </div>
                   </div>
+                  
+                  {/* New Wanted Item Search Field */}
+                  <div>
+                    <Label htmlFor="wantedItem">Looking For</Label>
+                    <div className="relative">
+                      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="wantedItem"
+                        type="search"
+                        placeholder="Search for desired item..."
+                        className="pl-8"
+                        value={wantedItemQuery}
+                        onChange={(e) => setWantedItemQuery(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  
                   <p className="text-sm text-muted-foreground">
                     Showing items within 40% of ${selectedProduct.price.toFixed(2)} (
                     ${(selectedProduct.price * 0.6).toFixed(2)} - ${(selectedProduct.price * 1.4).toFixed(2)})

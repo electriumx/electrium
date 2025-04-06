@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Product } from '../data/productData';
 import { useToast } from '@/hooks/use-toast';
@@ -156,66 +157,74 @@ const ProductGrid = ({
       
       let imageUrl = product.imageUrl;
 
-      // Apply new image URLs based on product details
-      if (product.brand.toLowerCase() === 'google' && product.name.toLowerCase().includes('chromebook')) {
-        imageUrl = '/lovable-uploads/6b47797a-7950-4e45-9ec1-b49920bedce3.png';
-      } else if (product.brand.toLowerCase() === 'xbox' || 
-                (product.brand.toLowerCase() === 'microsoft' && product.category.toLowerCase() === 'gaming consoles') ||
-                product.name.toLowerCase().includes('xbox')) {
-        imageUrl = '/lovable-uploads/4b5ba4b7-1d75-4c44-aa6c-c1d6e0d028c4.png';
-      } else if (product.name.toLowerCase() === 'playstation 5' || 
-                (product.brand.toLowerCase() === 'playstation' && !product.name.toLowerCase().includes('digital')) ||
-                product.name.toLowerCase().includes('playstation 5 digital') || 
-                (product.name.toLowerCase().includes('playstation') && product.name.toLowerCase().includes('digital'))) {
-        imageUrl = '/lovable-uploads/245080f6-be80-47c6-b153-72bc982b50ac.png';
-      } else if (product.name.toLowerCase().includes('battlefield')) {
-        imageUrl = '/lovable-uploads/ab3d21b8-041b-4137-865c-22fe07795d75.png';
-      } else if (product.brand.toLowerCase() === 'nintendo' || product.name.toLowerCase().includes('nintendo') || product.name.toLowerCase().includes('switch')) {
-        imageUrl = '/lovable-uploads/54b67814-dd27-4a46-ac69-4beaf7bd7851.png';
-      } else if (product.brand.toLowerCase() === 'xiaomi' && product.category.toLowerCase() === 'smartphones') {
-        imageUrl = '/lovable-uploads/19334ecf-42e6-4db9-8443-15db93e88166.png';
-      } else if (product.name.toLowerCase().includes('speaker') || product.category.toLowerCase().includes('speaker')) {
-        imageUrl = '/lovable-uploads/4d754bb4-c77a-436a-8470-ef066e888a5d.png';
-      } else if (product.name.toLowerCase().includes('microphone') || product.category.toLowerCase().includes('microphone')) {
-        imageUrl = '/lovable-uploads/55a7c5a8-4ffa-4448-8ada-7591813f3755.png';
-      } else if (product.name.toLowerCase().includes('quietcomfort') && product.brand.toLowerCase() === 'bose') {
-        imageUrl = '/lovable-uploads/7be48add-b36a-4617-8856-47352e844bae.png';
-      } else if (product.name.toLowerCase().includes('death stranding')) {
-        imageUrl = '/lovable-uploads/e61d09d1-fb3f-4e38-aaca-2342513b89de.png';
-      } else if (product.name.toLowerCase().includes('elden ring')) {
-        imageUrl = 'https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg';
-      } else if (product.name.toLowerCase().includes('call of duty')) {
-        imageUrl = '/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png';
-      } else if (product.name.toLowerCase().includes('rainbow six')) {
-        imageUrl = '/lovable-uploads/2b732385-bcb9-459e-981e-bb57c1860769.png';
-      } else if (product.name.toLowerCase().includes('cyberpunk 2077')) {
-        imageUrl = '/lovable-uploads/d0b5f6e9-d8a7-4e6d-92d9-0981cb533be3.png';
-      } else if (product.name.toLowerCase().includes('horizon kings') && product.name.toLowerCase().includes('simulation')) {
-        imageUrl = '/lovable-uploads/f58b103e-1e2f-4e40-92bd-5ceee55670d4.png';
-      } else if (product.name.toLowerCase().includes('world of warriors') && product.name.toLowerCase().includes('racing')) {
-        imageUrl = '/lovable-uploads/cf30cef5-878e-4911-b265-6fadc46cd9b1.png';
-      } else if (product.name.toLowerCase().includes('ultimate fantasy') && product.name.toLowerCase().includes('racing')) {
-        imageUrl = '/lovable-uploads/49cf3cc6-b591-4fe9-b0ca-7e21178098d2.png';
-      } else if (product.category === 'Washing Machines') {
-        imageUrl = '/lovable-uploads/2ae5236f-4492-452a-b393-492c225380c1.png';
-      } else if (product.category === 'Headphones') {
-        imageUrl = getHeadphoneImage(product.name, product.brand);
-      } else if (product.brand === 'Samsung') {
-        if (product.name.toLowerCase().includes('interactive panel')) {
-          imageUrl = '/lovable-uploads/83220acc-b41f-488f-996c-70c790349093.png';
-        } else if (product.name.toLowerCase().includes('smart digital display')) {
-          imageUrl = '/lovable-uploads/f4d18f61-e011-41e1-8945-0862b8e9cb22.png';
-        } else if (product.name.toLowerCase().includes('digital signage')) {
-          imageUrl = '/lovable-uploads/e4e5c805-99ee-44b2-bac6-a7549cd85562.png';
-        } else if (product.category === 'Microwaves') {
-          imageUrl = '/lovable-uploads/86bf4158-8228-4965-8b2d-1f5a3feed7e9.png';
+      // Apply new image URLs based on product details with null checks
+      if (product.brand && product.name) {
+        if (product.brand.toLowerCase() === 'google' && product.name.toLowerCase().includes('chromebook')) {
+          imageUrl = '/lovable-uploads/6b47797a-7950-4e45-9ec1-b49920bedce3.png';
+        } else if ((product.brand.toLowerCase() === 'xbox') || 
+                  (product.brand.toLowerCase() === 'microsoft' && product.category && product.category.toLowerCase() === 'gaming consoles') ||
+                  (product.name.toLowerCase().includes('xbox'))) {
+          imageUrl = '/lovable-uploads/4b5ba4b7-1d75-4c44-aa6c-c1d6e0d028c4.png';
+        } else if (product.name.toLowerCase() === 'playstation 5' || 
+                  (product.brand.toLowerCase() === 'playstation' && !product.name.toLowerCase().includes('digital')) ||
+                  product.name.toLowerCase().includes('playstation 5 digital') || 
+                  (product.name.toLowerCase().includes('playstation') && product.name.toLowerCase().includes('digital'))) {
+          imageUrl = '/lovable-uploads/245080f6-be80-47c6-b153-72bc982b50ac.png';
+        } else if (product.name.toLowerCase().includes('battlefield')) {
+          imageUrl = '/lovable-uploads/ab3d21b8-041b-4137-865c-22fe07795d75.png';
+        } else if (product.brand.toLowerCase() === 'nintendo' || product.name.toLowerCase().includes('nintendo') || product.name.toLowerCase().includes('switch')) {
+          imageUrl = '/lovable-uploads/54b67814-dd27-4a46-ac69-4beaf7bd7851.png';
+        } else if (product.brand.toLowerCase() === 'xiaomi' && product.category && product.category.toLowerCase() === 'smartphones') {
+          imageUrl = '/lovable-uploads/19334ecf-42e6-4db9-8443-15db93e88166.png';
+        } else if (product.name.toLowerCase().includes('speaker') || (product.category && product.category.toLowerCase().includes('speaker'))) {
+          imageUrl = '/lovable-uploads/4d754bb4-c77a-436a-8470-ef066e888a5d.png';
+        } else if (product.name.toLowerCase().includes('microphone') || (product.category && product.category.toLowerCase().includes('microphone'))) {
+          imageUrl = '/lovable-uploads/55a7c5a8-4ffa-4448-8ada-7591813f3755.png';
+        } else if (product.name.toLowerCase().includes('quietcomfort') && product.brand.toLowerCase() === 'bose') {
+          imageUrl = '/lovable-uploads/7be48add-b36a-4617-8856-47352e844bae.png';
+        } else if (product.name.toLowerCase().includes('death stranding')) {
+          imageUrl = '/lovable-uploads/e61d09d1-fb3f-4e38-aaca-2342513b89de.png';
+        } else if (product.name.toLowerCase().includes('elden ring')) {
+          imageUrl = 'https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg';
+        } else if (product.name.toLowerCase().includes('call of duty')) {
+          imageUrl = '/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png';
+        } else if (product.name.toLowerCase().includes('rainbow six')) {
+          imageUrl = '/lovable-uploads/2b732385-bcb9-459e-981e-bb57c1860769.png';
+        } else if (product.name.toLowerCase().includes('cyberpunk 2077')) {
+          imageUrl = '/lovable-uploads/d0b5f6e9-d8a7-4e6d-92d9-0981cb533be3.png';
+        } else if (product.name.toLowerCase().includes('horizon kings') && product.name.toLowerCase().includes('simulation')) {
+          imageUrl = '/lovable-uploads/f58b103e-1e2f-4e40-92bd-5ceee55670d4.png';
+        } else if (product.name.toLowerCase().includes('world of warriors') && product.name.toLowerCase().includes('racing')) {
+          imageUrl = '/lovable-uploads/cf30cef5-878e-4911-b265-6fadc46cd9b1.png';
+        } else if (product.name.toLowerCase().includes('ultimate fantasy') && product.name.toLowerCase().includes('racing')) {
+          imageUrl = '/lovable-uploads/49cf3cc6-b591-4fe9-b0ca-7e21178098d2.png';
+        } else if (product.category === 'Washing Machines') {
+          imageUrl = '/lovable-uploads/2ae5236f-4492-452a-b393-492c225380c1.png';
+        } else if (product.name.toLowerCase().includes('red dead redemption 2')) {
+          imageUrl = '/lovable-uploads/1748b1d8-8870-49dc-a082-62aa0268034f.png';
+        } else if (product.category === 'Headphones' && product.brand === 'Sony' && product.name.includes('WH-1000XM4')) {
+          imageUrl = '/lovable-uploads/6d5d9d75-2a70-4aef-8210-c87984af388f.png';
+        } else if (product.category === 'Headphones') {
+          imageUrl = getHeadphoneImage(product.name, product.brand);
+        } else if (product.brand === 'Samsung') {
+          if (product.name.toLowerCase().includes('interactive panel')) {
+            imageUrl = '/lovable-uploads/83220acc-b41f-488f-996c-70c790349093.png';
+          } else if (product.name.toLowerCase().includes('smart digital display')) {
+            imageUrl = '/lovable-uploads/f4d18f61-e011-41e1-8945-0862b8e9cb22.png';
+          } else if (product.name.toLowerCase().includes('digital signage')) {
+            imageUrl = '/lovable-uploads/e4e5c805-99ee-44b2-bac6-a7549cd85562.png';
+          } else if (product.category === 'Microwaves') {
+            imageUrl = '/lovable-uploads/86bf4158-8228-4965-8b2d-1f5a3feed7e9.png';
+          }
+        } else if (product.brand === 'LG' && product.category === 'Microwaves') {
+          imageUrl = '/lovable-uploads/67a3f208-e588-471a-88d1-c0db17913854.png';
+        } else if (product.brand === 'Whirlpool' && product.category === 'Microwaves') {
+          imageUrl = '/lovable-uploads/0140d4cf-1335-41c7-9dbd-d5c2fc67a2f8.png';
+        } else if (product.brand === 'Panasonic' && product.category === 'Microwaves') {
+          imageUrl = '/lovable-uploads/05649a66-79e2-4aa3-b369-2496bac58ad7.png';
+        } else if (product.category === 'Refrigerators' && product.name.toLowerCase().includes('mini')) {
+          imageUrl = '/lovable-uploads/e600f5d4-8c6b-4148-b14f-0361afd8437f.png';
         }
-      } else if (product.brand === 'LG' && product.category === 'Microwaves') {
-        imageUrl = '/lovable-uploads/67a3f208-e588-471a-88d1-c0db17913854.png';
-      } else if (product.brand === 'Whirlpool' && product.category === 'Microwaves') {
-        imageUrl = '/lovable-uploads/0140d4cf-1335-41c7-9dbd-d5c2fc67a2f8.png';
-      } else if (product.brand === 'Panasonic' && product.category === 'Microwaves') {
-        imageUrl = '/lovable-uploads/05649a66-79e2-4aa3-b369-2496bac58ad7.png';
       }
 
       return <div key={product.id} onClick={() => handleProductClick(product)} className="bg-card rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow">
@@ -233,7 +242,7 @@ const ProductGrid = ({
               {product.subcategory && <div className="subcategory-element">{product.subcategory}</div>}
             </div>
             <div className="p-4">
-              <h3 className="text-lg font-semibold mb-1 line-clamp-1">{formatText(product.name)}</h3>
+              <h3 className="text-lg font-semibold mb-1 line-clamp-1">{formatText(product.name || '')}</h3>
               <div className="flex justify-between items-center mb-3">
                 <div className="flex items-center">
                   <span className="font-bold text-lg">
@@ -244,7 +253,7 @@ const ProductGrid = ({
                     </span>}
                 </div>
                 <span className="text-sm text-muted-foreground">
-                  {product.brand}
+                  {product.brand || 'Unknown'}
                 </span>
               </div>
               <div className="flex items-center justify-between">
