@@ -677,4 +677,168 @@ const ProductDetailModal = ({
                         const accessoriesTotal = confirmedAccessories.reduce((sum, acc) => sum + acc.price, 0);
                         setTotalPrice((basePrice + accessoriesTotal) * newQuantity);
                       }}
-                      className="px-3 py-1 bg-secondary rounded-l-md
+                      className="px-3 py-1 bg-secondary rounded-l-md hover:bg-secondary/80 border-r"
+                    >
+                      -
+                    </button>
+                    <span className="px-4 py-1 bg-secondary">{quantity}</span>
+                    <button 
+                      onClick={() => {
+                        const newQuantity = quantity + 1;
+                        setQuantity(newQuantity);
+                        const basePrice = discount > 0 ? discountedPrice : price;
+                        const accessoriesTotal = confirmedAccessories.reduce((sum, acc) => sum + acc.price, 0);
+                        setTotalPrice((basePrice + accessoriesTotal) * newQuantity);
+                      }}
+                      className="px-3 py-1 bg-secondary rounded-r-md hover:bg-secondary/80 border-l"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <Button onClick={handleAddToCart}>Add to Cart</Button>
+                </div>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="specs" className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {Object.entries(specs).map(([key, value]) => (
+                  <div key={key} className="border rounded-md p-3">
+                    <p className="capitalize text-sm text-muted-foreground">{key.replace('_', ' ')}</p>
+                    <p className="font-medium">{value}</p>
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="accessories" className="space-y-4">
+              {compatibleAccessories.length > 0 ? (
+                <>
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-lg font-medium">Compatible Accessories</h3>
+                    <Button 
+                      onClick={handleConfirmAccessories} 
+                      variant="outline"
+                      className="text-xs"
+                    >
+                      Confirm Accessories
+                    </Button>
+                  </div>
+                  
+                  {Object.entries(accessoryCategories).map(([category, items]) => 
+                    items.length > 0 && (
+                      <div key={category} className="space-y-2">
+                        <h4 className="font-medium text-sm">{category}</h4>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {items.map(accessory => {
+                            const isSelected = selectedAccessories.some(a => a.id === accessory.id);
+                            return (
+                              <div 
+                                key={accessory.id}
+                                className={`border rounded-md p-2 flex items-center gap-2 cursor-pointer transition-all ${
+                                  isSelected ? 'border-primary bg-primary/5' : 'hover:bg-secondary/50'
+                                }`}
+                                onClick={() => handleToggleAccessory(accessory)}
+                              >
+                                <div className="w-10 h-10 relative flex-shrink-0">
+                                  <img 
+                                    src={accessory.image} 
+                                    alt={accessory.name} 
+                                    className="w-full h-full object-cover rounded"
+                                  />
+                                  {isSelected && (
+                                    <div className="absolute -top-1 -right-1 bg-primary text-white rounded-full w-5 h-5 flex items-center justify-center">
+                                      <Check className="w-3 h-3" />
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium text-sm truncate">{accessory.name}</p>
+                                  <p className="text-muted-foreground text-xs">${accessory.price.toFixed(2)}</p>
+                                </div>
+                                <button 
+                                  className={`w-6 h-6 rounded-full flex items-center justify-center border ${
+                                    isSelected ? 'bg-primary text-primary-foreground' : 'bg-secondary'
+                                  }`}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleToggleAccessory(accessory);
+                                  }}
+                                >
+                                  {isSelected ? <Check className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
+                                </button>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )
+                  )}
+                  
+                  {selectedAccessories.length > 0 && (
+                    <div className="border-t pt-3 mt-3 flex justify-between items-center">
+                      <span>
+                        Selected: <span className="font-medium">{selectedAccessories.length} items</span>
+                      </span>
+                      <span>
+                        Total: <span className="font-medium">
+                          ${selectedAccessories.reduce((sum, acc) => sum + acc.price, 0).toFixed(2)}
+                        </span>
+                      </span>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">No compatible accessories found for this product</p>
+                </div>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="reviews" className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-medium">Customer Reviews</h3>
+                <Button 
+                  onClick={handleOpenReviewModal}
+                  size="sm"
+                  className="text-xs"
+                >
+                  <MessageSquare className="w-3 h-3 mr-1" />
+                  Write a Review
+                </Button>
+              </div>
+              
+              {productReviews.length > 0 ? (
+                <div className="space-y-4">
+                  {productReviews.map((review, index) => (
+                    <div key={index} className="border rounded-md p-3 space-y-2">
+                      <div className="flex justify-between">
+                        <h4 className="font-medium">{review.name}</h4>
+                        {renderStarRating(review.rating)}
+                      </div>
+                      <p className="text-sm">{review.comment}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">No reviews yet. Be the first to review this product!</p>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+        </DialogContent>
+      </Dialog>
+      
+      <ProductReviewModal 
+        productId={id}
+        productName={name}
+        isOpen={reviewModalOpen}
+        onClose={() => setReviewModalOpen(false)}
+        onSubmit={handleReviewSubmit}
+      />
+    </>
+  );
+};
+
+export default ProductDetailModal;
