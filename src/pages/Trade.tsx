@@ -21,6 +21,7 @@ const Trade = () => {
   const [tradeForProducts, setTradeForProducts] = useState<Product[]>([]);
   const [secondSearchQuery, setSecondSearchQuery] = useState('');
   const [secondCategory, setSecondCategory] = useState('all');
+  const [wantedItem, setWantedItem] = useState('');
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -71,12 +72,16 @@ const Trade = () => {
                              product.brand.toLowerCase().includes(secondSearchQuery.toLowerCase());
         const matchesCategory = secondCategory === 'all' || product.category === secondCategory;
         
-        return inPriceRange && matchesSearch && matchesCategory;
+        // Filter by wanted item name if provided
+        const matchesWanted = wantedItem === '' || 
+                             product.name.toLowerCase().includes(wantedItem.toLowerCase());
+        
+        return inPriceRange && matchesSearch && matchesCategory && matchesWanted;
       });
       
       setTradeForProducts(eligibleProducts);
     }
-  }, [selectedProduct, secondSearchQuery, secondCategory, allProducts]);
+  }, [selectedProduct, secondSearchQuery, secondCategory, wantedItem, allProducts]);
 
   const handleSelectProduct = (product: Product) => {
     setSelectedProduct(product);
@@ -111,10 +116,15 @@ const Trade = () => {
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-4">Trade Your Items</h1>
+        <h1 className="text-3xl font-bold mb-4 text-center text-foreground">
+          Trade Your Items
+        </h1>
         <p className="text-muted-foreground">
           Select an item you want to trade, then choose another item within 40% of its value to trade for.
         </p>
+        <div className="mt-4 text-center">
+          <span className="font-bold font-serif">Start Here</span> → Select Your Item → Choose Trade Item → Complete Trade
+        </div>
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -248,10 +258,32 @@ const Trade = () => {
                       </Select>
                     </div>
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    Showing items within 40% of ${selectedProduct.price.toFixed(2)} (
-                    ${(selectedProduct.price * 0.6).toFixed(2)} - ${(selectedProduct.price * 1.4).toFixed(2)})
-                  </p>
+                  
+                  <div>
+                    <Label htmlFor="wantedItem">Looking For (Product Name)</Label>
+                    <Input
+                      id="wantedItem"
+                      type="text"
+                      placeholder="Enter specific product you want..."
+                      value={wantedItem}
+                      onChange={(e) => setWantedItem(e.target.value)}
+                    />
+                  </div>
+                  
+                  <div className="bg-muted p-4 rounded-lg">
+                    <h4 className="font-medium mb-1">Trade Details</h4>
+                    <p className="text-sm mb-2">
+                      Your item value: <span className="font-semibold">${selectedProduct.price.toFixed(2)}</span>
+                    </p>
+                    <p className="text-sm mb-2">
+                      Acceptable range: ${(selectedProduct.price * 0.6).toFixed(2)} - ${(selectedProduct.price * 1.4).toFixed(2)}
+                    </p>
+                    <p className="text-sm font-medium">
+                      Estimated Trade Value: ${tradeForProducts.length > 0 
+                        ? tradeForProducts[0].price.toFixed(2) 
+                        : (selectedProduct.price).toFixed(2)}
+                    </p>
+                  </div>
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center h-40">
