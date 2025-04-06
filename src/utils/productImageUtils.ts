@@ -5,7 +5,7 @@ export const getHeadphoneImage = (name: string, brand: string): string => {
   
   // Sony WH-1000XM4 gets the specified image
   if (name.toLowerCase().includes('wh-1000xm4') && brand.toLowerCase() === 'sony') {
-    return '/lovable-uploads/381f64d4-781a-4425-84fc-6c239fcbdfa6.png';
+    return '/lovable-uploads/17ad1b1a-5bfb-4fb0-aedc-d183c4a73046.png';
   }
   
   // Other specific headphone models
@@ -40,7 +40,7 @@ export const getCategoryImage = (category: string, brand?: string, name?: string
   if (category.toLowerCase() === 'refrigerators' || 
       (name && (name.toLowerCase().includes('mini refrigerator') ||
                name.toLowerCase().includes('mini fridge')))) {
-    return '/lovable-uploads/0f20c433-000a-4503-83ed-7ccef1cc7a31.png';
+    return '/lovable-uploads/f5d3e2bc-690c-4d5c-b85c-cb73e230baca.png';
   }
   
   if (category === 'Vacuum Cleaners') {
@@ -130,7 +130,7 @@ export const getGameImage = (name: string): string => {
   let imageUrl = '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png';
   
   if (name.toLowerCase().includes('red dead redemption')) {
-    return '/lovable-uploads/6cefe48b-7d76-4342-9781-52333f176b63.png';
+    return '/lovable-uploads/17c10a81-e9a9-49b8-8d05-685b47c135c0.png';
   }
   
   if (name.toLowerCase().includes('battlefield')) {

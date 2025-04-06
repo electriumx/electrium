@@ -22,6 +22,7 @@ const Trade = () => {
   const [secondSearchQuery, setSecondSearchQuery] = useState('');
   const [secondCategory, setSecondCategory] = useState('all');
   const [wantedItem, setWantedItem] = useState('');
+  const [estimatedTradeValue, setEstimatedTradeValue] = useState(0);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -80,6 +81,13 @@ const Trade = () => {
       });
       
       setTradeForProducts(eligibleProducts);
+      
+      // Update estimated trade value based on first product in filtered list
+      if (eligibleProducts.length > 0) {
+        setEstimatedTradeValue(eligibleProducts[0].price);
+      } else {
+        setEstimatedTradeValue(selectedProduct.price);
+      }
     }
   }, [selectedProduct, secondSearchQuery, secondCategory, wantedItem, allProducts]);
 
@@ -279,9 +287,7 @@ const Trade = () => {
                       Acceptable range: ${(selectedProduct.price * 0.6).toFixed(2)} - ${(selectedProduct.price * 1.4).toFixed(2)}
                     </p>
                     <p className="text-sm font-medium">
-                      Estimated Trade Value: ${tradeForProducts.length > 0 
-                        ? tradeForProducts[0].price.toFixed(2) 
-                        : (selectedProduct.price).toFixed(2)}
+                      Estimated Trade Value: ${estimatedTradeValue.toFixed(2)}
                     </p>
                   </div>
                 </div>

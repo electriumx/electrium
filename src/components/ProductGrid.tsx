@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { Product } from '../data/productData';
 import { useToast } from '@/hooks/use-toast';
 import ProductDetailModal from './ProductDetailModal';
 import { Heart } from 'lucide-react';
-import { getHeadphoneImage } from '@/utils/productImageUtils';
+import { getHeadphoneImage, getCategoryImage, getGameImage } from '@/utils/productImageUtils';
 
 interface ProductGridProps {
   products: Product[];
@@ -88,12 +87,8 @@ const ProductGrid = ({
       });
     } else {
       const productToAdd = {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        imageUrl: product.imageUrl,
-        brand: product.brand,
-        discount: product.discount || 0
+        ...product,
+        quantity: 0
       };
       const updatedWishlist = [...existingWishlist, productToAdd];
       localStorage.setItem('wishlist', JSON.stringify(updatedWishlist));
@@ -157,7 +152,20 @@ const ProductGrid = ({
       
       let imageUrl = product.imageUrl;
 
-      // Apply new image URLs based on product details
+      if (product.category === 'Refrigerators' || 
+          product.name.toLowerCase().includes('mini refrigerator') ||
+          product.name.toLowerCase().includes('mini fridge')) {
+        imageUrl = '/lovable-uploads/f5d3e2bc-690c-4d5c-b85c-cb73e230baca.png';
+      }
+      
+      if (product.name.toLowerCase().includes('wh-1000xm4') && product.brand.toLowerCase() === 'sony') {
+        imageUrl = '/lovable-uploads/17ad1b1a-5bfb-4fb0-aedc-d183c4a73046.png';
+      }
+      
+      if (product.name.toLowerCase().includes('red dead redemption')) {
+        imageUrl = '/lovable-uploads/17c10a81-e9a9-49b8-8d05-685b47c135c0.png';
+      }
+      
       if (product.brand.toLowerCase() === 'google' && product.name.toLowerCase().includes('chromebook')) {
         imageUrl = '/lovable-uploads/6b47797a-7950-4e45-9ec1-b49920bedce3.png';
       } else if (product.brand.toLowerCase() === 'xbox' || 
@@ -199,15 +207,6 @@ const ProductGrid = ({
         imageUrl = '/lovable-uploads/49cf3cc6-b591-4fe9-b0ca-7e21178098d2.png';
       } else if (product.category === 'Washing Machines') {
         imageUrl = '/lovable-uploads/2ae5236f-4492-452a-b393-492c225380c1.png';
-      } else if (product.name.toLowerCase().includes('wh-1000xm4') || 
-                (product.brand.toLowerCase() === 'sony' && product.name.toLowerCase().includes('wh-1000xm4'))) {
-        imageUrl = '/lovable-uploads/448f842e-5c19-44d1-8657-1685577d1d5b.png';
-      } else if (product.name.toLowerCase().includes('red dead redemption')) {
-        imageUrl = '/lovable-uploads/26e6e062-7742-4fc2-a35f-284e14029789.png';
-      } else if (product.category === 'Refrigerators' || 
-                 product.name.toLowerCase().includes('mini refrigerator') ||
-                 product.name.toLowerCase().includes('mini fridge')) {
-        imageUrl = '/lovable-uploads/36fdb57d-95cb-4f52-a96a-aaf2f174a210.png';
       } else if (product.category === 'Headphones') {
         imageUrl = getHeadphoneImage(product.name, product.brand);
       } else if (product.brand === 'Samsung') {
