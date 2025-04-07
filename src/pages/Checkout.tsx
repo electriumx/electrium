@@ -127,13 +127,13 @@ const Checkout = () => {
           className="bg-card rounded-xl shadow-lg p-8 border border-border"
         >
           <h1 className="text-3xl font-medium text-foreground mb-8">
-            {translateText("order_summary", currentLanguage) || "Order Summary"}
+            {currentLanguage === "english" ? "Order Summary" : translateText("order_summary", currentLanguage)}
           </h1>
           
           {purchasedItems.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-muted-foreground">
-                {translateText("cart_empty", currentLanguage) || "Your cart is empty"}
+                {currentLanguage === "english" ? "Cart Empty" : translateText("cart_empty", currentLanguage)}
               </p>
               <button
                 onClick={() => navigate('/products')}
@@ -164,7 +164,11 @@ const Checkout = () => {
                             formatProductName(translateText(item.name, currentLanguage)) : 
                             formatProductName(item.name)}
                           {item.selectedColor && (
-                            <span className="ml-2 text-sm" style={{color: item.selectedColor.toLowerCase()}}>
+                            <span className="ml-2 text-sm" style={{color: item.selectedColor.toLowerCase() === 'dark blue' ? '#0A4D68' : 
+                                                                         item.selectedColor.toLowerCase() === 'white' ? '#ffffff' :
+                                                                         item.selectedColor.toLowerCase() === 'titanium' ? '#878681' :
+                                                                         item.selectedColor.toLowerCase() === 'black' ? '#000000' : 
+                                                                         item.selectedColor.toLowerCase()}}>
                               ({item.selectedColor})
                             </span>
                           )}

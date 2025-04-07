@@ -46,6 +46,11 @@ export const getCategoryImage = (category: string, brand?: string, name?: string
   const brandLower = typeof brand === 'string' ? brand.toLowerCase() : '';
   const nameLower = typeof name === 'string' ? name.toLowerCase() : '';
   
+  // iPhone 13 Pro specific image
+  if (brandLower === 'apple' && nameLower.includes('iphone 13 pro')) {
+    return '/lovable-uploads/36fdb57d-95cb-4f52-a96a-aaf2f174a210.png';
+  }
+  
   // Dell XPS 15 specific image
   if (brandLower === 'dell' && nameLower.includes('xps 15')) {
     return '/lovable-uploads/1bd70cd9-f378-4873-8086-6fcaed3c58e0.png';

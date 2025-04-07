@@ -16,6 +16,16 @@ export const translations: TranslationData = {
     "french": "Paiement",
     "arabic": "الدفع"
   },
+  "order_summary": {
+    "english": "Order Summary",
+    "french": "Récapitulatif de la commande",
+    "arabic": "ملخص الطلب"
+  },
+  "cart_empty": {
+    "english": "Cart Empty",
+    "french": "Panier Vide",
+    "arabic": "عربة التسوق فارغة"
+  },
   "products": {
     "english": "Products",
     "french": "Produits",

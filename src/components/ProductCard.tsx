@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, Heart } from "lucide-react";
@@ -42,7 +41,7 @@ const ProductCard = ({
   const navigate = useNavigate();
   
   // Available product colors
-  const productColors = ["Dark Blue", "White", "Titanium", "Black", "Dark Green", "Dark Red"];
+  const productColors = ["Dark Blue", "White", "Titanium", "Black"];
   
   useEffect(() => {
     // Check if the product is already in the wishlist when the component mounts
@@ -208,8 +207,6 @@ const ProductCard = ({
                   backgroundColor: color.toLowerCase() === 'dark blue' ? '#0A4D68' : 
                                   color.toLowerCase() === 'white' ? '#ffffff' :
                                   color.toLowerCase() === 'titanium' ? '#878681' :
-                                  color.toLowerCase() === 'dark green' ? '#154734' :
-                                  color.toLowerCase() === 'dark red' ? '#8B0000' :
                                   '#000000',
                   cursor: 'pointer'
                 }}
@@ -221,9 +218,9 @@ const ProductCard = ({
           
           <div className="flex justify-between items-center mb-3">
             <div>
-              {discount > 0 ? (
+              {discount > 0 && discountedPrice ? (
                 <>
-                  <span className="text-destructive font-semibold">${discountedPrice?.toFixed(2)}</span>
+                  <span className="text-destructive font-semibold">${discountedPrice.toFixed(2)}</span>
                   <span className="text-muted-foreground text-sm line-through ml-1">${price.toFixed(2)}</span>
                 </>
               ) : (

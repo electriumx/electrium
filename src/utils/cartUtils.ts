@@ -75,7 +75,7 @@ export const calculateProductTotal = (product: Product, discounts: Record<string
     discountedPrice = discountedPrice * (1 - discounts['All'].value / 100);
   }
   
-  // Apply product-specific discount if available (from admin)
+  // Apply product-specific discount only if it exists
   if (product.discount && product.discount > 0) {
     discountedPrice = discountedPrice * (1 - product.discount / 100);
   }
