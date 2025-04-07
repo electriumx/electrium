@@ -90,3 +90,27 @@ export const calculateProductTotal = (product: Product, discounts: Record<string
   
   return totalPrice;
 };
+
+// Get included accessories text for a product
+export const getIncludedAccessoriesText = (product: Product): string => {
+  if (!product.accessories || product.accessories.length === 0) {
+    return "No accessories included";
+  }
+  
+  const selectedAccessories = product.accessories.filter(acc => acc.selected);
+  
+  if (selectedAccessories.length === 0) {
+    return "No accessories included";
+  }
+  
+  return selectedAccessories.map(acc => `${acc.name} (+$${acc.price.toFixed(2)})`).join(', ');
+};
+
+// Calculate total accessories price
+export const calculateAccessoriesTotal = (product: Product): number => {
+  if (!product.accessories) return 0;
+  
+  return product.accessories
+    .filter(acc => acc.selected)
+    .reduce((sum, acc) => sum + acc.price, 0);
+};

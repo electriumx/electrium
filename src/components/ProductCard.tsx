@@ -1,9 +1,11 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Minus, Plus, Heart } from "lucide-react";
+import { Minus, Plus, Heart, Package } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from 'react-router-dom';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction } from "@/components/ui/alert-dialog";
+import { calculateAccessoriesTotal, getIncludedAccessoriesText } from '@/utils/cartUtils';
 
 interface ProductCardProps {
   id: number;
@@ -17,6 +19,12 @@ interface ProductCardProps {
   onProductClick?: () => void;
   stock?: number;
   updateStock?: (id: number, newStock: number) => void;
+  accessories?: Array<{
+    id: number | string;
+    name: string;
+    price: number;
+    selected: boolean;
+  }>;
 }
 
 const ProductCard = ({ 
@@ -30,7 +38,8 @@ const ProductCard = ({
   onQuantityChange,
   onProductClick,
   stock = Math.floor(Math.random() * 50) + 1,
-  updateStock
+  updateStock,
+  accessories = []
 }: ProductCardProps) => {
   const [quantity, setQuantity] = useState(0);
   const [wishlist, setWishlist] = useState(false);
@@ -125,7 +134,8 @@ const ProductCard = ({
         price,
         imageUrl: image,
         brand,
-        discount: discount || 0
+        discount: discount || 0,
+        accessories
       };
       
       const updatedWishlist = [...existingWishlist, productToAdd];
@@ -155,6 +165,24 @@ const ProductCard = ({
       });
     }
   };
+
+  // Calculate total price including selected accessories
+  const getTotalPrice = () => {
+    const accessoriesTotal = accessories
+      .filter(acc => acc.selected)
+      .reduce((sum, acc) => sum + acc.price, 0);
+    
+    return price + accessoriesTotal;
+  };
+  
+  // Calculate total discounted price including accessories
+  const getTotalDiscountedPrice = () => {
+    const totalPrice = getTotalPrice();
+    return discount > 0 ? totalPrice * (1 - discount/100) : totalPrice;
+  };
+  
+  // Get included accessories text
+  const hasSelectedAccessories = accessories.some(acc => acc.selected);
   
   return (
     <>
@@ -216,15 +244,40 @@ const ProductCard = ({
             ))}
           </div>
           
+          {/* Current selected color */}
+          <div className="text-center text-xs text-muted-foreground mb-2">
+            Color: <span className="font-medium">{selectedColor}</span>
+          </div>
+          
+          {/* Accessories info if any */}
+          {hasSelectedAccessories && (
+            <div className="mb-3 border-t border-border pt-2">
+              <div className="flex items-center text-xs text-muted-foreground mb-1">
+                <Package size={14} className="mr-1" />
+                <span>Included Accessories:</span>
+              </div>
+              <div className="text-xs">
+                {accessories
+                  .filter(acc => acc.selected)
+                  .map(acc => (
+                    <div key={acc.id} className="flex justify-between">
+                      <span>{acc.name}</span>
+                      <span>+${acc.price.toFixed(2)}</span>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
+          
           <div className="flex justify-between items-center mb-3">
             <div>
-              {discount > 0 && discountedPrice ? (
+              {discount > 0 ? (
                 <>
-                  <span className="text-destructive font-semibold">${discountedPrice.toFixed(2)}</span>
-                  <span className="text-muted-foreground text-sm line-through ml-1">${price.toFixed(2)}</span>
+                  <span className="text-destructive font-semibold">${getTotalDiscountedPrice().toFixed(2)}</span>
+                  <span className="text-muted-foreground text-sm line-through ml-1">${getTotalPrice().toFixed(2)}</span>
                 </>
               ) : (
-                <span className="font-semibold">${price.toFixed(2)}</span>
+                <span className="font-semibold">${getTotalPrice().toFixed(2)}</span>
               )}
               <span className="text-xs text-muted-foreground block">In Stock: {currentStock}</span>
             </div>

@@ -4,13 +4,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { MapPin, Clock } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { locationData } from '@/utils/locationData';
+import { locationData, getLocationFee } from '@/utils/locationData';
 import { translateText } from '@/utils/translation';
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { format } from "date-fns";
 
 interface DeliveryLocationSelectorProps {
   onLocationChange: (location: string, fee: number) => void;
   onTimeSlotChange: (timeSlot: string, fee: number) => void;
   onCountryChange?: (country: string) => void;
+  onDeliveryTimeChange?: (time: string, fee: number) => void;
 }
 
 interface Location {
@@ -26,13 +30,23 @@ interface TimeSlot {
 const DeliveryLocationSelector = ({ 
   onLocationChange, 
   onTimeSlotChange,
-  onCountryChange
+  onCountryChange,
+  onDeliveryTimeChange
 }: DeliveryLocationSelectorProps) => {
   const [selectedLocation, setSelectedLocation] = useState('');
   const [selectedTimeSlot, setSelectedTimeSlot] = useState('');
   const [selectedCountry, setSelectedCountry] = useState('United States');
   const [currentLanguage, setCurrentLanguage] = useState('english');
   const [locations, setLocations] = useState<Location[]>([]);
+  const [fastDeliveryTime, setFastDeliveryTime] = useState('');
+  const [invalidTimeError, setInvalidTimeError] = useState('');
+  
+  // Get minimum allowed time (current time + 30 minutes)
+  const getMinimumTime = () => {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() + 30);
+    return format(now, "HH:mm");
+  };
   
   const timeSlots: TimeSlot[] = [
     { slot: '9:00 AM - 12:00 PM', fee: 0 },
@@ -41,7 +55,7 @@ const DeliveryLocationSelector = ({
     { slot: '6:00 PM - 9:00 PM', fee: 5 },  // Premium evening slot
     { slot: 'Next Day Morning', fee: 0 },
     { slot: 'Next Day Afternoon', fee: 0 },
-    { slot: 'Express Delivery (2h)', fee: 15 }  // Express delivery
+    { slot: 'Express Delivery (Custom Time)', fee: 15 }  // Express delivery with custom time
   ];
 
   useEffect(() => {
@@ -86,6 +100,39 @@ const DeliveryLocationSelector = ({
     const timeSlot = timeSlots.find(slot => slot.slot === value);
     if (timeSlot) {
       onTimeSlotChange(timeSlot.slot, timeSlot.fee);
+      
+      // Reset custom time selection if not express delivery
+      if (value !== 'Express Delivery (Custom Time)') {
+        setFastDeliveryTime('');
+        setInvalidTimeError('');
+      }
+    }
+  };
+  
+  const handleFastDeliveryTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const timeValue = e.target.value;
+    setFastDeliveryTime(timeValue);
+    
+    // Validate that the time is at least 30 minutes from now
+    const minimumTime = getMinimumTime();
+    const isValid = timeValue >= minimumTime;
+    
+    if (!isValid) {
+      setInvalidTimeError(`Time must be at least 30 minutes from now (${minimumTime} or later)`);
+    } else {
+      setInvalidTimeError('');
+      
+      // Calculate fee based on country and location
+      let baseFee = 15; // Base express delivery fee
+      if (selectedLocation) {
+        const locationFee = getLocationFee(selectedCountry, selectedLocation);
+        baseFee += locationFee;
+      }
+      
+      // Notify parent component about the custom time
+      if (onDeliveryTimeChange) {
+        onDeliveryTimeChange(timeValue, baseFee);
+      }
     }
   };
   
@@ -155,14 +202,37 @@ const DeliveryLocationSelector = ({
             </div>
           ))}
         </RadioGroup>
+        
+        {/* Custom time for express delivery */}
+        {selectedTimeSlot === 'Express Delivery (Custom Time)' && (
+          <div className="mt-4 border border-input rounded-md p-4">
+            <Label htmlFor="express-time" className="block mb-2">
+              Select Delivery Time (minimum 30 minutes from now)
+            </Label>
+            <Input
+              id="express-time"
+              type="time"
+              min={getMinimumTime()}
+              value={fastDeliveryTime}
+              onChange={handleFastDeliveryTimeChange}
+              className="mb-2"
+            />
+            {invalidTimeError && (
+              <p className="text-sm text-destructive">{invalidTimeError}</p>
+            )}
+          </div>
+        )}
       </div>
       
       {selectedLocation && selectedTimeSlot && (
         <div className="bg-muted rounded-md p-3">
-          <h4 className="font-medium">{translateText("delivery", currentLanguage)} {translateText("summary", currentLanguage)}</h4>
+          <h4 className="font-medium">Delivery Summary</h4>
           <p className="text-sm mt-1">
-            {translateText("order_delivered_to", currentLanguage)} <span className="font-medium">{selectedLocation}</span> {translateText("during", currentLanguage)} 
-            <span className="font-medium"> {selectedTimeSlot}</span>.
+            Order delivered to <span className="font-medium">{selectedLocation}, {selectedCountry}</span> during
+            <span className="font-medium"> {selectedTimeSlot}</span>
+            {selectedTimeSlot === 'Express Delivery (Custom Time)' && fastDeliveryTime && !invalidTimeError && (
+              <span className="font-medium"> at {fastDeliveryTime}</span>
+            )}.
           </p>
         </div>
       )}
