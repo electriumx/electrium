@@ -29,8 +29,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const login = (username: string, password: string) => {
-    const user = users.find(u => u.username === username && u.password === password);
+  const login = (email: string, password: string) => {
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast({
+        variant: "destructive",
+        title: "Invalid email",
+        description: "Please enter a valid email address."
+      });
+      return false;
+    }
+    
+    const user = users.find(u => u.username === email && u.password === password);
     if (user) {
       setCurrentUser(user);
       localStorage.setItem('currentUser', JSON.stringify(user));
@@ -43,7 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     toast({
       variant: "destructive",
       title: "Error",
-      description: "Invalid username or password"
+      description: "Invalid email or password"
     });
     return false;
   };

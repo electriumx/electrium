@@ -164,7 +164,9 @@ const Checkout = () => {
                             formatProductName(translateText(item.name, currentLanguage)) : 
                             formatProductName(item.name)}
                           {item.selectedColor && (
-                            <span className="ml-2 text-sm text-muted-foreground">({item.selectedColor})</span>
+                            <span className="ml-2 text-sm" style={{color: item.selectedColor.toLowerCase()}}>
+                              ({item.selectedColor})
+                            </span>
                           )}
                         </h3>
                         <p className="text-muted-foreground">

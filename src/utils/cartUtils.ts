@@ -54,32 +54,34 @@ export const addProductToCart = (product: Product, quantity: number, accessories
 
 // Calculate total price of a product including accessories
 export const calculateProductTotal = (product: Product, discounts: Record<string, { value: number; expiresAt: number; }>) => {
-  let basePrice = product.price;
-  
-  // Apply discount if available
-  if (product.brand && discounts[product.brand] && discounts[product.brand].expiresAt > Date.now()) {
-    basePrice = basePrice * (1 - discounts[product.brand].value / 100);
-  } else if (discounts['All'] && discounts['All'].expiresAt > Date.now()) {
-    basePrice = basePrice * (1 - discounts['All'].value / 100);
-  }
-  
-  // Apply product-specific discount if available (from admin)
-  if (product.discount && product.discount > 0) {
-    basePrice = basePrice * (1 - product.discount / 100);
-  }
-  
-  // Add accessory prices to the base price
+  // First add accessories price to base price
+  const basePrice = product.price;
   const accessoriesPrice = product.accessories
     ? product.accessories
         .filter(acc => acc.selected)
         .reduce((sum, acc) => sum + acc.price, 0)
     : 0;
   
-  // Add accessories price to base price
+  // Calculate total price before discount
   const totalItemPrice = basePrice + accessoriesPrice;
   
-  // Multiply by quantity for total
-  const totalPrice = totalItemPrice * (product.quantity || 1);
+  // Then apply discount to the combined price
+  let discountedPrice = totalItemPrice;
+  
+  // Apply brand discount if available
+  if (product.brand && discounts[product.brand] && discounts[product.brand].expiresAt > Date.now()) {
+    discountedPrice = discountedPrice * (1 - discounts[product.brand].value / 100);
+  } else if (discounts['All'] && discounts['All'].expiresAt > Date.now()) {
+    discountedPrice = discountedPrice * (1 - discounts['All'].value / 100);
+  }
+  
+  // Apply product-specific discount if available (from admin)
+  if (product.discount && product.discount > 0) {
+    discountedPrice = discountedPrice * (1 - product.discount / 100);
+  }
+  
+  // Multiply by quantity for final total
+  const totalPrice = discountedPrice * (product.quantity || 1);
   
   // Make sure we have a valid reviews array (or empty array)
   if (typeof product.reviews === 'number' || product.reviews === undefined) {

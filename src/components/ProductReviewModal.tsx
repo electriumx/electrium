@@ -67,51 +67,85 @@ const ProductReviewModal = ({
       setName(currentUser?.displayName || '');
       setRating(5);
       setComment('');
+      
+      // Save the review in local storage to persist across accounts
+      saveReviewToLocalStorage(productId, name, rating, comment);
     }
   };
 
-  const handleStarHover = (value: number) => {
-    setHoverRating(value);
+  // Function to save reviews to localStorage
+  const saveReviewToLocalStorage = (
+    productId: number, 
+    name: string, 
+    rating: number, 
+    comment: string
+  ) => {
+    const allReviews = JSON.parse(localStorage.getItem('productReviews') || '{}');
+    
+    if (!allReviews[productId]) {
+      allReviews[productId] = [];
+    }
+    
+    // Add the new review
+    allReviews[productId].push({
+      name,
+      rating,
+      comment,
+      date: new Date().toISOString()
+    });
+    
+    localStorage.setItem('productReviews', JSON.stringify(allReviews));
   };
 
   const handleStarClick = (value: number) => {
     setRating(value);
   };
 
+  const handleStarHover = (value: number) => {
+    setHoverRating(value);
+  };
+
   const renderStarRating = () => {
     const activeRating = hoverRating || rating;
-    const maxStars = 5;
-    const starsArray = [];
-    
-    for (let i = 1; i <= maxStars; i++) {
-      // For each star, we'll create two half-star clickable areas
-      for (let half = 0; half < 2; half++) {
-        const starValue = i - 0.5 + half * 0.5;
-        const isFilled = activeRating >= starValue;
-        
-        starsArray.push(
-          <div 
-            key={`star-${i}-${half}`}
-            className="inline-block cursor-pointer relative"
-            onClick={() => handleStarClick(starValue)}
-            onMouseEnter={() => handleStarHover(starValue)}
-            onMouseLeave={() => setHoverRating(0)}
-            title={`${starValue.toFixed(1)} stars`}
-          >
-            <Star 
-              className={`h-6 w-6 ${isFilled ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
-              style={{ 
-                clipPath: half === 0 ? 'polygon(0 0, 50% 0, 50% 100%, 0 100%)' : 'polygon(50% 0, 100% 0, 100% 100%, 50% 100%)'
-              }}
-            />
-          </div>
-        );
-      }
-    }
     
     return (
       <div className="flex items-center">
-        {starsArray}
+        {[1, 2, 3, 4, 5].map((star) => (
+          <div key={star} className="relative">
+            {/* Full star background (gray) */}
+            <Star 
+              className="h-6 w-6 text-gray-300"
+            />
+            
+            {/* Filled overlay - full star */}
+            {activeRating >= star && (
+              <Star 
+                className="absolute top-0 left-0 h-6 w-6 text-yellow-400 fill-yellow-400"
+              />
+            )}
+            
+            {/* Filled overlay - half star */}
+            {activeRating > star - 1 && activeRating < star && (
+              <div className="absolute top-0 left-0 h-6 w-3 overflow-hidden">
+                <Star 
+                  className="h-6 w-6 text-yellow-400 fill-yellow-400"
+                />
+              </div>
+            )}
+            
+            {/* Interactive areas */}
+            <div className="absolute top-0 left-0 w-3 h-6 cursor-pointer" 
+                 onClick={() => handleStarClick(star - 0.5)}
+                 onMouseEnter={() => handleStarHover(star - 0.5)}
+                 onMouseLeave={() => setHoverRating(0)}
+            />
+            <div className="absolute top-0 right-0 w-3 h-6 cursor-pointer" 
+                 onClick={() => handleStarClick(star)}
+                 onMouseEnter={() => handleStarHover(star)}
+                 onMouseLeave={() => setHoverRating(0)}
+            />
+          </div>
+        ))}
         <span className="ml-2 text-sm">({activeRating.toFixed(1)})</span>
       </div>
     );

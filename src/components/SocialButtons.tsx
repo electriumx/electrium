@@ -1,6 +1,7 @@
 
+// Social buttons component is deprecated as social logins have been removed
 const SocialButtons = () => {
-  return null; // Component emptied as social buttons are moved to footer
+  return null;
 };
 
 export default SocialButtons;
