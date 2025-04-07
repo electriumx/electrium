@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Product } from "@/data/productData";
 import { allNewProducts } from "@/data/newProducts";
-import { allRefrigeratorProducts } from "@/data/refrigeratorProducts";
+import { refrigeratorProducts } from "@/data/refrigeratorProducts";
 import { allAdditionalProducts } from "@/data/additionalNewProducts";
 
 export const useProducts = () => {
@@ -15,7 +15,7 @@ export const useProducts = () => {
     const fetchProducts = async () => {
       try {
         // Combine all product sources
-        const allProducts = [...allNewProducts, ...allRefrigeratorProducts, ...allAdditionalProducts];
+        const allProducts = [...allNewProducts, ...refrigeratorProducts, ...allAdditionalProducts];
         
         // Initialize product stocks in localStorage if not already set
         const productStocks = JSON.parse(localStorage.getItem('productStocks') || '{}');
