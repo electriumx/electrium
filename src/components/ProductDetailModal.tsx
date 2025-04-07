@@ -305,13 +305,13 @@ const ProductDetailModal = ({
     const defaultColors = ["Blue", "White", "Black"];
     
     if (category === "Smartphones" || brand === "Apple" || brand === "Samsung" || category === "Tablets") {
-      return ["Blue", "White", "Black", "Silver", "Gold", "Red", "Green", "Purple", "Titanium"];
+      return ["Blue", "White", "Black", "Silver", "Gold", "Titanium"];
     } else if (category === "Laptops") {
       return ["Silver", "Space Gray", "Black", "White", "Blue"];
     } else if (category === "Gaming Consoles") {
-      return ["Black", "White", "Red", "Blue"];
+      return ["Black", "White", "Blue"];
     } else if (category.includes("Headphones") || category === "Audio") {
-      return ["Black", "White", "Silver", "Blue", "Red", "Green"];
+      return ["Black", "White", "Silver", "Blue"];
     }
     
     return defaultColors;
