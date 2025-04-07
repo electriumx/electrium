@@ -34,7 +34,7 @@ const Hero = ({
           }} transition={{
             delay: 0.3,
             duration: 0.7
-          }} className="block text-3xl md:text-4xl font-light bg-gradient-to-br from-[#F2FCE2] to-[#0EA5E9] bg-clip-text text-transparent">
+          }} className="block text-3xl md:text-4xl font-light bg-gradient-to-br from-[#FFFFFF] to-[#FFFFFF] bg-clip-text text-transparent">
               Starts Here
             </motion.span>
           </motion.h1>
