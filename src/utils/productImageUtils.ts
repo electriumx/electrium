@@ -45,6 +45,11 @@ export const getCategoryImage = (category: string, brand?: string, name?: string
   const brandLower = typeof brand === 'string' ? brand.toLowerCase() : '';
   const nameLower = typeof name === 'string' ? name.toLowerCase() : '';
   
+  // Xiaomi Mi 11 specific image
+  if (brandLower === 'xiaomi' && nameLower.includes('mi 11')) {
+    return '/lovable-uploads/5c31ebb9-c488-4519-a777-9a35f5548f66.png';
+  }
+  
   // Apply category-specific images
   if (categoryLower === 'refrigerators' || 
       (nameLower && (nameLower.includes('mini refrigerator') ||

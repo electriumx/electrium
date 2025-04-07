@@ -1,5 +1,3 @@
-
-// At the top of the file, import the Product interface
 import { Product, Review } from './productData';
 
 // Add this helper function at the top
@@ -21,6 +19,18 @@ const fixAccessoryFormat = (accessory: any): any => {
 
 // Define new products with proper typing
 export const allNewProducts: Product[] = [
+  {
+    id: 10016,
+    name: "Xiaomi Mi 11",
+    price: 749.99,
+    category: "Smartphones",
+    brand: "Xiaomi",
+    description: "Flagship smartphone with Snapdragon 888, 108MP camera, and 120Hz AMOLED display.",
+    imageUrl: "/lovable-uploads/5c31ebb9-c488-4519-a777-9a35f5548f66.png",
+    quantity: 0,
+    rating: 4.6,
+    reviews: createEmptyReviews()
+  },
   {
     id: 10001,
     name: "Vankyo Cosmos 6",
