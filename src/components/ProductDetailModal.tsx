@@ -649,9 +649,6 @@ const ProductDetailModal = ({
                               color.toLowerCase() === 'black' ? '#000000' :
                               color.toLowerCase() === 'silver' ? '#c0c0c0' :
                               color.toLowerCase() === 'gold' ? '#ffd700' :
-                              color.toLowerCase() === 'red' ? '#ff0000' :
-                              color.toLowerCase() === 'green' ? '#008000' :
-                              color.toLowerCase() === 'purple' ? '#800080' :
                               color.toLowerCase() === 'space gray' ? '#88898b' :
                               color.toLowerCase() === 'titanium' ? '#878681' : '#cccccc',
                           }}

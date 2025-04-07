@@ -1,3 +1,4 @@
+
 import { Product, Review } from './productData';
 
 // Add this helper function at the top
@@ -29,6 +30,18 @@ export const allNewProducts: Product[] = [
     imageUrl: "/lovable-uploads/5c31ebb9-c488-4519-a777-9a35f5548f66.png",
     quantity: 0,
     rating: 4.6,
+    reviews: createEmptyReviews()
+  },
+  {
+    id: 10017,
+    name: "Dell XPS 15",
+    price: 1799.99,
+    category: "Laptops",
+    brand: "Dell",
+    description: "Premium laptop with 11th Gen Intel Core i7, 16GB RAM, and NVIDIA GeForce RTX 3050 Ti.",
+    imageUrl: "/lovable-uploads/1bd70cd9-f378-4873-8086-6fcaed3c58e0.png",
+    quantity: 0,
+    rating: 4.8,
     reviews: createEmptyReviews()
   },
   {

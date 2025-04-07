@@ -1,3 +1,4 @@
+
 // Get image based on headphone details
 export const getHeadphoneImage = (name: string, brand: string): string => {
   // Default headphone image fallback
@@ -44,6 +45,11 @@ export const getCategoryImage = (category: string, brand?: string, name?: string
   const categoryLower = typeof category === 'string' ? category.toLowerCase() : '';
   const brandLower = typeof brand === 'string' ? brand.toLowerCase() : '';
   const nameLower = typeof name === 'string' ? name.toLowerCase() : '';
+  
+  // Dell XPS 15 specific image
+  if (brandLower === 'dell' && nameLower.includes('xps 15')) {
+    return '/lovable-uploads/1bd70cd9-f378-4873-8086-6fcaed3c58e0.png';
+  }
   
   // Xiaomi Mi 11 specific image
   if (brandLower === 'xiaomi' && nameLower.includes('mi 11')) {
