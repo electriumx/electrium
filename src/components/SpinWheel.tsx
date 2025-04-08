@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from '../contexts/AuthContext';
@@ -130,7 +129,7 @@ const SpinWheel = ({
         ctx.translate(textX, textY);
         ctx.rotate(midAngle + Math.PI / 2);
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 9px Arial';
+        ctx.font = 'bold 16px Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         
@@ -140,18 +139,18 @@ const SpinWheel = ({
         if (brandName.length > 8) {
           const words = brandName.split(' ');
           if (words.length > 1) {
-            ctx.fillText(words[0], 0, -6);
-            ctx.fillText(words.slice(1).join(' '), 0, 2);
-            ctx.fillText(discount, 0, 10);
+            ctx.fillText(words[0], 0, -8);
+            ctx.fillText(words.slice(1).join(' '), 0, 8);
+            ctx.fillText(discount, 0, 24);
           } else {
             const midpoint = Math.floor(brandName.length / 2);
-            ctx.fillText(brandName.substring(0, midpoint) + '-', 0, -6);
-            ctx.fillText(brandName.substring(midpoint), 0, 2);
-            ctx.fillText(discount, 0, 10);
+            ctx.fillText(brandName.substring(0, midpoint) + '-', 0, -8);
+            ctx.fillText(brandName.substring(midpoint), 0, 8);
+            ctx.fillText(discount, 0, 24);
           }
         } else {
-          ctx.fillText(brandName, 0, -3);
-          ctx.fillText(discount, 0, 7);
+          ctx.fillText(brandName, 0, -5);
+          ctx.fillText(discount, 0, 15);
         }
         ctx.restore();
       });
@@ -217,7 +216,6 @@ const SpinWheel = ({
         requestAnimationFrame(animate);
       } else {
         const normalizedRotation = currentRotation % 360;
-        // Calculate which segment we landed on
         const segmentIndex = Math.floor(((normalizedRotation + 90) % 360) / segmentAngle);
         const actualIndex = segmentIndex % numSegments;
         const landedSegment = segments[actualIndex];
