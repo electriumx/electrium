@@ -14,6 +14,9 @@ import { generateAdditionalProducts } from '../data/additionalProducts';
 import { convertNumericReviews } from '../utils/productUtils';
 import { format } from 'date-fns';
 import { locationData, getLocationFee, calculateFastDeliveryFee } from '@/utils/locationData';
+import { allNewProducts } from '../data/newProducts';
+import { refrigeratorProducts } from '../data/refrigeratorProducts';
+import { allAdditionalProducts } from '../data/additionalNewProducts';
 
 const Trade = () => {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
@@ -52,9 +55,15 @@ const Trade = () => {
   };
 
   useEffect(() => {
-    // Combine all products from both sources
+    // Combine all products from all sources
     const additionalProducts = generateAdditionalProducts();
-    const allAvailableProducts = [...catalogProducts, ...additionalProducts];
+    const allAvailableProducts = [
+      ...catalogProducts, 
+      ...additionalProducts, 
+      ...allNewProducts, 
+      ...refrigeratorProducts, 
+      ...allAdditionalProducts
+    ];
     
     // Ensure all products have the correct format
     const formattedProducts = allAvailableProducts.map(product => convertNumericReviews(product));

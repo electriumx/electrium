@@ -61,6 +61,11 @@ export const getCategoryImage = (category: string, brand?: string, name?: string
     return '/lovable-uploads/5c31ebb9-c488-4519-a777-9a35f5548f66.png';
   }
   
+  // Logitech MX Keys specific image
+  if (brandLower === 'logitech' && nameLower.includes('mx keys')) {
+    return '/lovable-uploads/aa8af480-0d1f-49a5-a304-fdd660e7bba1.png';
+  }
+  
   // Apply category-specific images
   if (categoryLower === 'refrigerators' || 
       (nameLower && (nameLower.includes('mini refrigerator') ||

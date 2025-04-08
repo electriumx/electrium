@@ -1,4 +1,3 @@
-
 import { Product, Review } from './productData';
 
 // Add this helper function at the top
@@ -64,7 +63,7 @@ export const allNewProducts: Product[] = [
     subcategory: "Keyboards",
     brand: "Logitech",
     description: "Premium wireless keyboard with backlit keys and multi-device connectivity.",
-    imageUrl: "/lovable-uploads/3f391803-44c1-4437-a246-5070b31d60a5.png",
+    imageUrl: "/lovable-uploads/aa8af480-0d1f-49a5-a304-fdd660e7bba1.png",
     quantity: 0,
     rating: 4.8,
     reviews: createEmptyReviews()
