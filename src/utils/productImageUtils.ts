@@ -1,4 +1,3 @@
-
 // Get image based on headphone details
 export const getHeadphoneImage = (name: string, brand: string): string => {
   // Default headphone image fallback
@@ -11,6 +10,16 @@ export const getHeadphoneImage = (name: string, brand: string): string => {
   // Sony WH-1000XM4 gets the specified image
   if (nameLower.includes('wh-1000xm4') && brandLower === 'sony') {
     return '/lovable-uploads/17ad1b1a-5bfb-4fb0-aedc-d183c4a73046.png';
+  }
+  
+  // Sony WH-1000XM5 - use a standard image instead of Cyberpunk
+  if (nameLower.includes('wh-1000xm5') && brandLower === 'sony') {
+    return '/lovable-uploads/d1307e35-8834-4230-b1d0-9aa18e7760f7.png';
+  }
+  
+  // Beats Fit Pro - use a standard image instead of Cyberpunk
+  if (nameLower.includes('fit pro') && brandLower === 'beats') {
+    return '/lovable-uploads/bfd80abc-6761-4660-9b25-36864420ec27.png';
   }
   
   // Other specific headphone models
@@ -45,6 +54,23 @@ export const getCategoryImage = (category: string, brand?: string, name?: string
   const categoryLower = typeof category === 'string' ? category.toLowerCase() : '';
   const brandLower = typeof brand === 'string' ? brand.toLowerCase() : '';
   const nameLower = typeof name === 'string' ? name.toLowerCase() : '';
+  
+  // Specific product images
+  
+  // Vankyo Cosmos 6 - use a standard image instead of Cyberpunk
+  if (brandLower === 'vankyo' && nameLower.includes('cosmos 6')) {
+    return '/lovable-uploads/7f739f1f-3772-4ead-89b5-34d5c94221bb.png';
+  }
+  
+  // PlayStation 5 Digital Edition - use a standard image instead of Cyberpunk
+  if (brandLower === 'sony' && nameLower.includes('playstation 5 digital')) {
+    return '/lovable-uploads/67d0bb7c-dce4-421b-9ccc-4e0b5f12c545.png';
+  }
+  
+  // Xbox Series S - use a standard image instead of Cyberpunk
+  if (brandLower === 'microsoft' && nameLower.includes('xbox series s')) {
+    return '/lovable-uploads/4b5ba4b7-1d75-4c44-aa6c-c1d6e0d028c4.png';
+  }
   
   // Logitech MX Master 3 specific image
   if (brandLower === 'logitech' && nameLower.includes('mx master 3')) {
@@ -192,6 +218,7 @@ export const getGameImage = (name: string): string => {
     return '/lovable-uploads/e61d09d1-fb3f-4e38-aaca-2342513b89de.png';
   }
   
+  // Only use Cyberpunk image for Cyberpunk game
   if (nameLower.includes('cyberpunk 2077')) {
     return '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png';
   }

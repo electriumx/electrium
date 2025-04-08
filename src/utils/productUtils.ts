@@ -1,3 +1,4 @@
+
 import { Product, Review } from '../data/productData';
 
 // Convert number reviews to proper Review array format
@@ -121,6 +122,39 @@ export const updateProductNames = (products: Product[]): Product[] => {
     // Rename PlayStation 3 to PlayStation 4
     if (product.name.toLowerCase() === "playstation 3") {
       product.name = "PlayStation 4";
+    }
+    
+    return product;
+  });
+};
+
+// Remove color text from product descriptions that don't have colors
+export const removeColorTextFromProducts = (products: Product[]): Product[] => {
+  return products.map(product => {
+    const desc = product.description || '';
+    
+    // Check if the description mentions color but the product likely doesn't have one
+    if (desc.toLowerCase().includes('color:') || 
+        desc.toLowerCase().includes('colors:') || 
+        desc.toLowerCase().includes('available in')) {
+      
+      // Products that typically don't have color options
+      const noColorCategories = [
+        'Games', 'PC Games', 'Software', 'Gift Cards', 'Subscriptions', 
+        'Digital Content', 'Services', 'Extended Warranties'
+      ];
+      
+      // If product is in a category that typically doesn't have colors, remove color text
+      if (noColorCategories.includes(product.category)) {
+        // Remove color references
+        product.description = desc
+          .replace(/color:\s*[^,.]+[,.]/gi, '')
+          .replace(/colors:\s*[^,.]+[,.]/gi, '')
+          .replace(/available in\s*[^,.]+[,.]/gi, '')
+          .replace(/available in\s*[^,.]+$/gi, '')
+          .replace(/\s{2,}/g, ' ')
+          .trim();
+      }
     }
     
     return product;

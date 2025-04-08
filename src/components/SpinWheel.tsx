@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from '../contexts/AuthContext';
@@ -129,7 +130,7 @@ const SpinWheel = ({
         ctx.translate(textX, textY);
         ctx.rotate(midAngle + Math.PI / 2);
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 16px Arial';
+        ctx.font = 'bold 12px Arial'; // Changed to 12px as requested
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         
