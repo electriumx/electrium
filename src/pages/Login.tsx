@@ -9,9 +9,9 @@ import { useToast } from '@/hooks/use-toast';
 import { addUser } from '../data/users';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
+  const [usernameOrEmail, setUsernameOrEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState({ email: '', password: '' });
+  const [errors, setErrors] = useState({ usernameOrEmail: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -19,16 +19,11 @@ const Login = () => {
   const { toast } = useToast();
 
   const validateForm = () => {
-    const newErrors = { email: '', password: '' };
+    const newErrors = { usernameOrEmail: '', password: '' };
     let isValid = true;
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email.trim()) {
-      newErrors.email = 'Email is required';
-      isValid = false;
-    } else if (!emailRegex.test(email)) {
-      newErrors.email = 'Please enter a valid email address';
+    if (!usernameOrEmail.trim()) {
+      newErrors.usernameOrEmail = 'Username or Email is required';
       isValid = false;
     }
 
@@ -47,7 +42,7 @@ const Login = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      if (login(email.toLowerCase(), password)) {
+      if (login(usernameOrEmail, password)) {
         const from = location.state?.from?.pathname || '/';
         navigate(from);
       }
@@ -68,19 +63,19 @@ const Login = () => {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium mb-1">Email Address</label>
+              <label htmlFor="usernameOrEmail" className="block text-sm font-medium mb-1">Username or Email Address</label>
               <input
-                id="email"
-                name="email"
-                type="email"
+                id="usernameOrEmail"
+                name="usernameOrEmail"
+                type="text"
                 required
                 className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-input bg-background placeholder-muted-foreground focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
-                placeholder="Email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Username or Email address"
+                value={usernameOrEmail}
+                onChange={(e) => setUsernameOrEmail(e.target.value)}
               />
-              {errors.email && (
-                <p className="text-destructive text-sm mt-1">{errors.email}</p>
+              {errors.usernameOrEmail && (
+                <p className="text-destructive text-sm mt-1">{errors.usernameOrEmail}</p>
               )}
             </div>
             <div>

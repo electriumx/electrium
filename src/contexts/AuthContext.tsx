@@ -6,7 +6,7 @@ import { useToast } from '@/components/ui/use-toast';
 
 interface AuthContextType {
   currentUser: User | null;
-  login: (username: string, password: string) => boolean;
+  login: (usernameOrEmail: string, password: string) => boolean;
   logout: () => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
@@ -29,19 +29,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const login = (email: string, password: string) => {
-    // Validate email format
+  const login = (usernameOrEmail: string, password: string) => {
+    // Check if input is email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      toast({
-        variant: "destructive",
-        title: "Invalid email",
-        description: "Please enter a valid email address."
-      });
-      return false;
-    }
+    const isEmail = emailRegex.test(usernameOrEmail);
     
-    const user = users.find(u => u.username === email && u.password === password);
+    // Find user by either username or email
+    const user = users.find(u => 
+      (isEmail ? u.username === usernameOrEmail : (u.username === usernameOrEmail || u.displayName === usernameOrEmail)) 
+      && u.password === password
+    );
+    
     if (user) {
       setCurrentUser(user);
       localStorage.setItem('currentUser', JSON.stringify(user));
@@ -54,7 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     toast({
       variant: "destructive",
       title: "Error",
-      description: "Invalid email or password"
+      description: "Invalid username/email or password"
     });
     return false;
   };

@@ -114,3 +114,27 @@ export const calculateAccessoriesTotal = (product: Product): number => {
     .filter(acc => acc.selected)
     .reduce((sum, acc) => sum + acc.price, 0);
 };
+
+// Format the total price with accessories
+export const formatTotalPriceWithAccessories = (basePrice: number, accessoriesTotal: number, quantity: number = 1): string => {
+  const total = (basePrice + accessoriesTotal) * quantity;
+  return `$${total.toFixed(2)}`;
+};
+
+// Get a formatted string of accessory details
+export const getAccessoryDetails = (product: Product): { text: string, total: number } => {
+  if (!product.accessories || product.accessories.length === 0) {
+    return { text: "No accessories", total: 0 };
+  }
+  
+  const selectedAccessories = product.accessories.filter(acc => acc.selected);
+  
+  if (selectedAccessories.length === 0) {
+    return { text: "No accessories", total: 0 };
+  }
+  
+  const total = selectedAccessories.reduce((sum, acc) => sum + acc.price, 0);
+  const text = selectedAccessories.map(acc => `${acc.name} (+$${acc.price.toFixed(2)})`).join(', ');
+  
+  return { text, total };
+};
