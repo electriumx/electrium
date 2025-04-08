@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -31,7 +30,6 @@ const Trade = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   
-  // Add location states
   const [selectedCountry, setSelectedCountry] = useState('United States');
   const [selectedCity, setSelectedCity] = useState('');
   const [cities, setCities] = useState<{ name: string; fee: number }[]>([]);
@@ -39,15 +37,12 @@ const Trade = () => {
   const [deliveryFee, setDeliveryFee] = useState(0);
   const [invalidTimeError, setInvalidTimeError] = useState('');
 
-  // Filter for max price difference of 40%
   const priceRangePercent = 40;
 
-  // Get all product categories for filters
   const categories = ['all', ...new Set(
     allProducts.map(product => product.category)
   )];
   
-  // Get minimum allowed time (current time + 30 minutes)
   const getMinimumTime = () => {
     const now = new Date();
     now.setMinutes(now.getMinutes() + 30);
@@ -55,7 +50,6 @@ const Trade = () => {
   };
 
   useEffect(() => {
-    // Combine all products from all sources
     const additionalProducts = generateAdditionalProducts();
     const allAvailableProducts = [
       ...catalogProducts, 
@@ -65,22 +59,18 @@ const Trade = () => {
       ...allAdditionalProducts
     ];
     
-    // Ensure all products have the correct format
     const formattedProducts = allAvailableProducts.map(product => convertNumericReviews(product));
     
     setAllProducts(formattedProducts);
     
-    // Update cities based on selected country
     setCities(locationData[selectedCountry] || []);
   }, []);
   
   useEffect(() => {
-    // Update cities when country changes
     setCities(locationData[selectedCountry] || []);
     setSelectedCity('');
   }, [selectedCountry]);
 
-  // Filter first set of products
   const filteredProducts = allProducts.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                          product.brand.toLowerCase().includes(searchQuery.toLowerCase());
@@ -88,7 +78,6 @@ const Trade = () => {
     return matchesSearch && matchesCategory;
   });
 
-  // When a product is selected, filter the trade-for options
   useEffect(() => {
     if (selectedProduct) {
       const basePrice = selectedProduct.price;
@@ -96,19 +85,15 @@ const Trade = () => {
       const maxPrice = basePrice * (1 + priceRangePercent/100);
       
       const eligibleProducts = allProducts.filter(product => {
-        // Don't include the selected product in trade options
         if (product.id === selectedProduct.id) return false;
         
-        // Filter by price range
         const inPriceRange = product.price >= minPrice && product.price <= maxPrice;
         
-        // Filter by search and category
         const matchesSearch = secondSearchQuery === '' || 
                              product.name.toLowerCase().includes(secondSearchQuery.toLowerCase()) || 
                              product.brand.toLowerCase().includes(secondSearchQuery.toLowerCase());
         const matchesCategory = secondCategory === 'all' || product.category === secondCategory;
         
-        // Filter by wanted item name if provided
         const matchesWanted = wantedItem === '' || 
                              product.name.toLowerCase().includes(wantedItem.toLowerCase());
         
@@ -117,7 +102,6 @@ const Trade = () => {
       
       setTradeForProducts(eligibleProducts);
       
-      // Update estimated trade value based on first product in filtered list
       if (eligibleProducts.length > 0) {
         setEstimatedTradeValue(eligibleProducts[0].price);
       } else {
@@ -160,7 +144,6 @@ const Trade = () => {
       description: `Trading ${selectedProduct.name} for ${tradeProduct.name}. Delivery to ${selectedCity}, ${selectedCountry} at ${deliveryTime}`,
     });
     
-    // Pass trade and delivery details to payment page
     navigate('/payment?trade=true', {
       state: {
         tradeDetails: {
@@ -199,7 +182,6 @@ const Trade = () => {
     const timeValue = e.target.value;
     setDeliveryTime(timeValue);
     
-    // Validate that the time is at least 30 minutes from now
     const minimumTime = getMinimumTime();
     const isValid = timeValue >= minimumTime;
     
@@ -213,7 +195,7 @@ const Trade = () => {
   
   const updateDeliveryFee = () => {
     if (selectedCity && deliveryTime) {
-      const baseFee = 15; // Base express delivery fee
+      const baseFee = 15;
       const fee = calculateFastDeliveryFee(selectedCountry, selectedCity, baseFee);
       setDeliveryFee(fee);
     }
@@ -240,7 +222,6 @@ const Trade = () => {
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Your Item Selection */}
         <div>
           <Card className="mb-6">
             <CardHeader>
@@ -346,7 +327,6 @@ const Trade = () => {
           )}
         </div>
         
-        {/* Trade For Selection */}
         <div>
           <Card className="mb-6">
             <CardHeader>
@@ -398,7 +378,6 @@ const Trade = () => {
                     />
                   </div>
                   
-                  {/* Add delivery location selection */}
                   <div className="space-y-4 border border-border rounded-lg p-4 mt-4">
                     <h3 className="font-medium flex items-center">
                       <MapPin className="mr-2 h-4 w-4" />
