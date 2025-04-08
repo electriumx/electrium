@@ -4,10 +4,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { MapPin, Clock } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { locationData, getLocationFee } from '@/utils/locationData';
+import { locationData, getLocationFee, calculateFastDeliveryFee } from '@/utils/locationData';
 import { translateText } from '@/utils/translation';
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 
 interface DeliveryLocationSelectorProps {
@@ -126,12 +125,12 @@ const DeliveryLocationSelector = ({
       let baseFee = 15; // Base express delivery fee
       if (selectedLocation) {
         const locationFee = getLocationFee(selectedCountry, selectedLocation);
-        baseFee += locationFee;
-      }
-      
-      // Notify parent component about the custom time
-      if (onDeliveryTimeChange) {
-        onDeliveryTimeChange(timeValue, baseFee);
+        const fastDeliveryFee = calculateFastDeliveryFee(selectedCountry, selectedLocation, baseFee);
+        
+        // Notify parent component about the custom time
+        if (onDeliveryTimeChange) {
+          onDeliveryTimeChange(timeValue, fastDeliveryFee);
+        }
       }
     }
   };
@@ -219,6 +218,12 @@ const DeliveryLocationSelector = ({
             />
             {invalidTimeError && (
               <p className="text-sm text-destructive">{invalidTimeError}</p>
+            )}
+            {!invalidTimeError && fastDeliveryTime && selectedLocation && (
+              <p className="text-sm">
+                Fast Delivery Fee: $
+                {calculateFastDeliveryFee(selectedCountry, selectedLocation, 15).toFixed(2)}
+              </p>
             )}
           </div>
         )}

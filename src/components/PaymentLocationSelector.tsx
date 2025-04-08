@@ -3,8 +3,10 @@ import { useState, useEffect } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { locationData, getLocationFee } from '@/utils/locationData';
+import { locationData, getLocationFee, calculateFastDeliveryFee } from '@/utils/locationData';
 import { translateText } from '@/utils/translation';
+import { Input } from "@/components/ui/input";
+import { format } from "date-fns";
 
 interface PaymentLocationSelectorProps {
   onLocationChange: (country: string, city: string, fee: number) => void;
@@ -20,6 +22,15 @@ const PaymentLocationSelector = ({
   const [selectedDeliveryTime, setSelectedDeliveryTime] = useState('standard');
   const [currentLanguage, setCurrentLanguage] = useState('english');
   const [cities, setCities] = useState<{ name: string; fee: number }[]>([]);
+  const [fastDeliveryTime, setFastDeliveryTime] = useState('');
+  const [invalidTimeError, setInvalidTimeError] = useState('');
+  
+  // Get minimum allowed time (current time + 30 minutes)
+  const getMinimumTime = () => {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() + 30);
+    return format(now, "HH:mm");
+  };
   
   useEffect(() => {
     // Update cities based on selected country
@@ -58,20 +69,51 @@ const PaymentLocationSelector = ({
   
   const handleDeliveryTimeChange = (value: string) => {
     setSelectedDeliveryTime(value);
+    setFastDeliveryTime('');
+    setInvalidTimeError('');
+    
     let timeFee = 0;
     
     if (value === 'express') {
       timeFee = 10;
     } else if (value === 'priority') {
       timeFee = 20;
+    } else if (value === 'custom') {
+      // Will be calculated when custom time is set
+      return;
     }
     
     onDeliveryTimeChange(value, timeFee);
   };
   
+  const handleFastDeliveryTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const timeValue = e.target.value;
+    setFastDeliveryTime(timeValue);
+    
+    // Validate that the time is at least 30 minutes from now
+    const minimumTime = getMinimumTime();
+    const isValid = timeValue >= minimumTime;
+    
+    if (!isValid) {
+      setInvalidTimeError(`Time must be at least 30 minutes from now (${minimumTime} or later)`);
+      return;
+    } 
+    
+    setInvalidTimeError('');
+    
+    // Calculate fee based on country and location
+    if (selectedCity) {
+      const fee = calculateFastDeliveryFee(selectedCountry, selectedCity, 15);
+      onDeliveryTimeChange(`custom:${timeValue}`, fee);
+    }
+  };
+  
   const getTimeFee = () => {
     if (selectedDeliveryTime === 'express') return 10;
     if (selectedDeliveryTime === 'priority') return 20;
+    if (selectedDeliveryTime === 'custom' && selectedCity && !invalidTimeError) {
+      return calculateFastDeliveryFee(selectedCountry, selectedCity, 15);
+    }
     return 0;
   };
   
@@ -160,7 +202,42 @@ const PaymentLocationSelector = ({
               </div>
             </Label>
           </div>
+          
+          <div className="flex items-center space-x-2 border border-input rounded-md p-3">
+            <RadioGroupItem value="custom" id="custom-delivery" />
+            <Label htmlFor="custom-delivery" className="flex-1 cursor-pointer">
+              <div>
+                <p className="font-medium">{translateText("custom", currentLanguage) || "Custom Time"}</p>
+                <p className="text-sm text-muted-foreground">{translateText("specific_time", currentLanguage) || "Select a specific delivery time"}</p>
+              </div>
+            </Label>
+          </div>
         </RadioGroup>
+        
+        {selectedDeliveryTime === 'custom' && (
+          <div className="mt-4 border border-input rounded-md p-4">
+            <Label htmlFor="express-time" className="block mb-2">
+              {translateText("select_delivery_time", currentLanguage) || "Select Delivery Time"} (minimum 30 minutes from now)
+            </Label>
+            <Input
+              id="express-time"
+              type="time"
+              min={getMinimumTime()}
+              value={fastDeliveryTime}
+              onChange={handleFastDeliveryTimeChange}
+              className="mb-2"
+            />
+            {invalidTimeError && (
+              <p className="text-sm text-destructive">{invalidTimeError}</p>
+            )}
+            {!invalidTimeError && fastDeliveryTime && selectedCity && (
+              <p className="text-sm">
+                {translateText("delivery_fee", currentLanguage)}: $
+                {calculateFastDeliveryFee(selectedCountry, selectedCity, 15).toFixed(2)}
+              </p>
+            )}
+          </div>
+        )}
       </div>
       
       {selectedCity && (
@@ -173,7 +250,9 @@ const PaymentLocationSelector = ({
             {translateText("delivery_time", currentLanguage)}: {
               selectedDeliveryTime === 'standard' ? translateText("standard", currentLanguage) :
               selectedDeliveryTime === 'express' ? translateText("express", currentLanguage) :
-              translateText("priority", currentLanguage)
+              selectedDeliveryTime === 'priority' ? translateText("priority", currentLanguage) :
+              selectedDeliveryTime === 'custom' && fastDeliveryTime ? `${translateText("custom", currentLanguage) || "Custom"} (${fastDeliveryTime})` :
+              translateText("not_selected", currentLanguage) || "Not selected"
             }
           </p>
           <p className="text-sm font-medium mt-1">
