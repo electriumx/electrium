@@ -21,31 +21,16 @@ const SpinWheel = ({
   const navigate = useNavigate();
 
   const segments = [
-    { brand: "Apple", discount: 5, color: "#1A1C29" },
     { brand: "Samsung", discount: 10, color: "#243949" },
     { brand: "All", discount: 15, color: "#0F4C81" },
-    { brand: "Sony", discount: 7, color: "#2C3E50" },
     { brand: "Google", discount: 12, color: "#18304C" },
-    { brand: "Microsoft", discount: 8, color: "#143A5C" },
     { brand: "Xiaomi", discount: 20, color: "#1E293B" },
     { brand: "Accessories", discount: 25, color: "#0A4D68" },
-    { brand: "Audio", discount: 18, color: "#222831" },
     { brand: "Games", discount: 30, color: "#1A1C24" },
-    { brand: "PlayStation", discount: 15, color: "#0D2B44" },
     { brand: "PC Games", discount: 22, color: "#1F3A5F" },
-    { brand: "Speakers", discount: 17, color: "#2A3147" },
-    { brand: "Laptops", discount: 8, color: "#203654" },
-    { brand: "Tablets", discount: 12, color: "#30445C" },
     { brand: "Gaming Gear", discount: 20, color: "#0E2A47" },
-    { brand: "TVs", discount: 15, color: "#1C3D5B" },
-    { brand: "Cameras", discount: 10, color: "#263859" },
     { brand: "Smartwatches", discount: 22, color: "#0D293E" },
-    { brand: "Home Tech", discount: 18, color: "#18445C" },
     { brand: "Nintendo", discount: 14, color: "#2A3F65" },
-    { brand: "Dell", discount: 9, color: "#0D2438" },
-    { brand: "HP", discount: 11, color: "#243752" },
-    { brand: "LG", discount: 13, color: "#162839" },
-    { brand: "Monitors", discount: 16, color: "#213449" },
   ];
 
   const numSegments = segments.length;
@@ -99,7 +84,7 @@ const SpinWheel = ({
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
-    const radius = Math.min(centerX, centerY) - 20;
+    const radius = Math.min(centerX, centerY) - 10;
     
     const drawOctagramWheel = () => {
       segments.forEach((segment, i) => {
@@ -253,8 +238,8 @@ const SpinWheel = ({
       <div className="relative">
         <canvas 
           ref={canvasRef} 
-          width={340} 
-          height={340} 
+          width={480} 
+          height={480} 
           className="border rounded-full shadow-lg border-border"
         />
       </div>
