@@ -76,6 +76,10 @@ const Payment = () => {
   const [searchValue, setSearchValue] = useState('');
   const [searchResults, setSearchResults] = useState<string[]>([]);
   const [products, setProducts] = useState<any[]>([]);
+  const [searchTradeForValue, setSearchTradeForValue] = useState('');
+  const [searchTradeForResults, setSearchTradeForResults] = useState<string[]>([]);
+  const [selectedTradeForItem, setSelectedTradeForItem] = useState('');
+  const [tradeForItems, setTradeForItems] = useState<string[]>([]);
 
   const calculateTotal = () => {
     const subtotal = calculateSubtotal();
@@ -270,6 +274,19 @@ const Payment = () => {
     setTradeItems(tradeItems.filter(i => i !== item));
   };
 
+  const handleAddTradeForItem = () => {
+    if (selectedTradeForItem && !tradeForItems.includes(selectedTradeForItem)) {
+      setTradeForItems([...tradeForItems, selectedTradeForItem]);
+      setSelectedTradeForItem('');
+      setSearchTradeForValue('');
+      setSearchTradeForResults([]);
+    }
+  };
+
+  const handleRemoveTradeForItem = (item: string) => {
+    setTradeForItems(tradeForItems.filter(i => i !== item));
+  };
+
   const handleApplyCoupon = () => {
     if (!couponCode.trim()) {
       toast({
@@ -316,7 +333,8 @@ const Payment = () => {
           "MacBook Pro", "Dell XPS 13", "HP Spectre", "Lenovo ThinkPad",
           "iPad Pro", "Samsung Galaxy Tab", "Amazon Fire HD", "Microsoft Surface",
           "AirPods Pro", "Sony WH-1000XM4", "Bose QuietComfort", "Jabra Elite",
-          "Apple Watch", "Samsung Galaxy Watch", "Fitbit Versa", "Garmin Forerunner"
+          "Apple Watch", "Samsung Galaxy Watch", "Fitbit Versa", "Garmin Forerunner",
+          "Logitech MX Keys", "Nintendo Switch", "PlayStation 5", "Xbox Series X"
         ];
     
     const filteredResults = productNames.filter(name => 
@@ -324,6 +342,32 @@ const Payment = () => {
     );
     
     setSearchResults(filteredResults);
+  };
+
+  const handleSearchTradeFor = (query: string) => {
+    setSearchTradeForValue(query);
+    
+    if (!query.trim()) {
+      setSearchTradeForResults([]);
+      return;
+    }
+    
+    const productNames = products.length > 0 
+      ? products.map((p: any) => p.name) 
+      : [
+          "iPhone 13", "Samsung Galaxy S21", "Google Pixel 6", "OnePlus 9",
+          "MacBook Pro", "Dell XPS 13", "HP Spectre", "Lenovo ThinkPad",
+          "iPad Pro", "Samsung Galaxy Tab", "Amazon Fire HD", "Microsoft Surface",
+          "AirPods Pro", "Sony WH-1000XM4", "Bose QuietComfort", "Jabra Elite",
+          "Apple Watch", "Samsung Galaxy Watch", "Fitbit Versa", "Garmin Forerunner",
+          "Logitech MX Keys", "Nintendo Switch", "PlayStation 5", "Xbox Series X"
+        ];
+    
+    const filteredResults = productNames.filter(name => 
+      name.toLowerCase().includes(query.toLowerCase())
+    );
+    
+    setSearchTradeForResults(filteredResults);
   };
 
   const handleCardSelection = (cardId: string) => {
@@ -831,9 +875,72 @@ const Payment = () => {
                     )}
                   </div>
                   
+                  <div className="space-y-2 mt-6">
+                    <Label htmlFor="trade-for-item-input">Item to Trade For</Label>
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <Input 
+                          id="trade-for-item-input" 
+                          placeholder="Search for items you want..."
+                          value={searchTradeForValue}
+                          onChange={(e) => handleSearchTradeFor(e.target.value)}
+                        />
+                        {searchTradeForResults.length > 0 && (
+                          <div className="absolute z-10 mt-1 w-full bg-background border border-border rounded-md shadow-lg max-h-60 overflow-auto">
+                            {searchTradeForResults.map((result, idx) => (
+                              <div 
+                                key={idx} 
+                                className="px-4 py-2 hover:bg-accent cursor-pointer"
+                                onClick={() => {
+                                  setSelectedTradeForItem(result);
+                                  setSearchTradeForValue(result);
+                                  setSearchTradeForResults([]);
+                                }}
+                              >
+                                {result}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <Button 
+                        onClick={handleAddTradeForItem}
+                        type="button"
+                        disabled={!selectedTradeForItem}
+                      >
+                        Add
+                      </Button>
+                    </div>
+                    {selectedTradeForItem && (
+                      <p className="text-sm text-green-500 mt-1">
+                        Selected: {selectedTradeForItem} (Available: Yes)
+                      </p>
+                    )}
+                  </div>
+                  
+                  {tradeForItems.length > 0 && (
+                    <div className="space-y-2">
+                      <Label>Items You Want</Label>
+                      <div className="space-y-2">
+                        {tradeForItems.map((item, index) => (
+                          <div key={index} className="flex justify-between items-center p-2 bg-muted rounded-md">
+                            <span>{item}</span>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={() => handleRemoveTradeForItem(item)}
+                            >
+                              <Trash size={16} />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
                   {tradeItems.length > 0 && (
                     <div className="space-y-2">
-                      <Label>Selected Trade Items</Label>
+                      <Label>Items You're Trading</Label>
                       <div className="space-y-2">
                         {tradeItems.map((item, index) => (
                           <div key={index} className="flex justify-between items-center p-2 bg-muted rounded-md">

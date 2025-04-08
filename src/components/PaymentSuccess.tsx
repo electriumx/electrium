@@ -2,6 +2,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
+import confetti from 'canvas-confetti';
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
@@ -14,6 +15,13 @@ const PaymentSuccess = () => {
     toast({
       title: "Payment Successful",
       description: "Thank you for your purchase!"
+    });
+
+    // Launch confetti to celebrate
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 }
     });
 
     // Redirect to thank you page
