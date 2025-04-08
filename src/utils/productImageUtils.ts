@@ -46,6 +46,11 @@ export const getCategoryImage = (category: string, brand?: string, name?: string
   const brandLower = typeof brand === 'string' ? brand.toLowerCase() : '';
   const nameLower = typeof name === 'string' ? name.toLowerCase() : '';
   
+  // Logitech MX Master 3 specific image
+  if (brandLower === 'logitech' && nameLower.includes('mx master 3')) {
+    return '/lovable-uploads/d25b7839-e5c3-40e7-b085-79d316d78dcf.png';
+  }
+  
   // iPhone 13 Pro specific image
   if (brandLower === 'apple' && nameLower.includes('iphone 13 pro')) {
     return '/lovable-uploads/36fdb57d-95cb-4f52-a96a-aaf2f174a210.png';
@@ -117,6 +122,11 @@ export const getCategoryImage = (category: string, brand?: string, name?: string
     return '/lovable-uploads/3f391803-44c1-4437-a246-5070b31d60a5.png';
   }
   
+  // Special case for PC Accessories category with mouse
+  if (category === 'PC Accessories' && name && nameLower.includes('mouse')) {
+    return '/lovable-uploads/d25b7839-e5c3-40e7-b085-79d316d78dcf.png';
+  }
+  
   // Handle specific brand cases
   if (brand) {
     if (brand === 'Nintendo' || (name && (nameLower.includes('nintendo') || nameLower.includes('switch')))) {
@@ -183,11 +193,11 @@ export const getGameImage = (name: string): string => {
   }
   
   if (nameLower.includes('cyberpunk 2077')) {
-    return '/lovable-uploads/d0b5f6e9-d8a7-4e6d-92d9-0981cb533be3.png';
+    return '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png';
   }
   
   if (nameLower.includes('elden ring')) {
-    return 'https://cdn.cloudflare.steamstatic.com/steam/apps/1245620/header.jpg';
+    return '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png';
   }
   
   if (nameLower.includes('horizon kings') && nameLower.includes('simulation')) {

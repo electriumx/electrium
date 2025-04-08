@@ -76,7 +76,7 @@ export const allNewProducts: Product[] = [
     subcategory: "Mice",
     brand: "Logitech",
     description: "Advanced wireless mouse with customizable buttons and app-specific profiles.",
-    imageUrl: "/lovable-uploads/3f391803-44c1-4437-a246-5070b31d60a5.png",
+    imageUrl: "/lovable-uploads/d25b7839-e5c3-40e7-b085-79d316d78dcf.png",
     quantity: 0,
     rating: 4.9,
     reviews: createEmptyReviews()
