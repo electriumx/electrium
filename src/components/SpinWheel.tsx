@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from '../contexts/AuthContext';
@@ -31,6 +32,11 @@ const SpinWheel = ({
     { brand: "Gaming Gear", discount: 20, color: "#0E2A47" },
     { brand: "Smartwatches", discount: 22, color: "#0D293E" },
     { brand: "Nintendo", discount: 14, color: "#2A3F65" },
+    { brand: "Headphones", discount: 18, color: "#172B3A" },
+    { brand: "Keyboards", discount: 16, color: "#293745" },
+    { brand: "Monitors", discount: 15, color: "#1D3B52" },
+    { brand: "Speakers", discount: 12, color: "#204060" },
+    { brand: "Smart Home", discount: 20, color: "#0B3B5D" },
   ];
 
   const numSegments = segments.length;
@@ -211,8 +217,10 @@ const SpinWheel = ({
         requestAnimationFrame(animate);
       } else {
         const normalizedRotation = currentRotation % 360;
-        const segmentIndex = Math.floor((normalizedRotation + 90) % 360 / segmentAngle);
-        const landedSegment = segments[segmentIndex % numSegments];
+        // Calculate which segment we landed on
+        const segmentIndex = Math.floor(((normalizedRotation + 90) % 360) / segmentAngle);
+        const actualIndex = segmentIndex % numSegments;
+        const landedSegment = segments[actualIndex];
         
         const resultMessage = `You won ${landedSegment.discount}% off ${landedSegment.brand} products! Expires in 48 hours. Come back in 24 hours to spin again.`;
         setResult(resultMessage);
@@ -238,8 +246,8 @@ const SpinWheel = ({
       <div className="relative">
         <canvas 
           ref={canvasRef} 
-          width={480} 
-          height={480} 
+          width={400} 
+          height={400} 
           className="border rounded-full shadow-lg border-border"
         />
       </div>
