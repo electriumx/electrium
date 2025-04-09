@@ -40,6 +40,12 @@ const OrderSummary = ({
             <div className="flex-1">
               <h3 className="font-medium">{item.name}</h3>
               <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
+              {/* Only show color if it's explicitly selected */}
+              {item.selectedColor && (
+                <p className="text-xs text-muted-foreground">
+                  Color: {item.selectedColor}
+                </p>
+              )}
               {item.accessories && item.accessories.length > 0 && (
                 <p className="text-xs text-muted-foreground">
                   With: {item.accessories.filter(a => a.selected).map(a => a.name).join(', ')}

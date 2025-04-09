@@ -52,6 +52,12 @@ const MobileOrderSummary = ({
                 <div className="flex-1">
                   <h3 className="font-medium">{item.name}</h3>
                   <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
+                  {/* Only show color if it's explicitly selected */}
+                  {item.selectedColor && (
+                    <p className="text-xs text-muted-foreground">
+                      Color: {item.selectedColor}
+                    </p>
+                  )}
                   <p className="font-semibold">${calculateItemTotal(item).toFixed(2)}</p>
                 </div>
               </div>
