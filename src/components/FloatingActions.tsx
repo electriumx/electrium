@@ -1,10 +1,13 @@
+
 import { useNavigate } from 'react-router-dom';
-import { ShoppingCart, Heart } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+
 interface FloatingActionsProps {
   showCheckout?: boolean;
   cartItemCount?: number;
 }
+
 const FloatingActions = ({
   showCheckout = true,
   cartItemCount = 0
@@ -18,11 +21,8 @@ const FloatingActions = ({
             <span>Your Cart ({cartItemCount})</span>
           </Button>
         </div>}
-      
-      {/* Wishlist Button - Bottom Right */}
-      <div className="fixed bottom-6 right-6 z-40">
-        
-      </div>
     </>;
 };
+
 export default FloatingActions;
+
