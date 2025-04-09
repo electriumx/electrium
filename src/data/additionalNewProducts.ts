@@ -1,3 +1,4 @@
+
 import { Product, Review } from './productData';
 
 // Add this helper function at the top
@@ -701,136 +702,11 @@ export const newGamingConsoles: Product[] = [
   }
 ];
 
-// Define new PC accessories products
-export const newPCAccessories: Product[] = [
-  {
-    id: 25001,
-    name: "USB-C Hub",
-    price: 29.99,
-    category: "PC Accessories",
-    brand: "Corsair",
-    description: "6-port USB-C hub with fast charging and USB 3.2 Gen 2 support.",
-    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
-    quantity: 0,
-    rating: 4.5,
-    reviews: createEmptyReviews()
-  },
-  {
-    id: 25002,
-    name: "Keyboard",
-    price: 49.99,
-    category: "PC Accessories",
-    brand: "Logitech",
-    description: "Wireless keyboard with RGB lighting and macro keys.",
-    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
-    quantity: 0,
-    rating: 4.4,
-    reviews: createEmptyReviews()
-  },
-  {
-    id: 25003,
-    name: "Mouse",
-    price: 29.99,
-    category: "PC Accessories",
-    brand: "Razer",
-    description: "Wireless mouse with customizable DPI and RGB lighting.",
-    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
-    quantity: 0,
-    rating: 4.3,
-    reviews: createEmptyReviews()
-  },
-  {
-    id: 25004,
-    name: "Monitor",
-    price: 199.99,
-    category: "PC Accessories",
-    brand: "Acer",
-    description: "24-inch 144Hz monitor with IPS panel and adjustable stand.",
-    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
-    quantity: 0,
-    rating: 4.2,
-    reviews: createEmptyReviews()
-  },
-  {
-    id: 25005,
-    name: "Headphones",
-    price: 99.99,
-    category: "PC Accessories",
-    brand: "Sony",
-    description: "Wireless headphones with noise cancellation and 360-degree audio.",
-    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
-    quantity: 0,
-    rating: 4.1,
-    reviews: createEmptyReviews()
-  },
-  {
-    id: 25006,
-    name: "Mousepad",
-    price: 19.99,
-    category: "PC Accessories",
-    brand: "Logitech",
-    description: "Durable mousepad with anti-slip surface and RGB lighting.",
-    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
-    quantity: 0,
-    rating: 4.0,
-    reviews: createEmptyReviews()
-  },
-  {
-    id: 25007,
-    name: "Power Supply",
-    price: 79.99,
-    category: "PC Accessories",
-    brand: "Corsair",
-    description: "1000W power supply with modular design and 80+ Bronze certification.",
-    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
-    quantity: 0,
-    rating: 4.9,
-    reviews: createEmptyReviews()
-  },
-  {
-    id: 25008,
-    name: "Case",
-    price: 149.99,
-    category: "PC Accessories",
-    brand: "NZXT",
-    description: "High-quality case with RGB lighting and 240mm water cooling.",
-    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
-    quantity: 0,
-    rating: 4.8,
-    reviews: createEmptyReviews()
-  },
-  {
-    id: 25009,
-    name: "Cooling Fan",
-    price: 29.99,
-    category: "PC Accessories",
-    brand: "Corsair",
-    description: "120mm high-performance cooling fan with RGB lighting.",
-    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
-    quantity: 0,
-    rating: 4.7,
-    reviews: createEmptyReviews()
-  },
-  {
-    id: 25010,
-    name: "Storage Drive",
-    price: 49.99,
-    category: "PC Accessories",
-    brand: "Seagate",
-    description: "2TB 7200RPM hard drive with USB 3.2 Gen 2 interface.",
-    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
-    quantity: 0,
-    rating: 4.6,
-    reviews: createEmptyReviews()
-  }
-];
-
-// Combine all new products into a single array for export
+// Export all new products
 export const allAdditionalProducts: Product[] = [
   ...newSmartphones,
   ...newLaptops,
   ...newHeadphones,
   ...newTablets,
-  ...newGamingConsoles,
-  ...newPCAccessories,
+  ...newGamingConsoles
 ];

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -5,9 +6,8 @@ import { Button } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
 import { Product } from '@/data/productData';
 import { applyCoupon } from '@/components/admin/CouponUtils';
-import { Switch } from "@/components/ui/switch";
-import { Heart } from "lucide-react";
 
+// Importing our new components
 import MobileOrderSummary from '@/components/payment/MobileOrderSummary';
 import PaymentMethodCard from '@/components/payment/PaymentMethodCard';
 import CashOnDelivery from '@/components/payment/CashOnDelivery';
@@ -72,8 +72,6 @@ const Payment = () => {
   const [searchTradeForResults, setSearchTradeForResults] = useState<string[]>([]);
   const [selectedTradeForItem, setSelectedTradeForItem] = useState('');
   const [tradeForItems, setTradeForItems] = useState<string[]>([]);
-  const [roundUpDonation, setRoundUpDonation] = useState(false);
-  const [roundUpAmount, setRoundUpAmount] = useState(0);
 
   const calculateTotal = () => {
     const subtotal = calculateSubtotal();
@@ -84,16 +82,7 @@ const Payment = () => {
     const couponDiscountAmount = couponDiscount / 100 * subtotal;
     const tradeDiscount = paymentMethod === 'trade' ? calculateTradeDiscount() : 0;
     
-    let total = subtotal + tax + shipping + deliveryFee - couponDiscountAmount - tradeDiscount;
-    
-    if (roundUpDonation) {
-      total = Math.ceil(total);
-      setRoundUpAmount(total - (subtotal + tax + shipping + deliveryFee - couponDiscountAmount - tradeDiscount));
-    } else {
-      setRoundUpAmount(0);
-    }
-    
-    return total;
+    return subtotal + tax + shipping + deliveryFee - couponDiscountAmount - tradeDiscount;
   };
 
   useEffect(() => {
@@ -175,19 +164,6 @@ const Payment = () => {
   useEffect(() => {
     updateEstimatedDeliveryTime();
   }, [deliveryOption, deliveryTime, deliveryLocation]);
-
-  useEffect(() => {
-    if (roundUpDonation) {
-      const rawTotal = calculateSubtotal() + calculateTax() + calculateShipping() + 
-                      (paymentMethod === 'cash' ? getDeliveryFee() : 0) - 
-                      (couponDiscount / 100 * calculateSubtotal()) - 
-                      (paymentMethod === 'trade' ? calculateTradeDiscount() : 0);
-      
-      setRoundUpAmount(Math.ceil(rawTotal) - rawTotal);
-    } else {
-      setRoundUpAmount(0);
-    }
-  }, [roundUpDonation, cart, paymentMethod, couponDiscount, deliveryOption, deliveryTime, deliveryLocation, tradeValue]);
 
   const updateEstimatedDeliveryTime = () => {
     let baseTime = '';
@@ -429,6 +405,7 @@ const Payment = () => {
   const handleSubmitPayment = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validate form fields based on payment method
     if (paymentMethod === 'card' && showCardForm) {
       if (!cardName || !cardNumber || !cardExpiry || !cardCVV) {
         toast({
@@ -467,6 +444,7 @@ const Payment = () => {
       }
     }
     
+    // Validate billing address
     if (showAddressForm) {
       const { name, street, city, state, zip, country } = billingAddress;
       if (!name || !street || !city || !state || !zip || !country) {
@@ -649,53 +627,12 @@ const Payment = () => {
             />
           </div>
           
-          <div className="p-6 bg-card rounded-lg border border-border space-y-4">
-            <div className="flex items-start space-x-3">
-              <Heart className="h-5 w-5 text-destructive mt-0.5" />
-              <div>
-                <h3 className="font-medium text-lg">Donation Option</h3>
-                <p className="text-sm text-muted-foreground mb-4">Round up your payment to donate the difference to charity.</p>
-                
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Switch 
-                      checked={roundUpDonation}
-                      onCheckedChange={setRoundUpDonation}
-                      id="round-up-donation"
-                    />
-                    <label htmlFor="round-up-donation" className="text-sm font-medium cursor-pointer">
-                      {roundUpDonation ? 'Donating to charity' : 'Round up to donate'}
-                    </label>
-                  </div>
-                  
-                  {roundUpDonation && roundUpAmount > 0 && (
-                    <span className="text-sm font-medium text-destructive">
-                      +${roundUpAmount.toFixed(2)} donation
-                    </span>
-                  )}
-                </div>
-                
-                {roundUpDonation && (
-                  <div className="mt-3 text-sm text-muted-foreground bg-muted/50 p-3 rounded-md">
-                    Your donation will support our partner charities working on education, 
-                    environmental conservation, and community development programs.
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-          
           <Button 
             onClick={handleSubmitPayment}
             disabled={processingPayment}
             className="w-full py-6 text-lg"
           >
-            {processingPayment 
-              ? 'Processing...' 
-              : roundUpDonation && roundUpAmount > 0 
-                ? `Pay $${calculateTotal().toFixed(2)} (includes $${roundUpAmount.toFixed(2)} donation)`
-                : `Pay $${calculateTotal().toFixed(2)}`
-            }
+            {processingPayment ? 'Processing...' : `Pay $${calculateTotal().toFixed(2)}`}
           </Button>
           
           <div className="text-center text-sm text-muted-foreground">
