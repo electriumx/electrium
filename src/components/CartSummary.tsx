@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
@@ -61,6 +62,14 @@ const CartSummary = ({
   const calculateTotal = () => {
     return calculateSubtotal() + calculateTax();
   };
+  
+  // Helper function to check if a product should have color selection displayed
+  const shouldShowColor = (item: Product) => {
+    // Categories that typically have color options
+    const colorSelectableCategories = ['Smartphones', 'Laptops', 'Gaming Consoles', 'Headphones', 'Tablets'];
+    return colorSelectableCategories.includes(item.category);
+  };
+  
   const clearCart = () => {
     localStorage.setItem('cart', JSON.stringify([]));
     const event = new CustomEvent('cartUpdate', {
@@ -95,7 +104,7 @@ const CartSummary = ({
                       <div>
                         <h4 className={`text-sm font-medium ${item.discount && item.discount > 0 ? 'pl-2' : ''}`}>
                           {formatProductName(item.name)}
-                          {item.selectedColor && <span className="ml-1 text-muted-foreground">({item.selectedColor})</span>}
+                          {shouldShowColor(item) && item.selectedColor && <span className="ml-1 text-muted-foreground">({item.selectedColor})</span>}
                         </h4>
                         <div className="text-xs text-muted-foreground">
                           Quantity: {item.quantity}

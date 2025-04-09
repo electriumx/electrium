@@ -13,6 +13,7 @@ interface ProductCardProps {
   price: number;
   image: string;
   brand: string;
+  category?: string;
   discountedPrice?: number;
   discount?: number;
   onQuantityChange: (id: number, quantity: number, selectedColor?: string) => void;
@@ -33,6 +34,7 @@ const ProductCard = ({
   price, 
   image, 
   brand, 
+  category = "Electronics",
   discountedPrice, 
   discount = 0, 
   onQuantityChange,
@@ -60,6 +62,14 @@ const ProductCard = ({
     
     // Update local stock if prop changes
     setCurrentStock(stock);
+    
+    // Check if the product is already in the cart and get its color
+    const existingCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const cartItem = existingCart.find((item: any) => item.id === id);
+    if (cartItem && cartItem.selectedColor) {
+      setSelectedColor(cartItem.selectedColor);
+      setQuantity(cartItem.quantity || 0);
+    }
   }, [id, stock]);
   
   const handleAddToCart = () => {
@@ -134,6 +144,7 @@ const ProductCard = ({
         price,
         imageUrl: image,
         brand,
+        category,
         discount: discount || 0,
         accessories
       };
@@ -184,6 +195,12 @@ const ProductCard = ({
   // Get included accessories text
   const hasSelectedAccessories = accessories.some(acc => acc.selected);
   
+  // Should show color selection based on category
+  const shouldShowColorSelection = () => {
+    const colorSelectableCategories = ['Smartphones', 'Laptops', 'Gaming Consoles', 'Headphones', 'Tablets'];
+    return colorSelectableCategories.includes(category);
+  };
+  
   return (
     <>
       <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
@@ -222,32 +239,36 @@ const ProductCard = ({
             <p className="text-sm text-muted-foreground">{brand}</p>
           </div>
           
-          {/* Color selection buttons */}
-          <div className="flex justify-center gap-2 mb-3">
-            {productColors.map(color => (
-              <button
-                key={color}
-                onClick={() => handleColorSelect(color)}
-                className={`w-6 h-6 rounded-full border ${
-                  selectedColor === color ? 'border-primary ring-2 ring-primary/30' : 'border-gray-300'
-                }`}
-                style={{ 
-                  backgroundColor: color.toLowerCase() === 'dark blue' ? '#0A4D68' : 
-                                  color.toLowerCase() === 'white' ? '#ffffff' :
-                                  color.toLowerCase() === 'titanium' ? '#878681' :
-                                  '#000000',
-                  cursor: 'pointer'
-                }}
-                aria-label={`Select ${color} color`}
-                title={color}
-              />
-            ))}
-          </div>
-          
-          {/* Current selected color */}
-          <div className="text-center text-xs text-muted-foreground mb-2">
-            Color: <span className="font-medium">{selectedColor}</span>
-          </div>
+          {/* Color selection buttons - only show for applicable categories */}
+          {shouldShowColorSelection() && (
+            <>
+              <div className="flex justify-center gap-2 mb-3">
+                {productColors.map(color => (
+                  <button
+                    key={color}
+                    onClick={() => handleColorSelect(color)}
+                    className={`w-6 h-6 rounded-full border ${
+                      selectedColor === color ? 'border-primary ring-2 ring-primary/30' : 'border-gray-300'
+                    }`}
+                    style={{ 
+                      backgroundColor: color.toLowerCase() === 'dark blue' ? '#0A4D68' : 
+                                      color.toLowerCase() === 'white' ? '#ffffff' :
+                                      color.toLowerCase() === 'titanium' ? '#878681' :
+                                      '#000000',
+                      cursor: 'pointer'
+                    }}
+                    aria-label={`Select ${color} color`}
+                    title={color}
+                  />
+                ))}
+              </div>
+              
+              {/* Current selected color */}
+              <div className="text-center text-xs text-muted-foreground mb-2">
+                Color: <span className="font-medium">{selectedColor}</span>
+              </div>
+            </>
+          )}
           
           {/* Accessories info if any */}
           {hasSelectedAccessories && (

@@ -27,6 +27,13 @@ const OrderSummary = ({
   couponDiscount,
   discounts
 }: OrderSummaryProps) => {
+  // Helper function to check if a product should display color
+  const shouldShowColor = (item: Product) => {
+    // Categories that typically have color options
+    const colorSelectableCategories = ['Smartphones', 'Laptops', 'Gaming Consoles', 'Headphones', 'Tablets'];
+    return colorSelectableCategories.includes(item.category);
+  };
+
   return (
     <div className="p-6 bg-card rounded-lg border border-border">
       <h2 className="text-xl font-semibold mb-6">Order Summary</h2>
@@ -40,6 +47,9 @@ const OrderSummary = ({
             <div className="flex-1">
               <h3 className="font-medium">{item.name}</h3>
               <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
+              {shouldShowColor(item) && item.selectedColor && (
+                <p className="text-sm text-muted-foreground">Color: {item.selectedColor}</p>
+              )}
               {item.accessories && item.accessories.length > 0 && (
                 <p className="text-xs text-muted-foreground">
                   With: {item.accessories.filter(a => a.selected).map(a => a.name).join(', ')}

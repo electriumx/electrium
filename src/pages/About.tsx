@@ -29,13 +29,13 @@ const About = () => {
           animate={{ opacity: 1, y: 0 }}
           className="bg-black/60 backdrop-blur-sm rounded-xl shadow-lg p-8"
         >
-          <h1 className="text-4xl font-bold text-white mb-8">About Electrium</h1>
+          <h1 className="text-5xl font-bold text-white mb-8">About Electrium</h1>
           <div className="space-y-6">
-            <p className="text-gray-200 text-lg mb-8">
+            <p className="text-xl text-gray-200 mb-8">
               Welcome to Electrium, your premier destination for electronic devices. We strive to provide the best shopping experience with a curated selection of high-quality products.
             </p>
             
-            <h2 className="text-2xl font-semibold text-white mb-4">Facts About Online Shopping</h2>
+            <h2 className="text-3xl font-semibold text-white mb-4">Facts About Online Shopping</h2>
             <ul className="space-y-4">
               {facts.map((fact, index) => (
                 <motion.li
@@ -43,7 +43,7 @@ const About = () => {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="flex items-start text-gray-200"
+                  className="flex items-start text-lg text-gray-200"
                 >
                   <span className="flex-shrink-0 w-6 h-6 bg-sage-500 text-white rounded-full flex items-center justify-center mr-3 mt-1">
                     {index + 1}

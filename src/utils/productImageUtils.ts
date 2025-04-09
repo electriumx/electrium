@@ -57,6 +57,26 @@ export const getCategoryImage = (category: string, brand?: string, name?: string
   
   // Specific product images
   
+  // Logitech MX Master 3 specific image - UPDATED
+  if (brandLower === 'logitech' && nameLower.includes('mx master 3')) {
+    return '/lovable-uploads/d25b7839-e5c3-40e7-b085-79d316d78dcf.png';
+  }
+  
+  // Samsung Galaxy Tab S8 specific image - UPDATED
+  if (brandLower === 'samsung' && nameLower.includes('galaxy tab s8')) {
+    return '/lovable-uploads/ca7ef935-a15a-44db-8d0a-25f62f3b929a.png';
+  }
+  
+  // Apple iPad Air specific image - UPDATED
+  if (brandLower === 'apple' && nameLower.includes('ipad air')) {
+    return '/lovable-uploads/ca7ef935-a15a-44db-8d0a-25f62f3b929a.png';
+  }
+  
+  // Google Chromebook specific image - UPDATED
+  if (brandLower === 'google' && nameLower.includes('chromebook')) {
+    return '/lovable-uploads/6b47797a-7950-4e45-9ec1-b49920bedce3.png';
+  }
+  
   // Vankyo Cosmos 6 - use a standard image instead of Cyberpunk
   if (brandLower === 'vankyo' && nameLower.includes('cosmos 6')) {
     return '/lovable-uploads/7f739f1f-3772-4ead-89b5-34d5c94221bb.png';
@@ -70,11 +90,6 @@ export const getCategoryImage = (category: string, brand?: string, name?: string
   // Xbox Series S - use a standard image instead of Cyberpunk
   if (brandLower === 'microsoft' && nameLower.includes('xbox series s')) {
     return '/lovable-uploads/4b5ba4b7-1d75-4c44-aa6c-c1d6e0d028c4.png';
-  }
-  
-  // Logitech MX Master 3 specific image
-  if (brandLower === 'logitech' && nameLower.includes('mx master 3')) {
-    return '/lovable-uploads/d25b7839-e5c3-40e7-b085-79d316d78dcf.png';
   }
   
   // iPhone 13 Pro specific image
