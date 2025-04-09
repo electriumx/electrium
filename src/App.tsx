@@ -28,6 +28,7 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import CookieConsent from "./components/CookieConsent";
 import AIChat from "./components/AIChat";
 import RouteTracker from "./components/RouteTracker";
+import Cart from "./components/Cart";
 
 const queryClient = new QueryClient();
 
@@ -93,6 +94,8 @@ const AppWithAuth = () => {
   const { isAuthenticated, currentUser } = useAuth();
   const [showCookieConsent, setShowCookieConsent] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [cartItems, setCartItems] = useState<any[]>([]);
+  const [cartTotal, setCartTotal] = useState(0);
 
   useEffect(() => {
     // Check if cookie consent has been shown to this account
@@ -104,6 +107,42 @@ const AppWithAuth = () => {
       const cookieConsent = localStorage.getItem('cookieConsent_guest');
       setShowCookieConsent(!cookieConsent);
     }
+
+    // Load cart data for Cart component
+    const loadCartData = () => {
+      const cartData = JSON.parse(localStorage.getItem('cart') || '[]');
+      setCartItems(cartData);
+      
+      // Calculate total
+      const total = cartData.reduce((sum: number, item: any) => {
+        const itemPrice = item.price * (item.quantity || 1);
+        return sum + itemPrice;
+      }, 0);
+      
+      setCartTotal(total);
+    };
+
+    loadCartData();
+
+    // Listen for cart updates
+    const handleCartUpdate = (e: CustomEvent) => {
+      const updatedCart = e.detail;
+      setCartItems(updatedCart);
+      
+      // Recalculate total
+      const total = updatedCart.reduce((sum: number, item: any) => {
+        const itemPrice = item.price * (item.quantity || 1);
+        return sum + itemPrice;
+      }, 0);
+      
+      setCartTotal(total);
+    };
+
+    window.addEventListener('cartUpdate', handleCartUpdate as EventListener);
+    
+    return () => {
+      window.removeEventListener('cartUpdate', handleCartUpdate as EventListener);
+    };
   }, [isAuthenticated, currentUser]);
 
   const toggleChat = () => {
@@ -152,8 +191,12 @@ const AppWithAuth = () => {
       
       {isChatOpen && <AIChat onClose={toggleChat} />}
       
+      {/* Correctly pass required props to the Cart component */}
+      <Cart total={cartTotal} itemCount={cartItems.length} />
+      
       <SocialButtons />
       <Footer />
+      {/* Correctly pass required props to the CookieConsent component */}
       {showCookieConsent && <CookieConsent onAccept={handleCookieAccept} />}
     </>
   );
