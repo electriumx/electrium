@@ -165,7 +165,7 @@ const Checkout = () => {
                             formatProductName(item.name)}
                           {item.selectedColor && (
                             <span className="ml-2 text-sm" style={{color: item.selectedColor.toLowerCase() === 'dark blue' ? '#0A4D68' : 
-                                                                         item.selectedColor.toLowerCase() === 'white' ? '#ffffff' :
+                                                                         item.selectedColor.toLowerCase() === 'white' ? '#cccccc' :
                                                                          item.selectedColor.toLowerCase() === 'titanium' ? '#878681' :
                                                                          item.selectedColor.toLowerCase() === 'black' ? '#000000' : 
                                                                          item.selectedColor.toLowerCase()}}>
