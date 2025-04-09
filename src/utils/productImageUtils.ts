@@ -57,9 +57,9 @@ export const getCategoryImage = (category: string, brand?: string, name?: string
   
   // Updated Product Images as requested
   
-  // Updated: Logitech MX Master 3 specific image
+  // Updated: Logitech MX Master 3 specific image with new URL
   if (brandLower === 'logitech' && nameLower.includes('mx master 3')) {
-    return '/lovable-uploads/0ce72e2e-9dd3-4c58-809b-09eaee1dbe69.png';
+    return '/lovable-uploads/new-logitech-mx-master-3.png';
   }
   
   // Updated: Samsung Galaxy Tab S8 specific image
