@@ -1,5 +1,3 @@
-import React from 'react';
-
 // Get image based on headphone details
 export const getHeadphoneImage = (name: string, brand: string): string => {
   // Default headphone image fallback
@@ -75,8 +73,8 @@ export const getCategoryImage = (category: string, brand?: string, name?: string
   }
   
   // Logitech MX Master 3 specific image
-  if (brand === 'Logitech' && name && name.includes('MX Master 3')) {
-    return '/lovable-uploads/62139f0e-bea1-4c16-9cd8-3808407de51f.png';
+  if (brandLower === 'logitech' && nameLower.includes('mx master 3')) {
+    return '/lovable-uploads/d25b7839-e5c3-40e7-b085-79d316d78dcf.png';
   }
   
   // iPhone 13 Pro specific image
@@ -143,12 +141,7 @@ export const getCategoryImage = (category: string, brand?: string, name?: string
   }
   
   if (category === 'Tablets') {
-    if (name === 'Samsung Galaxy Tab S8') {
-      return '/lovable-uploads/a047847e-cce0-4640-bd11-06bae205b795.png';
-    }
-    if (name === 'Apple iPad Air') {
-      return '/lovable-uploads/07576ea8-0330-49e9-8af6-67d36408f939.png';
-    }
+    return '/lovable-uploads/ca7ef935-a15a-44db-8d0a-25f62f3b929a.png';
   }
   
   if (category === 'PC Accessories' && name && nameLower.includes('keyboard')) {
@@ -167,7 +160,7 @@ export const getCategoryImage = (category: string, brand?: string, name?: string
     }
     
     if (brand === 'Google' && name && nameLower.includes('chromebook')) {
-      return '/lovable-uploads/e0bd6a1e-c79c-4d51-b7f8-26292c9c6587.png';
+      return '/lovable-uploads/6b47797a-7950-4e45-9ec1-b49920bedce3.png';
     }
     
     if (brand === 'Google' && category === 'Smartphones') {

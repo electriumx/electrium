@@ -19,7 +19,6 @@ const fixAccessoryFormat = (accessory: any): any => {
 
 // Define new products with proper typing
 export const allNewProducts: Product[] = [
-  // Update specific products
   {
     id: 10016,
     name: "Xiaomi Mi 11",
@@ -58,15 +57,15 @@ export const allNewProducts: Product[] = [
   },
   {
     id: 10002,
-    name: "Logitech MX Master 3",
-    price: 99.99,
+    name: "Logitech MX Keys",
+    price: 119.99,
     category: "PC Accessories",
-    subcategory: "Mice",
+    subcategory: "Keyboards",
     brand: "Logitech",
-    description: "Advanced wireless mouse with customizable buttons and app-specific profiles.",
-    imageUrl: "/lovable-uploads/62139f0e-bea1-4c16-9cd8-3808407de51f.png",
+    description: "Premium wireless keyboard with backlit keys and multi-device connectivity.",
+    imageUrl: "/lovable-uploads/aa8af480-0d1f-49a5-a304-fdd660e7bba1.png",
     quantity: 0,
-    rating: 4.9,
+    rating: 4.8,
     reviews: createEmptyReviews()
   },
   {
@@ -89,7 +88,7 @@ export const allNewProducts: Product[] = [
     category: "Tablets",
     brand: "Samsung",
     description: "Premium Android tablet with S Pen support and powerful performance.",
-    imageUrl: "/lovable-uploads/a047847e-cce0-4640-bd11-06bae205b795.png",
+    imageUrl: "/lovable-uploads/ca7ef935-a15a-44db-8d0a-25f62f3b929a.png",
     quantity: 0,
     rating: 4.6,
     reviews: createEmptyReviews()
@@ -101,7 +100,7 @@ export const allNewProducts: Product[] = [
     category: "Tablets",
     brand: "Apple",
     description: "Lightweight and powerful tablet with M1 chip and all-day battery life.",
-    imageUrl: "/lovable-uploads/07576ea8-0330-49e9-8af6-67d36408f939.png",
+    imageUrl: "/lovable-uploads/ca7ef935-a15a-44db-8d0a-25f62f3b929a.png",
     quantity: 0,
     rating: 4.8,
     reviews: createEmptyReviews()
@@ -113,7 +112,7 @@ export const allNewProducts: Product[] = [
     category: "Laptops",
     brand: "Google",
     description: "Affordable, lightweight Chromebook with Chrome OS and cloud-based applications.",
-    imageUrl: "/lovable-uploads/e0bd6a1e-c79c-4d51-b7f8-26292c9c6587.png",
+    imageUrl: "/lovable-uploads/6b47797a-7950-4e45-9ec1-b49920bedce3.png",
     quantity: 0,
     rating: 4.2,
     reviews: createEmptyReviews()
