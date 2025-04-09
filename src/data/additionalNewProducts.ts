@@ -1,3 +1,4 @@
+
 import { Product, Review } from './productData';
 
 // Add this helper function at the top
@@ -632,3 +633,212 @@ export const newGamingConsoles: Product[] = [
     rating: 4.7,
     reviews: createEmptyReviews(),
     accessories: [
+      fixAccessoryFormat({ id: "116", name: "Analogue Dock", price: 49.99, category: 'accessory', image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" }),
+      fixAccessoryFormat({ id: "117", name: "Analogue Hard Case", price: 29.99, category: 'accessory', image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" })
+    ]
+  },
+  {
+    id: 24007,
+    name: "Retroid Pocket 3+",
+    price: 149.99,
+    category: "Gaming Consoles",
+    subcategory: "Handheld",
+    brand: "Retroid",
+    description: "Retro gaming handheld with Android OS and physical controls.",
+    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
+    quantity: 0,
+    rating: 4.4,
+    reviews: createEmptyReviews(),
+    accessories: [
+      fixAccessoryFormat({ id: "118", name: "Retroid Screen Protector", price: 9.99, category: 'accessory', image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" }),
+      fixAccessoryFormat({ id: "119", name: "Retroid Carrying Case", price: 19.99, category: 'accessory', image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" })
+    ]
+  },
+  {
+    id: 24008,
+    name: "Anbernic RG353P",
+    price: 129.99,
+    category: "Gaming Consoles",
+    subcategory: "Handheld",
+    brand: "Anbernic",
+    description: "Dual boot handheld with Linux and Android, vibration motors.",
+    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
+    quantity: 0,
+    rating: 4.2,
+    reviews: createEmptyReviews(),
+    accessories: [
+      fixAccessoryFormat({ id: "120", name: "Anbernic Grip Case", price: 14.99, category: 'accessory', image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" })
+    ]
+  },
+  {
+    id: 24009,
+    name: "Miyoo Mini Plus",
+    price: 69.99,
+    category: "Gaming Consoles",
+    subcategory: "Handheld",
+    brand: "Miyoo",
+    description: "Compact retro gaming handheld with high-quality build and display.",
+    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
+    quantity: 0,
+    rating: 4.5,
+    reviews: createEmptyReviews(),
+    accessories: [
+      fixAccessoryFormat({ id: "121", name: "Miyoo Mini Case", price: 12.99, category: 'accessory', image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" })
+    ]
+  },
+  {
+    id: 24010,
+    name: "Ayn Odin Pro",
+    price: 279.99,
+    category: "Gaming Consoles",
+    subcategory: "Handheld",
+    brand: "Ayn",
+    description: "Android gaming handheld with Snapdragon 845, active cooling, and large battery.",
+    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
+    quantity: 0,
+    rating: 4.6,
+    reviews: createEmptyReviews(),
+    accessories: [
+      fixAccessoryFormat({ id: "122", name: "Ayn Odin Dock", price: 59.99, category: 'accessory', image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" }),
+      fixAccessoryFormat({ id: "123", name: "Ayn Super Dock", price: 89.99, category: 'accessory', image: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png" })
+    ]
+  }
+];
+
+// Define new PC accessories products
+export const newPCAccessories: Product[] = [
+  {
+    id: 25001,
+    name: "Logitech MX Keys Advanced",
+    price: 119.99,
+    category: "PC Accessories",
+    subcategory: "Keyboards",
+    brand: "Logitech",
+    description: "Premium wireless keyboard with smart illumination and perfect stroke keys.",
+    imageUrl: "/lovable-uploads/aa8af480-0d1f-49a5-a304-fdd660e7bba1.png",
+    quantity: 0,
+    rating: 4.8,
+    reviews: createEmptyReviews(),
+    discount: 10
+  },
+  {
+    id: 25002,
+    name: "Keychron Q1 Pro",
+    price: 199.99,
+    category: "PC Accessories",
+    subcategory: "Keyboards",
+    brand: "Keychron",
+    description: "Wireless mechanical keyboard with QMK/VIA support, gasket mount design.",
+    imageUrl: "/lovable-uploads/3f391803-44c1-4437-a246-5070b31d60a5.png",
+    quantity: 0,
+    rating: 4.7,
+    reviews: createEmptyReviews()
+  },
+  {
+    id: 25003,
+    name: "Logitech G Pro X Superlight",
+    price: 149.99,
+    category: "PC Accessories",
+    subcategory: "Mice",
+    brand: "Logitech",
+    description: "Ultra-lightweight wireless gaming mouse with HERO 25K sensor.",
+    imageUrl: "/lovable-uploads/d25b7839-e5c3-40e7-b085-79d316d78dcf.png",
+    quantity: 0,
+    rating: 4.9,
+    reviews: createEmptyReviews()
+  },
+  {
+    id: 25004,
+    name: "Razer Basilisk V3",
+    price: 69.99,
+    category: "PC Accessories",
+    subcategory: "Mice",
+    brand: "Razer",
+    description: "Customizable gaming mouse with 11 programmable buttons and RGB lighting.",
+    imageUrl: "/lovable-uploads/d25b7839-e5c3-40e7-b085-79d316d78dcf.png",
+    quantity: 0,
+    rating: 4.6,
+    reviews: createEmptyReviews()
+  },
+  {
+    id: 25005,
+    name: "Blue Yeti X",
+    price: 169.99,
+    category: "PC Accessories",
+    subcategory: "Microphones",
+    brand: "Blue",
+    description: "Professional USB condenser microphone with Blue VO!CE software.",
+    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
+    quantity: 0,
+    rating: 4.7,
+    reviews: createEmptyReviews(),
+    discount: 15
+  },
+  {
+    id: 25006,
+    name: "Elgato Stream Deck MK.2",
+    price: 149.99,
+    category: "PC Accessories",
+    subcategory: "Streaming",
+    brand: "Elgato",
+    description: "Customizable LCD key controller for streamers and content creators.",
+    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
+    quantity: 0,
+    rating: 4.8,
+    reviews: createEmptyReviews()
+  },
+  {
+    id: 25007,
+    name: "SteelSeries Arctis Nova Pro",
+    price: 349.99,
+    category: "PC Accessories",
+    subcategory: "Headsets",
+    brand: "SteelSeries",
+    description: "Premium gaming headset with active noise cancellation and hot-swappable batteries.",
+    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
+    quantity: 0,
+    rating: 4.8,
+    reviews: createEmptyReviews()
+  },
+  {
+    id: 25008,
+    name: "Logitech C920 HD Pro",
+    price: 79.99,
+    category: "PC Accessories",
+    subcategory: "Webcams",
+    brand: "Logitech",
+    description: "Full HD 1080p webcam with dual microphones for clear video calls.",
+    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
+    quantity: 0,
+    rating: 4.7,
+    reviews: createEmptyReviews()
+  },
+  {
+    id: 25009,
+    name: "Wacom Intuos Pro Medium",
+    price: 379.99,
+    category: "PC Accessories",
+    subcategory: "Drawing Tablets",
+    brand: "Wacom",
+    description: "Professional pen tablet with 8192 pressure levels and multi-touch support.",
+    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
+    quantity: 0,
+    rating: 4.8,
+    reviews: createEmptyReviews(),
+    discount: 10
+  },
+  {
+    id: 25010,
+    name: "Anker USB C Hub",
+    price: 49.99,
+    category: "PC Accessories",
+    subcategory: "Adapters",
+    brand: "Anker",
+    description: "7-in-1 USB C hub with 4K HDMI, USB 3.0, SD/microSD, and 100W power delivery.",
+    imageUrl: "/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png",
+    quantity: 0,
+    rating: 4.5,
+    reviews: createEmptyReviews()
+  }
+];
+
