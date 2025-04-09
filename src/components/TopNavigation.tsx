@@ -40,7 +40,6 @@ const TopNavigation = ({
         {isIndexPage && (
           <div className="flex-1 flex justify-center gap-4 md:gap-8 mt-2 md:mt-0">
             <Link to="/about" className="text-white hover:text-[#9eff00] transition-colors">About</Link>
-            <Link to="/donation" className="text-white hover:text-[#9eff00] transition-colors">Donation</Link>
             <a href="#" onClick={handleContactClick} className="text-white hover:text-[#9eff00] transition-colors">Contact</a>
           </div>
         )}
