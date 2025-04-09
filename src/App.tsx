@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +15,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
 import ThankYou from "./pages/ThankYou";
+import Donation from "./pages/Donation";
 import Settings from "./pages/Settings";
 import Admin from "./pages/Admin";
 import Wishlist from "./pages/Wishlist";
@@ -179,6 +181,7 @@ const AppWithAuth = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/thank-you" element={<ThankYou />} />
+          <Route path="/donation" element={<Donation />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/admin" element={<AdminRoute />} />
@@ -188,10 +191,12 @@ const AppWithAuth = () => {
       
       {isChatOpen && <AIChat onClose={toggleChat} />}
       
+      {/* Correctly pass required props to the Cart component */}
       <Cart total={cartTotal} itemCount={cartItems.length} />
       
       <SocialButtons />
       <Footer />
+      {/* Correctly pass required props to the CookieConsent component */}
       {showCookieConsent && <CookieConsent onAccept={handleCookieAccept} />}
     </>
   );
