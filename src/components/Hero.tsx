@@ -47,7 +47,7 @@ const Hero = ({
         }} transition={{
           delay: 0.5,
           duration: 0.7
-        }} className="text-lg md:text-xl mb-8 font-['Times_New_Roman'] bg-gradient-to-br from-[#F2FCE2] to-[#0EA5E9] bg-clip-text text-transparent">
+        }} className="text-lg md:text-xl mb-8 font-['Times_New_Roman'] bg-gradient-to-br from-[#FFFFFF] to-[#FFFFFF] bg-clip-text text-transparent">
             Quality products. Seamless shopping.
             <br />
             "Discover top-tier products designed to enhance your lifestyle."
