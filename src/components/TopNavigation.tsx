@@ -1,7 +1,7 @@
 
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Heart, Settings } from 'lucide-react';
+import { Heart, Settings, ArrowLeftRight } from 'lucide-react';
 import BackButton from './BackButton';
 
 interface TopNavigationProps {
@@ -41,13 +41,6 @@ const TopNavigation = ({
           <div className="flex-1 flex justify-center gap-4 md:gap-8 mt-2 md:mt-0">
             <Link to="/about" className="text-white hover:text-[#9eff00] transition-colors">About</Link>
             <a href="#" onClick={handleContactClick} className="text-white hover:text-[#9eff00] transition-colors">Contact</a>
-            <Link 
-              to="/trade" 
-              className="text-white hover:text-[#9eff00] transition-colors"
-              aria-label="Item Trade"
-            >
-              Trade
-            </Link>
           </div>
         )}
         
@@ -58,6 +51,16 @@ const TopNavigation = ({
               Welcome, {currentUser.displayName || currentUser.username}
             </div>
           )}
+          
+          {/* Item Trade Button */}
+          <Link 
+            to="/trade" 
+            className="flex items-center gap-1 text-white hover:text-[#9eff00] transition-colors"
+            aria-label="Item Trade"
+          >
+            <ArrowLeftRight size={20} className="text-white" />
+            <span className="hidden sm:inline">Trade</span>
+          </Link>
           
           {/* Settings Button */}
           <div className="flex items-center gap-2">
