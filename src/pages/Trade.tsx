@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeftRight, Truck, DollarSign, ShieldCheck } from "lucide-react";
+import { ArrowLeftRight, Truck, DollarSign, ShieldCheck, Package, RefreshCw } from "lucide-react";
 
 const Trade = () => {
   const navigate = useNavigate();
@@ -20,6 +20,50 @@ const Trade = () => {
         <p className="text-xl text-muted-foreground max-w-3xl">
           Get credit for your old devices when purchasing new electronics from Electrium
         </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+        <div className="flex flex-col justify-center">
+          <h2 className="text-3xl font-bold mb-4">How It Works</h2>
+          <p className="text-lg mb-6">
+            Electrium's Trade-In program allows you to exchange your old electronics for store credit. 
+            It's our way of helping you upgrade your tech while reducing electronic waste.
+          </p>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0">
+              <Package className="text-primary" />
+            </div>
+            <div>
+              <h3 className="font-medium text-lg">Bring in your devices</h3>
+              <p className="text-muted-foreground">We accept smartphones, laptops, tablets, and more</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0">
+              <RefreshCw className="text-primary" />
+            </div>
+            <div>
+              <h3 className="font-medium text-lg">Get an appraisal</h3>
+              <p className="text-muted-foreground">Our experts will evaluate your items on the spot</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0">
+              <DollarSign className="text-primary" />
+            </div>
+            <div>
+              <h3 className="font-medium text-lg">Receive store credit</h3>
+              <p className="text-muted-foreground">Use your credit immediately or save it for later</p>
+            </div>
+          </div>
+        </div>
+        <div className="rounded-lg overflow-hidden">
+          <img 
+            src="https://images.unsplash.com/photo-1498050108023-c5249f4df085" 
+            alt="Electronics Trade In Process" 
+            className="w-full h-full object-cover" 
+          />
+        </div>
       </div>
 
       <Tabs defaultValue="how-it-works" className="max-w-4xl mx-auto">
