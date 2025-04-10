@@ -27,10 +27,10 @@ import CookieConsent from "./components/CookieConsent";
 import AIChat from "./components/AIChat";
 import RouteTracker from "./components/RouteTracker";
 import Cart from "./components/Cart";
+import TradeInformation from "./pages/TradeInformation";
 
 const queryClient = new QueryClient();
 
-// Protected route component for Admin
 const AdminRoute = () => {
   const { currentUser } = useAuth();
   const isAdminUser = currentUser?.username === "Omar Tarek" && currentUser?.password === "otdk1234";
@@ -38,14 +38,12 @@ const AdminRoute = () => {
   return isAdminUser ? <Admin /> : <Navigate to="/" replace />;
 };
 
-// Protected route component for payment page
 const ProtectedPaymentRoute = () => {
   const { isAuthenticated } = useAuth();
   
   return isAuthenticated ? <Payment /> : <Navigate to="/login" replace />;
 };
 
-// Admin key handler component
 const AdminKeyHandler = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -56,21 +54,17 @@ const AdminKeyHandler = () => {
       if (e.key === '/') {
         e.preventDefault();
         
-        // Store current location or restore previous location
         const prevPage = sessionStorage.getItem('prevPageBeforeAdmin');
         
         if (location.pathname === '/admin') {
-          // If currently on admin page, go back to previous page
           if (prevPage) {
             navigate(prevPage);
           } else {
             navigate('/');
           }
         } else {
-          // Store current page and go to admin
           sessionStorage.setItem('prevPageBeforeAdmin', location.pathname);
           
-          // Check if user is Omar Tarek
           if (currentUser?.username === "Omar Tarek" && currentUser?.password === "otdk1234") {
             navigate('/admin');
           } else if (currentUser?.username === "Omar Tarek") {
@@ -87,7 +81,6 @@ const AdminKeyHandler = () => {
   return null;
 };
 
-// Main app wrapper that uses the auth context
 const AppWithAuth = () => {
   const { isAuthenticated, currentUser } = useAuth();
   const [showCookieConsent, setShowCookieConsent] = useState(false);
@@ -96,22 +89,18 @@ const AppWithAuth = () => {
   const [cartTotal, setCartTotal] = useState(0);
 
   useEffect(() => {
-    // Check if cookie consent has been shown to this account
     if (isAuthenticated && currentUser) {
       const cookieConsent = localStorage.getItem(`cookieConsent_${currentUser.username}`);
       setShowCookieConsent(!cookieConsent);
     } else if (!isAuthenticated) {
-      // For non-authenticated users, use a generic key
       const cookieConsent = localStorage.getItem('cookieConsent_guest');
       setShowCookieConsent(!cookieConsent);
     }
 
-    // Load cart data for Cart component
     const loadCartData = () => {
       const cartData = JSON.parse(localStorage.getItem('cart') || '[]');
       setCartItems(cartData);
       
-      // Calculate total
       const total = cartData.reduce((sum: number, item: any) => {
         const itemPrice = item.price * (item.quantity || 1);
         return sum + itemPrice;
@@ -122,12 +111,10 @@ const AppWithAuth = () => {
 
     loadCartData();
 
-    // Listen for cart updates
     const handleCartUpdate = (e: CustomEvent) => {
       const updatedCart = e.detail;
       setCartItems(updatedCart);
       
-      // Recalculate total
       const total = updatedCart.reduce((sum: number, item: any) => {
         const itemPrice = item.price * (item.quantity || 1);
         return sum + itemPrice;
@@ -147,7 +134,6 @@ const AppWithAuth = () => {
     setIsChatOpen(!isChatOpen);
   };
 
-  // Force dark mode
   useEffect(() => {
     document.documentElement.classList.add('dark');
   }, []);
@@ -182,18 +168,17 @@ const AppWithAuth = () => {
           <Route path="/settings" element={<Settings />} />
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/admin" element={<AdminRoute />} />
+          <Route path="/trade" element={<TradeInformation />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
       
       {isChatOpen && <AIChat onClose={toggleChat} />}
       
-      {/* Correctly pass required props to the Cart component */}
       <Cart total={cartTotal} itemCount={cartItems.length} />
       
       <SocialButtons />
       <Footer />
-      {/* Correctly pass required props to the CookieConsent component */}
       {showCookieConsent && <CookieConsent onAccept={handleCookieAccept} />}
     </>
   );
