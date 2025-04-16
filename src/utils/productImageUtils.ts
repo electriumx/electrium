@@ -1,3 +1,4 @@
+
 // Get image based on headphone details
 export const getHeadphoneImage = (name: string, brand: string): string => {
   // Default headphone image fallback
@@ -165,7 +166,7 @@ export const getCategoryImage = (category: string, brand?: string, name?: string
   
   // Special case for PC Accessories category with mouse
   if (category === 'PC Accessories' && name && nameLower.includes('mouse')) {
-    return '/lovable-uploads/aecec080-b315-4ea6-a7eb-d0a149dc0835.png';
+    return '/lovable-uploads/d25b7839-e5c3-40e7-b085-79d316d78dcf.png';
   }
   
   // Handle specific brand cases
@@ -213,17 +214,16 @@ export const getGameImage = (name: string): string => {
   // Make sure input is a string and use safe toLowerCase
   const nameLower = typeof name === 'string' ? name.toLowerCase() : '';
   
-  // Call of Duty games - use the dedicated COD image
-  if (nameLower.includes('call of duty')) {
-    return '/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png';
-  }
-  
   if (nameLower.includes('red dead redemption')) {
     return '/lovable-uploads/17c10a81-e9a9-49b8-8d05-685b47c135c0.png';
   }
   
   if (nameLower.includes('battlefield')) {
     return '/lovable-uploads/ab3d21b8-041b-4137-865c-22fe07795d75.png';
+  }
+  
+  if (nameLower.includes('call of duty')) {
+    return '/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png';
   }
   
   if (nameLower.includes('rainbow six')) {
@@ -236,7 +236,7 @@ export const getGameImage = (name: string): string => {
   
   // Only use Cyberpunk image for Cyberpunk game
   if (nameLower.includes('cyberpunk 2077')) {
-    return '/lovable-uploads/d0b5f6e9-d8a7-4e6d-92d9-0981cb533be3.png';
+    return '/lovable-uploads/247135f4-b54e-45b5-b11a-44fe27602132.png';
   }
   
   if (nameLower.includes('elden ring')) {

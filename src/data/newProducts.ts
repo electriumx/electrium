@@ -239,44 +239,5 @@ export const allNewProducts: Product[] = [
       fixAccessoryFormat({ id: "109", name: "Xbox Wireless Controller", price: 59.99, category: 'accessory', image: "/lovable-uploads/4b5ba4b7-1d75-4c44-aa6c-c1d6e0d028c4.png" }),
       fixAccessoryFormat({ id: "110", name: "Play & Charge Kit", price: 24.99, category: 'accessory', image: "/lovable-uploads/4b5ba4b7-1d75-4c44-aa6c-c1d6e0d028c4.png" })
     ]
-  },
-  {
-    id: 10090,
-    name: "Call of Duty: Black Ops 3",
-    price: 39.99,
-    category: "Games",
-    brand: "PC Games",
-    description: "Call of Duty: Black Ops 3 - intense first-person shooter with futuristic warfare and zombies mode",
-    imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
-    quantity: 0,
-    rating: 4.6,
-    reviews: createEmptyReviews(),
-    subcategory: "FPS Games"
-  },
-  {
-    id: 10091,
-    name: "Call of Duty: Black Ops 6",
-    price: 59.99,
-    category: "Games",
-    brand: "PC Games",
-    description: "Call of Duty: Black Ops 6 - the latest entry in the Black Ops series featuring next-gen graphics and immersive gameplay",
-    imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
-    quantity: 0,
-    rating: 4.8,
-    reviews: createEmptyReviews(),
-    subcategory: "FPS Games"
-  },
-  {
-    id: 10092,
-    name: "Call of Duty: Warzone",
-    price: 24.99,
-    category: "Games",
-    brand: "PC Games",
-    description: "Call of Duty: Warzone - popular battle royale game with intense action and strategic gameplay",
-    imageUrl: "/lovable-uploads/2f5f9ee3-73a7-48e2-b97a-5de770162a36.png",
-    quantity: 0,
-    rating: 4.7,
-    reviews: createEmptyReviews(),
-    subcategory: "FPS Games"
   }
 ];
