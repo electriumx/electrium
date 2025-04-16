@@ -1,4 +1,3 @@
-
 import { Product, Review } from './productData';
 
 // Add this helper function at the top
@@ -6,6 +5,10 @@ const createEmptyReviews = (): Review[] => {
   return [];
 };
 
+// For each product that uses numeric reviews, update the initialization to use empty arrays
+// And for each accessory, make sure selected property is included
+
+// This code should be somewhere near the top of the file before products are defined
 // Fix accessory format by ensuring 'selected' property exists
 const fixAccessoryFormat = (accessory: any): any => {
   return {
@@ -14,7 +17,7 @@ const fixAccessoryFormat = (accessory: any): any => {
   };
 };
 
-// Define new smartphone products
+// Define new products with proper typing
 export const newSmartphones: Product[] = [
   {
     id: 20001,
@@ -702,11 +705,52 @@ export const newGamingConsoles: Product[] = [
   }
 ];
 
+// Define new PC games products
+export const newPCGames: Product[] = [
+  {
+    id: 25001,
+    name: "Call of Duty: Black Ops 3",
+    price: 39.99,
+    category: "PC Games",
+    brand: "Activision",
+    description: "First-person shooter with futuristic combat and zombies mode.",
+    imageUrl: "/lovable-uploads/f58b103e-1e2f-4e40-92bd-5ceee55670d4.png",
+    quantity: 0,
+    rating: 4.5,
+    reviews: createEmptyReviews()
+  },
+  {
+    id: 25002,
+    name: "Call of Duty: Black Ops 6",
+    price: 59.99,
+    category: "PC Games",
+    brand: "Activision",
+    description: "The latest installment in the Black Ops series with enhanced gameplay and graphics.",
+    imageUrl: "/lovable-uploads/f58b103e-1e2f-4e40-92bd-5ceee55670d4.png",
+    quantity: 0,
+    rating: 4.7,
+    reviews: createEmptyReviews()
+  },
+  {
+    id: 25003,
+    name: "Call of Duty: Warzone",
+    price: 24.99,
+    category: "PC Games",
+    brand: "Activision",
+    description: "Free-to-play battle royale game set in the Call of Duty universe.",
+    imageUrl: "/lovable-uploads/f58b103e-1e2f-4e40-92bd-5ceee55670d4.png",
+    quantity: 0,
+    rating: 4.6,
+    reviews: createEmptyReviews()
+  }
+];
+
 // Export all new products
 export const allAdditionalProducts: Product[] = [
   ...newSmartphones,
   ...newLaptops,
   ...newHeadphones,
   ...newTablets,
-  ...newGamingConsoles
+  ...newGamingConsoles,
+  ...newPCGames
 ];
