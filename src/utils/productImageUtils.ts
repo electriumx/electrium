@@ -1,3 +1,4 @@
+
 // Get image based on headphone details
 export const getHeadphoneImage = (name: string, brand: string): string => {
   // Default headphone image fallback
@@ -57,9 +58,9 @@ export const getCategoryImage = (category: string, brand?: string, name?: string
   
   // Updated Product Images as requested
   
-  // Updated: Logitech MX Master 3 specific image with new URL
+  // Updated: Logitech MX Master 3 specific image with new URL for uploaded image
   if (brandLower === 'logitech' && nameLower.includes('mx master 3')) {
-    return '/lovable-uploads/8791dff5-f24b-4f19-a9b9-8213c9153619.png';
+    return '/lovable-uploads/aecec080-b315-4ea6-a7eb-d0a149dc0835.png';
   }
   
   // Updated: Samsung Galaxy Tab S8 specific image
