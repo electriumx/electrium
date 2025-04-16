@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Product as ProductType, ProductAccessory } from '../data/productData';
 import ProductReviewModal from "./ProductReviewModal";
 import { useToast } from "@/hooks/use-toast";
+import { getHeadphoneImage, getCategoryImage, getGameImage } from '@/utils/productImageUtils';
 
 interface ProductDetailModalProps {
   product: ProductType;
@@ -388,9 +389,24 @@ const ProductDetailModal = ({
     )
   };
   
+  const getProductImageUrl = () => {
+    if (category === 'Headphones') {
+      return getHeadphoneImage(name, brand);
+    } 
+    else if (category === 'PC Games' || category === 'Games' || category === 'Gaming') {
+      return getGameImage(name);
+    }
+    else {
+      const subcategory = product.subcategory || '';
+      return getCategoryImage(category, brand, name);
+    }
+  };
+  
+  const productImageUrl = imageUrl || getProductImageUrl();
+
   const handleImageClick = () => {
     const img = new Image();
-    img.src = imageUrl;
+    img.src = productImageUrl;
     img.style.maxHeight = '90vh';
     img.style.maxWidth = '90vw';
     img.style.objectFit = 'contain';
@@ -596,7 +612,7 @@ const ProductDetailModal = ({
                 onClick={handleImageClick}
               >
                 <img 
-                  src={imageUrl} 
+                  src={productImageUrl} 
                   alt={name} 
                   className="w-full h-auto object-cover"
                 />
