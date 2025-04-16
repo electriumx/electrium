@@ -4,6 +4,7 @@ import { Product } from "@/data/productData";
 import { allNewProducts } from "@/data/newProducts";
 import { refrigeratorProducts } from "@/data/refrigeratorProducts";
 import { allAdditionalProducts } from "@/data/additionalNewProducts";
+import { combineAllProducts } from "@/utils/combineProductData";
 
 export const useProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -14,8 +15,8 @@ export const useProducts = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // Combine all product sources
-        const allProducts = [...allNewProducts, ...refrigeratorProducts, ...allAdditionalProducts];
+        // Combine all product sources using the combineAllProducts utility
+        const allProducts = combineAllProducts();
         
         // Initialize product stocks in localStorage if not already set
         const productStocks = JSON.parse(localStorage.getItem('productStocks') || '{}');
